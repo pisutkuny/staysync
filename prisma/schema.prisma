@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id        Int      @id @default(autoincrement())
+  number    String   @unique
+  status    String   @default("Available") // Available, Occupied, Maintenance
+  price     Float
+  residents Resident[]
+  billings  Billing[]
+}
+
+model Resident {
+  id         Int       @id @default(autoincrement())
+  fullName   String
+  phone        String   @default("")
+  lineUserId   String?  // Line User ID for notifications
+  lineVerifyCode String? @unique // Code for linking Line Account
+  room         Room?    @relation(fields: [roomId], references: [id])
+  roomId       Int?
+  status       String   @default("Active") // Active, CheckedOut
+  deposit      Float    @default(0)
+  checkInDate  DateTime @default(now())
+  checkOutDate DateTime?
+  issues       Issue[]
+  billings     Billing[]
+  documents  Document[]
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  type       String   // Contract, IDCard, Other
+  url        String
+  uploadedAt DateTime @default(now())
+  resident   Resident @relation(fields: [residentId], references: [id])
+  residentId Int
+}
+
+model Billing {
+  id            Int      @id @default(autoincrement())
+  
+  // Meter Readings
+  waterMeterLast    Float  @default(0)
+  waterMeterCurrent Float  @default(0)
+  waterRate         Float  @default(18) // Default price per unit
+  
+  electricMeterLast    Float  @default(0)
+  electricMeterCurrent Float  @default(0)
+  electricRate         Float  @default(7) // Default price per unit
+  
+  meterReading  Float @default(0) // Kept for legacy compatibility (can be removed later)
+  
+  // Fees
+  internetFee   Float    @default(0)
+  trashFee      Float    @default(0)
+  otherFees     Float    @default(0)
+  note          String?
+
+  totalAmount   Float
+  paymentStatus String   @default("Pending") // Pending, Review, Paid, Rejected
+  slipImage     String?
+  paymentDate   DateTime? // When the slip was uploaded
+  month         DateTime @default(now()) // To track billing month
+  createdAt     DateTime @default(now())
+  
+  room       Room     @relation(fields: [roomId], references: [id])
+  roomId     Int
+  
+  resident   Resident? @relation(fields: [residentId], references: [id])
+  residentId Int?
+}
+
+model Issue {
+  id          Int      @id @default(autoincrement())
+  category    String   // Water, Electricity, Internet, Other
+  description String
+  photo       String?
+  status      String   @default("Pending") // Pending, InProgress, Done
+  createdAt   DateTime @default(now())
+  
+  resident    Resident? @relation(fields: [residentId], references: [id])
+  residentId  Int?
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  role     String @default("STAFF") // OWNER, STAFF, TENANT
+}
+
+model SystemConfig {
+  id                Int      @id @default(autoincrement())
+  dormName          String   @default("My Dormitory")
+  dormAddress       String   @default("123 Street, City")
+  
+  // Bank Info
+  bankName          String   @default("Bank Name")
+  bankAccountName   String   @default("Account Name")
+  bankAccountNumber String   @default("000-0-00000-0")
+  promptPayId       String?  // Optional PromptPay ID
+
+  // Default Rates
+  waterRate         Float    @default(18)
+  electricRate      Float    @default(7)
+  trashFee          Float    @default(0)
+  internetFee       Float    @default(0)
+  otherFees         Float    @default(0)
+
+  updatedAt         DateTime @updatedAt
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  title       String
+  amount      Float
+  category    String   @default("Other") // Maintenance, Utilities, Salary, Other
+  date        DateTime @default(now())
+  note        String?
+  createdAt   DateTime @default(now())
+}
