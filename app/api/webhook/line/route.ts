@@ -32,7 +32,8 @@ export async function POST(req: Request) {
 
                     // Find resident with this code
                     const resident = await prisma.resident.findUnique({
-                        where: { lineVerifyCode: code }
+                        where: { lineVerifyCode: code },
+                        include: { room: true }
                     });
 
                     if (resident) {
