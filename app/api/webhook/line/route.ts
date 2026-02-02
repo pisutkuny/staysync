@@ -71,20 +71,11 @@ export async function POST(req: Request) {
                 }
             }
         }));
-        const userId = event.source.userId;
-        if (userId) {
-            await client.replyMessage(event.replyToken, {
-                type: "text",
-                text: "ยินดีต้อนรับสู่ StaySync! 🏠\n\nกรุณาพิมพ์ **Code ยืนยันตัวตน** (เช่น #1234)\nที่คุณได้รับจากเจ้าหน้าที่หอพัก เพื่อเชื่อมต่อบัญชีครับ ✨"
-            });
-            console.log(`New follower: ${userId}`);
-        }
-    }
-    }));
 
-return NextResponse.json({ success: true });
-} catch (error) {
-    console.error("Webhook Error:", error);
-    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
-}
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Webhook Error:", error);
+        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+    }
 }
