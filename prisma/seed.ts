@@ -71,7 +71,10 @@ async function main() {
     if (resident1 && room101) {
         await prisma.billing.create({
             data: {
-                meterReading: 1500,
+                waterMeterLast: 90,
+                waterMeterCurrent: 100,
+                electricMeterLast: 450,
+                electricMeterCurrent: 500,
                 totalAmount: 4350,
                 paymentStatus: "Paid",
                 roomId: room101.id,
@@ -80,6 +83,29 @@ async function main() {
             }
         })
     }
+
+    // Default Config
+    await prisma.systemConfig.upsert({
+        where: { id: 1 },
+        update: {},
+        create: {
+            dormName: "หอพักมีตังค์ (Supabase)",
+            dormAddress: "268 หมู่ 6 ต.สันนาเม็ง อ.สันทราย จ.เชียงใหม่",
+            waterRate: 18,
+            electricRate: 7,
+            trashFee: 30,
+            internetFee: 0
+        }
+    });
+
+    // Seed Expenses
+    await prisma.expense.createMany({
+        data: [
+            { title: "Fix Main Gate", amount: 1500, category: "Maintenance", date: new Date() },
+            { title: "Internet Monthly", amount: 599, category: "Utilities", date: new Date() },
+            { title: "Cleaner Salary", amount: 9000, category: "Salary", date: new Date() },
+        ]
+    });
 
     console.log("Seeding finished.");
 }
