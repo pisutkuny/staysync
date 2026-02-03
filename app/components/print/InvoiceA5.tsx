@@ -17,9 +17,20 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
         : "";
 
     return (
-        <div className="w-full h-[148mm] bg-white p-8 flex text-black relative border-b border-dashed border-gray-300 last:border-0 font-sans">
+        <div className="w-full h-[148mm] bg-white p-8 flex text-black relative border-b border-dashed border-gray-300 last:border-0 font-sans overflow-hidden">
+            {/* Watermark Background */}
+            {config.invoiceLogo && (
+                <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                    <img
+                        src={config.invoiceLogo}
+                        alt="Watermark"
+                        className="w-[70%] h-auto object-contain opacity-[0.03] grayscale transform scale-110"
+                    />
+                </div>
+            )}
+
             {/* Left Main Content */}
-            <div className="flex-1 pr-8 flex flex-col">
+            <div className="flex-1 pr-8 flex flex-col relative z-10">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-8">
                     <h1 className="text-5xl font-bold tracking-tight text-gray-800 uppercase">Invoice</h1>
