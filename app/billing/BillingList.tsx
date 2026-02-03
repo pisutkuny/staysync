@@ -66,7 +66,8 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                         <ExternalLink size={16} />
                                     </a>
                                 )}
-                                <a href={`/billing/${bill.id}/print`} target="_blank" className="p-2 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100" title="Print">
+
+                                <a href={`/billing/${bill.id}/print?type=a4`} target="_blank" className="p-2 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100" title="Print">
                                     <span>🖨️</span>
                                 </a>
                             </div>
@@ -151,7 +152,7 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                                 </button>
                                             </>
                                         )}
-                                        <a href={`/billing/${bill.id}/print`} target="_blank"
+                                        <a href={`/billing/${bill.id}/print?type=a4`} target="_blank"
                                             className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-sm font-bold transition-all shadow-sm">
                                             <span>🖨️</span> Print Only
                                         </a>

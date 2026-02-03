@@ -1,94 +1,67 @@
-import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import BillSlip from "@/app/components/BillSlip";
-import { format, subMonths } from "date-fns";
+import InvoiceA4 from "@/app/components/print/InvoiceA4";
+import ReceiptSlip from "@/app/components/print/ReceiptSlip";
+import { notFound } from "next/navigation";
 
-export default async function PrintBillPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export default async function PrintPage({ params, searchParams }: { params: { id: string }, searchParams: { type: string } }) {
+    const { id } = params;
+    const type = searchParams.type || 'a4'; // Default to A4
 
-    const bill = await prisma.billing.findUnique({
-        where: { id: parseInt(id) },
+    const billing = await prisma.billing.findUnique({
+        where: { id: Number(id) },
         include: {
-            resident: true,
-            room: true
+            room: true,
+            resident: true
         }
     });
 
-    if (!bill) return notFound();
-
-    // Prepare data for BillSlip
-    // Assuming 'month' in bill is the billing month.
-    // Previous month logic: If bills are generated monthly, simple date math.
-    const billDate = new Date(bill.createdAt);
-    const prevDate = subMonths(billDate, 1);
-
     const config = await prisma.systemConfig.findFirst();
 
-    const bankInfo = {
-        name: config?.bankAccountName || "Unknown Account",
-        acc: config?.bankAccountNumber || "000-000-000",
-        bank: config?.bankName || "Bank",
-        promptPayId: config?.promptPayId
-    };
-
-    const headerInfo = {
-        name: config?.dormName || "Dormitory",
-        address: config?.dormAddress || ""
-    };
-
-    const slipData = {
-        roomNumber: bill.room.number,
-        residentName: bill.resident?.fullName || "Unknown",
-        billDate: billDate,
-        prevDate: prevDate,
-        header: headerInfo,
-        bankInfo: bankInfo,
-        water: {
-            last: bill.waterMeterLast,
-            curr: bill.waterMeterCurrent,
-            rate: bill.waterRate,
-            unit: bill.waterMeterCurrent - bill.waterMeterLast,
-            total: (bill.waterMeterCurrent - bill.waterMeterLast) * bill.waterRate
-        },
-        electric: {
-            last: bill.electricMeterLast,
-            curr: bill.electricMeterCurrent,
-            rate: bill.electricRate,
-            unit: bill.electricMeterCurrent - bill.electricMeterLast,
-            total: (bill.electricMeterCurrent - bill.electricMeterLast) * bill.electricRate
-        },
-        trash: bill.trashFee,
-        internet: bill.internetFee || 0,
-        other: bill.otherFees || 0,
-        total: bill.totalAmount
-    };
+    if (!billing || !config) {
+        return notFound();
+    }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
-            <div className="mb-6 print:hidden flex gap-4">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8 print:p-0 print:bg-white">
+            <style type="text/css" dangerouslySetInnerHTML={{
+                __html: `
+                @media print {
+                    @page { margin: 0; }
+                    body { background: white; }
+                }
+            `}} />
+
+            {/* Print Toolbar (Hidden when printing) */}
+            <div className="fixed top-4 right-4 flex gap-2 print:hidden">
+                <a href={`/billing/${id}/print?type=a4`}
+                    className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'a4' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
+                    A4 Invoice
+                </a>
+                <a href={`/billing/${id}/print?type=slip`}
+                    className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'slip' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
+                    Thermal Slip
+                </a>
                 <button
-                    // We need a client component wrapper or just simple script for print?
-                    // actually this is a server component. We can add a simple script or just use browser print.
-                    // Or keep it simple: Add a client component button.
-                    // For now, just render the slip. The user can use browser print.
-                    // But the plan said "Add a Print button".
-                    // Let's add a small client script or just standard window.print() via onClick in a client wrapper.
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-blue-700"
-                // onclick="window.print()" // This won't work in server component directly without 'use client'
-                >
-                    🖨️ Use Browser Print (Ctrl+P)
+                    onClick={() => window.print()}
+                    className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold shadow-sm flex items-center gap-2 hover:bg-gray-800">
+                    🖨️ Print Now
                 </button>
             </div>
 
-            <div className="bg-white shadow-2xl print:shadow-none print:w-full">
-                <BillSlip data={slipData} />
+            {/* Preview Area */}
+            <div className={`shadow-2xl print:shadow-none ${type === 'a4' ? 'max-w-[210mm]' : 'max-w-[80mm]'}`}>
+                {type === 'a4' ? (
+                    <InvoiceA4 billing={billing} config={config} />
+                ) : (
+                    <ReceiptSlip billing={billing} config={config} />
+                )}
             </div>
 
-            <style type="text/css" media="print">{`
-                @page { size: auto; margin: 0mm; }
-                body { background-color: white; }
-                .print\\:hidden { display: none; }
-            `}</style>
+            <script dangerouslySetInnerHTML={{
+                __html: `
+                // Auto print if requested, but better to let user click to ensure layout loads
+                // window.print();
+            `}} />
         </div>
     );
 }
