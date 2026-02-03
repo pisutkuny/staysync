@@ -205,31 +205,27 @@ export default function SettingsPage() {
                                 <div className="flex-1">
                                     <input
                                         type="file"
-                                        accept="image/*"
-                                        onChange={async (e) => {
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (!file) return;
 
-                                            // Show loading state if needed, here we just upload directly
-                                            const formData = new FormData();
-                                            formData.append("file", file);
-
-                                            try {
-                                                const res = await fetch("/api/upload", {
-                                                    method: "POST",
-                                                    body: formData,
-                                                });
-                                                const data = await res.json();
-
-                                                if (data.success) {
-                                                    setConfig(prev => ({ ...prev, invoiceLogo: data.url }));
-                                                } else {
-                                                    alert("Upload failed: " + data.error);
-                                                }
-                                            } catch (err) {
-                                                console.error(err);
-                                                alert("Upload failed error");
+                                            // Limit file size to 800KB to ensure smooth DB storage/transmission
+                                            if (file.size > 800 * 1024) {
+                                                alert("File is too large. Please choose an image under 800KB.");
+                                                return;
                                             }
+
+                                            // Convert to Base64
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                const base64String = reader.result as string;
+                                                setConfig(prev => ({ ...prev, invoiceLogo: base64String }));
+                                            };
+                                            reader.onerror = () => {
+                                                alert("Failed to read file.");
+                                            };
+                                            reader.readAsDataURL(file);
                                         }}
                                         className="block w-full text-sm text-gray-500
                                             file:mr-4 file:py-2 file:px-4
@@ -240,7 +236,7 @@ export default function SettingsPage() {
                                         "
                                     />
                                     <p className="text-xs text-gray-500 mt-2">
-                                        Upload a PNG or JPG file. It will be used as the invoice header logo and the watermark.
+                                        Upload a PNG or JPG file (Max 800KB). It will be saved directly to the database.
                                     </p>
                                 </div>
                             </div>
