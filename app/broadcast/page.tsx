@@ -11,6 +11,7 @@ export default function BroadcastPage() {
     // Filters
     const [floor, setFloor] = useState("all");
     const [unpaidOnly, setUnpaidOnly] = useState(false);
+    const [roomNumber, setRoomNumber] = useState("");
 
     const handleBroadcast = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,7 +28,8 @@ export default function BroadcastPage() {
                     message,
                     filters: {
                         floor,
-                        unpaidOnly
+                        unpaidOnly,
+                        roomNumber
                     }
                 }),
             });
@@ -65,8 +67,12 @@ export default function BroadcastPage() {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <select
                                 value={floor}
-                                onChange={(e) => setFloor(e.target.value)}
-                                className="flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                onChange={(e) => {
+                                    setFloor(e.target.value);
+                                    if (e.target.value !== 'all') setRoomNumber('');
+                                }}
+                                disabled={!!roomNumber}
+                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none ${roomNumber ? 'opacity-50' : ''}`}
                             >
                                 <option value="all">All Floors</option>
                                 <option value="1">Floor 1</option>
@@ -74,6 +80,17 @@ export default function BroadcastPage() {
                                 <option value="3">Floor 3</option>
                                 <option value="4">Floor 4</option>
                             </select>
+
+                            <input
+                                type="text"
+                                value={roomNumber}
+                                onChange={(e) => {
+                                    setRoomNumber(e.target.value);
+                                    if (e.target.value) setFloor('all');
+                                }}
+                                placeholder="Specific Room (e.g. 101)"
+                                className="flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            />
 
                             <div
                                 onClick={() => setUnpaidOnly(!unpaidOnly)}

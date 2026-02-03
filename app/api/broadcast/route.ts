@@ -20,6 +20,16 @@ export async function POST(request: Request) {
             };
         }
 
+        // Filter by Specific Room Number
+        if (filters?.roomNumber && filters.roomNumber.trim() !== "") {
+            whereClause.room = {
+                // Determine if we are filtering by floor AND room or just room. 
+                // If specific room is set, it overrides floor filter usually, or we can use AND.
+                // Let's assume specific room overrides floor for simplicity.
+                number: filters.roomNumber
+            };
+        }
+
         // Filter by Unpaid Bills
         if (filters?.unpaidOnly) {
             whereClause.billings = {
