@@ -2,6 +2,11 @@ import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
 export default function InvoiceA4({ billing, resident, config }: { billing: any, resident: any, config: any }) {
+    // Calculate Amounts safely
+    const waterAmount = (billing.waterMeterCurrent - billing.waterMeterLast) * billing.waterRate;
+    const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0));
+
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -45,47 +50,55 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
                             <td className="py-4">Room Rent</td>
                             <td className="py-4 text-center">-</td>
                             <td className="py-4 text-center">1 Month</td>
-                            <td className="py-4 text-right font-mono">{billing.rentAmount.toLocaleString()}</td>
+                            <td className="py-4 text-right font-mono">{rentAmount.toLocaleString()}</td>
                         </tr>
                         {/* Water */}
                         <tr>
                             <td className="py-4">
                                 Water Usage
                                 <div className="text-xs text-gray-400 mt-1">
-                                    Meter: {billing.waterMeterBefore} → {billing.waterMeterAfter}
+                                    Meter: {billing.waterMeterLast} → {billing.waterMeterCurrent}
                                 </div>
                             </td>
                             <td className="py-4 text-center">{billing.waterRate}</td>
-                            <td className="py-4 text-center">{billing.waterUsage} Unit</td>
-                            <td className="py-4 text-right font-mono">{billing.waterAmount.toLocaleString()}</td>
+                            <td className="py-4 text-center">{(billing.waterMeterCurrent - billing.waterMeterLast).toLocaleString()} Unit</td>
+                            <td className="py-4 text-right font-mono">{waterAmount.toLocaleString()}</td>
                         </tr>
                         {/* Electric */}
                         <tr>
                             <td className="py-4">
                                 Electric Usage
                                 <div className="text-xs text-gray-400 mt-1">
-                                    Meter: {billing.electricMeterBefore} → {billing.electricMeterAfter}
+                                    Meter: {billing.electricMeterLast} → {billing.electricMeterCurrent}
                                 </div>
                             </td>
                             <td className="py-4 text-center">{billing.electricRate}</td>
-                            <td className="py-4 text-center">{billing.electricUsage} Unit</td>
-                            <td className="py-4 text-right font-mono">{billing.electricAmount.toLocaleString()}</td>
+                            <td className="py-4 text-center">{(billing.electricMeterCurrent - billing.electricMeterLast).toLocaleString()} Unit</td>
+                            <td className="py-4 text-right font-mono">{electricAmount.toLocaleString()}</td>
                         </tr>
                         {/* Others */}
-                        {billing.trashAmount > 0 && (
+                        {billing.trashFee > 0 && (
                             <tr>
                                 <td className="py-4">Trash Collection Fee</td>
                                 <td className="py-4 text-center">-</td>
                                 <td className="py-4 text-center">-</td>
-                                <td className="py-4 text-right font-mono">{billing.trashAmount.toLocaleString()}</td>
+                                <td className="py-4 text-right font-mono">{billing.trashFee.toLocaleString()}</td>
                             </tr>
                         )}
-                        {billing.otherAmount > 0 && (
+                        {billing.otherFees > 0 && (
                             <tr>
                                 <td className="py-4">Other Fees</td>
                                 <td className="py-4 text-center">-</td>
                                 <td className="py-4 text-center">-</td>
-                                <td className="py-4 text-right font-mono">{billing.otherAmount.toLocaleString()}</td>
+                                <td className="py-4 text-right font-mono">{billing.otherFees.toLocaleString()}</td>
+                            </tr>
+                        )}
+                        {billing.internetFee > 0 && (
+                            <tr>
+                                <td className="py-4">Internet Fee</td>
+                                <td className="py-4 text-center">-</td>
+                                <td className="py-4 text-center">-</td>
+                                <td className="py-4 text-right font-mono">{billing.internetFee.toLocaleString()}</td>
                             </tr>
                         )}
                     </tbody>

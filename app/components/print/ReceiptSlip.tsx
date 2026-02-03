@@ -2,6 +2,11 @@ import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
 export default function ReceiptSlip({ billing, resident, config }: { billing: any, resident: any, config: any }) {
+    // Calculate Amounts safely
+    const waterAmount = (billing.waterMeterCurrent - billing.waterMeterLast) * billing.waterRate;
+    const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0));
+
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -28,26 +33,32 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
             <div className="space-y-1 mb-4">
                 <div className="flex justify-between">
                     <span>Rent</span>
-                    <span>{billing.rentAmount.toLocaleString()}</span>
+                    <span>{rentAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span>Water ({billing.waterUsage}u)</span>
-                    <span>{billing.waterAmount.toLocaleString()}</span>
+                    <span>Water ({(billing.waterMeterCurrent - billing.waterMeterLast).toLocaleString()}u)</span>
+                    <span>{waterAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span>Elec ({billing.electricUsage}u)</span>
-                    <span>{billing.electricAmount.toLocaleString()}</span>
+                    <span>Elec ({(billing.electricMeterCurrent - billing.electricMeterLast).toLocaleString()}u)</span>
+                    <span>{electricAmount.toLocaleString()}</span>
                 </div>
-                {billing.trashAmount > 0 && (
+                {billing.trashFee > 0 && (
                     <div className="flex justify-between">
                         <span>Trash</span>
-                        <span>{billing.trashAmount.toLocaleString()}</span>
+                        <span>{billing.trashFee.toLocaleString()}</span>
                     </div>
                 )}
-                {billing.otherAmount > 0 && (
+                {billing.otherFees > 0 && (
                     <div className="flex justify-between">
                         <span>Other</span>
-                        <span>{billing.otherAmount.toLocaleString()}</span>
+                        <span>{billing.otherFees.toLocaleString()}</span>
+                    </div>
+                )}
+                {billing.internetFee > 0 && (
+                    <div className="flex justify-between">
+                        <span>Internet</span>
+                        <span>{billing.internetFee.toLocaleString()}</span>
                     </div>
                 )}
             </div>
