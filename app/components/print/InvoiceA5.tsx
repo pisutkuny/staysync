@@ -24,7 +24,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                     <img
                         src={config.invoiceLogo}
                         alt="Watermark"
-                        className="w-[70%] h-auto object-contain opacity-[0.03] grayscale transform scale-110"
+                        className="w-[50%] h-auto object-contain opacity-[0.03] grayscale"
                     />
                 </div>
             )}
