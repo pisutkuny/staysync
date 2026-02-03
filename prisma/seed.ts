@@ -107,6 +107,17 @@ async function main() {
         ]
     });
 
+    // Create Owner User
+    await prisma.user.upsert({
+        where: { username: "owner" },
+        update: {},
+        create: {
+            username: "owner",
+            password: "pass1234",
+            role: "OWNER"
+        }
+    });
+
     console.log("Seeding finished.");
 }
 

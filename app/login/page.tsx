@@ -27,8 +27,8 @@ export default function LoginPage() {
                 throw new Error("Invalid password");
             }
 
-            router.push("/");
-            router.refresh();
+            // Force full reload to ensure cookies are sent and middleware/server components see the new session
+            window.location.href = "/";
         } catch (error) {
             alert("Invalid password");
         } finally {

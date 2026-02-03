@@ -8,7 +8,7 @@ const config = {
     channelSecret: process.env.LINE_CHANNEL_SECRET || "",
 };
 
-const client = new Client(config);
+const client = config.channelAccessToken ? new Client(config) : null;
 
 export async function POST(req: Request) {
     try {
@@ -47,15 +47,19 @@ export async function POST(req: Request) {
                             }
                         });
 
-                        await client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: `✅ เชื่อมต่อบัญชีสำเร็จ!\nคุณคือ: ${resident.fullName}\nห้อง: ${resident.room?.number || 'ไม่ระบุ'}\n\nจากนี้คุณจะได้รับการแจ้งเตือนบิลและข่าวสารผ่านช่องทางนี้ครับ`
-                        });
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: `✅ เชื่อมต่อบัญชีสำเร็จ!\nคุณคือ: ${resident.fullName}\nห้อง: ${resident.room?.number || 'ไม่ระบุ'}\n\nจากนี้คุณจะได้รับการแจ้งเตือนบิลและข่าวสารผ่านช่องทางนี้ครับ`
+                            });
+                        }
                     } else {
-                        await client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: "❌ รหัสยืนยันไม่ถูกต้อง หรือถูกใช้ไปแล้ว"
-                        });
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: "❌ รหัสยืนยันไม่ถูกต้อง หรือถูกใช้ไปแล้ว"
+                            });
+                        }
                     }
                 } else {
                     // Auto-reply for other messages
@@ -64,10 +68,12 @@ export async function POST(req: Request) {
             } else if (event.type === 'follow') {
                 const userId = event.source.userId;
                 if (userId) {
-                    await client.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: "ยินดีต้อนรับสู่ StaySync! 🏠\n\nกรุณาพิมพ์ **Code ยืนยันตัวตน** (เช่น #1234)\nที่คุณได้รับจากเจ้าหน้าที่หอพัก เพื่อเชื่อมต่อบัญชีครับ ✨"
-                    });
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "ยินดีต้อนรับสู่ StaySync! 🏠\n\nกรุณาพิมพ์ **Code ยืนยันตัวตน** (เช่น #1234)\nที่คุณได้รับจากเจ้าหน้าที่หอพัก เพื่อเชื่อมต่อบัญชีครับ ✨"
+                        });
+                    }
                     console.log(`New follower: ${userId}`);
                 }
             }

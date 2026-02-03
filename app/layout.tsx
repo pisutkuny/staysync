@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import LogoutButton from "./components/LogoutButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -67,6 +68,9 @@ export default async function RootLayout({
                 </Link>
               )}
             </nav>
+            <div className="px-4 pb-2">
+              <LogoutButton />
+            </div>
             <div className="p-4 border-t border-gray-100 text-xs text-center text-gray-400">
               v1.0.0
             </div>
