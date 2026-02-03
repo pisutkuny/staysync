@@ -155,14 +155,14 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-100 text-gray-700 font-bold">
                         <tr>
-                            <th className="p-4">Room</th>
-                            <th className="p-4">Resident</th>
-                            <th className="p-4 text-center bg-blue-50 text-blue-800">Water (Old)</th>
-                            <th className="p-4 text-center bg-blue-100 text-blue-800 border-l border-blue-200">Water (New)</th>
-                            <th className="p-4 text-center bg-yellow-50 text-yellow-800">Elec (Old)</th>
-                            <th className="p-4 text-center bg-yellow-100 text-yellow-800 border-l border-yellow-200">Elec (New)</th>
-                            <th className="p-4 text-right">Preview Total</th>
-                            <th className="p-4">Status</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Room</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Resident</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-50 text-blue-800 whitespace-nowrap">Water (Old)</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-100 text-blue-800 border-l border-blue-200 whitespace-nowrap">Water (New)</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-50 text-yellow-800 whitespace-nowrap">Elec (Old)</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-100 text-yellow-800 border-l border-yellow-200 whitespace-nowrap">Elec (New)</th>
+                            <th className="px-3 py-3 sm:p-4 text-right whitespace-nowrap">Preview Total</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -174,17 +174,17 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
 
                             return (
                                 <tr key={room.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="p-4 font-bold">{room.number}</td>
-                                    <td className="p-4 text-gray-600">{room.residentName}</td>
+                                    <td className="px-3 py-3 sm:p-4 font-bold whitespace-nowrap">{room.number}</td>
+                                    <td className="px-3 py-3 sm:p-4 text-gray-600 whitespace-nowrap max-w-[120px] truncate">{room.residentName}</td>
 
                                     {/* Water */}
-                                    <td className="p-4 text-center font-mono text-gray-500 bg-blue-50/30">
+                                    <td className="px-2 py-3 sm:p-4 text-center font-mono text-gray-500 bg-blue-50/30 whitespace-nowrap">
                                         {room.lastWater}
                                     </td>
-                                    <td className="p-4 text-center border-l border-blue-100 bg-blue-50/50">
+                                    <td className="px-2 py-3 sm:p-4 text-center border-l border-blue-100 bg-blue-50/50 whitespace-nowrap">
                                         <input
                                             type="number"
-                                            className="w-20 p-1 border border-blue-300 rounded text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-16 sm:w-20 p-1 border border-blue-300 rounded text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none"
                                             value={wCurr}
                                             onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
                                             placeholder={room.lastWater.toString()}
@@ -192,23 +192,23 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                                     </td>
 
                                     {/* Elec */}
-                                    <td className="p-4 text-center font-mono text-gray-500 bg-yellow-50/30">
+                                    <td className="px-2 py-3 sm:p-4 text-center font-mono text-gray-500 bg-yellow-50/30 whitespace-nowrap">
                                         {room.lastElectric}
                                     </td>
-                                    <td className="p-4 text-center border-l border-yellow-100 bg-yellow-50/50">
+                                    <td className="px-2 py-3 sm:p-4 text-center border-l border-yellow-100 bg-yellow-50/50 whitespace-nowrap">
                                         <input
                                             type="number"
-                                            className="w-20 p-1 border border-yellow-300 rounded text-center font-bold focus:ring-2 focus:ring-yellow-500 outline-none"
+                                            className="w-16 sm:w-20 p-1 border border-yellow-300 rounded text-center font-bold focus:ring-2 focus:ring-yellow-500 outline-none"
                                             value={eCurr}
                                             onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
                                             placeholder={room.lastElectric.toString()}
                                         />
                                     </td>
 
-                                    <td className="p-4 text-right font-bold text-gray-900">
+                                    <td className="px-3 py-3 sm:p-4 text-right font-bold text-gray-900 whitespace-nowrap">
                                         {total > room.roomPrice ? `฿${total.toLocaleString()}` : '-'}
                                     </td>
-                                    <td className="p-4">
+                                    <td className="px-3 py-3 sm:p-4 whitespace-nowrap">
                                         {isDone ? (
                                             <span className="flex items-center gap-1 text-green-600 font-bold text-xs">
                                                 <Check size={14} /> Sent
