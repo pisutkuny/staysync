@@ -30,7 +30,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
             )}
 
             {/* Left Main Content */}
-            <div className="flex-1 pr-8 flex flex-col relative z-10">
+            <div className="flex-1 pr-8 flex flex-col relative z-10 border-r-2 border-dashed border-gray-200" style={{ height: '100%' }}>
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex gap-4 items-start">
@@ -123,18 +123,16 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 </div>
 
                 {/* Bottom Section: Signature */}
-                <div className="mt-auto pt-4">
-                    <div className="flex justify-center mb-2">
-                        <div className="text-center w-40">
-                            <div className="border-b border-gray-300 mb-1 h-8"></div>
-                            <p className="text-[10px] text-gray-400">ผู้รับเงิน / Collector</p>
-                        </div>
+                <div className="mt-auto pt-8 pb-4 flex justify-center">
+                    <div className="text-center w-[200px]">
+                        <div className="border-b border-gray-400 mb-2 h-8"></div>
+                        <p className="text-[10px] text-gray-500 font-medium">ผู้รับเงิน / Collector</p>
                     </div>
                 </div>
             </div>
 
             {/* Right Sidebar */}
-            <div className="w-[30%] border-l border-gray-100 pl-6 flex flex-col gap-4 bg-gray-50/30 -my-8 py-8 -mr-8 pr-8 text-right">
+            <div className="w-[30%] pl-8 flex flex-col gap-4 bg-gray-50/30 -my-8 py-8 -mr-8 pr-8 text-right">
                 {/* QR Code Section */}
                 {promptPayPayload && (
                     <div className="flex flex-col items-end">

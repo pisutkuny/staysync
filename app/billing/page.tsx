@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import BillingForm from "./BillingForm";
 import BillingList from "./BillingList";
 import MeterDashboard from "./MeterDashboard";
+import ExportButton from "./ExportButton";
 import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
@@ -59,11 +60,14 @@ export default async function BillingPage() {
                     <h2 className="text-3xl font-bold tracking-tight text-gray-900">Monthly Billing</h2>
                     <p className="text-gray-500 mt-2">Manage billing and view utility usage.</p>
                 </div>
-                <Link href="/billing/bulk">
-                    <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2">
-                        <span>📝</span> Record All Meters
-                    </button>
-                </Link>
+                <div className="flex gap-3">
+                    <ExportButton />
+                    <Link href="/billing/bulk">
+                        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2">
+                            <span>📝</span> Record All Meters
+                        </button>
+                    </Link>
+                </div>
             </div>
 
             {/* Meter Dashboard Table */}
