@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import InvoiceA4 from "@/app/components/print/InvoiceA4";
+import InvoiceA5 from "@/app/components/print/InvoiceA5";
 import ReceiptSlip from "@/app/components/print/ReceiptSlip";
 import PrintToolbar from "@/app/components/print/PrintToolbar";
 import { notFound } from "next/navigation";
@@ -44,10 +45,17 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
             <PrintToolbar id={id} />
 
             {/* Preview Area */}
-            <div className={`shadow-2xl print:shadow-none ${type === 'a4' ? 'max-w-[210mm]' : 'max-w-[80mm]'}`}>
-                {type === 'a4' ? (
+            <div className={`shadow-2xl print:shadow-none ${type === 'slip' ? 'max-w-[80mm]' : 'max-w-[210mm]'}`}>
+                {type === 'a4' && (
                     <InvoiceA4 billing={billing} resident={resident} config={config} />
-                ) : (
+                )}
+                {type === 'a5' && (
+                    <div className="w-[210mm] h-[297mm] bg-white print:w-full print:h-full flex flex-col">
+                        <InvoiceA5 billing={billing} resident={resident} config={config} copyType="ORIGINAL (Customer)" />
+                        <InvoiceA5 billing={billing} resident={resident} config={config} copyType="COPY (Admin/Resident)" />
+                    </div>
+                )}
+                {type === 'slip' && (
                     <ReceiptSlip billing={billing} resident={resident} config={config} />
                 )}
             </div>
