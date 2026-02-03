@@ -9,6 +9,9 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
     const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
     const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0));
 
+    // Theme Color
+    const themeColor = config.invoiceColor || "#4f46e5";
+
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -20,15 +23,20 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 {/* Header */}
                 <div>
                     <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <h1 className="text-2xl font-bold uppercase tracking-wide text-gray-900 leading-none">{config.dormName}</h1>
-                            <p className="text-xs text-gray-500 mt-1 whitespace-pre-line">{config.dormAddress}</p>
+                        <div className="flex items-center gap-3">
+                            {config.invoiceLogo && (
+                                <img src={config.invoiceLogo} alt="Logo" className="h-10 w-auto object-contain" />
+                            )}
+                            <div>
+                                <h1 className="text-2xl font-bold uppercase tracking-wide text-gray-900 leading-none">{config.dormName}</h1>
+                                <p className="text-xs text-gray-500 mt-1 whitespace-pre-line">{config.dormAddress}</p>
+                            </div>
                         </div>
                         <div className="text-right">
                             <div className="inline-block bg-gray-100 px-2 py-1 rounded text-[10px] font-bold text-gray-500 uppercase mb-1">
                                 {copyType}
                             </div>
-                            <h2 className="text-xl font-bold text-indigo-600">INVOICE</h2>
+                            <h2 className="text-xl font-bold" style={{ color: themeColor }}>INVOICE</h2>
                             <p className="font-mono text-xs text-gray-500">#{billing.id.toString().padStart(6, '0')}</p>
                         </div>
                     </div>
@@ -85,10 +93,12 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
 
                 {/* Footer Totals */}
                 <div className="flex justify-between items-end border-t border-gray-200 pt-3">
-                    <p className="text-[10px] text-gray-400 italic mt-2">Thank you for your payment.</p>
+                    <div className="text-[10px] text-gray-400 italic mt-2">
+                        <p>{config.invoiceNote ? config.invoiceNote : "Thank you for your payment."}</p>
+                    </div>
                     <div className="text-right">
                         <p className="text-xs text-gray-500 mb-1">Total Amount Due</p>
-                        <p className="text-3xl font-bold text-indigo-600 leading-none">฿{billing.totalAmount.toLocaleString()}</p>
+                        <p className="text-3xl font-bold leading-none" style={{ color: themeColor }}>฿{billing.totalAmount.toLocaleString()}</p>
                     </div>
                 </div>
             </div>
@@ -96,7 +106,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
             {/* Right Side: QR Code Area */}
             {promptPayPayload && (
                 <div className="w-[80mm] bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold">
+                    <div className="absolute top-0 right-0 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold" style={{ backgroundColor: themeColor }}>
                         SCAN TO PAY
                     </div>
 

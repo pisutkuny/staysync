@@ -13,16 +13,25 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
 
+    // Theme Color (Default Indigo-600)
+    const themeColor = config.invoiceColor || "#4f46e5";
+
     return (
         <div className="w-[210mm] h-[297mm] bg-white p-12 mx-auto text-black print:w-full print:h-full">
             {/* Header */}
-            <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
-                <div>
-                    <h1 className="text-4xl font-bold uppercase tracking-wide text-gray-900">{config.dormName}</h1>
-                    <p className="mt-2 text-gray-600 whitespace-pre-line">{config.dormAddress}</p>
+            <div className="flex justify-between items-start border-b-2 pb-6 mb-8" style={{ borderColor: themeColor }}>
+                <div className="flex gap-4 items-center">
+                    {/* Logo (if exists) */}
+                    {config.invoiceLogo && (
+                        <img src={config.invoiceLogo} alt="Logo" className="h-16 w-auto object-contain" />
+                    )}
+                    <div>
+                        <h1 className="text-4xl font-bold uppercase tracking-wide text-gray-900">{config.dormName}</h1>
+                        <p className="mt-2 text-gray-600 whitespace-pre-line">{config.dormAddress}</p>
+                    </div>
                 </div>
                 <div className="text-right">
-                    <h2 className="text-2xl font-bold text-indigo-600">INVOICE</h2>
+                    <h2 className="text-2xl font-bold" style={{ color: themeColor }}>INVOICE</h2>
                     <p className="font-mono text-gray-500 mt-1">#{billing.id.toString().padStart(6, '0')}</p>
                     <p className="text-sm text-gray-500 mt-1">Date: {new Date(billing.createdAt).toLocaleDateString('th-TH')}</p>
                 </div>
@@ -108,7 +117,7 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
             </div>
 
             {/* Summary & Payment */}
-            <div className="flex justify-between items-end border-t-2 border-gray-800 pt-8">
+            <div className="flex justify-between items-end border-t-2 pt-8" style={{ borderColor: themeColor }}>
                 <div>
                     {promptPayPayload && (
                         <div className="flex gap-4 items-center">
@@ -122,10 +131,16 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
                             </div>
                         </div>
                     )}
+                    {/* Custom Note */}
+                    {config.invoiceNote && (
+                        <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 max-w-sm border border-gray-100 italic">
+                            Note: {config.invoiceNote}
+                        </div>
+                    )}
                 </div>
                 <div className="text-right">
                     <p className="text-gray-500 mb-2">Total Amount Due</p>
-                    <p className="text-5xl font-bold text-indigo-600">฿{billing.totalAmount.toLocaleString()}</p>
+                    <p className="text-5xl font-bold" style={{ color: themeColor }}>฿{billing.totalAmount.toLocaleString()}</p>
                     <p className="text-sm text-gray-400 mt-2 italic">Thank you for your business</p>
                 </div>
             </div>

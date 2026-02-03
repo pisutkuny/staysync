@@ -18,7 +18,10 @@ export default function SettingsPage() {
         trashFee: 0,
         internetFee: 0,
         otherFees: 0,
-        adminLineUserId: ""
+        adminLineUserId: "",
+        invoiceLogo: "",
+        invoiceNote: "",
+        invoiceColor: ""
     });
 
     useEffect(() => {
@@ -158,6 +161,56 @@ export default function SettingsPage() {
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded-lg font-mono bg-gray-50"
                                 placeholder="e.g. 081-234-5678 or 1234567890123"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Invoice Customization */}
+                <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><path d="M16 13H8" /><path d="M16 17H8" /><path d="M10 9H8" /></svg>
+                        Invoice Customization
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Dorm Logo URL</label>
+                            <input
+                                name="invoiceLogo"
+                                value={config.invoiceLogo || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg font-mono text-sm bg-gray-50"
+                                placeholder="https://example.com/logo.png"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Direct link to image (PNG/JPG). Leave empty to hide.</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Theme Color</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="color"
+                                    name="invoiceColor"
+                                    value={config.invoiceColor || "#4f46e5"}
+                                    onChange={handleChange}
+                                    className="h-10 w-20 p-1 border rounded-lg cursor-pointer"
+                                />
+                                <input
+                                    name="invoiceColor"
+                                    value={config.invoiceColor || ""}
+                                    onChange={handleChange}
+                                    className="flex-1 p-2 border rounded-lg font-mono text-sm bg-gray-50"
+                                    placeholder="#4f46e5"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Footer / Note</label>
+                            <input
+                                name="invoiceNote"
+                                value={config.invoiceNote || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg"
+                                placeholder="e.g. Please pay within 5 days"
                             />
                         </div>
                     </div>

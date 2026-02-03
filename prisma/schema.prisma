@@ -111,6 +111,11 @@ model SystemConfig {
   promptPayId       String?  // Optional PromptPay ID
   adminLineUserId   String?  // Line User ID for Admin Alerts
 
+  // Invoice Customization
+  invoiceLogo       String?  // URL of the logo image
+  invoiceNote       String?  // Custom note/footer text
+  invoiceColor      String?  // Theme color hex code (e.g. #4f46e5)
+
   // Default Rates
   waterRate         Float    @default(18)
   electricRate      Float    @default(7)
