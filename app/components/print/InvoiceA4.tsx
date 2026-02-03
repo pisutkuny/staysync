@@ -25,7 +25,7 @@ export default function InvoiceA4({ billing, config }: { billing: any, config: a
             <div className="mb-10">
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Bill To</h3>
                 <div className="text-xl font-bold text-gray-900">Room {billing.room.number}</div>
-                <p className="text-gray-600">{billing.room.resident?.fullName || "Guest Resident"}</p>
+                <p className="text-gray-600">{billing.resident?.fullName || "Guest Resident"}</p>
             </div>
 
             {/* Table */}
