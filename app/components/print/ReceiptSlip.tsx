@@ -1,7 +1,7 @@
 import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
-export default function ReceiptSlip({ billing, config }: { billing: any, config: any }) {
+export default function ReceiptSlip({ billing, resident, config }: { billing: any, resident: any, config: any }) {
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -21,7 +21,7 @@ export default function ReceiptSlip({ billing, config }: { billing: any, config:
             {/* Customer */}
             <div className="mb-4 text-center">
                 <span className="font-bold text-lg">Room {billing.room.number}</span>
-                <p className="text-xs text-gray-500">{billing.resident?.fullName || "Guest"}</p>
+                <p className="text-xs text-gray-500">{resident?.fullName || "Guest"}</p>
             </div>
 
             {/* Items */}

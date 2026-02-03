@@ -10,8 +10,11 @@ export default async function PrintPage({ params, searchParams }: { params: { id
     const billing = await prisma.billing.findUnique({
         where: { id: Number(id) },
         include: {
-            room: true,
-            resident: true
+            room: {
+                include: {
+                    residents: true
+                }
+            }
         }
     });
 
@@ -20,6 +23,11 @@ export default async function PrintPage({ params, searchParams }: { params: { id
     if (!billing || !config) {
         return notFound();
     }
+
+    // Fallback logic to find the correct resident
+    // 1. Try to find 'Active' resident
+    // 2. Fallback to the first resident found
+    const resident = billing.room.residents.find((r: any) => r.status === 'Active') || billing.room.residents[0];
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8 print:p-0 print:bg-white">
@@ -51,9 +59,9 @@ export default async function PrintPage({ params, searchParams }: { params: { id
             {/* Preview Area */}
             <div className={`shadow-2xl print:shadow-none ${type === 'a4' ? 'max-w-[210mm]' : 'max-w-[80mm]'}`}>
                 {type === 'a4' ? (
-                    <InvoiceA4 billing={billing} config={config} />
+                    <InvoiceA4 billing={billing} resident={resident} config={config} />
                 ) : (
-                    <ReceiptSlip billing={billing} config={config} />
+                    <ReceiptSlip billing={billing} resident={resident} config={config} />
                 )}
             </div>
 
