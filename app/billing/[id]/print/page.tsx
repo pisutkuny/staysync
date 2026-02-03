@@ -3,9 +3,9 @@ import InvoiceA4 from "@/app/components/print/InvoiceA4";
 import ReceiptSlip from "@/app/components/print/ReceiptSlip";
 import { notFound } from "next/navigation";
 
-export default async function PrintPage({ params, searchParams }: { params: { id: string }, searchParams: { type: string } }) {
-    const { id } = params;
-    const type = searchParams.type || 'a4'; // Default to A4
+export default async function PrintPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ type: string }> }) {
+    const { id } = await params;
+    const { type = 'a4' } = await searchParams; // Default to A4
 
     const billing = await prisma.billing.findUnique({
         where: { id: Number(id) },
@@ -27,7 +27,7 @@ export default async function PrintPage({ params, searchParams }: { params: { id
     // Fallback logic to find the correct resident
     // 1. Try to find 'Active' resident
     // 2. Fallback to the first resident found
-    const resident = billing.room.residents.find((r: any) => r.status === 'Active') || billing.room.residents[0];
+    const resident = billing.room?.residents?.find((r: any) => r.status === 'Active') || billing.room?.residents?.[0];
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8 print:p-0 print:bg-white">
