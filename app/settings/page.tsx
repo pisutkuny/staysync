@@ -79,7 +79,7 @@ export default function SettingsPage() {
     if (loading) return <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-indigo-500" /></div>;
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
+        <div className="p-4 md:p-8 max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold mb-8 text-gray-900 flex items-center gap-2">
                 ⚙️ System Settings
             </h1>
@@ -90,8 +90,8 @@ export default function SettingsPage() {
                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-700">
                         <Building2 size={20} /> Dormitory Details
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="col-span-2">
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Dormitory Name</label>
                             <input
                                 name="dormName"
@@ -101,7 +101,7 @@ export default function SettingsPage() {
                                 required
                             />
                         </div>
-                        <div className="col-span-2">
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                             <input
                                 name="dormAddress"
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                                 placeholder="000-0-00000-0"
                             />
                         </div>
-                        <div className="col-span-2">
+                        <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
                             <input
                                 name="bankAccountName"
@@ -149,7 +149,7 @@ export default function SettingsPage() {
                                 className="w-full p-2 border rounded-lg"
                             />
                         </div>
-                        <div className="col-span-2">
+                        <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">PromptPay ID / เบอร์พร้อมเพย์ (Optional)</label>
                             <input
                                 name="promptPayId"
@@ -167,7 +167,7 @@ export default function SettingsPage() {
                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-orange-700">
                         <Zap size={20} /> Default Utility Rates
                     </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Water (฿/Unit)</label>
                             <input

@@ -12,9 +12,11 @@ export default function MobileNav({ userRole }: { userRole?: string }) {
         <>
             {/* Header for Mobile */}
             <div className="md:hidden fixed top-0 left-0 w-full bg-white border-b border-gray-200 z-50 px-4 py-3 flex items-center justify-between shadow-sm">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                    StaySync
-                </h1>
+                <Link href="/">
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent cursor-pointer">
+                        StaySync
+                    </h1>
+                </Link>
                 <button
                     onClick={() => setIsOpen(true)}
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

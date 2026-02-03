@@ -191,34 +191,34 @@ export default async function Home() {
       {/* Quick Actions */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-4">
           <Link href="/rooms/add">
-            <button className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold transition-all shadow-sm hover:shadow-md">
+            <button className="w-full px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold transition-all shadow-sm hover:shadow-md">
               + Add Room
             </button>
           </Link>
           <Link href="/billing">
-            <button className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all">
+            <button className="w-full px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all">
               Manage Billing
             </button>
           </Link>
           <Link href="/billing/bulk">
-            <button className="px-5 py-2.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl hover:bg-indigo-100 font-bold transition-all">
+            <button className="w-full px-5 py-2.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl hover:bg-indigo-100 font-bold transition-all">
               📝 Bulk Recording
             </button>
           </Link>
           <Link href="/broadcast">
-            <button className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-sm hover:shadow-md">
+            <button className="w-full px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-sm hover:shadow-md">
               Broadcast
             </button>
           </Link>
           <Link href="/expenses">
-            <button className="px-5 py-2.5 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-100 font-bold transition-all">
+            <button className="w-full px-5 py-2.5 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-100 font-bold transition-all">
               📉 Expenses
             </button>
           </Link>
           <Link href="/settings">
-            <button className="px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-200 font-bold transition-all">
+            <button className="w-full px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-200 font-bold transition-all">
               ⚙️ Settings
             </button>
           </Link>
