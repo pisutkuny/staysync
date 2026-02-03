@@ -151,7 +151,66 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+            {/* Mobile View: Cards */}
+            <div className="md:hidden space-y-4">
+                {rooms.map(room => {
+                    const wCurr = readings[room.id]?.wCurr || "";
+                    const eCurr = readings[room.id]?.eCurr || "";
+                    const total = calculateTotal(room, wCurr, eCurr);
+                    const isDone = submitted.includes(room.id);
+
+                    return (
+                        <div key={room.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-bold text-gray-900 text-lg">Room {room.number}</h4>
+                                    <p className="text-gray-500 text-sm">{room.residentName}</p>
+                                </div>
+                                {isDone ? (
+                                    <span className="flex items-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-lg border border-green-100">
+                                        <Check size={14} /> Sent
+                                    </span>
+                                ) : (
+                                    <div className="text-right">
+                                        <span className="text-xs text-gray-400">Total</span>
+                                        <p className="font-bold text-gray-900">{total > room.roomPrice ? `฿${total.toLocaleString()}` : '-'}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-blue-700">
+                                        <span>Water (Old: {room.lastWater})</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        className="w-full p-2 border border-blue-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50/50"
+                                        value={wCurr}
+                                        onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
+                                        placeholder={room.lastWater.toString()}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-yellow-700">
+                                        <span>Elec (Old: {room.lastElectric})</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        className="w-full p-2 border border-yellow-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-yellow-50/50"
+                                        value={eCurr}
+                                        onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
+                                        placeholder={room.lastElectric.toString()}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Desktop View: Table */}
+            <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-100 text-gray-700 font-bold">
                         <tr>

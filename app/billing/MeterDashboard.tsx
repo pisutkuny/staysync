@@ -42,7 +42,53 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Mobile View: Cards */}
+            <div className="md:hidden divide-y divide-gray-100">
+                {filteredRooms.map((room) => {
+                    const lastBill = room.billings[0];
+                    const lastUpdate = lastBill ? new Date(lastBill.createdAt).toLocaleDateString() : "-";
+
+                    return (
+                        <div key={room.id} className="p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                        Room {room.number}
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${room.status === 'Occupied' ? 'bg-green-100 text-green-700' :
+                                            room.status === 'Maintenance' ? 'bg-red-100 text-red-700' :
+                                                'bg-gray-100 text-gray-600'
+                                            }`}>
+                                            {room.status}
+                                        </span>
+                                    </h4>
+                                    <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "No Resident"}</p>
+                                </div>
+                                <div className="text-xs text-gray-400 text-right">
+                                    Last Update<br />{lastUpdate}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <div>
+                                    <p className="text-xs font-bold text-blue-600 mb-1">Last Water</p>
+                                    <p className="font-mono text-gray-900 font-bold">{lastBill?.waterMeterCurrent?.toLocaleString() || "0"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-yellow-600 mb-1">Last Electric</p>
+                                    <p className="font-mono text-gray-900 font-bold">{lastBill?.electricMeterCurrent?.toLocaleString() || "0"}</p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+                {filteredRooms.length === 0 && (
+                    <div className="p-8 text-center text-gray-400">
+                        No rooms found matching "{filter}"
+                    </div>
+                )}
+            </div>
+
+            {/* Desktop View: Table */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
                         <tr>
@@ -64,8 +110,8 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                                     <td className="px-6 py-3 font-bold text-gray-900">{room.number}</td>
                                     <td className="px-6 py-3">
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${room.status === 'Occupied' ? 'bg-green-100 text-green-700' :
-                                                room.status === 'Maintenance' ? 'bg-red-100 text-red-700' :
-                                                    'bg-gray-100 text-gray-600'
+                                            room.status === 'Maintenance' ? 'bg-red-100 text-red-700' :
+                                                'bg-gray-100 text-gray-600'
                                             }`}>
                                             {room.status}
                                         </span>
