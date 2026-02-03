@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import InvoiceA4 from "@/app/components/print/InvoiceA4";
 import ReceiptSlip from "@/app/components/print/ReceiptSlip";
+import PrintToolbar from "@/app/components/print/PrintToolbar";
 import { notFound } from "next/navigation";
 
 export default async function PrintPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ type: string }> }) {
@@ -39,22 +40,8 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
                 }
             `}} />
 
-            {/* Print Toolbar (Hidden when printing) */}
-            <div className="fixed top-4 right-4 flex gap-2 print:hidden">
-                <a href={`/billing/${id}/print?type=a4`}
-                    className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'a4' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
-                    A4 Invoice
-                </a>
-                <a href={`/billing/${id}/print?type=slip`}
-                    className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'slip' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
-                    Thermal Slip
-                </a>
-                <button
-                    onClick={() => window.print()}
-                    className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold shadow-sm flex items-center gap-2 hover:bg-gray-800">
-                    🖨️ Print Now
-                </button>
-            </div>
+            {/* Print Toolbar (Client Component) */}
+            <PrintToolbar id={id} />
 
             {/* Preview Area */}
             <div className={`shadow-2xl print:shadow-none ${type === 'a4' ? 'max-w-[210mm]' : 'max-w-[80mm]'}`}>

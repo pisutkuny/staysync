@@ -1,3 +1,5 @@
+"use client";
+
 import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
