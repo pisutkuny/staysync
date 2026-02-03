@@ -61,6 +61,14 @@ export async function POST(req: Request) {
                             });
                         }
                     }
+                } else if (text.toLowerCase() === 'myid' || text.toLowerCase() === 'admin') {
+                    // Admin Helper: Reply with User ID
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: `🔑 Your User ID:\n${userId}\n\n(Copy this ID to StaySync Settings > Admin Alerts)`
+                        });
+                    }
                 } else {
                     // Auto-reply for other messages
                     // Optional: "Type #xxxx to verify"

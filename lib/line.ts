@@ -23,3 +23,27 @@ export async function sendLineMessage(userId: string, message: string) {
         console.error("Failed to send Line message:", error);
     }
 }
+
+export async function sendLineImageMessage(userId: string, message: string, imageUrl?: string) {
+    if (!lineClient) return;
+
+    try {
+        const messages: any[] = [
+            { type: "text", text: message }
+        ];
+
+        if (imageUrl) {
+            // Line Messaging API requires HTTPS for images
+            messages.push({
+                type: "image",
+                originalContentUrl: imageUrl,
+                previewImageUrl: imageUrl
+            });
+        }
+
+        await lineClient.pushMessage(userId, messages);
+        console.log(`Line Message sent to ${userId}`);
+    } catch (error) {
+        console.error("Failed to send Line message:", error);
+    }
+}
