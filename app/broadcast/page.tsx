@@ -8,10 +8,22 @@ export default function BroadcastPage() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+    // Filter Data
+    const [rooms, setRooms] = useState<any[]>([]);
+
     // Filters
     const [floor, setFloor] = useState("all");
     const [unpaidOnly, setUnpaidOnly] = useState(false);
     const [roomNumber, setRoomNumber] = useState("");
+
+    // Fetch rooms on mount
+    import { useEffect } from "react";
+    useEffect(() => {
+        fetch('/api/rooms')
+            .then(res => res.json())
+            .then(data => setRooms(data))
+            .catch(err => console.error("Failed to load rooms", err));
+    }, []);
 
     const handleBroadcast = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,16 +93,21 @@ export default function BroadcastPage() {
                                 <option value="4">Floor 4</option>
                             </select>
 
-                            <input
-                                type="text"
+                            <select
                                 value={roomNumber}
                                 onChange={(e) => {
                                     setRoomNumber(e.target.value);
                                     if (e.target.value) setFloor('all');
                                 }}
-                                placeholder="Specific Room (e.g. 101)"
-                                className="flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
+                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer`}
+                            >
+                                <option value="">Select Room (Optional)</option>
+                                {rooms.map((room) => (
+                                    <option key={room.id} value={room.number}>
+                                        Room {room.number}
+                                    </option>
+                                ))}
+                            </select>
 
                             <div
                                 onClick={() => setUnpaidOnly(!unpaidOnly)}
@@ -103,7 +120,7 @@ export default function BroadcastPage() {
                                     }`}>
                                     {unpaidOnly && <Users size={12} className="text-white" />}
                                 </div>
-                                <span className="font-medium">Unpaid Bills Only</span>
+                                <span className="font-medium text-sm">Unpaid Only</span>
                             </div>
                         </div>
                     </div>
@@ -124,7 +141,11 @@ export default function BroadcastPage() {
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                         <div className="flex items-center gap-2 text-gray-500 text-sm bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
                             <Users size={16} />
-                            <span>Sends to everyone</span>
+                            <span>
+                                {roomNumber ? `Sending to Room ${roomNumber}` :
+                                    floor !== 'all' ? `Sending to Floor ${floor}` :
+                                        'Sends to everyone'}
+                            </span>
                         </div>
 
                         <button
@@ -142,7 +163,6 @@ export default function BroadcastPage() {
             {status && (
                 <div className={`p-4 rounded-xl flex items-center gap-3 ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                     {status.type === 'success' ? <Megaphone size={20} /> : <Loader2 size={20} className="animate-spin" />}
-                    {/* Reusing Loader2 as error icon temporarily or AlertCircle if imported */}
                     <span className="font-medium">{status.text}</span>
                 </div>
             )}
