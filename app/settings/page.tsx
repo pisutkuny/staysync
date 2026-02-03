@@ -174,15 +174,76 @@ export default function SettingsPage() {
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Dorm Logo URL</label>
-                            <input
-                                name="invoiceLogo"
-                                value={config.invoiceLogo || ""}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded-lg font-mono text-sm bg-gray-50"
-                                placeholder="https://example.com/logo.png"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">Direct link to image (PNG/JPG). Leave empty to hide.</p>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Dorm Logo</label>
+
+                            <div className="flex items-start gap-4">
+                                {/* Preview */}
+                                {config.invoiceLogo ? (
+                                    <div className="relative group">
+                                        <div className="w-24 h-24 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center p-2">
+                                            <img
+                                                src={config.invoiceLogo}
+                                                alt="Logo Preview"
+                                                className="w-full h-full object-contain"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setConfig(prev => ({ ...prev, invoiceLogo: "" }))}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                                        <div className="text-xs text-center p-2">No Logo</div>
+                                    </div>
+                                )}
+
+                                {/* File Input */}
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+
+                                            // Show loading state if needed, here we just upload directly
+                                            const formData = new FormData();
+                                            formData.append("file", file);
+
+                                            try {
+                                                const res = await fetch("/api/upload", {
+                                                    method: "POST",
+                                                    body: formData,
+                                                });
+                                                const data = await res.json();
+
+                                                if (data.success) {
+                                                    setConfig(prev => ({ ...prev, invoiceLogo: data.url }));
+                                                } else {
+                                                    alert("Upload failed: " + data.error);
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                                alert("Upload failed error");
+                                            }
+                                        }}
+                                        className="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-full file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-indigo-50 file:text-indigo-700
+                                            hover:file:bg-indigo-100
+                                        "
+                                    />
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Upload a PNG or JPG file. It will be used as the invoice header logo and the watermark.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Theme Color</label>
