@@ -109,6 +109,7 @@ model SystemConfig {
   bankAccountName   String   @default("Account Name")
   bankAccountNumber String   @default("000-0-00000-0")
   promptPayId       String?  // Optional PromptPay ID
+  lineNotifyToken   String?  // Line Notify Token for Admin Alerts
 
   // Default Rates
   waterRate         Float    @default(18)

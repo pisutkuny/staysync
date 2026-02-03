@@ -21,19 +21,20 @@ export async function POST(
             include: { room: true }
         });
 
-        // Notify Admin via Line
-        const ownerLineId = process.env.OWNER_LINE_USER_ID;
-        if (ownerLineId) {
-            const message = `💸 แจ้งโอนเงิน!\n` +
+        // Notify Admin via Line Notify
+        const config = await prisma.systemConfig.findFirst();
+        if (config?.lineNotifyToken) {
+            const message =
+                `\n💸 แจ้งโอนเงินใหม่!\n` +
                 `ห้อง: ${billing.room.number}\n` +
-                `ยอดเงิน: ${billing.totalAmount} บาท\n` +
-                `สถานะ: รอตรวจสอบ`;
+                `ยอดเงิน: ${billing.totalAmount.toLocaleString()} บาท\n` +
+                `เมื่อ: ${new Date().toLocaleTimeString('th-TH')}`;
 
             try {
-                const { sendLineMessage } = await import("@/lib/line");
-                await sendLineMessage(ownerLineId, message);
+                const { sendLineNotify } = await import("@/lib/lineNotify");
+                await sendLineNotify(config.lineNotifyToken, message, slipImage);
             } catch (e) {
-                console.error("Failed to send Line notification", e);
+                console.error("Failed to send Line Notify", e);
             }
         }
 

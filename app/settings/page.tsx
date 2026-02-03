@@ -17,7 +17,8 @@ export default function SettingsPage() {
         electricRate: 0,
         trashFee: 0,
         internetFee: 0,
-        otherFees: 0
+        otherFees: 0,
+        lineNotifyToken: ""
     });
 
     useEffect(() => {
@@ -158,6 +159,30 @@ export default function SettingsPage() {
                                 className="w-full p-2 border rounded-lg font-mono bg-gray-50"
                                 placeholder="e.g. 081-234-5678 or 1234567890123"
                             />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Automation & Alerts */}
+                <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                        Admin Alerts (Line Notify)
+                    </h2>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Line Notify Token</label>
+                            <input
+                                name="lineNotifyToken"
+                                value={config.lineNotifyToken || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg font-mono text-sm bg-gray-50"
+                                placeholder="Generate token at https://notify-bot.line.me"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Get this token to receive instant alerts when residents pay bills.
+                                <a href="https://notify-bot.line.me/my/" target="_blank" className="text-indigo-600 underline ml-1">Get Token</a>
+                            </p>
                         </div>
                     </div>
                 </section>
