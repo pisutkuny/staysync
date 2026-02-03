@@ -8,6 +8,10 @@ export default function BroadcastPage() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+    // Filters
+    const [floor, setFloor] = useState("all");
+    const [unpaidOnly, setUnpaidOnly] = useState(false);
+
     const handleBroadcast = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!message.trim()) return;
@@ -19,7 +23,13 @@ export default function BroadcastPage() {
             const res = await fetch("/api/broadcast", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message }),
+                body: JSON.stringify({
+                    message,
+                    filters: {
+                        floor,
+                        unpaidOnly
+                    }
+                }),
             });
 
             if (!res.ok) throw new Error("Failed");
@@ -48,6 +58,39 @@ export default function BroadcastPage() {
 
             <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm">
                 <form onSubmit={handleBroadcast} className="space-y-6">
+
+                    {/* Target Audience Section */}
+                    <div className="space-y-3">
+                        <label className="block text-sm font-bold text-gray-700">Target Audience</label>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <select
+                                value={floor}
+                                onChange={(e) => setFloor(e.target.value)}
+                                className="flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            >
+                                <option value="all">All Floors</option>
+                                <option value="1">Floor 1</option>
+                                <option value="2">Floor 2</option>
+                                <option value="3">Floor 3</option>
+                                <option value="4">Floor 4</option>
+                            </select>
+
+                            <div
+                                onClick={() => setUnpaidOnly(!unpaidOnly)}
+                                className={`flex-1 flex items-center justify-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${unpaidOnly
+                                        ? "bg-red-50 border-red-200 text-red-700 scale-[1.02]"
+                                        : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                    }`}
+                            >
+                                <div className={`w-5 h-5 rounded border flex items-center justify-center ${unpaidOnly ? "bg-red-500 border-red-500" : "border-gray-400"
+                                    }`}>
+                                    {unpaidOnly && <Users size={12} className="text-white" />}
+                                </div>
+                                <span className="font-medium">Unpaid Bills Only</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
                         <textarea

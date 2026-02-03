@@ -4,15 +4,35 @@ import { sendLineMessage } from "@/lib/line";
 
 export async function POST(request: Request) {
     try {
-        const { message } = await request.json();
+        const body = await request.json();
+        const { message, filters } = body;
 
-        // 1. Get all active residents with Line ID
+        // Build Where Clause
+        const whereClause: any = {
+            status: "Active",
+            lineUserId: { not: null }
+        };
+
+        // Filter by Floor (e.g., Room starts with "1")
+        if (filters?.floor && filters.floor !== "all") {
+            whereClause.room = {
+                number: { startsWith: filters.floor }
+            };
+        }
+
+        // Filter by Unpaid Bills
+        if (filters?.unpaidOnly) {
+            whereClause.billings = {
+                some: {
+                    paymentStatus: { not: "Paid" }
+                }
+            };
+        }
+
+        // 1. Get all active residents with Line ID based on filters
         const residents = await prisma.resident.findMany({
-            where: {
-                status: "Active",
-                lineUserId: { not: null } // Ensure they have Line ID
-            },
-            select: { lineUserId: true } // Select only needed field
+            where: whereClause,
+            select: { lineUserId: true, fullName: true, room: { select: { number: true } } }
         });
 
         // 2. Send Notifications (Parallel)
