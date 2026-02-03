@@ -36,7 +36,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                     <h1 className="text-5xl font-bold tracking-tight text-gray-800 uppercase">Invoice</h1>
                     {/* Logo if exists */}
                     {config.invoiceLogo && (
-                        <img src={config.invoiceLogo} alt="Logo" className="h-12 w-auto object-contain grayscale opacity-80" />
+                        <img src={config.invoiceLogo} alt="Logo" className="h-24 w-auto object-contain grayscale opacity-80" />
                     )}
                 </div>
 
