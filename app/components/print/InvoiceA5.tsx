@@ -33,7 +33,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
             <div className="flex-1 pr-8 flex flex-col relative z-10">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-8">
-                    <h1 className="text-5xl font-bold tracking-tight text-gray-800 uppercase">ใบแจ้งหนี้</h1>
+                    <h1 className="text-5xl font-bold tracking-tight text-gray-800 uppercase">INVOICE</h1>
                 </div>
 
                 {/* Table */}
@@ -94,14 +94,25 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                     </div>
                 </div>
 
-                {/* Bottom Left Branding & Logo */}
-                <div className="mt-auto pt-8 flex items-center gap-4">
-                    {/* Logo Moved Here */}
-                    {config.invoiceLogo && (
-                        <img src={config.invoiceLogo} alt="Logo" className="h-16 w-auto object-contain grayscale opacity-100" />
-                    )}
-                    <div className="text-xs text-gray-500 font-bold tracking-widest">
-                        {config.dormName}
+                {/* Bottom Section: Signature & Branding */}
+                <div className="mt-auto pt-4">
+                    {/* Signature Line - Centered relative to main content or explicit placement */}
+                    <div className="flex justify-center mb-4">
+                        <div className="text-center w-40">
+                            <div className="border-b border-gray-300 mb-2 h-4"></div>
+                            <p className="text-[10px] text-gray-400">ผู้รับเงิน / Collector</p>
+                        </div>
+                    </div>
+
+                    {/* Bottom Branding & Logo */}
+                    <div className="flex items-center gap-4 border-t border-gray-50 pt-2">
+                        {/* Logo */}
+                        {config.invoiceLogo && (
+                            <img src={config.invoiceLogo} alt="Logo" className="h-12 w-auto object-contain grayscale opacity-100" />
+                        )}
+                        <div className="text-xs text-gray-500 font-bold tracking-widest">
+                            {config.dormName}
+                        </div>
                     </div>
                 </div>
             </div>
