@@ -28,7 +28,7 @@ export default async function RoomsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {rooms.map((room) => (
-                    <div key={room.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between h-52">
+                    <div key={room.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[13rem]">
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="text-2xl font-bold text-gray-900">{room.number}</h3>

@@ -151,7 +151,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-100 text-gray-700 font-bold">
                         <tr>

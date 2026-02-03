@@ -187,10 +187,10 @@ export default function ExpensesPage() {
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-gray-50 text-gray-600 font-medium">
                                     <tr>
-                                        <th className="p-4">Date</th>
-                                        <th className="p-4">Title</th>
-                                        <th className="p-4">Category</th>
-                                        <th className="p-4 text-right">Amount</th>
+                                        <th className="px-2 py-3 sm:p-4">Date</th>
+                                        <th className="px-2 py-3 sm:p-4">Title</th>
+                                        <th className="px-2 py-3 sm:p-4">Category</th>
+                                        <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -201,14 +201,14 @@ export default function ExpensesPage() {
                                     ) : (
                                         expenses.map((expense) => (
                                             <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="p-4 text-gray-500">
+                                                <td className="px-2 py-3 sm:p-4 text-gray-500">
                                                     {format(new Date(expense.date), "dd MMM yyyy")}
                                                 </td>
-                                                <td className="p-4 font-medium text-gray-900">
+                                                <td className="px-2 py-3 sm:p-4 font-medium text-gray-900">
                                                     {expense.title}
                                                     {expense.note && <div className="text-xs text-gray-400 font-normal">{expense.note}</div>}
                                                 </td>
-                                                <td className="p-4">
+                                                <td className="px-2 py-3 sm:p-4">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-bold 
                                                         ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
                                                             expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
@@ -217,7 +217,7 @@ export default function ExpensesPage() {
                                                         {expense.category}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 text-right font-bold text-red-600">
+                                                <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
                                                     -฿{expense.amount.toLocaleString()}
                                                 </td>
                                             </tr>
