@@ -51,7 +51,7 @@ export default function AddRoomPage() {
                 </div>
             </div>
 
-            <div className="max-w-md bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <div className="max-w-md bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>

@@ -56,7 +56,7 @@ export default function BroadcastPage() {
                 </div>
             </div>
 
-            <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm">
+            <div className="bg-white p-4 sm:p-8 rounded-xl border border-gray-100 shadow-sm">
                 <form onSubmit={handleBroadcast} className="space-y-6">
 
                     {/* Target Audience Section */}
@@ -78,8 +78,8 @@ export default function BroadcastPage() {
                             <div
                                 onClick={() => setUnpaidOnly(!unpaidOnly)}
                                 className={`flex-1 flex items-center justify-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${unpaidOnly
-                                        ? "bg-red-50 border-red-200 text-red-700 scale-[1.02]"
-                                        : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                    ? "bg-red-50 border-red-200 text-red-700 scale-[1.02]"
+                                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                                     }`}
                             >
                                 <div className={`w-5 h-5 rounded border flex items-center justify-center ${unpaidOnly ? "bg-red-500 border-red-500" : "border-gray-400"
