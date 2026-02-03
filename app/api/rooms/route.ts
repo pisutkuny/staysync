@@ -11,20 +11,19 @@ export async function POST(request: Request) {
                 number,
                 price,
                 status: "Available",
-            },
-        });
-
-        return NextResponse.json({ error: "Failed to create room" }, { status: 500 });
-    }
-}
+                return NextResponse.json(room, { status: 201 });
+            } catch(error) {
+                return NextResponse.json({ error: "Failed to create room" }, { status: 500 });
+            }
+        }
 
 export async function GET() {
-    try {
-        const rooms = await prisma.room.findMany({
-            orderBy: { number: 'asc' }
-        });
-        return NextResponse.json(rooms);
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to fetch rooms" }, { status: 500 });
-    }
-}
+            try {
+                const rooms = await prisma.room.findMany({
+                    orderBy: { number: 'asc' }
+                });
+                return NextResponse.json(rooms);
+            } catch (error) {
+                return NextResponse.json({ error: "Failed to fetch rooms" }, { status: 500 });
+            }
+        }

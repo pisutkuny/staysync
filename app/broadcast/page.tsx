@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Megaphone, Send, Users } from "lucide-react";
 
 export default function BroadcastPage() {
@@ -17,7 +17,6 @@ export default function BroadcastPage() {
     const [roomNumber, setRoomNumber] = useState("");
 
     // Fetch rooms on mount
-    import { useEffect } from "react";
     useEffect(() => {
         fetch('/api/rooms')
             .then(res => res.json())
