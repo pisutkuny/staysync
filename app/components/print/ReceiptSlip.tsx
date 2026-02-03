@@ -17,6 +17,9 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
         <div className="w-[80mm] bg-white p-4 mx-auto text-black font-mono text-sm">
             {/* Header */}
             <div className="text-center mb-6 border-b border-dashed border-gray-300 pb-4">
+                {config.invoiceLogo && (
+                    <img src={config.invoiceLogo} alt="Logo" className="h-8 w-auto object-contain mx-auto mb-2 grayscale" />
+                )}
                 <h1 className="font-bold text-lg">{config.dormName}</h1>
                 <p className="text-xs text-gray-500 mt-1 whitespace-pre-line">{config.dormAddress}</p>
                 <div className="mt-2 text-xs">
@@ -81,6 +84,12 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
                     </div>
                     <p className="text-xs font-bold mt-2">SCAN TO PAY</p>
                     <p className="text-[10px] text-gray-500">{config.bankAccountName}</p>
+                </div>
+            )}
+
+            {config.invoiceNote && (
+                <div className="text-center text-xs mb-4 border-t border-dashed border-gray-300 pt-2 italic">
+                    {config.invoiceNote}
                 </div>
             )}
 
