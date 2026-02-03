@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone } from "lucide-react";
 
