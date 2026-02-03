@@ -103,51 +103,54 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
             </div>
 
             {/* Rate Settings */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-6 items-center flex-wrap">
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-amber-800">💧 Water Rate:</span>
-                    <input
-                        type="number"
-                        value={rates.water}
-                        onChange={(e) => setRates({ ...rates, water: parseFloat(e.target.value) || 0 })}
-                        className="w-20 p-1 rounded border border-amber-300 text-center text-sm font-bold"
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-amber-800">⚡ Electric Rate:</span>
-                    <input
-                        type="number"
-                        value={rates.electric}
-                        onChange={(e) => setRates({ ...rates, electric: parseFloat(e.target.value) || 0 })}
-                        className="w-20 p-1 rounded border-amber-300 border text-center text-sm font-bold"
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-amber-800">🗑️ Trash:</span>
-                    <input
-                        type="number"
-                        value={rates.trash}
-                        onChange={(e) => setRates({ ...rates, trash: parseFloat(e.target.value) || 0 })}
-                        className="w-20 p-1 rounded border border-amber-300 text-center text-sm font-bold"
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-amber-800">🌐 Internet:</span>
-                    <input
-                        type="number"
-                        value={rates.internet}
-                        onChange={(e) => setRates({ ...rates, internet: parseFloat(e.target.value) || 0 })}
-                        className="w-20 p-1 rounded border border-amber-300 text-center text-sm font-bold"
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-amber-800">➕ Other/Common:</span>
-                    <input
-                        type="number"
-                        value={rates.other}
-                        onChange={(e) => setRates({ ...rates, other: parseFloat(e.target.value) || 0 })}
-                        className="w-20 p-1 rounded border border-amber-300 text-center text-sm font-bold"
-                    />
+            {/* Rate Settings */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-amber-800 uppercase">💧 Water Rate</span>
+                        <input
+                            type="number"
+                            value={rates.water}
+                            onChange={(e) => setRates({ ...rates, water: parseFloat(e.target.value) || 0 })}
+                            className="w-full p-2 rounded border border-amber-300 text-center text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-amber-800 uppercase">⚡ Electric Rate</span>
+                        <input
+                            type="number"
+                            value={rates.electric}
+                            onChange={(e) => setRates({ ...rates, electric: parseFloat(e.target.value) || 0 })}
+                            className="w-full p-2 rounded border border-amber-300 text-center text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-amber-800 uppercase">🗑️ Trash</span>
+                        <input
+                            type="number"
+                            value={rates.trash}
+                            onChange={(e) => setRates({ ...rates, trash: parseFloat(e.target.value) || 0 })}
+                            className="w-full p-2 rounded border border-amber-300 text-center text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-amber-800 uppercase">🌐 Internet</span>
+                        <input
+                            type="number"
+                            value={rates.internet}
+                            onChange={(e) => setRates({ ...rates, internet: parseFloat(e.target.value) || 0 })}
+                            className="w-full p-2 rounded border border-amber-300 text-center text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-amber-800 uppercase">➕ Other</span>
+                        <input
+                            type="number"
+                            value={rates.other}
+                            onChange={(e) => setRates({ ...rates, other: parseFloat(e.target.value) || 0 })}
+                            className="w-full p-2 rounded border border-amber-300 text-center text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                        />
+                    </div>
                 </div>
             </div>
 
