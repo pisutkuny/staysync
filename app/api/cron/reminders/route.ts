@@ -60,6 +60,11 @@ export async function GET(request: Request) {
 
             const message = `⚠️ แจ้งเตือนยอดค้างชำระ\n\nห้อง ${bill.room.number} มียอดค้างชำระ ${bill.totalAmount.toLocaleString()} บาท\nประจำรอบบิล ${new Date(bill.createdAt).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}\n\nกรุณาชำระเงินเพื่อหลีกเลี่ยงค่าปรับ ขอบคุณครับ 🙏`;
 
+            if (!lineClient) {
+                console.warn("Skipping Line alert: Line Client not initialized");
+                return { roomId: bill.room.number, status: "skipped_no_client" };
+            }
+
             try {
                 // Using pushMessage (Requires Multicast/Push Plan or simple dev bot)
                 // Note: Standard Line OA free plan allows Limited Push messages. 
