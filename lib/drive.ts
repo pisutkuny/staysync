@@ -1,73 +1,46 @@
-import { google } from 'googleapis';
-import { Readable } from 'stream';
+export async function uploadToDrive(file: File, folderId?: string) {
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
+    if (!scriptUrl) {
+        throw new Error("Missing GOOGLE_SCRIPT_URL environment variable.");
+    }
 
-export async function uploadToDrive(file: File, folderId: string) {
     try {
-        const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-        const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'); // Handle newline char in env
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const base64 = buffer.toString('base64');
 
-        if (!clientEmail || !privateKey || !folderId) {
-            throw new Error("Missing Google Drive Configuration (Email, Key, or Folder ID)");
+        const payload = {
+            filename: file.name,
+            mimeType: file.type,
+            file: base64,
+            // folderId is hardcoded in the script or can be passed if script supports it.
+            // Our script implementation hardcodes it for security/simplicity.
+        };
+
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Google Apps Script returned status ${response.status}`);
         }
 
-        const auth = new google.auth.GoogleAuth({
-            credentials: {
-                client_email: clientEmail,
-                private_key: privateKey,
-            },
-            scopes: SCOPES,
-        });
+        const result = await response.json();
 
-        const drive = google.drive({ version: 'v3', auth });
-
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const stream = new Readable();
-        stream.push(buffer);
-        stream.push(null);
-
-        const fileMetadata = {
-            name: file.name,
-            parents: [folderId],
-        };
-
-        const media = {
-            mimeType: file.type,
-            body: stream,
-        };
-
-        const response = await drive.files.create({
-            requestBody: fileMetadata,
-            media: media,
-            fields: 'id, webViewLink, webContentLink',
-        });
-
-        // Set permission to anyone with link (Optional, but good for viewing)
-        // Or we rely on the Service Account being owner. 
-        // Typically for public viewing by residents, we might want to make it readable by anyone with link.
-        // But for privacy, maybe not?
-        // Let's assume the user just wants it stored. 
-        // Wait, "webViewLink" requires permissions to view. 
-        // If the resident clicks it, they need access.
-        // Let's make it readable by anyone with the link for now to ensure it works for the end user.
-
-        await drive.permissions.create({
-            fileId: response.data.id!,
-            requestBody: {
-                role: 'reader',
-                type: 'anyone',
-            },
-        });
+        if (result.status !== 'success') {
+            throw new Error(result.message || "Unknown error from Google Apps Script");
+        }
 
         return {
-            id: response.data.id,
-            url: response.data.webViewLink, // Link to view in browser
-            downloadUrl: response.data.webContentLink // Link to download
+            id: result.id,
+            url: result.url,
+            downloadUrl: result.downloadUrl
         };
 
     } catch (error) {
-        console.error("Google Drive Upload Error:", error);
+        console.error("GAS Upload Error:", error);
         throw error;
     }
 }
