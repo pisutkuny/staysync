@@ -27,7 +27,7 @@ export default async function RootLayout({
           <Navbar userRole={userRole} />
 
           {/* Main Content - No left margin needed as sidebar is now a popup */}
-          <main className="pt-32 p-4 md:p-8 max-w-7xl mx-auto">
+          <main className="pt-32 p-4 md:p-8 md:pt-36 max-w-7xl mx-auto">
             {children}
           </main>
         </div>
