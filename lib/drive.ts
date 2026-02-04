@@ -23,11 +23,16 @@ export async function uploadToDrive(file: File, folderId?: string) {
             headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!response.ok) {
-            throw new Error(`Google Apps Script returned status ${response.status}`);
-        }
+        const responseText = await response.text();
+        let result;
 
-        const result = await response.json();
+        try {
+            result = JSON.parse(responseText);
+        } catch (e) {
+            // Include a snippet of the response in the error (e.g. "<!DOCTYPE html>...")
+            console.error("GAS Non-JSON Response:", responseText);
+            throw new Error(`Invalid response from Script: ${responseText.substring(0, 100)}...`);
+        }
 
         if (result.status !== 'success') {
             throw new Error(result.message || "Unknown error from Google Apps Script");
