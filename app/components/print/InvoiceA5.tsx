@@ -3,7 +3,7 @@
 import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
-export default function InvoiceA5({ billing, resident, config, copyType }: { billing: any, resident: any, config: any, copyType: string }) {
+export default function InvoiceA5({ billing, resident, config, copyType, type = 'invoice' }: { billing: any, resident: any, config: any, copyType: string, type?: 'invoice' | 'receipt' }) {
     // Calculate Amounts safely
     const waterAmount = (billing.waterMeterCurrent - billing.waterMeterLast) * billing.waterRate;
     const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
@@ -47,7 +47,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                             <p className="text-[10px] text-gray-500 max-w-[250px] leading-tight mt-1">{config.dormAddress}</p>
                         </div>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-800 uppercase">INVOICE</h1>
+                    <h1 className="text-4xl font-bold tracking-tight text-gray-800 uppercase">{type === 'receipt' ? 'RECEIPT' : 'INVOICE'}</h1>
                 </div>
 
                 {/* Table */}
@@ -133,34 +133,44 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
 
             {/* Right Sidebar */}
             <div className="w-[30%] pl-8 flex flex-col gap-4 bg-gray-50/30 -my-8 py-8 -mr-8 pr-8">
-                {/* QR Code Section */}
-                {promptPayPayload && (
-                    <div className="flex flex-col items-center text-center">
-                        <div className="relative inline-block p-1 border-2 border-gray-800 rounded-lg bg-white mb-2">
-                            {/* Corner accents */}
-                            <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-gray-800"></div>
-                            <div className="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-gray-800"></div>
-                            <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-gray-800"></div>
-                            <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-gray-800"></div>
-                            <QRCodeCanvas value={promptPayPayload} size={90} />
+                {/* QR Code Section or PAID Stamp */}
+                {type === 'receipt' ? (
+                    <div className="flex flex-col items-center text-center justify-center h-[200px]">
+                        <div className="border-4 border-red-500 rounded-lg p-2 px-4 transform rotate-[-12deg] opacity-80">
+                            <span className="text-3xl font-black text-red-500 tracking-widest">PAID</span>
                         </div>
-
-                        <div className="text-lg font-bold text-gray-900 leading-none" style={{ color: themeColor }}>
-                            ฿{billing.totalAmount.toLocaleString()}
-                        </div>
-                        <p className="text-sm font-bold text-gray-800 mt-1">สแกนเพื่อชำระเงิน</p>
-
-                        {/* Custom Note */}
-                        {config.invoiceNote ? (
-                            <p className="text-[9px] text-gray-500 italic mt-1 max-w-[150px] leading-tight">
-                                {config.invoiceNote}
-                            </p>
-                        ) : (
-                            <p className="text-[9px] text-gray-400 italic mt-1 max-w-[150px] leading-tight">
-                                กรุณาโอนชำระและส่งสลิปยืนยันภายใน 5 วัน
-                            </p>
-                        )}
+                        <p className="text-lg font-bold text-red-600 mt-4">ชำระเงินแล้ว</p>
+                        <p className="text-xs text-red-400 mt-1">{new Date().toLocaleDateString('th-TH')}</p>
                     </div>
+                ) : (
+                    promptPayPayload && (
+                        <div className="flex flex-col items-center text-center">
+                            <div className="relative inline-block p-1 border-2 border-gray-800 rounded-lg bg-white mb-2">
+                                {/* Corner accents */}
+                                <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-gray-800"></div>
+                                <div className="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-gray-800"></div>
+                                <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-gray-800"></div>
+                                <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-gray-800"></div>
+                                <QRCodeCanvas value={promptPayPayload} size={90} />
+                            </div>
+
+                            <div className="text-lg font-bold text-gray-900 leading-none" style={{ color: themeColor }}>
+                                ฿{billing.totalAmount.toLocaleString()}
+                            </div>
+                            <p className="text-sm font-bold text-gray-800 mt-1">สแกนเพื่อชำระเงิน</p>
+
+                            {/* Custom Note */}
+                            {config.invoiceNote ? (
+                                <p className="text-[9px] text-gray-500 italic mt-1 max-w-[150px] leading-tight">
+                                    {config.invoiceNote}
+                                </p>
+                            ) : (
+                                <p className="text-[9px] text-gray-400 italic mt-1 max-w-[150px] leading-tight">
+                                    กรุณาโอนชำระและส่งสลิปยืนยันภายใน 5 วัน
+                                </p>
+                            )}
+                        </div>
+                    )
                 )}
 
                 {/* Spacing */}
