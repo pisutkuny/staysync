@@ -29,51 +29,71 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = async () => {
+            reader.onload = () => {
                 const base64Content = (reader.result as string).split(',')[1];
                 const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
 
                 if (!scriptUrl) {
-                    reject(new Error("Missing Script URL configuration"));
+                    reject(new Error("Missing Script URL config"));
                     return;
                 }
 
-                try {
-                    console.log("Starting upload to:", scriptUrl);
+                // Unique ID for this upload instance
+                const uploadId = 'iframe_upload_' + Date.now();
 
-                    // Add timestamp to bypass cache
-                    const urlWithTimestamp = `${scriptUrl}?t=${Date.now()}`;
+                // 1. Create hidden Iframe
+                const iframe = document.createElement('iframe');
+                iframe.name = uploadId;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
 
-                    const response = await fetch(urlWithTimestamp, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            filename: file.name,
-                            mimeType: file.type,
-                            file: base64Content
-                        }),
-                        // Explicitly set text/plain to ensure Simple Request (no preflight)
-                        headers: { 'Content-Type': 'text/plain' },
-                        credentials: 'omit',
-                    });
+                // 2. Create hidden Form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = scriptUrl;
+                form.target = uploadId;
+                form.style.display = 'none';
 
-                    if (!response.ok) {
-                        throw new Error(`Script returned status ${response.status}`);
+                const addField = (name: string, value: string) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name;
+                    input.value = value;
+                    form.appendChild(input);
+                };
+
+                addField('filename', file.name);
+                addField('mimeType', file.type);
+                addField('file', base64Content);
+                document.body.appendChild(form);
+
+                // 3. Listener for response from GAS
+                const messageHandler = (event: MessageEvent) => {
+                    // Try to parse JSON from event.data
+                    try {
+                        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+                        if (data && (data.status === 'success' || data.status === 'error')) {
+                            // Cleanup
+                            window.removeEventListener('message', messageHandler);
+                            if (document.body.contains(form)) document.body.removeChild(form);
+                            if (document.body.contains(iframe)) document.body.removeChild(iframe);
+
+                            if (data.status === 'success') {
+                                resolve(data.url);
+                            } else {
+                                reject(new Error(data.message || "Unknown Script Error"));
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore irrelevant messages
                     }
+                };
 
-                    const result = await response.json();
+                window.addEventListener('message', messageHandler);
 
-                    if (result.status === 'success') {
-                        resolve(result.url);
-                    } else {
-                        reject(new Error(result.message || "Unknown GAS Error"));
-                    }
-                } catch (error: any) {
-                    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-                        reject(new Error("Network Error: Please disable AdBlocker (uBlock/AdGuard) or VPN and try again."));
-                    } else {
-                        reject(error);
-                    }
-                }
+                // 4. Submit
+                form.submit();
             };
             reader.onerror = error => reject(error);
         });
