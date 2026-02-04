@@ -52,7 +52,7 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
                 {type === 'a5' && (
                     <div className="w-[210mm] h-[297mm] bg-white print:w-full print:h-full flex flex-col">
                         <InvoiceA5 billing={billing} resident={resident} config={config} copyType="ORIGINAL (Customer)" type="invoice" />
-                        <InvoiceA5 billing={billing} resident={resident} config={config} copyType="ORIGINAL (Receipt)" type="receipt" />
+                        <InvoiceA5 billing={billing} resident={resident} config={config} copyType="ORIGINAL (Customer)" type="receipt" />
                     </div>
                 )}
                 {type === 'slip' && (
