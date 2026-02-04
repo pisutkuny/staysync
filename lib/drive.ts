@@ -20,7 +20,11 @@ export async function uploadToDrive(file: File, folderId?: string) {
         const response = await fetch(scriptUrl, {
             method: 'POST',
             body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'text/plain', // Use text/plain to avoid strict parsing issues
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            redirect: 'follow'
         });
 
         const responseText = await response.text();
