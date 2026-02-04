@@ -41,15 +41,18 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                 try {
                     console.log("Starting upload to:", scriptUrl);
 
-                    // Remove explicit Content-Type to avoid CORS complications
-                    // Add credentials: 'omit' to ensure no cookies are sent (standard for public GAS scripts)
-                    const response = await fetch(scriptUrl, {
+                    // Add timestamp to bypass cache
+                    const urlWithTimestamp = `${scriptUrl}?t=${Date.now()}`;
+
+                    const response = await fetch(urlWithTimestamp, {
                         method: 'POST',
                         body: JSON.stringify({
                             filename: file.name,
                             mimeType: file.type,
                             file: base64Content
                         }),
+                        // Explicitly set text/plain to ensure Simple Request (no preflight)
+                        headers: { 'Content-Type': 'text/plain' },
                         credentials: 'omit',
                     });
 
@@ -60,12 +63,16 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                     const result = await response.json();
 
                     if (result.status === 'success') {
-                        resolve(result.url); // Return the WebViewLink
+                        resolve(result.url);
                     } else {
                         reject(new Error(result.message || "Unknown GAS Error"));
                     }
-                } catch (error) {
-                    reject(error);
+                } catch (error: any) {
+                    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+                        reject(new Error("Network Error: Please disable AdBlocker (uBlock/AdGuard) or VPN and try again."));
+                    } else {
+                        reject(error);
+                    }
                 }
             };
             reader.onerror = error => reject(error);
