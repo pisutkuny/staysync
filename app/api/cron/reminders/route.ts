@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import lineClient from "@/lib/line";
+import { lineClient } from "@/lib/line";
 
 export const dynamic = 'force-dynamic'; // Ensure not cached
 
