@@ -43,14 +43,21 @@ export default async function RoomsPage() {
                         <div className="mt-4">
                             {room.status === "Occupied" ? (
                                 <div>
-                                    <p className="text-sm text-gray-500">Resident:</p>
-                                    {room.residents?.length > 0 ? (
-                                        <Link href={`/residents/${room.residents[0].id}`} className="text-indigo-600 font-medium hover:underline flex items-center gap-1">
-                                            👤 {room.residents[0].fullName}
-                                        </Link>
-                                    ) : (
-                                        <p className="font-medium text-gray-900">Unknown</p>
-                                    )}
+                                    <p className="text-sm text-gray-500 mb-1">Residents ({room.residents.filter((r: any) => r.status === 'Active').length}):</p>
+                                    <div className="space-y-1">
+                                        {room.residents.filter((r: any) => r.status === 'Active').length > 0 ? (
+                                            room.residents.filter((r: any) => r.status === 'Active').slice(0, 2).map((resident: any) => (
+                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-indigo-600 font-medium hover:underline text-sm">
+                                                    👤 {resident.fullName}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <p className="font-medium text-gray-900">Unknown</p>
+                                        )}
+                                        {room.residents.filter((r: any) => r.status === 'Active').length > 2 && (
+                                            <p className="text-xs text-gray-400 pl-5">+ {room.residents.filter((r: any) => r.status === 'Active').length - 2} more</p>
+                                        )}
+                                    </div>
                                 </div>
                             ) : (
                                 <p className="text-sm text-gray-400 italic">Empty room</p>
@@ -69,10 +76,12 @@ export default async function RoomsPage() {
                                     <DeleteRoomButton roomId={room.id} />
                                 </>
                             ) : (
-                                <button disabled className="w-full py-2 bg-gray-50 text-gray-400 rounded-lg cursor-not-allowed font-medium flex items-center justify-center gap-2">
-                                    <UserMinus size={18} />
-                                    Occupied
-                                </button>
+                                <Link href={`/rooms/checkin/${room.id}`} className="w-full">
+                                    <button className="w-full py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 font-medium transition-colors flex items-center justify-center gap-2">
+                                        <UserPlus size={18} />
+                                        Add Resident
+                                    </button>
+                                </Link>
                             )}
                         </div>
                     </div>
