@@ -15,13 +15,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "File too large. Max 5MB." }, { status: 400 });
         }
 
-        // Check availability of Google Drive
-        const useDrive = process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_DRIVE_FOLDER_ID;
+        // Check availability of Google Drive (Apps Script Method)
+        const useDrive = !!process.env.GOOGLE_SCRIPT_URL;
 
         if (useDrive) {
             try {
-                // Upload to Google Drive
-                const result = await uploadToDrive(file, process.env.GOOGLE_DRIVE_FOLDER_ID!);
+                // Upload to Google Drive via Apps Script
+                const result = await uploadToDrive(file); // No folderId needed, it's in the script
                 return NextResponse.json({
                     success: true,
                     url: result.url, // WebViewLink from Drive
