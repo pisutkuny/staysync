@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendLineMessage } from "@/lib/line";
+import { sendLineMessage, sendBillNotificationFlex } from "@/lib/line";
 
 // Rates matching the slip image (Defaults if not provided)
 const DEFAULT_WATER_RATE = 11;
@@ -63,21 +63,26 @@ export async function POST(req: Request) {
 
             // Send Line Notif
             if (resident?.lineUserId) {
-                const message = `แจ้งบิลค่าเช่าห้อง ${room.number}\n` +
-                    `ประจำเดือน: ${new Date().toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}\n` +
-                    `----------------------------\n` +
-                    `🏠 ค่าห้อง: ${room.price.toLocaleString()} ฿\n` +
-                    `⚡ ไฟ (${eLast}-${eCurr}): ${eUnits}หน่วย x ${ELECTRIC_RATE} = ${eTotal} ฿\n` +
-                    `💧 น้ำ (${wLast}-${wCurr}): ${wUnits}หน่วย x ${WATER_RATE} = ${wTotal} ฿\n` +
-                    `🗑️ ขยะ: ${TRASH_FEE} ฿\n` +
-                    (INTERNET_FEE > 0 ? `🌐 อินเทอร์เน็ต: ${INTERNET_FEE} ฿\n` : "") +
-                    (OTHER_FEE > 0 ? `➕ ส่วนกลาง/อื่นๆ: ${OTHER_FEE} ฿\n` : "") +
-                    `----------------------------\n` +
-                    `💰 ยอดรวม: ${totalAmount.toLocaleString()} ฿\n` +
-                    `----------------------------\n` +
-                    `กรุณาโอนและแนบสลิปที่ลิงก์นี้ครับ:\n` +
-                    `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
-                await sendLineMessage(resident.lineUserId, message);
+                const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
+
+                // Construct Flex Message Data
+                const items = [
+                    { label: "ค่าห้อง", value: `${room.price.toLocaleString()} ฿` },
+                    { label: `ไฟ (${eUnits} หน่วย)`, value: `${eTotal.toLocaleString()} ฿` },
+                    { label: `น้ำ (${wUnits} หน่วย)`, value: `${wTotal.toLocaleString()} ฿` },
+                    { label: "ขยะ", value: `${TRASH_FEE.toLocaleString()} ฿` }
+                ];
+
+                if (INTERNET_FEE > 0) items.push({ label: "อินเทอร์เน็ต", value: `${INTERNET_FEE.toLocaleString()} ฿` });
+                if (OTHER_FEE > 0) items.push({ label: "ส่วนกลาง/อื่นๆ", value: `${OTHER_FEE.toLocaleString()} ฿` });
+
+                await sendBillNotificationFlex(resident.lineUserId, {
+                    roomNumber: room.number,
+                    month: new Date().toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }),
+                    totalAmount: totalAmount.toLocaleString(),
+                    payUrl: payUrl,
+                    items: items
+                });
             }
         }
 
