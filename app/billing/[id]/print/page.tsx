@@ -77,8 +77,8 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
 
             {/* Preview Area */}
             <div className={`print-content bg-white shadow-2xl print:shadow-none mx-auto ${type === 'slip' ? 'w-[80mm]' : 'w-[210mm] min-h-[297mm]'}`}>
-                {type === 'a4' && (
-                    <InvoiceA4 billing={billing} resident={resident} config={config} />
+                {(type === 'a4' || type === 'a4_receipt') && (
+                    <InvoiceA4 billing={billing} resident={resident} config={config} type={type === 'a4_receipt' ? 'receipt' : 'invoice'} />
                 )}
                 {type === 'a5' && (
                     <div className="w-[210mm] h-[297mm] bg-white print:w-full print:h-full flex flex-col">

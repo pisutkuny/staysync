@@ -10,7 +10,11 @@ export default function PrintToolbar({ id }: { id: string }) {
         <div className="fixed top-4 right-4 flex gap-2 print:hidden z-50">
             <a href={`/billing/${id}/print?type=a4`}
                 className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'a4' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
-                A4 Full
+                A4 Invoice
+            </a>
+            <a href={`/billing/${id}/print?type=a4_receipt`}
+                className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'a4_receipt' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
+                A4 Receipt
             </a>
             <a href={`/billing/${id}/print?type=a5`}
                 className={`px-4 py-2 rounded-lg font-bold shadow-sm ${type === 'a5' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>

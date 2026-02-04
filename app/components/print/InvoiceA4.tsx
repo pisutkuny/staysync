@@ -3,7 +3,7 @@
 import generatePayload from 'promptpay-qr';
 import { QRCodeCanvas } from 'qrcode.react';
 
-export default function InvoiceA4({ billing, resident, config }: { billing: any, resident: any, config: any }) {
+export default function InvoiceA4({ billing, resident, config, type = 'invoice' }: { billing: any, resident: any, config: any, type?: 'invoice' | 'receipt' }) {
     // Calculate Amounts safely
     const waterAmount = (billing.waterMeterCurrent - billing.waterMeterLast) * billing.waterRate;
     const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
@@ -48,7 +48,7 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
                             </div>
                         </div>
                         <div className="text-right">
-                            <h2 className="text-4xl font-bold uppercase tracking-tight" style={{ color: themeColor }}>INVOICE</h2>
+                            <h2 className="text-4xl font-bold uppercase tracking-tight" style={{ color: themeColor }}>{type === 'receipt' ? 'RECEIPT' : 'INVOICE'}</h2>
                             <p className="font-mono text-lg text-gray-600 mt-2 font-bold">INV #{billing.id.toString().padStart(6, '0')}</p>
                             <p className="text-sm text-gray-500 mt-1">วันที่: {new Date(billing.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>
@@ -151,33 +151,45 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
                     <div className="flex justify-between items-end border-t-2 border-gray-100 pt-8">
                         {/* Payment / QR */}
                         <div className="w-2/3 pr-8">
-                            {promptPayPayload && (
-                                <div className="flex gap-6 items-start">
-                                    <div className="relative p-2 border-2 border-gray-200 rounded-xl bg-white">
-                                        <QRCodeCanvas value={promptPayPayload} size={110} />
-                                        {/* Corner Accents */}
-                                        <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-gray-800"></div>
-                                        <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-gray-800"></div>
-                                        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-gray-800"></div>
-                                        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-gray-800"></div>
+                            {type === 'receipt' ? (
+                                <div className="flex gap-6 items-center">
+                                    <div className="border-4 border-red-500 rounded-lg p-3 px-6 transform rotate-[-8deg] opacity-80 mask-stamp">
+                                        <span className="text-4xl font-black text-red-500 tracking-widest uppercase">PAID</span>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-lg text-gray-900 mb-1">สแกนชำระเงิน (Scan to Pay)</h4>
-                                        <p className="text-sm text-gray-600 font-medium">{config.bankName}</p>
-                                        <p className="text-sm text-gray-600">{config.bankAccountName}</p>
-                                        <p className="text-lg font-mono font-bold text-gray-800 mt-1">{config.bankAccountNumber}</p>
-
-                                        {config.invoiceNote ? (
-                                            <p className="text-sm text-gray-500 italic mt-3 bg-gray-50 p-2 rounded border border-gray-100 max-w-sm">
-                                                Note: {config.invoiceNote}
-                                            </p>
-                                        ) : (
-                                            <p className="text-xs text-gray-400 italic mt-2">
-                                                กรุณาโอนชำระและส่งสลิปภายใน 5 วัน
-                                            </p>
-                                        )}
+                                        <p className="text-xl font-bold text-red-600">ชำระเงินเรียบร้อยแล้ว</p>
+                                        <p className="text-gray-500 mt-1">วันที่ชำระ: {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                     </div>
                                 </div>
+                            ) : (
+                                promptPayPayload && (
+                                    <div className="flex gap-6 items-start">
+                                        <div className="relative p-2 border-2 border-gray-200 rounded-xl bg-white">
+                                            <QRCodeCanvas value={promptPayPayload} size={110} />
+                                            {/* Corner Accents */}
+                                            <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-gray-800"></div>
+                                            <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-gray-800"></div>
+                                            <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-gray-800"></div>
+                                            <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-gray-800"></div>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-lg text-gray-900 mb-1">สแกนชำระเงิน (Scan to Pay)</h4>
+                                            <p className="text-sm text-gray-600 font-medium">{config.bankName}</p>
+                                            <p className="text-sm text-gray-600">{config.bankAccountName}</p>
+                                            <p className="text-lg font-mono font-bold text-gray-800 mt-1">{config.bankAccountNumber}</p>
+
+                                            {config.invoiceNote ? (
+                                                <p className="text-sm text-gray-500 italic mt-3 bg-gray-50 p-2 rounded border border-gray-100 max-w-sm">
+                                                    Note: {config.invoiceNote}
+                                                </p>
+                                            ) : (
+                                                <p className="text-xs text-gray-400 italic mt-2">
+                                                    กรุณาโอนชำระและส่งสลิปภายใน 5 วัน
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )
                             )}
                         </div>
 
