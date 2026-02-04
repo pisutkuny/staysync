@@ -32,20 +32,51 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
     const resident = billing.room?.residents?.find((r: any) => r.status === 'Active') || billing.room?.residents?.[0];
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8 print:p-0 print:bg-white">
+        <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col items-center justify-start overflow-auto p-8 print:p-0 print:bg-white print:static print:block">
             <style type="text/css" dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
-                    @page { margin: 0; }
-                    body { background: white; }
+                    @page { 
+                        size: A4 portrait; 
+                        margin: 0; 
+                    }
+                    body { 
+                        background: white; 
+                        margin: 0; 
+                        padding: 0; 
+                        -webkit-print-color-adjust: exact; 
+                        print-color-adjust: exact;
+                    }
+                    * {
+                        visibility: hidden;
+                    }
+                    .print-content, .print-content * {
+                        visibility: visible;
+                    }
+                    .print-content {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        margin: 0;
+                    }
+                    /* Hide toolbar and all other page elements */
+                    nav, header, footer, .sidebar {
+                        display: none !important;
+                    }
                 }
             `}} />
 
             {/* Print Toolbar (Client Component) */}
-            <PrintToolbar id={id} />
+            <div className="print:hidden w-full max-w-[210mm] mb-6 flex justify-between items-center">
+                <PrintToolbar id={id} />
+                <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-md shadow-sm border border-gray-200">
+                    💡 Tip: ตั้งค่า Paper Size เป็น <b>A4</b> และ Margins เป็น <b>None/Default</b>
+                </div>
+            </div>
 
             {/* Preview Area */}
-            <div className={`shadow-2xl print:shadow-none ${type === 'slip' ? 'max-w-[80mm]' : 'max-w-[210mm]'}`}>
+            <div className={`print-content bg-white shadow-2xl print:shadow-none mx-auto ${type === 'slip' ? 'w-[80mm]' : 'w-[210mm] min-h-[297mm]'}`}>
                 {type === 'a4' && (
                     <InvoiceA4 billing={billing} resident={resident} config={config} />
                 )}
