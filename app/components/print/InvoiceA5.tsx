@@ -124,9 +124,9 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
 
                 {/* Bottom Section: Signature */}
                 <div className="mt-auto pt-8 pb-4 flex justify-start">
-                    <div className="text-center w-full max-w-[300px]">
-                        <div className="border-b-2 border-dotted border-black mb-2 h-8 w-full"></div>
-                        <p className="text-[12px] text-gray-600 font-medium">ผู้รับเงิน / Collector</p>
+                    <div className="text-center w-[200px]">
+                        <div className="border-b-2 border-dotted border-black mb-2 h-8"></div>
+                        <p className="text-[12px] text-gray-600 font-medium">ผู้ดูแลหอพัก / Dorm Manager</p>
                     </div>
                 </div>
             </div>
