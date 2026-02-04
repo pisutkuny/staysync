@@ -48,7 +48,7 @@ export default function InvoiceA4({ billing, resident, config }: { billing: any,
                             </div>
                         </div>
                         <div className="text-right">
-                            <h2 className="text-4xl font-bold uppercase tracking-tight text-gray-800">INVOICE</h2>
+                            <h2 className="text-4xl font-bold uppercase tracking-tight" style={{ color: themeColor }}>INVOICE</h2>
                             <p className="font-mono text-lg text-gray-600 mt-2 font-bold">INV #{billing.id.toString().padStart(6, '0')}</p>
                             <p className="text-sm text-gray-500 mt-1">วันที่: {new Date(billing.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>

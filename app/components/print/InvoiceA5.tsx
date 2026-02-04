@@ -47,7 +47,7 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                             <p className="text-[10px] text-gray-500 max-w-[250px] leading-tight mt-1">{config.dormAddress}</p>
                         </div>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-800 uppercase">{type === 'receipt' ? 'RECEIPT' : 'INVOICE'}</h1>
+                    <h1 className="text-4xl font-bold tracking-tight uppercase" style={{ color: themeColor }}>{type === 'receipt' ? 'RECEIPT' : 'INVOICE'}</h1>
                 </div>
 
                 {/* Table */}
