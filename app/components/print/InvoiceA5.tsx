@@ -132,10 +132,10 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
             </div>
 
             {/* Right Sidebar */}
-            <div className="w-[30%] pl-8 flex flex-col gap-4 bg-gray-50/30 -my-8 py-8 -mr-8 pr-8 text-right">
+            <div className="w-[30%] pl-8 flex flex-col gap-4 bg-gray-50/30 -my-8 py-8 -mr-8 pr-8">
                 {/* QR Code Section */}
                 {promptPayPayload && (
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-center text-center">
                         <div className="relative inline-block p-1 border-2 border-gray-800 rounded-lg bg-white mb-2">
                             {/* Corner accents */}
                             <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-gray-800"></div>
@@ -167,7 +167,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 <div className="h-2"></div>
 
                 {/* Issued To */}
-                <div className="text-right">
+                <div className="text-left">
                     <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-1">ออกให้แก่ :</h3>
                     <p className="font-bold text-gray-900 text-sm">{resident?.fullName || "Guest"}</p>
                     <p className="text-xs text-gray-500">{resident?.phone || "-"}</p>
@@ -175,7 +175,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 </div>
 
                 {/* Invoice Details */}
-                <div className="space-y-2 text-right">
+                <div className="space-y-2 text-left">
                     <div>
                         <h3 className="text-[10px] font-bold text-gray-400 uppercase">เลขที่เอกสาร</h3>
                         <p className="font-mono text-xs text-gray-900 font-bold">INV/#{billing.id.toString().padStart(6, '0')}</p>
