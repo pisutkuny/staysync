@@ -38,11 +38,16 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                 const uploadData = new FormData();
                 uploadData.append("file", selectedFile);
                 const uploadRes = await fetch("/api/upload", { method: "POST", body: uploadData });
-                if (!uploadRes.ok) throw new Error("Upload failed");
+
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json();
+                    throw new Error(errorData.error || "Upload failed");
+                }
+
                 const { url } = await uploadRes.json();
                 finalUrl = url;
-            } catch (error) {
-                alert("Error uploading file.");
+            } catch (error: any) {
+                alert("Upload Error: " + error.message);
                 setLoading(false);
                 return;
             }
