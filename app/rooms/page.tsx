@@ -46,16 +46,13 @@ export default async function RoomsPage() {
                                     <p className="text-sm text-gray-500 mb-1">Residents ({room.residents.filter((r: any) => r.status === 'Active').length}):</p>
                                     <div className="space-y-1">
                                         {room.residents.filter((r: any) => r.status === 'Active').length > 0 ? (
-                                            room.residents.filter((r: any) => r.status === 'Active').slice(0, 2).map((resident: any) => (
+                                            room.residents.filter((r: any) => r.status === 'Active').map((resident: any) => (
                                                 <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-indigo-600 font-medium hover:underline text-sm">
                                                     👤 {resident.fullName}
                                                 </Link>
                                             ))
                                         ) : (
                                             <p className="font-medium text-gray-900">Unknown</p>
-                                        )}
-                                        {room.residents.filter((r: any) => r.status === 'Active').length > 2 && (
-                                            <p className="text-xs text-gray-400 pl-5">+ {room.residents.filter((r: any) => r.status === 'Active').length - 2} more</p>
                                         )}
                                     </div>
                                 </div>
