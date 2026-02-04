@@ -39,7 +39,10 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                 }
 
                 try {
-                    // Use standard fetch with text/plain to avoid CORS preflight issues with GAS
+                    console.log("Starting upload to:", scriptUrl);
+
+                    // Remove explicit Content-Type to avoid CORS complications
+                    // Add credentials: 'omit' to ensure no cookies are sent (standard for public GAS scripts)
                     const response = await fetch(scriptUrl, {
                         method: 'POST',
                         body: JSON.stringify({
@@ -47,7 +50,7 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                             mimeType: file.type,
                             file: base64Content
                         }),
-                        headers: { 'Content-Type': 'text/plain' },
+                        credentials: 'omit',
                     });
 
                     if (!response.ok) {
