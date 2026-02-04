@@ -12,12 +12,13 @@ export async function uploadToDrive(file: File, folderId: string) {
             throw new Error("Missing Google Drive Configuration (Email, Key, or Folder ID)");
         }
 
-        const auth = new google.auth.JWT(
-            clientEmail,
-            undefined,
-            privateKey,
-            SCOPES
-        );
+        const auth = new google.auth.GoogleAuth({
+            credentials: {
+                client_email: clientEmail,
+                private_key: privateKey,
+            },
+            scopes: SCOPES,
+        });
 
         const drive = google.drive({ version: 'v3', auth });
 
