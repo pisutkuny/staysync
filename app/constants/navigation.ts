@@ -1,0 +1,47 @@
+
+import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings } from "lucide-react";
+
+export const NAV_ITEMS = [
+    {
+        label: "Dashboard",
+        href: "/",
+        icon: LayoutDashboard,
+        roles: ["OWNER", "STAFF", "TENANT"] // Visible to all (or logic handled in component)
+    },
+    {
+        label: "Rooms",
+        href: "/rooms",
+        icon: DoorOpen,
+        roles: ["OWNER", "STAFF"]
+    },
+    {
+        label: "Billing",
+        href: "/billing",
+        icon: Receipt,
+        roles: ["OWNER"]
+    },
+    {
+        label: "Pending Issues",
+        href: "/issues",
+        icon: FileText,
+        roles: ["OWNER", "STAFF"]
+    },
+    {
+        label: "Report Issue",
+        href: "/report",
+        icon: FileText,
+        roles: ["OWNER", "STAFF", "TENANT"]
+    },
+    {
+        label: "Broadcast",
+        href: "/broadcast",
+        icon: Megaphone,
+        roles: ["OWNER"]
+    },
+    {
+        label: "Settings",
+        href: "/settings",
+        icon: Settings,
+        roles: ["OWNER"]
+    }
+];

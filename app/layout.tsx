@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
-import MobileNav from "./components/MobileNav";
-import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,12 +23,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="flex min-h-screen">
-          <MobileNav userRole={userRole} />
-          <Sidebar userRole={userRole} />
+        <div className="min-h-screen bg-gray-50">
+          <Navbar userRole={userRole} />
 
-          {/* Main Content */}
-          <main className="flex-1 md:ml-64 p-4 pt-20 md:p-8 bg-gray-50 min-h-screen">
+          {/* Main Content - No left margin needed as sidebar is now a popup */}
+          <main className="pt-20 p-4 md:p-8 max-w-7xl mx-auto">
             {children}
           </main>
         </div>
