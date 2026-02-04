@@ -30,7 +30,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
             )}
 
             {/* Left Main Content */}
-            <div className="flex-1 pr-8 flex flex-col relative z-10 border-r-2 border-dashed border-gray-200" style={{ height: '100%' }}>
+            <div className="flex-1 pr-8 flex flex-col relative z-10 border-r border-gray-300" style={{ height: '100%' }}>
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex gap-4 items-start">
@@ -53,7 +53,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 {/* Table */}
                 <div className="flex-1">
                     <table className="w-full text-sm">
-                        <thead className="border-b border-gray-100 text-gray-500 font-bold text-[10px] tracking-wider bg-white">
+                        <thead className="border-y border-gray-400 text-gray-600 font-bold text-[10px] tracking-wider bg-transparent">
                             <tr>
                                 <th className="py-2 text-left">รายการ</th>
                                 <th className="py-2 text-right">ราคาต่อหน่วย</th>
@@ -61,7 +61,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                                 <th className="py-2 text-right">รวมเป็นเงิน</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50 text-xs font-medium text-gray-700">
+                        <tbody className="text-xs font-medium text-gray-700">
                             <tr>
                                 <td className="py-3">ค่าเช่าห้อง ({billing.room.number})</td>
                                 <td className="py-3 text-right">{rentAmount.toLocaleString()}</td>
@@ -109,7 +109,7 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 </div>
 
                 {/* Totals Section */}
-                <div className="flex justify-end mt-2 border-t border-gray-100 pt-2">
+                <div className="flex justify-end mt-2 pt-2 border-t border-gray-400">
                     <div className="w-1/2">
                         <div className="flex justify-between text-xs text-gray-500 mb-1">
                             <span>รวมเงิน</span>
@@ -123,10 +123,10 @@ export default function InvoiceA5({ billing, resident, config, copyType }: { bil
                 </div>
 
                 {/* Bottom Section: Signature */}
-                <div className="mt-auto pt-8 pb-4 flex justify-center">
-                    <div className="text-center w-[200px]">
-                        <div className="border-b border-gray-400 mb-2 h-8"></div>
-                        <p className="text-[10px] text-gray-500 font-medium">ผู้รับเงิน / Collector</p>
+                <div className="mt-auto pt-8 pb-4 flex justify-start">
+                    <div className="text-center w-full max-w-[300px]">
+                        <div className="border-b-2 border-dotted border-black mb-2 h-8 w-full"></div>
+                        <p className="text-[12px] text-gray-600 font-medium">ผู้รับเงิน / Collector</p>
                     </div>
                 </div>
             </div>
