@@ -25,6 +25,9 @@ export default function PrintToolbar({ id }: { id: string }) {
                 className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold shadow-sm flex items-center gap-2 hover:bg-gray-800">
                 🖨️ Print Now
             </button>
+            <a href="/billing" className="p-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors" title="Close">
+                ✕
+            </a>
         </div>
     );
 }

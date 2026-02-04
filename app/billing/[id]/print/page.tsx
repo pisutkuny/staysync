@@ -32,7 +32,7 @@ export default async function PrintPage({ params, searchParams }: { params: Prom
     const resident = billing.room?.residents?.find((r: any) => r.status === 'Active') || billing.room?.residents?.[0];
 
     return (
-        <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col items-center justify-start overflow-auto p-8 print:p-0 print:bg-white print:static print:block">
+        <div className="fixed inset-0 z-[60] bg-gray-100 flex flex-col items-center justify-start overflow-auto p-8 print:p-0 print:bg-white print:static print:block">
             <style type="text/css" dangerouslySetInnerHTML={{
                 __html: `
                 @media print {
