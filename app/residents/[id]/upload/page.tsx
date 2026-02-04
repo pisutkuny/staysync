@@ -25,41 +25,71 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
         }
     };
 
+    const uploadToGoogleDrive = async (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64Content = (reader.result as string).split(',')[1];
+                const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
+
+                if (!scriptUrl) {
+                    reject(new Error("Missing Script URL configuration"));
+                    return;
+                }
+
+                try {
+                    // Use standard fetch with text/plain to avoid CORS preflight issues with GAS
+                    const response = await fetch(scriptUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            filename: file.name,
+                            mimeType: file.type,
+                            file: base64Content
+                        }),
+                        headers: { 'Content-Type': 'text/plain' },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Script returned status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        resolve(result.url); // Return the WebViewLink
+                    } else {
+                        reject(new Error(result.message || "Unknown GAS Error"));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = error => reject(error);
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         let finalUrl = "";
-
-        if (uploadMode === 'file') {
-            if (!selectedFile) return;
-            setLoading(true);
-            try {
-                // 1. Upload File
-                const uploadData = new FormData();
-                uploadData.append("file", selectedFile);
-                const uploadRes = await fetch("/api/upload", { method: "POST", body: uploadData });
-
-                if (!uploadRes.ok) {
-                    const errorData = await uploadRes.json();
-                    throw new Error(errorData.error || "Upload failed");
-                }
-
-                const { url } = await uploadRes.json();
-                finalUrl = url;
-            } catch (error: any) {
-                alert("Upload Error: " + error.message);
-                setLoading(false);
-                return;
-            }
-        } else {
-            // Link Mode
-            if (!externalLink) return;
-            finalUrl = externalLink;
-        }
+        setLoading(true);
 
         try {
-            setLoading(true);
-            // 2. Save Document Record
+            if (uploadMode === 'file') {
+                if (!selectedFile) return;
+
+                // 1. Client-Side Upload to Google Drive (GAS)
+                finalUrl = await uploadToGoogleDrive(selectedFile);
+                console.log("File uploaded to Drive:", finalUrl);
+
+            } else {
+                // Link Mode
+                if (!externalLink) return;
+                finalUrl = externalLink;
+            }
+
+            // 2. Save Document Record to Database
             const res = await fetch("/api/documents", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -70,13 +100,15 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
                 }),
             });
 
-            if (!res.ok) throw new Error("Failed to save record");
+            if (!res.ok) throw new Error("Failed to save record to database");
 
             alert("Document saved successfully!");
             router.push(`/residents/${residentId}`);
-        } catch (error) {
-            alert("Error saving document record.");
-            console.error(error);
+            router.refresh();
+
+        } catch (error: any) {
+            console.error("Upload Logic Error:", error);
+            alert("Error: " + error.message);
         } finally {
             setLoading(false);
         }
