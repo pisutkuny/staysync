@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Client, WebhookEvent } from "@line/bot-sdk";
 import { sendLineMessage } from "@/lib/line";
+import { createInvoiceFlexMessage, createGuestFlexMessage } from "@/lib/line/flexMessages";
 
 const config = {
     channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
@@ -85,12 +86,14 @@ export async function POST(req: Request) {
 
                     if (resident) {
                         // Query Latest Bill
+                        // We need to fetch enough data for the invoice (meter readings, fees, etc.)
                         const latestBill = await prisma.billing.findFirst({
                             where: {
                                 roomId: resident.room?.id,
                                 residentId: resident.id
                             },
-                            orderBy: { createdAt: 'desc' }
+                            orderBy: { createdAt: 'desc' },
+                            include: { room: true } // Ensure room details are loaded
                         });
 
                         if (!latestBill) {
@@ -100,38 +103,25 @@ export async function POST(req: Request) {
                                     text: "✅ ไม่มียอดค้างชำระครับ\n\n(คุณยังไม่มีประวัติการแจ้งบิลในระบบ)"
                                 });
                             }
-                        } else if (latestBill.paymentStatus === "Paid") {
-                            if (client) {
-                                await client.replyMessage(event.replyToken, {
-                                    type: "text",
-                                    text: `✅ บิลเดือนนี้ชำระเรียบร้อยแล้วครับ\nขอบคุณครับ! 🙏`
-                                });
-                            }
-                        } else if (latestBill.paymentStatus === "Review") {
-                            if (client) {
-                                await client.replyMessage(event.replyToken, {
-                                    type: "text",
-                                    text: `⏳ สลิปของคุณกำลังรอการตรวจสอบครับ\nเราจะแจ้งผลให้ทราบเร็วๆ นี้ครับ`
-                                });
-                            }
                         } else {
-                            // Pending or Rejected
-                            const bankDetails = `🏦 ${sysConfig.bankName}\nเลขบัญชี: ${sysConfig.bankAccountNumber}\nชื่อ: ${sysConfig.bankAccountName}`;
+                            // Generate Flex Message for Invoice
+                            // Construct Pay URL
+                            // TODO: Replace <YOUR_WEB_URL> with actual domain from Env if possible
+                            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com";
+                            const payUrl = `${baseUrl}/pay/upload?billId=${latestBill.id}`;
+
+                            const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
+
                             if (client) {
-                                await client.replyMessage(event.replyToken, {
-                                    type: "text",
-                                    text: `🧾 ใบแจ้งหนี้ล่าสุด\nยอดชำระ: ${latestBill.totalAmount.toLocaleString()} บาท\n\n${bankDetails}\n\n📲 แจ้งโอนเงิน/แนบสลิป:\nhttps://<YOUR_WEB_URL>/pay/upload?billId=${latestBill.id}`
-                                });
+                                await client.replyMessage(event.replyToken, flexMessage);
                             }
                         }
 
                     } else {
-                        // Guest Response
+                        // Guest Response - Flex Message
+                        const guestFlex = createGuestFlexMessage();
                         if (client) {
-                            await client.replyMessage(event.replyToken, {
-                                type: "text",
-                                text: `🔒 เมนูนี้สำหรับผู้เช่าหอพักครับ\n\nหากคุณเป็นผู้เช่า กรุณาพิมพ์รหัสยืนยันตัวตน (Code) เพื่อเชื่อมต่อบัญชี\n\nหรือหากสนใจเช่าห้องพัก ติดต่อเจ้าหน้าที่ได้ที่เมนู Contact ครับ`
-                            });
+                            await client.replyMessage(event.replyToken, guestFlex);
                         }
                     }
                     return;
