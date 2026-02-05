@@ -111,6 +111,15 @@ export async function sendBillNotificationFlex(userId: string, data: {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
+                    // New: Scan Instruction
+                    ...(qrImageUrl ? [{
+                        "type": "text",
+                        "text": "สแกน QR เพื่อชำระเงิน",
+                        "align": "center",
+                        "size": "xs",
+                        "color": "#999999",
+                        "margin": "none"
+                    }] : []),
                     {
                         "type": "box",
                         "layout": "vertical",
