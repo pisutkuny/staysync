@@ -37,7 +37,10 @@ export async function POST(req: Request) {
                     rulesText: "1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน",
                     emergencyPhone: "191",
                     adminPhone: "081-234-5678",
-                    adminLineIdDisplay: "@staysync_admin"
+                    adminLineIdDisplay: "@staysync_admin",
+                    bankName: "Bank Name",
+                    bankAccountNumber: "000-0-00000-0",
+                    bankAccountName: "Account Name"
                 };
 
                 let userState = userStateObj;
