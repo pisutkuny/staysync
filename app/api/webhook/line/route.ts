@@ -68,43 +68,60 @@ export async function POST(req: Request) {
                         include: { room: true }
                     });
 
-                    if (!resident) {
-                        if (client) {
-                            await client.replyMessage(event.replyToken, {
-                                type: "text",
-                                text: "❌ คุณยังไม่ได้เชื่อมต่อบัญชีกับห้องพัก\nกรุณาพิมพ์ Code ยืนยันตัวตน (เช่น #1234) ก่อนแจ้งซ่อมครับ"
-                            });
-                        }
+                    // Parse description
+                    const description = text.replace(/^(แจ้งซ่อม|report)\s*/i, "").trim() || "ไม่ระบุรายละเอียด";
+                    let reporterName = "Line User";
+                    let residentId = null;
+                    let roomNumber = "Guest (Line)";
+
+                    if (resident) {
+                        residentId = resident.id;
+                        reporterName = resident.fullName;
+                        roomNumber = resident.room?.number || "Unknown";
                     } else {
-                        // Create Issue
-                        const description = text.replace(/^(แจ้งซ่อม|report)\s*/i, "").trim() || "ไม่ระบุรายละเอียด";
-
-                        const issue = await prisma.issue.create({
-                            data: {
-                                category: "Other", // Default for chat
-                                description: description,
-                                residentId: resident.id,
-                                status: "Pending"
+                        // Creating as Guest
+                        try {
+                            if (client) {
+                                const profile = await client.getProfile(userId);
+                                reporterName = profile.displayName;
                             }
+                        } catch (e) {
+                            console.error("Failed to fetch Line Profile", e);
+                        }
+                    }
+
+                    // Create Issue
+                    const issue = await prisma.issue.create({
+                        data: {
+                            category: "Other",
+                            description: description,
+                            residentId: residentId,
+                            status: "Pending",
+                            reporterName: resident ? undefined : reporterName,
+                            reporterContact: resident ? undefined : `Line:${userId}`
+                        }
+                    });
+
+                    // Reply User
+                    if (client) {
+                        const replyText = resident
+                            ? `📝 รับเรื่องแจ้งซ่อมเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: ${description}\n\nเจ้าหน้าที่จะดำเนินการตรวจสอบโดยเร็วที่สุดครับ`
+                            : `📢 รับแจ้งเหตุจากบุคคลทั่วไปเรียบร้อยครับ\n(Ticket #${issue.id})\n\nเราบันทึกชื่อคุณ (${reporterName}) สำหรับติดต่อกลับแล้วครับ ขอบคุณที่แจ้งเบาะแสครับ 🙏`;
+
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: replyText
                         });
+                    }
 
-                        // Reply User
-                        if (client) {
-                            await client.replyMessage(event.replyToken, {
-                                type: "text",
-                                text: `📝 รับเรื่องแจ้งซ่อมเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: ${description}\n\nเจ้าหน้าที่จะดำเนินการตรวจสอบโดยเร็วที่สุดครับ`
-                            });
-                        }
-
-                        // Notify Admin (Owner)
-                        const ownerLineId = process.env.OWNER_LINE_USER_ID;
-                        if (ownerLineId) {
-                            const adminMsg = `🔔 แจ้งซ่อมใหม่ (ผ่าน Line)!\n` +
-                                `ห้อง: ${resident.room?.number || "Unknown"}\n` +
-                                `ผู้แจ้ง: ${resident.fullName}\n` +
-                                `ปัญหา: ${description}`;
-                            await sendLineMessage(ownerLineId, adminMsg);
-                        }
+                    // Notify Admin (Owner)
+                    const ownerLineId = process.env.OWNER_LINE_USER_ID;
+                    if (ownerLineId) {
+                        const adminMsg = `🔔 แจ้งซ่อมใหม่ (Line ${resident ? 'Resident' : 'Guest'})!\n` +
+                            `ห้อง: ${roomNumber}\n` +
+                            `ผู้แจ้ง: ${reporterName}\n` +
+                            `ปัญหา: ${description}`;
+                        await sendLineMessage(ownerLineId, adminMsg);
                     }
                 } else if (text.toLowerCase() === 'myid' || text.toLowerCase() === 'admin') {
                     // Admin Helper: Reply with User ID

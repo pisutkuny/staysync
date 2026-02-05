@@ -18,6 +18,10 @@ export default function ReportIssuePage() {
     const [selectedRoomId, setSelectedRoomId] = useState<string>("");
     const [selectedResidentId, setSelectedResidentId] = useState<string>("");
 
+    // Guest State
+    const [isGuest, setIsGuest] = useState(false);
+    const [guestInfo, setGuestInfo] = useState({ name: "", contact: "" });
+
     // Fetch Residents on Mount
     useState(() => {
         fetch("/api/residents")
@@ -36,8 +40,15 @@ export default function ReportIssuePage() {
     const filteredResidents = residents.filter(r => r.room?.id?.toString() === selectedRoomId);
 
     const handleRoomChange = (roomId: string) => {
-        setSelectedRoomId(roomId);
-        setSelectedResidentId(""); // Reset resident when room changes
+        if (roomId === "public") {
+            setIsGuest(true);
+            setSelectedRoomId("public");
+            setSelectedResidentId("");
+        } else {
+            setIsGuest(false);
+            setSelectedRoomId(roomId);
+            setSelectedResidentId("");
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,10 +66,16 @@ export default function ReportIssuePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedResidentId) {
+
+        if (!isGuest && !selectedResidentId) {
             alert("Please select your name.");
             return;
         }
+        if (isGuest && (!guestInfo.name || !guestInfo.contact)) {
+            alert("Please fill in your name and contact info.");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -81,15 +98,24 @@ export default function ReportIssuePage() {
             }
 
             // 2. Create Issue
+            const payload = isGuest ? {
+                category: formData.category,
+                description: formData.description,
+                photo: photoUrl,
+                residentId: null,
+                reporterName: guestInfo.name,
+                reporterContact: guestInfo.contact
+            } : {
+                category: formData.category,
+                description: formData.description,
+                photo: photoUrl,
+                residentId: parseInt(selectedResidentId),
+            };
+
             const res = await fetch("/api/issues", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    category: formData.category,
-                    description: formData.description,
-                    photo: photoUrl,
-                    residentId: parseInt(selectedResidentId),
-                }),
+                body: JSON.stringify(payload),
             });
 
             if (!res.ok) throw new Error("Failed");
@@ -124,6 +150,8 @@ export default function ReportIssuePage() {
                                 className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                             >
                                 <option value="">-- Select Room --</option>
+                                <option value="public">🔔 Public / บุคคลทั่วไป (แจ้งเหตุภายนอก)</option>
+                                <option disabled>──────────────</option>
                                 {uniqueRooms.map((room: any) => (
                                     <option key={room.id} value={room.id}>
                                         Room {room.number}
@@ -132,26 +160,53 @@ export default function ReportIssuePage() {
                             </select>
                         </div>
 
-                        {/* Resident Selection (Dependent) */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">2. Select Your Name / เลือกชื่อผู้เช่า</label>
-                            <select
-                                required
-                                disabled={!selectedRoomId}
-                                value={selectedResidentId}
-                                onChange={(e) => setSelectedResidentId(e.target.value)}
-                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400"
-                            >
-                                <option value="">
-                                    {selectedRoomId ? "-- Select Name --" : "-- Select Room First --"}
-                                </option>
-                                {filteredResidents.map(r => (
-                                    <option key={r.id} value={r.id}>
-                                        {r.fullName}
+                        {/* Resident Selection OR Guest Input */}
+                        {!isGuest ? (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">2. Select Your Name / เลือกชื่อผู้เช่า</label>
+                                <select
+                                    required={!isGuest}
+                                    disabled={!selectedRoomId}
+                                    value={selectedResidentId}
+                                    onChange={(e) => setSelectedResidentId(e.target.value)}
+                                    className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                                >
+                                    <option value="">
+                                        {selectedRoomId ? "-- Select Name --" : "-- Select Room First --"}
                                     </option>
-                                ))}
-                            </select>
-                        </div>
+                                    {filteredResidents.map(r => (
+                                        <option key={r.id} value={r.id}>
+                                            {r.fullName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div className="space-y-3 bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1">Your Name / ชื่อผู้แจ้ง</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={guestInfo.name}
+                                        onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
+                                        placeholder="Enter your name"
+                                        className="w-full p-2.5 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1">Contact / เบอร์ติดต่อ</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={guestInfo.contact}
+                                        onChange={(e) => setGuestInfo({ ...guestInfo, contact: e.target.value })}
+                                        placeholder="Phone number or Line ID"
+                                        className="w-full p-2.5 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Category Selection */}

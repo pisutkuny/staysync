@@ -85,6 +85,8 @@ model Issue {
   category    String   // Water, Electricity, Internet, Other
   description String
   photo       String?
+  reporterName    String?  // For public/guest reports
+  reporterContact String?  // Phone or Line ID
   status      String   @default("Pending") // Pending, InProgress, Done
   createdAt   DateTime @default(now())
   

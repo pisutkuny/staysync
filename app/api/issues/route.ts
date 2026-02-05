@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { category, description, photo, residentId } = body;
+        const { category, description, photo, residentId, reporterName, reporterContact } = body;
 
         const issue = await prisma.issue.create({
             data: {
@@ -30,6 +30,8 @@ export async function POST(request: Request) {
                 description,
                 photo,
                 residentId: residentId ? Number(residentId) : null,
+                reporterName,
+                reporterContact
             },
         });
 
@@ -42,8 +44,12 @@ export async function POST(request: Request) {
                 include: { room: true }
             }) : null;
 
+            const roomText = resident?.room?.number || "Public/Guest";
+            const reporterText = resident?.fullName || reporterName || "Unknown";
+
             const message = `🔔 แจ้งซ่อมใหม่!\n` +
-                `ห้อง: ${resident?.room?.number || "Unknown"}\n` +
+                `ห้อง: ${roomText}\n` +
+                `ผู้แจ้ง: ${reporterText}\n` +
                 `ปัญหา: ${category}\n` +
                 `รายละเอียด: ${description}\n` +
                 `รูปภาพ: ${photo || "-"}`;
