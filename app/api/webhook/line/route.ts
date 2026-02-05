@@ -24,12 +24,157 @@ export async function POST(req: Request) {
 
                 if (!userId) return;
 
-                // Check if text is a Verification Code (e.g. starts with # or just 4 digits)
-                // Let's assume the code is exactly the string in DB
+                // 1. Get User State
+                let userState = await prisma.lineBotState.findUnique({ where: { lineUserId: userId } });
+                if (!userState) {
+                    userState = await prisma.lineBotState.create({
+                        data: { lineUserId: userId, state: "IDLE" }
+                    });
+                }
 
+                // 2. Helper to Reset State
+                const resetState = async () => prisma.lineBotState.update({
+                    where: { lineUserId: userId },
+                    data: { state: "IDLE", data: null }
+                });
+
+                // 3. Handle Keywords (Priority Override)
+                const lowerText = text.toLowerCase();
+
+                // --- RICH MENU TRIGGERS ---
+                if (text === "แจ้งซ่อม" || text === "Menu: Repair") {
+                    await prisma.lineBotState.update({
+                        where: { lineUserId: userId },
+                        data: { state: "REPAIR_DESC" }
+                    });
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "🔧 แจ้งซ่อม: กรุณาพิมพ์แจ้งปัญหาที่คุณพบได้เลยครับ\n(เช่น แอร์ไม่เย็น, ท่อน้ำรั่ว)"
+                        });
+                    }
+                    return;
+                }
+
+                if (lowerText === "myid" || text === "บิลของฉัน" || text === "Menu: Bill") {
+                    await resetState();
+                    // Fetch Bill logic (reused) or link
+                    // Find resident
+                    const resident = await prisma.resident.findFirst({
+                        where: { lineUserId: userId },
+                        include: { room: true }
+                    });
+
+                    if (resident) {
+                        // Check latest bill (Assuming logic exists) or just show status
+                        // For now, link to web
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: `💳 ดูบิลค่าเช่าของคุณได้ที่นี่ครับ:\nhttps://<YOUR_WEB_URL>/pay/search?room=${resident.room?.number}`
+                            });
+                        }
+                    } else {
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: `🔑 User ID ของคุณคือ:\n${userId}\n(แจ้ง Admin เพื่อเชื่อมต่อห้องพัก)`
+                            });
+                        }
+                    }
+                    return;
+                }
+
+                if (text === "Wifi" || text === "Menu: Wifi") {
+                    await resetState();
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "📶 ข้อมูล Wi-Fi\n\nSSID: StaySync_Residences\nPassword: staysync_wifi\n\n(หากเชื่อมต่อไม่ได้ แจ้งแอดมินได้เลยครับ)"
+                        });
+                    }
+                    return;
+                }
+
+                if (text === "Rules" || text === "Menu: Rules") {
+                    await resetState();
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "📘 กฎระเบียบหอพัก\n\n1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน\n\nขอบคุณที่ให้ความร่วมมือครับ 🙏"
+                        });
+                    }
+                    return;
+                }
+
+                if (text === "Admin" || text === "Menu: Contact") {
+                    await resetState();
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "📞 ติดต่อเจ้าหน้าที่\n\nโทร: 081-234-5678\nLine: @staysync_admin\n(เวลาทำการ 09.00 - 18.00 น.)"
+                        });
+                    }
+                    return;
+                }
+
+                // --- STATE HANDLERS ---
+                if (userState.state === "REPAIR_DESC") {
+                    // This message IS the repair description
+                    const description = text;
+
+                    // Create Issue
+                    const resident = await prisma.resident.findFirst({
+                        where: { lineUserId: userId },
+                        include: { room: true }
+                    });
+
+                    // Get Name if Guest
+                    let reporterName = "Line User";
+                    if (!resident) {
+                        try {
+                            if (client) {
+                                const profile = await client.getProfile(userId);
+                                reporterName = profile.displayName;
+                            }
+                        } catch (e) { }
+                    }
+
+                    const issue = await prisma.issue.create({
+                        data: {
+                            category: "Other",
+                            description: description,
+                            residentId: resident?.id || null,
+                            status: "Pending",
+                            reporterName: resident ? undefined : reporterName,
+                            reporterContact: resident ? undefined : `Line:${userId}`
+                        }
+                    });
+
+                    // Reply Success
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: `✅ รับเรื่องเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: "${description}"\nเราจะรีบตรวจสอบให้นะครับ`
+                        });
+                    }
+
+                    // Notify Admin
+                    const ownerLineId = process.env.OWNER_LINE_USER_ID;
+                    if (ownerLineId) {
+                        const roomText = resident?.room?.number || "Guest";
+                        const nameText = resident?.fullName || reporterName;
+                        await sendLineMessage(ownerLineId, `🔔 แจ้งซ่อมใหม่ (Chatbot)\nห้อง: ${roomText}\nผู้แจ้ง: ${nameText}\nปัญหา: ${description}`);
+                    }
+
+                    // Reset State
+                    await resetState();
+                    return;
+                }
+
+                // --- LEGACY / VERIFICATION FALLBACK ---
                 if (text.startsWith("#")) {
                     const code = text; // e.g. "#1234"
-
                     // Find resident with this code
                     const resident = await prisma.resident.findUnique({
                         where: { lineVerifyCode: code },
@@ -42,10 +187,11 @@ export async function POST(req: Request) {
                             where: { id: resident.id },
                             data: {
                                 lineUserId: userId,
-                                lineVerifyCode: null // Consume the code (One-time use) or keep it? 
-                                // Better to keep null to prevent re-use/hijacking.
+                                lineVerifyCode: null
                             }
                         });
+                        // Reset any pending state
+                        await resetState();
 
                         if (client) {
                             await client.replyMessage(event.replyToken, {
@@ -61,80 +207,36 @@ export async function POST(req: Request) {
                             });
                         }
                     }
-                } else if (text.startsWith("แจ้งซ่อม") || text.toLowerCase().startsWith("report")) {
-                    // Handle Issue Reporting via Line
-                    const resident = await prisma.resident.findFirst({
-                        where: { lineUserId: userId },
-                        include: { room: true }
-                    });
-
-                    // Parse description
-                    const description = text.replace(/^(แจ้งซ่อม|report)\s*/i, "").trim() || "ไม่ระบุรายละเอียด";
-                    let reporterName = "Line User";
-                    let residentId = null;
-                    let roomNumber = "Guest (Line)";
-
-                    if (resident) {
-                        residentId = resident.id;
-                        reporterName = resident.fullName;
-                        roomNumber = resident.room?.number || "Unknown";
-                    } else {
-                        // Creating as Guest
-                        try {
-                            if (client) {
-                                const profile = await client.getProfile(userId);
-                                reporterName = profile.displayName;
-                            }
-                        } catch (e) {
-                            console.error("Failed to fetch Line Profile", e);
-                        }
-                    }
-
-                    // Create Issue
-                    const issue = await prisma.issue.create({
-                        data: {
-                            category: "Other",
-                            description: description,
-                            residentId: residentId,
-                            status: "Pending",
-                            reporterName: resident ? undefined : reporterName,
-                            reporterContact: resident ? undefined : `Line:${userId}`
-                        }
-                    });
-
-                    // Reply User
-                    if (client) {
-                        const replyText = resident
-                            ? `📝 รับเรื่องแจ้งซ่อมเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: ${description}\n\nเจ้าหน้าที่จะดำเนินการตรวจสอบโดยเร็วที่สุดครับ`
-                            : `📢 รับแจ้งเหตุจากบุคคลทั่วไปเรียบร้อยครับ\n(Ticket #${issue.id})\n\nเราบันทึกชื่อคุณ (${reporterName}) สำหรับติดต่อกลับแล้วครับ ขอบคุณที่แจ้งเบาะแสครับ 🙏`;
-
-                        await client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: replyText
-                        });
-                    }
-
-                    // Notify Admin (Owner)
-                    const ownerLineId = process.env.OWNER_LINE_USER_ID;
-                    if (ownerLineId) {
-                        const adminMsg = `🔔 แจ้งซ่อมใหม่ (Line ${resident ? 'Resident' : 'Guest'})!\n` +
-                            `ห้อง: ${roomNumber}\n` +
-                            `ผู้แจ้ง: ${reporterName}\n` +
-                            `ปัญหา: ${description}`;
-                        await sendLineMessage(ownerLineId, adminMsg);
-                    }
-                } else if (text.toLowerCase() === 'myid' || text.toLowerCase() === 'admin') {
-                    // Admin Helper: Reply with User ID
-                    if (client) {
-                        await client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: `🔑 Your User ID:\n${userId}\n\n(Copy this ID to StaySync Settings > Admin Alerts)`
-                        });
-                    }
-                } else {
-                    // Auto-reply for other messages
-                    // Optional: "Type #xxxx to verify"
+                    return;
                 }
+
+                // Legacy "แจ้งซ่อม ..." format support (Optional)
+                if (text.startsWith("แจ้งซ่อม") || text.toLowerCase().startsWith("report")) {
+                    // Redirect to simplified flow
+                    await prisma.lineBotState.update({
+                        where: { lineUserId: userId },
+                        data: { state: "REPAIR_DESC" }
+                    });
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "เริ่มการแจ้งซ่อม: กรุณาพิมพ์รายละเอียดปัญหาได้เลยครับ"
+                        });
+                    }
+                    return;
+                }
+
+                // Default / IDLE Message
+                // Just acknowledge or ignore? Acknowledge is better for UX if it's a direct message.
+                // But avoid spamming if user just typed something random.
+                // Let's provide a "Confused" help message if it doesn't match anything.
+                // if (client) {
+                //      await client.replyMessage(event.replyToken, {
+                //         type: "text",
+                //         text: "🤖 ผมเป็นบอทครับ หากต้องการติดต่อเจ้าหน้าที่ กดปุ่ม 'Contact' หรือพิมพ์ 'Admin' ได้เลยครับ"
+                //     });
+                // }
+
             } else if (event.type === 'follow') {
                 const userId = event.source.userId;
                 if (userId) {

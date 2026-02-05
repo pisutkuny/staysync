@@ -137,3 +137,10 @@ model Expense {
   note        String?
   createdAt   DateTime @default(now())
 }
+
+model LineBotState {
+  lineUserId String   @id
+  state      String   @default("IDLE") // e.g., IDLE, REPAIR_DESC
+  data       String?  // JSON string for temp data
+  updatedAt  DateTime @updatedAt
+}
