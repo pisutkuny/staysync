@@ -1,37 +1,55 @@
 "use client";
 
 import { useState, use, useEffect } from "react";
-import { Loader2, Save, ArrowLeft } from "lucide-react";
+import { Loader2, Save, ArrowLeft, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+interface Room {
+    id: number;
+    number: string;
+    status: string;
+}
 
 export default function EditResidentPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [rooms, setRooms] = useState<Room[]>([]);
 
     // Form state
     const [formData, setFormData] = useState({
         fullName: "",
         phone: "",
-        lineUserId: ""
+        lineUserId: "",
+        roomId: ""
     });
 
-    // Fetch initial data
+    // Fetch initial data & Rooms
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(`/api/residents/${id}`);
-                if (!res.ok) throw new Error("Failed");
-                const data = await res.json();
+                // Parallel Fetch
+                const [resResident, resRooms] = await Promise.all([
+                    fetch(`/api/residents/${id}`),
+                    fetch(`/api/rooms`)
+                ]);
+
+                if (!resResident.ok || !resRooms.ok) throw new Error("Failed");
+
+                const resident = await resResident.json();
+                const roomsData = await resRooms.json();
+
                 setFormData({
-                    fullName: data.fullName,
-                    phone: data.phone || "",
-                    lineUserId: data.lineUserId || ""
+                    fullName: resident.fullName,
+                    phone: resident.phone || "",
+                    lineUserId: resident.lineUserId || "",
+                    roomId: resident.roomId?.toString() || ""
                 });
+                setRooms(roomsData);
             } catch (e) {
-                alert("Failed to load resident data");
+                alert("Failed to load data");
             } finally {
                 setLoading(false);
             }
@@ -46,7 +64,10 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             const res = await fetch(`/api/residents/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    roomId: formData.roomId ? Number(formData.roomId) : null
+                }),
             });
             if (!res.ok) throw new Error("Failed");
 
@@ -58,6 +79,10 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             setSaving(false);
         }
     };
+
+    // Helper: Get selected room status for warning
+    const selectedRoom = rooms.find(r => r.id.toString() === formData.roomId);
+    const isRoomOccupied = selectedRoom?.status === "Occupied";
 
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
 
@@ -71,6 +96,30 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
+
+                {/* Room Selection */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Room (Transfer)</label>
+                    <select
+                        value={formData.roomId}
+                        onChange={e => setFormData({ ...formData, roomId: e.target.value })}
+                        className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    >
+                        <option value="">-- No Room --</option>
+                        {rooms.map(room => (
+                            <option key={room.id} value={room.id}>
+                                Room {room.number} ({room.status})
+                            </option>
+                        ))}
+                    </select>
+                    {isRoomOccupied && (
+                        <div className="flex items-start gap-2 mt-2 text-amber-600 text-xs bg-amber-50 p-2 rounded-lg">
+                            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                            <p>Warning: This room is marked as "Occupied". You can still move here (e.g. sharing room), but please verify first.</p>
+                        </div>
+                    )}
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                     <input
