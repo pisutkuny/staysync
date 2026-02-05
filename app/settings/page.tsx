@@ -21,7 +21,14 @@ export default function SettingsPage() {
         adminLineUserId: "",
         invoiceLogo: "",
         invoiceNote: "",
-        invoiceColor: ""
+        invoiceColor: "",
+        // Chatbot Config
+        wifiSsid: "",
+        wifiPassword: "",
+        rulesText: "",
+        emergencyPhone: "",
+        adminPhone: "",
+        adminLineIdDisplay: ""
     });
 
     useEffect(() => {
@@ -268,6 +275,87 @@ export default function SettingsPage() {
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded-lg"
                                 placeholder="e.g. Please pay within 5 days"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Line Chatbot Configuration */}
+                <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        Line Chatbot Auto-Reply
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2 bg-indigo-50 p-4 rounded-lg mb-2">
+                            <p className="text-sm text-indigo-700">
+                                💡 ข้อมูลเหล่านี้จะถูกบอทตอบกลับอัตโนมัติเมื่อลูกบ้านกด Rich Menu หรือพิมพ์ถาม
+                            </p>
+                        </div>
+
+                        {/* Wi-Fi */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Wi-Fi Name (SSID)</label>
+                            <input
+                                name="wifiSsid"
+                                value={config.wifiSsid || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg"
+                                placeholder="StaySync_WiFi"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Wi-Fi Password</label>
+                            <input
+                                name="wifiPassword"
+                                value={config.wifiPassword || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg font-mono"
+                                placeholder="password1234"
+                            />
+                        </div>
+
+                        {/* Rules */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Dorm Rules (ข้อความกฎระเบียบ)</label>
+                            <textarea
+                                name="rulesText"
+                                value={config.rulesText || ""}
+                                onChange={(e) => setConfig(prev => ({ ...prev, rulesText: e.target.value }))}
+                                className="w-full p-2 border rounded-lg h-32"
+                                placeholder="1. ห้ามเสียงดัง..."
+                            />
+                        </div>
+
+                        {/* Contacts */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Phone (เบอร์ฉุกเฉิน)</label>
+                            <input
+                                name="emergencyPhone"
+                                value={config.emergencyPhone || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg"
+                                placeholder="191"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Admin Phone (เบอร์ติดต่อเจ้าหน้าที่)</label>
+                            <input
+                                name="adminPhone"
+                                value={config.adminPhone || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg"
+                                placeholder="081-xxxxxxx"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Admin Line ID (Official Account)</label>
+                            <input
+                                name="adminLineIdDisplay"
+                                value={config.adminLineIdDisplay || ""}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-lg"
+                                placeholder="@staysync_admin"
                             />
                         </div>
                     </div>

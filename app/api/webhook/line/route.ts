@@ -24,8 +24,23 @@ export async function POST(req: Request) {
 
                 if (!userId) return;
 
-                // 1. Get User State
-                let userState = await prisma.lineBotState.findUnique({ where: { lineUserId: userId } });
+                // 1. Get User State & System Config
+                const [userStateObj, configObj] = await Promise.all([
+                    prisma.lineBotState.findUnique({ where: { lineUserId: userId } }),
+                    prisma.systemConfig.findFirst()
+                ]);
+
+                // Default fallbacks if config is missing (init)
+                const sysConfig = configObj || {
+                    wifiSsid: "StaySync_Residences",
+                    wifiPassword: "staysync_wifi",
+                    rulesText: "1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน",
+                    emergencyPhone: "191",
+                    adminPhone: "081-234-5678",
+                    adminLineIdDisplay: "@staysync_admin"
+                };
+
+                let userState = userStateObj;
                 if (!userState) {
                     userState = await prisma.lineBotState.create({
                         data: { lineUserId: userId, state: "IDLE" }
@@ -90,7 +105,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "📶 ข้อมูล Wi-Fi\n\nSSID: StaySync_Residences\nPassword: staysync_wifi\n\n(หากเชื่อมต่อไม่ได้ แจ้งแอดมินได้เลยครับ)"
+                            text: `📶 ข้อมูล Wi-Fi\n\nSSID: ${sysConfig.wifiSsid}\nPassword: ${sysConfig.wifiPassword}\n\n(หากเชื่อมต่อไม่ได้ แจ้งแอดมินได้เลยครับ)`
                         });
                     }
                     return;
@@ -101,7 +116,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "📘 กฎระเบียบหอพัก\n\n1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน\n\nขอบคุณที่ให้ความร่วมมือครับ 🙏"
+                            text: `📘 กฎระเบียบหอพัก\n\n${sysConfig.rulesText}\n\nขอบคุณที่ให้ความร่วมมือครับ 🙏`
                         });
                     }
                     return;
@@ -112,7 +127,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "📞 ติดต่อเจ้าหน้าที่\n\nโทร: 081-234-5678\nLine: @staysync_admin\n(เวลาทำการ 09.00 - 18.00 น.)"
+                            text: `📞 ติดต่อเจ้าหน้าที่\n\nโทร: ${sysConfig.adminPhone}\nLine: ${sysConfig.adminLineIdDisplay}\n(ฉุกเฉิน: ${sysConfig.emergencyPhone})`
                         });
                     }
                     return;

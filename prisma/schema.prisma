@@ -125,6 +125,14 @@ model SystemConfig {
   internetFee       Float    @default(0)
   otherFees         Float    @default(0)
 
+  // Chatbot Auto-Reply Content
+  wifiSsid          String   @default("StaySync_Residences")
+  wifiPassword      String   @default("staysync_wifi")
+  rulesText         String   @default("1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน")
+  emergencyPhone    String   @default("191")
+  adminPhone        String   @default("081-234-5678")
+  adminLineIdDisplay String  @default("@staysync_admin")
+
   updatedAt         DateTime @updatedAt
 }
 
