@@ -54,14 +54,21 @@ export default function IssueItem({ issue }: { issue: any }) {
             </div>
 
             <div className="flex gap-2">
-                <button
-                    onClick={handleMarkDone}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50"
-                >
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
-                    Mark Done
-                </button>
+                {issue.status === "Done" ? (
+                    <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold border border-green-200">
+                        <CheckCircle2 size={18} />
+                        Resolved
+                    </span>
+                ) : (
+                    <button
+                        onClick={handleMarkDone}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50"
+                    >
+                        {loading ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
+                        Mark Done
+                    </button>
+                )}
             </div>
         </div>
     );
