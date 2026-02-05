@@ -14,6 +14,19 @@ export default function ReportIssuePage() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+    const [residents, setResidents] = useState<any[]>([]);
+    const [selectedResidentId, setSelectedResidentId] = useState<string>("");
+
+    // Fetch Residents on Mount
+    useState(() => {
+        fetch("/api/residents")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setResidents(data);
+            })
+            .catch(err => console.error(err));
+    });
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -29,6 +42,10 @@ export default function ReportIssuePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!selectedResidentId) {
+            alert("Please select your room.");
+            return;
+        }
         setLoading(true);
 
         try {
@@ -58,7 +75,7 @@ export default function ReportIssuePage() {
                     category: formData.category,
                     description: formData.description,
                     photo: photoUrl,
-                    residentId: 1, // Simulating Resident ID 1
+                    residentId: parseInt(selectedResidentId),
                 }),
             });
 
@@ -83,6 +100,24 @@ export default function ReportIssuePage() {
             <div className="p-4 max-w-md mx-auto">
                 <form onSubmit={handleSubmit} className="space-y-4">
 
+                    {/* Room Selection */}
+                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Select Your Room / เลือกห้อง</label>
+                        <select
+                            required
+                            value={selectedResidentId}
+                            onChange={(e) => setSelectedResidentId(e.target.value)}
+                            className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                        >
+                            <option value="">-- Click to Select Room --</option>
+                            {residents.map(r => (
+                                <option key={r.id} value={r.id}>
+                                    Room {r.room?.number} - {r.fullName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     {/* Category Selection */}
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
@@ -93,8 +128,8 @@ export default function ReportIssuePage() {
                                     type="button"
                                     onClick={() => setFormData({ ...formData, category: cat })}
                                     className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${formData.category === cat
-                                            ? "bg-indigo-600 text-white shadow-md"
-                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                        ? "bg-indigo-600 text-white shadow-md"
+                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                                         }`}
                                 >
                                     {cat}
