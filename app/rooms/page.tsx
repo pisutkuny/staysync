@@ -34,10 +34,15 @@ export default async function RoomsPage() {
                                 <h3 className="text-2xl font-bold text-gray-900">{room.number}</h3>
                                 <p className="text-indigo-600 font-medium">฿{room.price}/mo</p>
                             </div>
-                            <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full ${room.status === "Occupied" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
-                                }`}>
-                                {room.status}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <Link href={`/rooms/edit/${room.id}`} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                </Link>
+                                <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full ${room.status === "Occupied" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                                    }`}>
+                                    {room.status}
+                                </span>
+                            </div>
                         </div>
 
                         <div className="mt-4">

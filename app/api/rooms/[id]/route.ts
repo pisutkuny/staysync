@@ -28,11 +28,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
             return NextResponse.json({ error: "Cannot delete room with pending bills" }, { status: 400 });
         }
 
-        // Attempt deletion. If it fails due to FK, we'll catch it.
-
-        // Actually for simplicity, if history exists, we maybe shouldn't delete.
-        // But for "setting up" phase, hard delete is expected.
-
         await prisma.room.delete({
             where: { id }
         });
@@ -40,10 +35,34 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("Delete Room Error:", error);
-        // Specialized error message for FK constraint
         if (error.code === 'P2003') {
             return NextResponse.json({ error: "Cannot delete: Room has matching history (Residents/Bills)." }, { status: 400 });
         }
         return NextResponse.json({ error: "Failed to delete room" }, { status: 500 });
+    }
+}
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const { id: idStr } = await params;
+        const id = parseInt(idStr);
+        const body = await request.json(); // Wait, `request` variable name mismatch fix below
+        const { number, price } = body;
+
+        const updatedRoom = await prisma.room.update({
+            where: { id },
+            data: {
+                number,
+                price: parseFloat(price)
+            }
+        });
+
+        return NextResponse.json(updatedRoom);
+    } catch (error: any) {
+        console.error("Update Room Error:", error);
+        if (error.code === 'P2002') {
+            return NextResponse.json({ error: "Room number already exists" }, { status: 409 });
+        }
+        return NextResponse.json({ error: "Failed to update room" }, { status: 500 });
     }
 }
