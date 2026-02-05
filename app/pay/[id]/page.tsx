@@ -19,5 +19,5 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
         return notFound();
     }
 
-    return <PaymentForm id={id} config={config} />;
+    return <PaymentForm id={id} config={config} billDetails={billing} />;
 }

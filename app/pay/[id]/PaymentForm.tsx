@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Loader2, FileCheck, Banknote } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import generatePayload from "promptpay-qr";
 
-export default function PaymentForm({ id, config }: { id: string, config: any }) {
+export default function PaymentForm({ id, config, billDetails }: { id: string, config: any, billDetails?: any }) {
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [submitted, setSubmitted] = useState(false);
@@ -79,6 +81,17 @@ export default function PaymentForm({ id, config }: { id: string, config: any })
                             <p className="text-sm text-indigo-700 mt-2 pt-2 border-t border-indigo-200">
                                 PromptPay: <span className="font-mono font-bold text-indigo-900 bg-white/50 px-1 rounded">{config.promptPayId}</span>
                             </p>
+                        )}
+                        {config?.promptPayId && billDetails?.totalAmount && (
+                            <div className="mt-4 flex flex-col items-center p-4 bg-white rounded-lg border border-dashed border-indigo-200">
+                                <QRCodeSVG
+                                    value={generatePayload(config.promptPayId, { amount: billDetails.totalAmount })}
+                                    size={160}
+                                    level="L"
+                                    includeMargin={true}
+                                />
+                                <p className="text-xs text-indigo-500 mt-2 font-medium">Scan to Pay: {billDetails.totalAmount.toLocaleString()} THB</p>
+                            </div>
                         )}
                     </div>
                 </div>

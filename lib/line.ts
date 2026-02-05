@@ -54,8 +54,17 @@ export async function sendBillNotificationFlex(userId: string, data: {
     totalAmount: string;
     payUrl: string;
     items: { label: string; value: string; color?: string }[];
+    promptPayId?: string; // New: Config might have PPID
 }) {
     if (!lineClient) return;
+
+    // Construct Image URL for PromptPay QR (Using public API)
+    // Format: https://promptpay.io/{id}/{amount}
+    // Note: Amount should be raw number string
+    const amountClean = data.totalAmount.replace(/,/g, '');
+    const qrImageUrl = data.promptPayId
+        ? `https://promptpay.io/${data.promptPayId}/${amountClean}`
+        : null;
 
     const flexMessage: any = {
         type: "flex",
@@ -90,6 +99,14 @@ export async function sendBillNotificationFlex(userId: string, data: {
                     }
                 ]
             },
+            "hero": qrImageUrl ? {
+                "type": "image",
+                "url": qrImageUrl,
+                "size": "md",
+                "aspectRatio": "1:1",
+                "aspectMode": "cover",
+                "margin": "md"
+            } : undefined,
             "body": {
                 "type": "box",
                 "layout": "vertical",
@@ -159,7 +176,7 @@ export async function sendBillNotificationFlex(userId: string, data: {
                         "height": "sm",
                         "action": {
                             "type": "uri",
-                            "label": "ชำระเงิน / Pay Now",
+                            "label": "ส่งสลิป / Pay Now",
                             "uri": data.payUrl
                         },
                         "color": "#06c755"

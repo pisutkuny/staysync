@@ -81,12 +81,16 @@ export async function POST(req: Request) {
                 if (internet > 0) items.push({ label: "ค่าอินเทอร์เน็ต", value: `${internet.toLocaleString()} ฿` });
                 if (other > 0) items.push({ label: "อื่นๆ", value: `${other.toLocaleString()} ฿` });
 
+                // Fetch Config for PromptPay ID
+                const config = await prisma.systemConfig.findFirst();
+
                 await sendBillNotificationFlex(resident.lineUserId, {
                     roomNumber: room.number,
                     month: new Date().toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }),
                     totalAmount: totalAmount.toLocaleString(),
                     payUrl: payUrl,
-                    items: items
+                    items: items,
+                    promptPayId: config?.promptPayId || undefined
                 });
             }
         }
