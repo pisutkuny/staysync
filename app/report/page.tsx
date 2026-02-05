@@ -15,6 +15,7 @@ export default function ReportIssuePage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const [residents, setResidents] = useState<any[]>([]);
+    const [selectedRoomId, setSelectedRoomId] = useState<string>("");
     const [selectedResidentId, setSelectedResidentId] = useState<string>("");
 
     // Fetch Residents on Mount
@@ -26,6 +27,18 @@ export default function ReportIssuePage() {
             })
             .catch(err => console.error(err));
     });
+
+    // Derived State
+    const uniqueRooms = Array.from(new Map(residents.map(r => [r.room?.id, r.room])).values())
+        .filter(r => r) // Remove nulls
+        .sort((a: any, b: any) => a.number.localeCompare(b.number));
+
+    const filteredResidents = residents.filter(r => r.room?.id?.toString() === selectedRoomId);
+
+    const handleRoomChange = (roomId: string) => {
+        setSelectedRoomId(roomId);
+        setSelectedResidentId(""); // Reset resident when room changes
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -43,7 +56,7 @@ export default function ReportIssuePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedResidentId) {
-            alert("Please select your room.");
+            alert("Please select your name.");
             return;
         }
         setLoading(true);
@@ -101,21 +114,44 @@ export default function ReportIssuePage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     {/* Room Selection */}
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Select Your Room / เลือกห้อง</label>
-                        <select
-                            required
-                            value={selectedResidentId}
-                            onChange={(e) => setSelectedResidentId(e.target.value)}
-                            className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                        >
-                            <option value="">-- Click to Select Room --</option>
-                            {residents.map(r => (
-                                <option key={r.id} value={r.id}>
-                                    Room {r.room?.number} - {r.fullName}
+                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">1. Select Room / เลือกห้อง</label>
+                            <select
+                                required
+                                value={selectedRoomId}
+                                onChange={(e) => handleRoomChange(e.target.value)}
+                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            >
+                                <option value="">-- Select Room --</option>
+                                {uniqueRooms.map((room: any) => (
+                                    <option key={room.id} value={room.id}>
+                                        Room {room.number}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Resident Selection (Dependent) */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">2. Select Your Name / เลือกชื่อผู้เช่า</label>
+                            <select
+                                required
+                                disabled={!selectedRoomId}
+                                value={selectedResidentId}
+                                onChange={(e) => setSelectedResidentId(e.target.value)}
+                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                            >
+                                <option value="">
+                                    {selectedRoomId ? "-- Select Name --" : "-- Select Room First --"}
                                 </option>
-                            ))}
-                        </select>
+                                {filteredResidents.map(r => (
+                                    <option key={r.id} value={r.id}>
+                                        {r.fullName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     {/* Category Selection */}
