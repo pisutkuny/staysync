@@ -59,7 +59,7 @@ export function createInvoiceFlexMessage(
             text: "INVOICE",
             weight: "bold",
             color: "#1DB446",
-            size: "caption"
+            size: "xs"
         },
         {
             type: "text",
