@@ -3,8 +3,8 @@
 Rich Menu คือเมนูลัดด้านล่างแชท ที่ช่วยให้ลูกบ้านใช้งานระบบได้ง่ายขึ้น โดยไม่ต้องพิมพ์คำสั่งเอง
 
 ## 1. เตรียมรูปภาพ (Assets)
-ผมได้นำรูปภาพไปวางไว้ให้ในโฟลเดอร์โปรเจกต์แล้วครับ:
-`e:\StaySync\assets\staysync_rich_menu.png`
+ผมได้แก้ไขขนาดรูปภาพเป็น **2500px x 843px** (แบบ Compact/Small) ให้ตามที่ระบบต้องการแล้วครับ:
+`e:\StaySync\assets\staysync_rich_menu_compact.png`
 
 ## 2. เข้าไปที่ LINE Official Account Manager
 1. ไปที่ [manager.line.biz](https://manager.line.biz/)
@@ -13,10 +13,10 @@ Rich Menu คือเมนูลัดด้านล่างแชท ที
 
 ## 3. ตั้งค่า Rich Menu
 - **Title**: Main Menu
-- **Display period**: เลือกวันที่เริ่ม - สิ้นสุด (ตั้งยาวๆ ไปเลย เช่น ถึงปี 2030)
+- **Display period**: เลือกวันที่เริ่ม - สิ้นสุด
 - **Content settings**:
-    - **Template**: เลือกแบบ **Large - 3 items** (แบบ 3 ช่องเรียงกัน หรือแบบที่ตรงกับรูปที่ผมทำให้)
-    - **Upload Image**: อัปโหลดรูปที่เตรียมไว้
+    - **Template**: *สำคัญมาก!* ให้เลือกแบบ **Small** (ขนาดเล็ก) หรือที่ระบุว่า **2500px × 843px** (ปกติจะมี 3 ช่องเรียงกัน)
+    - **Upload Image**: อัปโหลดรูป `staysync_rich_menu_compact.png`
 
 ## 4. กำหนด Action (การทำงานของปุ่ม)
 
