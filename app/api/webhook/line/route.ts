@@ -61,6 +61,51 @@ export async function POST(req: Request) {
                             });
                         }
                     }
+                } else if (text.startsWith("แจ้งซ่อม") || text.toLowerCase().startsWith("report")) {
+                    // Handle Issue Reporting via Line
+                    const resident = await prisma.resident.findFirst({
+                        where: { lineUserId: userId },
+                        include: { room: true }
+                    });
+
+                    if (!resident) {
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: "❌ คุณยังไม่ได้เชื่อมต่อบัญชีกับห้องพัก\nกรุณาพิมพ์ Code ยืนยันตัวตน (เช่น #1234) ก่อนแจ้งซ่อมครับ"
+                            });
+                        }
+                    } else {
+                        // Create Issue
+                        const description = text.replace(/^(แจ้งซ่อม|report)\s*/i, "").trim() || "ไม่ระบุรายละเอียด";
+
+                        const issue = await prisma.issue.create({
+                            data: {
+                                category: "Other", // Default for chat
+                                description: description,
+                                residentId: resident.id,
+                                status: "Pending"
+                            }
+                        });
+
+                        // Reply User
+                        if (client) {
+                            await client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: `📝 รับเรื่องแจ้งซ่อมเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: ${description}\n\nเจ้าหน้าที่จะดำเนินการตรวจสอบโดยเร็วที่สุดครับ`
+                            });
+                        }
+
+                        // Notify Admin (Owner)
+                        const ownerLineId = process.env.OWNER_LINE_USER_ID;
+                        if (ownerLineId) {
+                            const adminMsg = `🔔 แจ้งซ่อมใหม่ (ผ่าน Line)!\n` +
+                                `ห้อง: ${resident.room?.number || "Unknown"}\n` +
+                                `ผู้แจ้ง: ${resident.fullName}\n` +
+                                `ปัญหา: ${description}`;
+                            await sendLineMessage(ownerLineId, adminMsg);
+                        }
+                    }
                 } else if (text.toLowerCase() === 'myid' || text.toLowerCase() === 'admin') {
                     // Admin Helper: Reply with User ID
                     if (client) {
