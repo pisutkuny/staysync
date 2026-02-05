@@ -236,7 +236,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
 
                             return (
                                 <tr key={room.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-3 py-3 sm:p-4 font-bold whitespace-nowrap">{room.number}</td>
+                                    <td className="px-3 py-3 sm:p-4 font-bold text-gray-900 whitespace-nowrap">{room.number}</td>
                                     <td className="px-3 py-3 sm:p-4 text-gray-600 whitespace-nowrap max-w-[120px] truncate">{room.residentName}</td>
 
                                     {/* Water */}
@@ -276,7 +276,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                                                 <Check size={14} /> Sent
                                             </span>
                                         ) : (
-                                            <span className="text-gray-300 text-xs">-</span>
+                                            <span className="text-gray-400 text-xs font-medium">Pending</span>
                                         )}
                                     </td>
                                 </tr>
