@@ -7,10 +7,11 @@ import Link from "next/link";
 
 interface UploadFormProps {
     residentId: number;
-    folderName: string; // New Prop
+    roomFolder: string;
+    profileFolder: string;
 }
 
-export default function UploadForm({ residentId, folderName }: UploadFormProps) {
+export default function UploadForm({ residentId, roomFolder, profileFolder }: UploadFormProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [docType, setDocType] = useState("Contract");
@@ -66,8 +67,9 @@ export default function UploadForm({ residentId, folderName }: UploadFormProps) 
                 addField('filename', file.name);
                 addField('mimeType', file.type);
                 addField('file', base64Content);
-                // NEW: Send folder name to GAS
-                addField('folderName', folderName);
+                // NEW: Send Nested Folder names
+                addField('roomFolder', roomFolder);
+                addField('profileFolder', profileFolder);
 
                 document.body.appendChild(form);
 

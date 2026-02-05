@@ -17,9 +17,10 @@ export default async function UploadDocumentPage({ params }: { params: Promise<{
         return <div>Resident not found</div>;
     }
 
-    // Determine Folder Name: "Room X - [Name]"
+    // Determine Folder Structure: "Room X" -> "[Name]"
     const roomNumber = resident.room ? resident.room.number : "Unknown Room";
-    const folderName = `Room ${roomNumber} - ${resident.fullName}`;
+    const roomFolder = `Room ${roomNumber}`;
+    const profileFolder = resident.fullName;
 
     return (
         <div className="max-w-md mx-auto space-y-6">
@@ -31,7 +32,11 @@ export default async function UploadDocumentPage({ params }: { params: Promise<{
             </div>
 
             {/* Render Client Form with Server Data */}
-            <UploadForm residentId={residentId} folderName={folderName} />
+            <UploadForm
+                residentId={residentId}
+                roomFolder={roomFolder}
+                profileFolder={profileFolder}
+            />
         </div>
     );
 }
