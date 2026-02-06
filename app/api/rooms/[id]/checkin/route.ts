@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendLineMessage } from "@/lib/line";
 
 export async function POST(
     request: Request,
@@ -11,7 +12,7 @@ export async function POST(
         const { fullName, phone, lineUserId } = body;
 
         // Transaction: Create Resident and Update Room Status
-        await prisma.$transaction([
+        const [resident, room] = await prisma.$transaction([
             prisma.resident.create({
                 data: {
                     fullName,
@@ -26,8 +27,17 @@ export async function POST(
             }),
         ]);
 
+        // Send Line Notification if lineUserId is provided
+        if (lineUserId) {
+            await sendLineMessage(
+                lineUserId,
+                `ยินดีต้อนรับคุณ ${fullName} เข้าสู่หอพัก StaySync (ห้อง ${room.number}) \nขอบคุณที่ไว้วางใจเราครับ 🙏`
+            );
+        }
+
         return NextResponse.json({ success: true }, { status: 201 });
     } catch (error) {
+        console.error("Check-in error:", error);
         return NextResponse.json({ error: "Failed to check in" }, { status: 500 });
     }
 }

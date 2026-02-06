@@ -41,7 +41,8 @@ export async function POST(req: Request) {
                     adminLineIdDisplay: "@staysync_admin",
                     bankName: "Bank Name",
                     bankAccountNumber: "000-0-00000-0",
-                    bankAccountName: "Account Name"
+                    bankAccountName: "Account Name",
+                    promptPayId: null
                 };
 
                 let userState = userStateObj;
@@ -106,8 +107,15 @@ export async function POST(req: Request) {
                         } else {
                             // Generate Flex Message for Invoice
                             // Construct Pay URL
-                            // TODO: Replace <YOUR_WEB_URL> with actual domain from Env if possible
-                            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com";
+                            // Try to get URL from VERCEL_URL if NEXT_PUBLIC_APP_URL is not set (or is localhost in prod)
+                            let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+                            if (!baseUrl || baseUrl.includes("localhost")) {
+                                if (process.env.VERCEL_URL) {
+                                    baseUrl = `https://${process.env.VERCEL_URL}`;
+                                } else if (!baseUrl) {
+                                    baseUrl = "https://your-domain.com";
+                                }
+                            }
                             const payUrl = `${baseUrl}/pay/upload?billId=${latestBill.id}`;
 
                             const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);

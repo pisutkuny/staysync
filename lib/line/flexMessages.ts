@@ -24,6 +24,7 @@ export function createInvoiceFlexMessage(
 ): FlexMessage {
     const isPaid = bill.paymentStatus === 'Paid';
     const isReview = bill.paymentStatus === 'Review';
+    const hasPromptPay = !!sysConfig.promptPayId;
 
     // Calculate Usage where possible
     const waterUsage = bill.waterMeterCurrent - bill.waterMeterLast;
@@ -116,6 +117,71 @@ export function createInvoiceFlexMessage(
         }
     } : null;
 
+    // QR Code Section (Only if Unpaid and ID exists)
+    // Using promptpay.io API: https://promptpay.io/{id}/{amount}
+    const qrSection = (!isPaid && hasPromptPay) ? [
+        {
+            type: "image",
+            url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
+            size: "md",
+            aspectMode: "cover",
+            margin: "md",
+            action: {
+                type: "uri",
+                label: "Open QR",
+                uri: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`
+            }
+        },
+        {
+            type: "text",
+            text: "สแกน QR เพื่อชำระเงิน",
+            size: "xs",
+            color: "#aaaaaa",
+            align: "center",
+            margin: "sm"
+        }
+    ] : [];
+
+    // Bank Info Section (Fallback if no PromptPay)
+    const bankSection = (!isPaid && !hasPromptPay) ? [
+        {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#F8F9FA",
+            cornerRadius: "md",
+            paddingAll: "md",
+            margin: "md",
+            contents: [
+                {
+                    type: "box",
+                    layout: "baseline",
+                    spacing: "sm",
+                    contents: [
+                        { type: "text", text: "🏦", flex: 0 },
+                        { type: "text", text: sysConfig.bankName, weight: "bold", size: "sm", color: "#333333" }
+                    ]
+                },
+                {
+                    type: "box",
+                    layout: "baseline",
+                    spacing: "sm",
+                    margin: "sm",
+                    contents: [
+                        { type: "text", text: "🔢", flex: 0 },
+                        { type: "text", text: sysConfig.bankAccountNumber, weight: "bold", size: "lg", color: "#333333" }
+                    ]
+                },
+                {
+                    type: "text",
+                    text: `ชื่อ: ${sysConfig.bankAccountName}`,
+                    size: "xs",
+                    color: "#666666",
+                    margin: "xs",
+                    wrap: true
+                }
+            ]
+        }
+    ] : [];
 
     return {
         type: "flex",
@@ -134,6 +200,9 @@ export function createInvoiceFlexMessage(
                 contents: [
                     // Stamp
                     ...(paidStamp ? [paidStamp] : []),
+
+                    // QR Code (Top of body)
+                    ...qrSection,
 
                     // Bill Items
                     {
@@ -194,58 +263,22 @@ export function createInvoiceFlexMessage(
                 type: "box",
                 layout: "vertical",
                 contents: [
-                    // Bank Info (Only if not paid)
-                    ...(!isPaid ? [
-                        {
-                            type: "box",
-                            layout: "vertical",
-                            backgroundColor: "#F8F9FA",
-                            cornerRadius: "md",
-                            paddingAll: "md",
-                            margin: "md",
-                            contents: [
-                                {
-                                    type: "box",
-                                    layout: "baseline",
-                                    spacing: "sm",
-                                    contents: [
-                                        { type: "text", text: "🏦", flex: 0 },
-                                        { type: "text", text: sysConfig.bankName, weight: "bold", size: "sm", color: "#333333" }
-                                    ]
-                                },
-                                {
-                                    type: "box",
-                                    layout: "baseline",
-                                    spacing: "sm",
-                                    margin: "sm",
-                                    contents: [
-                                        { type: "text", text: "🔢", flex: 0 },
-                                        { type: "text", text: sysConfig.bankAccountNumber, weight: "bold", size: "lg", color: "#333333" }
-                                    ]
-                                },
-                                {
-                                    type: "text",
-                                    text: `ชื่อ: ${sysConfig.bankAccountName}`,
-                                    size: "xs",
-                                    color: "#666666",
-                                    margin: "xs",
-                                    wrap: true
-                                }
-                            ]
+                    // Bank Info (Only if no QR)
+                    ...bankSection,
+
+                    // Buttons
+                    ...(!isPaid ? [{
+                        type: "button",
+                        style: "primary",
+                        color: "#06C755", // Line Green
+                        height: "sm",
+                        action: {
+                            type: "uri",
+                            label: isReview ? "ส่งสลิปเพิ่มเติม" : "ส่งสลิป / Pay Now",
+                            uri: payUrl
                         },
-                        {
-                            type: "button",
-                            style: "primary",
-                            color: "#06C755", // Line Green
-                            height: "sm",
-                            action: {
-                                type: "uri",
-                                label: isReview ? "ส่งสลิปเพิ่มเติม" : "ส่งสลิป / Pay Now",
-                                uri: payUrl
-                            },
-                            margin: "md"
-                        }
-                    ] : []),
+                        margin: "md"
+                    }] : []),
 
                     {
                         type: "text",
