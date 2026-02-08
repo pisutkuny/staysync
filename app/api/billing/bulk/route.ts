@@ -69,14 +69,23 @@ export async function POST(req: Request) {
                         month: {
                             gte: monthStart,
                             lt: monthEnd
-                        },
-                        paymentStatus: { not: "Paid" }
+                        }
                     }
                 });
 
+                // If there's an existing bill
                 if (existingBill) {
-                    results.skipped++;
-                    continue;
+                    // If it's already paid, skip creating a new one
+                    if (existingBill.paymentStatus === "Paid") {
+                        results.errors.push(`Room ${room.number}: Bill already paid for this month`);
+                        results.skipped++;
+                        continue;
+                    }
+
+                    // If unpaid, delete the old bill before creating new one
+                    await prisma.billing.delete({
+                        where: { id: existingBill.id }
+                    });
                 }
 
                 // Get last meter readings
