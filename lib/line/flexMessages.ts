@@ -1,4 +1,4 @@
-import { FlexContainer, FlexMessage } from "@line/bot-sdk";
+import { FlexContainer, FlexMessage, FlexComponent } from "@line/bot-sdk";
 
 // Helper to format currency
 const formatMoney = (amount: number) => {
@@ -99,7 +99,7 @@ export function createInvoiceFlexMessage(
                         "size": "xs",
                         "color": "#999999",
                         "margin": "none"
-                    }] : []),
+                    } as FlexComponent] : []),
                     {
                         "type": "box",
                         "layout": "vertical",
@@ -125,7 +125,7 @@ export function createInvoiceFlexMessage(
                                     "flex": 2
                                 }
                             ]
-                        }))
+                        } as FlexComponent))
                     },
                     {
                         "type": "separator",
@@ -170,7 +170,7 @@ export function createInvoiceFlexMessage(
                             "uri": payUrl
                         },
                         "color": "#06c755"
-                    }] : []),
+                    } as FlexComponent] : []),
                     {
                         "type": "text",
                         "text": isPaid ? "ขอบพระคุณที่ชำระค่าเช่าครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน",
@@ -192,58 +192,58 @@ export function createGuestFlexMessage(): FlexMessage {
         altText: "บริการเฉพาะผู้เช่าหอพัก",
         contents: {
             type: "bubble",
-            size: "kilo",
-            header: {
-                type: "box",
-                layout: "vertical",
-                backgroundColor: "#F8F9FA",
-                paddingAll: "lg",
+            "size": "kilo",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "backgroundColor": "#F8F9FA",
+                "paddingAll": "lg",
                 contents: [
                     {
-                        type: "text",
-                        text: "🔒 Residents Only",
-                        weight: "bold",
-                        size: "lg",
-                        color: "#1DB446",
-                        align: "center"
-                    }
+                        "type": "text",
+                        "text": "🔒 Residents Only",
+                        "weight": "bold",
+                        "size": "lg",
+                        "color": "#1DB446",
+                        "align": "center"
+                    } as FlexComponent
                 ]
             },
             body: {
                 type: "box",
-                layout: "vertical",
-                paddingAll: "xl",
+                "layout": "vertical",
+                "paddingAll": "xl",
                 contents: [
                     {
-                        type: "text",
-                        text: "ขออภัยครับ เมนูนี้สงวนไว้สำหรับผู้เช่าของหอพักเราเท่านั้น",
-                        size: "sm",
-                        color: "#555555",
-                        wrap: true,
-                        align: "center"
-                    },
+                        "type": "text",
+                        "text": "ขออภัยครับ เมนูนี้สงวนไว้สำหรับผู้เช่าของหอพักเราเท่านั้น",
+                        "size": "sm",
+                        "color": "#555555",
+                        "wrap": true,
+                        "align": "center"
+                    } as FlexComponent,
                     {
-                        type: "text",
-                        text: "หากคุณเป็นผู้เช่าแล้ว กรุณาพิมพ์รหัสยืนยันตัวตน เพื่อเข้าใช้งานระบบครับ",
-                        size: "xs",
-                        color: "#aaaaaa",
-                        wrap: true,
-                        margin: "lg",
-                        align: "center"
-                    }
+                        "type": "text",
+                        "text": "หากคุณเป็นผู้เช่าแล้ว กรุณาพิมพ์รหัสยืนยันตัวตน เพื่อเข้าใช้งานระบบครับ",
+                        "size": "xs",
+                        "color": "#aaaaaa",
+                        "wrap": true,
+                        "margin": "lg",
+                        "align": "center"
+                    } as FlexComponent
                 ]
             },
             footer: {
                 type: "box",
-                layout: "vertical",
-                paddingAll: "lg",
+                "layout": "vertical",
+                "paddingAll": "lg",
                 contents: [
                     {
-                        type: "button",
-                        style: "secondary",
-                        height: "sm",
-                        action: {
-                            type: "message",
+                        "type": "button",
+                        "style": "secondary",
+                        "height": "sm",
+                        "action": {
+                            "type": "message",
                             label: "ติดต่อแอดมิน",
                             text: "Menu: Contact"
                         }
