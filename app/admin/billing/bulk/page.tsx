@@ -64,14 +64,17 @@ export default function BulkMeterPage() {
                 .filter((r: any) => r.status === "Occupied")
                 .map((room: any) => {
                     const lastBilling = room.billings?.[0];
+                    const lastWater = lastBilling?.waterMeterCurrent || 0;
+                    const lastElectric = lastBilling?.electricMeterCurrent || 0;
+
                     return {
                         roomId: room.id,
                         roomNumber: room.number,
                         roomPrice: room.price,
-                        lastWater: lastBilling?.waterMeterCurrent || 0,
-                        lastElectric: lastBilling?.electricMeterCurrent || 0,
-                        waterCurrent: null,
-                        electricCurrent: null,
+                        lastWater,
+                        lastElectric,
+                        waterCurrent: lastWater, // Default to last reading
+                        electricCurrent: lastElectric, // Default to last reading
                         waterUsage: 0,
                         electricUsage: 0,
                         waterCost: 0,
