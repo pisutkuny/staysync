@@ -36,12 +36,21 @@ export async function uploadToDrive(file: File, folderId?: string) {
             throw new Error(`Invalid response from Script: ${responseText.substring(0, 100)}...`);
         }
 
+        console.log("GAS Response:", result);
+
+        if (result.status !== 'success') {
+            throw new Error(result.message || "Unknown error from Google Apps Script");
+        }
+
+        const thumbnailLink = result.id
+            ? `https://lh3.googleusercontent.com/d/${result.id}`
+            : result.url; // Fallback if ID is missing
+
         return {
             id: result.id,
             url: result.url,
             downloadUrl: result.downloadUrl,
-            // Use lh3.googleusercontent.com for direct image access (works better with Line)
-            thumbnailLink: `https://lh3.googleusercontent.com/d/${result.id}`
+            thumbnailLink: thumbnailLink
         };
 
     } catch (error) {

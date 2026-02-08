@@ -251,6 +251,9 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
         }
 
         setUploading(true);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
         try {
             const formData = new FormData();
             formData.append("file", file);
@@ -263,19 +266,32 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
 
             const res = await fetch("/api/upload", {
                 method: "POST",
-                body: formData
+                body: formData,
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || `Upload failed with status ${res.status}`);
+            }
+
             const data = await res.json();
 
             if (data.success) {
                 setUploadedUrl(data.url);
                 setUploading(false);
             } else {
-                alert("Upload failed: " + data.error);
-                setUploading(false);
+                throw new Error(data.error || "Unknown upload error");
             }
-        } catch (e) {
-            alert("Upload error");
+        } catch (e: any) {
+            clearTimeout(timeoutId);
+            console.error("Upload Error:", e);
+            if (e.name === 'AbortError') {
+                alert("Upload timed out. Please check your internet or Google Drive script.");
+            } else {
+                alert(`Upload failed: ${e.message}`);
+            }
             setUploading(false);
         }
     };
