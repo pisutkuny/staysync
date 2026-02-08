@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendLineMessage } from "@/lib/line";
+import { sendLineMessage, lineClient } from "@/lib/line";
 import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
 
 // Rates Configuration (Could be DB driven later)
@@ -96,35 +96,13 @@ export async function POST(req: Request) {
                 const flexMessage = createInvoiceFlexMessage(billForFlex, resident, config, payUrl);
 
                 // Send Push Message
-                // We need to import 'lineClient' from @/lib/line or @/lib/line/line ?
-                // Actually @/lib/line exports lineClient check lib/line.ts
-                // sendLineMessage is in @/lib/line
-                // Let's rely on the client from @/lib/line being available or import it.
-                // Checking imports in file: import { sendLineMessage, sendBillNotificationFlex } from "@/lib/line";
-                // I need to import lineClient from "@/lib/line" as well if exported.
-
-                // Since I cannot easily change imports in this block, I will assume I can add imports at the top 
-                // BUT this tool only replaces a chunk.
-                // Valid strategy: Update imports first, then update this block.
-                // Wait, I can do it in one go if I include imports? No, imports are at top.
-
-                // I will update the imports in a separate step or just assume sendBillNotificationFlex is replaced.
-                // Let's look at the file content again. Imports are at lines 1-3.
-                // I will do two edits or one big edit? 
-
-                // Better: I will use a multi_replace to do both safely.
-
-                if (resident.lineUserId) {
-                    // We need lineClient. Import it.
-                    const { lineClient } = require("@/lib/line"); // Quick fix for import if needed, or better, update top imports.
-                    if (lineClient) {
-                        try {
-                            await lineClient.pushMessage(resident.lineUserId, flexMessage);
-                        } catch (e) {
-                            console.error("Failed to push flex", e);
-                            // Fallback text?
-                            await sendLineMessage(resident.lineUserId, `บิลค่าเช่ามาแล้วครับ ยอด ${totalAmount} บาท (ดูรายละเอียดในเมนู Bill)`);
-                        }
+                if (resident.lineUserId && lineClient) {
+                    try {
+                        await lineClient.pushMessage(resident.lineUserId, flexMessage);
+                    } catch (e) {
+                        console.error("Failed to push flex message:", e);
+                        // Fallback to text message
+                        await sendLineMessage(resident.lineUserId, `บิลค่าเช่ามาแล้วครับ ยอด ${totalAmount} บาท (ดูรายละเอียดในเมนู Bill)`);
                     }
                 }
             }
