@@ -41,6 +41,76 @@ export function createInvoiceFlexMessage(
         items.push({ label: "🌐 ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
     }
 
+    // QR Code Section (Only if Unpaid and ID exists)
+    // Using promptpay.io API: https://promptpay.io/{id}/{amount}
+    const qrSection = (!isPaid && hasPromptPay) ? [
+        {
+            type: "image",
+            url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
+            size: "md",
+            aspectMode: "cover",
+            margin: "md",
+            action: {
+                type: "uri",
+                label: "Open QR",
+                uri: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`
+            }
+        },
+        {
+            type: "text",
+            text: "สแกน QR เพื่อชำระเงิน",
+            size: "xs",
+            color: "#aaaaaa",
+            align: "center",
+            margin: "sm"
+        },
+        {
+            type: "separator",
+            margin: "lg"
+        }
+    ] : [];
+
+    // Bank Info Section (Alternative if no PromptPay)
+    const bankSection = (!isPaid && !hasPromptPay) ? [
+        {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#F8F9FA",
+            cornerRadius: "md",
+            paddingAll: "md",
+            margin: "md",
+            contents: [
+                {
+                    type: "box",
+                    layout: "baseline",
+                    spacing: "sm",
+                    contents: [
+                        { type: "text", text: "🏦", flex: 0 },
+                        { type: "text", text: sysConfig.bankName, weight: "bold", size: "sm", color: "#333333" }
+                    ]
+                },
+                {
+                    type: "box",
+                    layout: "baseline",
+                    spacing: "sm",
+                    margin: "sm",
+                    contents: [
+                        { type: "text", text: "🔢", flex: 0 },
+                        { type: "text", text: sysConfig.bankAccountNumber, weight: "bold", size: "lg", color: "#333333" }
+                    ]
+                },
+                {
+                    type: "text",
+                    text: `ชื่อ: ${sysConfig.bankAccountName}`,
+                    size: "xs",
+                    color: "#666666",
+                    margin: "xs",
+                    wrap: true
+                }
+            ]
+        }
+    ] : [];
+
     // Header Color based on status
     const headerColor = isPaid ? "#1DB446" : "#4F46E5"; // Green for Paid, Indigo for Unpaid
 
@@ -119,6 +189,9 @@ export function createInvoiceFlexMessage(
                         }
                     }] : []),
 
+                    // QR Code
+                    ...qrSection,
+
                     {
                         type: "text",
                         text: `ประจำเดือน ${formatMonth(new Date(bill.month))}`,
@@ -189,6 +262,9 @@ export function createInvoiceFlexMessage(
                 spacing: "md",
                 paddingAll: "xl",
                 contents: [
+                    // Bank Info
+                    ...bankSection,
+
                     ...(!isPaid ? [
                         {
                             type: "button",
