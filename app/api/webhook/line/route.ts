@@ -76,7 +76,17 @@ export async function POST(req: Request) {
                     return;
                 }
 
-                if (lowerText === "myid" || text === "บิลของฉัน" || text === "Menu: Bill") {
+                if (lowerText === "myid") {
+                    if (client) {
+                        await client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: `🆔 User ID ของคุณคือ:\n\n${userId}\n\n(สามารถคัดลอกรหัสนี้ส่งให้ดูแลหอพักได้เลยครับ)`
+                        });
+                    }
+                    return;
+                }
+
+                if (text === "บิลของฉัน" || text === "Menu: Bill") {
                     await resetState();
 
                     // Find Resident
