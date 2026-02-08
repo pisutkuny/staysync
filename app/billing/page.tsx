@@ -74,7 +74,13 @@ export default async function BillingPage() {
             <MeterDashboard rooms={allRooms} />
 
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">Create New Bill</h3>
+                <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Create New Bill</h3>
+                    <p className="text-sm text-gray-500">
+                        💡 <strong>สำหรับสร้างบิลเฉพาะห้อง</strong> - แก้ไขบิลกลางเดือน หรือบิลพิเศษ |
+                        <span className="text-indigo-600 font-medium">สำหรับบันทึกมาตรประจำเดือนทั้งหมด ใช้ &quot;Record All Meters&quot;</span>
+                    </p>
+                </div>
                 {rooms.length > 0 ? <BillingForm rooms={rooms} initialRates={initialRates} /> : <p className="text-gray-500">No occupied rooms to bill.</p>}
             </div>
 
