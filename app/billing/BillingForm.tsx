@@ -42,11 +42,14 @@ export default function BillingForm({ rooms, initialRates }: { rooms: Room[]; in
                 const res = await fetch(`/api/rooms/${roomId}/billing/latest`);
                 const data = await res.json();
 
+                const lastWater = data.water?.toString() || "0";
+                const lastElectric = data.electric?.toString() || "0";
+
                 setFormData({
-                    waterCurrent: "",
-                    waterLast: data.water?.toString() || "0",
-                    electricCurrent: "",
-                    electricLast: data.electric?.toString() || "0",
+                    waterCurrent: lastWater, // Default to last reading
+                    waterLast: lastWater,
+                    electricCurrent: lastElectric, // Default to last reading
+                    electricLast: lastElectric,
                     trashFee: initialRates.trash.toString(),
                     internetFee: initialRates.internet.toString(),
                     otherFees: initialRates.other.toString()
