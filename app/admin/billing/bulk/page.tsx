@@ -154,7 +154,7 @@ export default function BulkMeterPage() {
             let message = `✅ สร้างบิลสำเร็จ ${result.created} ห้อง`;
 
             if (result.skipped > 0) {
-                message += `\n⏭️ ข้าม ${result.skipped} ห้อง (จ่ایเงินแล้ว)`;
+                message += `\n⏭️ ข้าม ${result.skipped} ห้อง (จ่ายเงินแล้ว)`;
             }
 
             if (result.errors && result.errors.length > 0) {
