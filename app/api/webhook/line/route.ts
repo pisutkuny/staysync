@@ -107,16 +107,24 @@ export async function POST(req: Request) {
                         } else {
                             // Generate Flex Message for Invoice
                             // Construct Pay URL
-                            // Try to get URL from VERCEL_URL if NEXT_PUBLIC_APP_URL is not set (or is localhost in prod)
+                            // PRIORITIZE NEXT_PUBLIC_APP_URL
                             let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-                            if (!baseUrl || baseUrl.includes("localhost")) {
-                                if (process.env.VERCEL_URL) {
-                                    baseUrl = `https://${process.env.VERCEL_URL}`;
-                                } else if (!baseUrl) {
-                                    baseUrl = "https://your-domain.com";
-                                }
+
+                            // Fallback to VERCEL_URL if NEXT_PUBLIC_APP_URL is not set
+                            if (!baseUrl && process.env.VERCEL_URL) {
+                                baseUrl = `https://${process.env.VERCEL_URL}`;
                             }
-                            const payUrl = `${baseUrl}/pay/upload?billId=${latestBill.id}`;
+
+                            // Fallback for Local Development
+                            if (!baseUrl || baseUrl.includes("localhost")) {
+                                baseUrl = "http://localhost:3000";
+                            }
+
+                            // Ensure no trailing slash
+                            baseUrl = baseUrl.replace(/\/$/, "");
+
+                            // The correct path is /pay/[billId]
+                            const payUrl = `${baseUrl}/pay/${latestBill.id}`;
 
                             const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
 
