@@ -124,12 +124,22 @@ export async function POST(req: Request) {
                             baseUrl = baseUrl.replace(/\/$/, "");
 
                             // The correct path is /pay/[billId]
+                            // The correct path is /pay/[billId]
                             const payUrl = `${baseUrl}/pay/${latestBill.id}`;
 
-                            const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
-
-                            if (client) {
-                                await client.replyMessage(event.replyToken, flexMessage);
+                            try {
+                                const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
+                                if (client) {
+                                    await client.replyMessage(event.replyToken, flexMessage);
+                                }
+                            } catch (flexError) {
+                                console.error("Flex Message Error:", flexError);
+                                if (client) {
+                                    await client.replyMessage(event.replyToken, {
+                                        type: "text",
+                                        text: "⚠️ ขออภัยครับ ไม่สามารถสร้างบิลได้ในขณะนี้\n(Error: Invalid Bill Data)"
+                                    });
+                                }
                             }
                         }
 

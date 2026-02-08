@@ -49,12 +49,7 @@ export function createInvoiceFlexMessage(
             url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
             size: "md",
             aspectMode: "cover",
-            margin: "md",
-            action: {
-                type: "uri",
-                label: "Open QR",
-                uri: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`
-            }
+            margin: "md"
         },
         {
             type: "text",
