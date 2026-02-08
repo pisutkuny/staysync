@@ -284,9 +284,9 @@ export default function BulkMeterPage() {
                             ตรวจสอบบิลก่อนส่ง
                         </h2>
 
-                        <div className="bg-yellow-50 border border-yellow-400 rounded p-4 mb-4 text-sm">
-                            <strong className="text-yellow-900">⚠️ ระบบจะสร้างบิล {completedEntries.length} ห้อง</strong>
-                            <span className="text-yellow-800"> และส่งการแจ้งเตือนผ่าน Line ให้ลูกค้าทันที</span>
+                        <div className="bg-yellow-50 border-2 border-yellow-500 rounded-lg p-4 mb-4">
+                            <strong className="text-gray-900 text-base">⚠️ ระบบจะสร้างบิล {completedEntries.length} ห้อง</strong>
+                            <span className="text-gray-800"> และส่งการแจ้งเตือนผ่าน Line ให้ลูกค้าทันที</span>
                         </div>
 
                         <div className="space-y-2 mb-6 max-h-64 overflow-auto">
