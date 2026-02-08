@@ -23,7 +23,16 @@ export async function POST(request: Request) {
 export async function GET() {
     try {
         const rooms = await prisma.room.findMany({
-            orderBy: { number: 'asc' }
+            orderBy: { number: 'asc' },
+            include: {
+                billings: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1
+                },
+                residents: {
+                    where: { status: 'Active' }
+                }
+            }
         });
         return NextResponse.json(rooms);
     } catch (error) {
