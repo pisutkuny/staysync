@@ -28,23 +28,42 @@ export async function POST(
         const refund = deposit - finalBillAmount;
 
         // 3. Transaction
-        await prisma.$transaction([
-            // Create Final Billing? Maybe.
-            // Update Resident Status
-            prisma.resident.update({
+        await prisma.$transaction(async (tx) => {
+            // A. Update Resident Status
+            await tx.resident.update({
                 where: { id: residentId },
                 data: {
                     status: "CheckedOut",
                     checkOutDate: new Date(),
-                    roomId: null, // Remove from room
+                    roomId: null,
                 }
-            }),
-            // Update Room Status
-            prisma.room.update({
-                where: { id: resident.room.id },
-                data: { status: "Available" }
-            })
-        ]);
+            });
+
+            // B. Check if any residents remain in the room
+            // We count residents who are NOT the current one (just to be safe, though we set roomId to null for current already)
+            // And who are active.
+            const remainingResidents = await tx.resident.count({
+                where: {
+                    roomId: resident.room!.id,
+                    status: "Active",
+                    checkOutDate: null // Ensure they haven't been checked out
+                }
+            });
+
+            // C. Update Room Status only if truly empty
+            if (remainingResidents === 0) {
+                await tx.room.update({
+                    where: { id: resident.room!.id },
+                    data: { status: "Available" }
+                });
+            } else {
+                // Ensure room is marked Occupied just in case
+                await tx.room.update({
+                    where: { id: resident.room!.id },
+                    data: { status: "Occupied" }
+                });
+            }
+        });
 
         return NextResponse.json({
             success: true,
