@@ -148,7 +148,7 @@ export default function BulkMeterPage() {
             }
 
             alert(`สร้างบิลสำเร็จ ${result.created} ห้อง!`);
-            window.location.href = "/admin/billing";
+            window.location.href = "/billing";
 
         } catch (error: any) {
             console.error("Submit error:", error);

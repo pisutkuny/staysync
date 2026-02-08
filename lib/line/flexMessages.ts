@@ -48,7 +48,7 @@ export function createInvoiceFlexMessage(
 
     return {
         type: "flex",
-        altText: `ใบแจ้งหนี้ห้อง ${resident.room?.number}`,
+        altText: `ใบแจ้งหนี้ห้อง ${bill.room?.number || 'N/A'}`,
         contents: {
             "type": "bubble",
             "size": "giga",
@@ -65,7 +65,7 @@ export function createInvoiceFlexMessage(
                     },
                     {
                         "type": "text",
-                        "text": `ห้อง ${resident.room?.number}`,
+                        "text": `ห้อง ${bill.room?.number || 'N/A'}`,
                         "weight": "bold",
                         "size": "xxl",
                         "margin": "md"
