@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         const folderId = formData.get("folderId") as string | undefined;
 
         // Check availability of Google Drive (Apps Script Method)
-        const useDrive = !!process.env.GOOGLE_SCRIPT_URL;
+        const useDrive = !!(process.env.GOOGLE_SCRIPT_URL || process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL);
 
         if (useDrive) {
             try {

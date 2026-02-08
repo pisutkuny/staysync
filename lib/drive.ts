@@ -1,8 +1,8 @@
 export async function uploadToDrive(file: File, folderId?: string) {
-    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL || process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
 
     if (!scriptUrl) {
-        throw new Error("Missing GOOGLE_SCRIPT_URL environment variable.");
+        throw new Error("Missing GOOGLE_SCRIPT_URL or NEXT_PUBLIC_GOOGLE_SCRIPT_URL environment variable.");
     }
 
     try {
