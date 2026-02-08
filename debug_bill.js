@@ -1,27 +1,6 @@
-import { FlexContainer, FlexMessage } from "@line/bot-sdk";
 
-// Helper to format currency
-const formatMoney = (amount: number) => {
-    return amount.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-};
-
-// Helper to format date (Thai Month)
-const formatMonth = (date: Date) => {
-    return date.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
-};
-
-interface BillItem {
-    label: string;
-    value: string;
-    color?: string;
-}
-
-export function createInvoiceFlexMessage(
-    bill: any,
-    resident: any,
-    sysConfig: any,
-    payUrl: string
-): FlexMessage {
+// Mock Function
+function createInvoiceFlexMessage(bill, resident, sysConfig, payUrl) {
     const isPaid = bill.paymentStatus === 'Paid';
     const isReview = bill.paymentStatus === 'Review';
     const hasPromptPay = !!sysConfig.promptPayId;
@@ -29,6 +8,9 @@ export function createInvoiceFlexMessage(
     // Calculate Usage
     const waterUsage = (bill.waterMeterCurrent - bill.waterMeterLast).toFixed(1);
     const electricUsage = (bill.electricMeterCurrent - bill.electricMeterLast).toFixed(1);
+
+    const formatMoney = (amount) => amount.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    const formatMonth = (date) => date.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
 
     const items = [
         { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
@@ -41,24 +23,13 @@ export function createInvoiceFlexMessage(
         items.push({ label: "🌐 ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
     }
 
-    // QR Code Section (Only if Unpaid and ID exists)
-    // Using promptpay.io API: https://promptpay.io/{id}/{amount}
     const qrSection = (!isPaid && hasPromptPay) ? [
-        /*
         {
             type: "image",
             url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
             size: "md",
             aspectMode: "cover",
             margin: "md"
-        },
-        */
-        {
-            type: "text",
-            text: `[QR Code Placeholder: ${sysConfig.promptPayId}]`,
-            size: "xs",
-            align: "center",
-            margin: "sm"
         },
         {
             type: "text",
@@ -74,7 +45,6 @@ export function createInvoiceFlexMessage(
         }
     ] : [];
 
-    // Bank Info Section (Alternative if no PromptPay)
     const bankSection = (!isPaid && !hasPromptPay) ? [
         {
             type: "box",
@@ -115,8 +85,7 @@ export function createInvoiceFlexMessage(
         }
     ] : [];
 
-    // Header Color based on status
-    const headerColor = isPaid ? "#1DB446" : "#4F46E5"; // Green for Paid, Indigo for Unpaid
+    const headerColor = isPaid ? "#1DB446" : "#4F46E5";
 
     return {
         type: "flex",
@@ -160,7 +129,6 @@ export function createInvoiceFlexMessage(
                 layout: "vertical",
                 paddingAll: "xl",
                 contents: [
-                    // PAID Stamp
                     ...(isPaid ? [{
                         type: "box",
                         layout: "vertical",
@@ -180,20 +148,12 @@ export function createInvoiceFlexMessage(
                                 color: "#1DB446",
                                 align: "center"
                             },
-                            {
-                                type: "text",
-                                text: bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString('th-TH') : "ชำระแล้ว",
-                                size: "xxs",
-                                color: "#1DB446",
-                                align: "center"
-                            }
                         ],
                         transform: {
                             rotate: "-15deg"
                         }
                     }] : []),
 
-                    // QR Code
                     ...qrSection,
 
                     {
@@ -266,7 +226,6 @@ export function createInvoiceFlexMessage(
                 spacing: "md",
                 paddingAll: "xl",
                 contents: [
-                    // Bank Info
                     ...bankSection,
 
                     ...(!isPaid ? [
@@ -298,73 +257,45 @@ export function createInvoiceFlexMessage(
                 }
             }
         }
-    } as any;
+    };
 }
 
-export function createGuestFlexMessage(): FlexMessage {
-    return {
-        type: "flex",
-        altText: "บริการเฉพาะผู้เช่าหอพัก",
-        contents: {
-            type: "bubble",
-            size: "kilo",
-            header: {
-                type: "box",
-                layout: "vertical",
-                backgroundColor: "#F8F9FA",
-                paddingAll: "lg",
-                contents: [
-                    {
-                        type: "text",
-                        text: "🔒 Residents Only",
-                        weight: "bold",
-                        size: "lg",
-                        color: "#1DB446",
-                        align: "center"
-                    }
-                ]
-            },
-            body: {
-                type: "box",
-                layout: "vertical",
-                paddingAll: "xl",
-                contents: [
-                    {
-                        type: "text",
-                        text: "ขออภัยครับ เมนูนี้สงวนไว้สำหรับผู้เช่าของหอพักเราเท่านั้น",
-                        size: "sm",
-                        color: "#555555",
-                        wrap: true,
-                        align: "center"
-                    },
-                    {
-                        type: "text",
-                        text: "หากคุณเป็นผู้เช่าแล้ว กรุณาพิมพ์รหัสยืนยันตัวตน เพื่อเข้าใช้งานระบบครับ",
-                        size: "xs",
-                        color: "#aaaaaa",
-                        wrap: true,
-                        margin: "lg",
-                        align: "center"
-                    }
-                ]
-            },
-            footer: {
-                type: "box",
-                layout: "vertical",
-                paddingAll: "lg",
-                contents: [
-                    {
-                        type: "button",
-                        style: "secondary",
-                        height: "sm",
-                        action: {
-                            type: "message",
-                            label: "ติดต่อแอดมิน",
-                            text: "Menu: Contact"
-                        }
-                    }
-                ]
-            }
-        }
-    };
+// Data
+const mockBill = {
+    id: 123,
+    room: { number: "101", price: 3500 },
+    waterMeterCurrent: 120,
+    waterMeterLast: 110,
+    waterRate: 18,
+    electricMeterCurrent: 550,
+    electricMeterLast: 500,
+    electricRate: 7,
+    trashFee: 0,
+    otherFees: 0,
+    internetFee: 300,
+    month: new Date(),
+    paymentStatus: "Pending", // or Paid
+    totalAmount: 4500,
+    paymentDate: null
+};
+
+const mockResident = {
+    fullName: "John Doe",
+    room: { number: "101" }
+};
+
+const mockConfig = {
+    bankName: "KBank",
+    bankAccountNumber: "123-4-56789-0",
+    bankAccountName: "Dorm Owner",
+    promptPayId: "0812345678"
+};
+
+const payUrl = "https://example.com/pay/123";
+
+try {
+    const flex = createInvoiceFlexMessage(mockBill, mockResident, mockConfig, payUrl);
+    console.log(JSON.stringify(flex, null, 2));
+} catch (e) {
+    console.error("Error:", e);
 }

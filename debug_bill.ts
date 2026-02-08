@@ -22,7 +22,7 @@ async function main() {
         bankName: "Bank Name",
         bankAccountNumber: "000-0-00000-0",
         bankAccountName: "Account Name",
-        promptPayId: null
+        promptPayId: "081 234 5678" // Test with spaces
     };
     console.log("System Config Loaded");
 
