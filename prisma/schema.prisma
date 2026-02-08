@@ -85,10 +85,12 @@ model Issue {
   category    String   // Water, Electricity, Internet, Other
   description String
   photo       String?
+  afterPhoto  String?  // Photo heavily requested by user
   reporterName    String?  // For public/guest reports
   reporterContact String?  // Phone or Line ID
   status      String   @default("Pending") // Pending, InProgress, Done
   createdAt   DateTime @default(now())
+  completedAt DateTime?
   
   resident    Resident? @relation(fields: [residentId], references: [id])
   residentId  Int?

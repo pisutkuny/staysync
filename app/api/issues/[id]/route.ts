@@ -5,12 +5,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     try {
         const { id } = await params;
         const body = await req.json();
+        const { status, afterPhoto } = body;
+
+        const updateData: any = {
+            status: status || "Done"
+        };
+
+        if (status === "Done") {
+            updateData.completedAt = new Date();
+            if (afterPhoto) updateData.afterPhoto = afterPhoto;
+        }
 
         const updatedIssue = await prisma.issue.update({
             where: { id: parseInt(id) },
-            data: {
-                status: body.status || "Done"
-            },
+            data: updateData,
             include: { resident: true }
         });
 
@@ -22,7 +30,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                     updatedIssue.resident.lineUserId,
                     updatedIssue.id,
                     updatedIssue.status,
-                    updatedIssue.description
+                    updatedIssue.description,
+                    updatedIssue.afterPhoto || undefined
                 );
             } catch (e) {
                 console.error("Failed to notify resident", e);

@@ -9,6 +9,7 @@ interface Issue {
     category: string;
     description: string;
     photo: string | null;
+    afterPhoto?: string | null;
     status: "Pending" | "In Progress" | "Done";
     createdAt: string;
     resident: {
@@ -24,6 +25,7 @@ export default function IssuesBoardPage() {
     const [issues, setIssues] = useState<Issue[]>([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState<number | null>(null);
+    const [completingIssue, setCompletingIssue] = useState<Issue | null>(null);
 
     const fetchIssues = async () => {
         try {
@@ -43,19 +45,22 @@ export default function IssuesBoardPage() {
         fetchIssues();
     }, []);
 
-    const updateStatus = async (id: number, newStatus: string) => {
+    const updateStatus = async (id: number, newStatus: string, afterPhoto?: string) => {
         setUpdating(id);
         try {
+            const body: any = { status: newStatus };
+            if (afterPhoto) body.afterPhoto = afterPhoto;
+
             const res = await fetch(`/api/issues/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify(body),
             });
 
             if (res.ok) {
                 // Optimistic update
                 setIssues(prev => prev.map(issue =>
-                    issue.id === id ? { ...issue, status: newStatus as any } : issue
+                    issue.id === id ? { ...issue, status: newStatus as any, afterPhoto: afterPhoto || issue.afterPhoto } : issue
                 ));
             } else {
                 alert("Failed to update status");
@@ -64,7 +69,12 @@ export default function IssuesBoardPage() {
             alert("Error updating status");
         } finally {
             setUpdating(null);
+            setCompletingIssue(null);
         }
+    };
+
+    const handleComplete = (issue: Issue) => {
+        setCompletingIssue(issue);
     };
 
     const getColumns = () => {
@@ -80,7 +90,7 @@ export default function IssuesBoardPage() {
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
 
     return (
-        <div className="space-y-6 h-[calc(100vh-100px)] flex flex-col">
+        <div className="space-y-6 h-[calc(100vh-100px)] flex flex-col relative w-full">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -123,7 +133,7 @@ export default function IssuesBoardPage() {
                             <IssueCard
                                 key={issue.id}
                                 issue={issue}
-                                onMove={() => updateStatus(issue.id, "Done")}
+                                onMove={() => handleComplete(issue)}
                                 onBack={() => updateStatus(issue.id, "Pending")}
                                 updating={updating === issue.id}
                                 type="InProgress"
@@ -153,6 +163,15 @@ export default function IssuesBoardPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Completion Modal */}
+            {completingIssue && (
+                <CompletionModal
+                    issue={completingIssue}
+                    onClose={() => setCompletingIssue(null)}
+                    onComplete={(url) => updateStatus(completingIssue.id, "Done", url)}
+                />
+            )}
         </div>
     );
 }
@@ -179,8 +198,14 @@ function IssueCard({ issue, onMove, onBack, updating, type }: {
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">{issue.description}</p>
 
             {issue.photo && (
+                <div className="mb-2">
+                    <a href={issue.photo} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">View Issue Photo</a>
+                </div>
+            )}
+
+            {issue.afterPhoto && (
                 <div className="mb-3">
-                    <a href={issue.photo} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">View Photo</a>
+                    <a href={issue.afterPhoto} target="_blank" rel="noreferrer" className="text-xs text-green-600 underline font-bold">View Completion Photo</a>
                 </div>
             )}
 
@@ -209,6 +234,64 @@ function IssueCard({ issue, onMove, onBack, updating, type }: {
                         )}
                     </button>
                 )}
+            </div>
+        </div>
+    );
+}
+
+function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose: () => void, onComplete: (url?: string) => void }) {
+    const [file, setFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+
+    const handleSubmit = async () => {
+        if (!file) {
+            onComplete(); // Complete without photo
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                onComplete(data.url);
+            } else {
+                alert("Upload failed: " + data.error);
+                setUploading(false); // Stop loading to allow retry or cancel
+            }
+        } catch (e) {
+            alert("Upload error");
+            setUploading(false);
+        }
+    };
+
+    return (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 p-4 rounded-xl">
+            <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
+                <h3 className="text-lg font-bold mb-4">Complete Job #{issue.id}</h3>
+                <p className="text-gray-600 mb-4 text-sm">Upload a photo of the completed repair (Optional).</p>
+
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-6"
+                />
+
+                <div className="flex justify-end gap-2">
+                    <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-bold">Cancel</button>
+                    <button onClick={handleSubmit} disabled={uploading} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold flex items-center gap-2">
+                        {uploading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />}
+                        Confirm Done
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -48,7 +48,7 @@ export async function sendLineImageMessage(userId: string, message: string, imag
     }
 }
 
-export async function sendRepairStatusUpdate(userId: string, issueId: number, status: string, description: string) {
+export async function sendRepairStatusUpdate(userId: string, issueId: number, status: string, description: string, afterPhoto?: string) {
     if (!lineClient) return;
 
     let statusText = "";
@@ -65,7 +65,9 @@ export async function sendRepairStatusUpdate(userId: string, issueId: number, st
         `สถานะใหม่: ${statusText}\n\n` +
         `ขอบคุณครับ 🙏`;
 
-    await sendLineMessage(userId, message);
+    if (afterPhoto && status === "Done") {
+        await sendLineImageMessage(userId, message, afterPhoto);
+    } else {
+        await sendLineMessage(userId, message);
+    }
 }
-
-
