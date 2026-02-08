@@ -31,8 +31,8 @@ export function createInvoiceFlexMessage(
 
     const items = [
         { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
-        { label: `💧 ค่าน้ำ (${waterUsage} หน่วย)`, value: `${formatMoney(parseFloat(waterUsage) * bill.waterRate)} ฿` },
-        { label: `⚡ ค่าไฟ (${electricUsage} หน่วย)`, value: `${formatMoney(parseFloat(electricUsage) * bill.electricRate)} ฿` },
+        { label: `💧 น้ำ ${bill.waterMeterLast} → ${bill.waterMeterCurrent} (${waterUsage} หน่วย)`, value: `${formatMoney(parseFloat(waterUsage) * bill.waterRate)} ฿` },
+        { label: `⚡ ไฟ ${bill.electricMeterLast} → ${bill.electricMeterCurrent} (${electricUsage} หน่วย)`, value: `${formatMoney(parseFloat(electricUsage) * bill.electricRate)} ฿` },
         { label: "🧹 ค่าขยะ/ส่วนกลาง", value: `${formatMoney(bill.trashFee + bill.otherFees)} ฿` }
     ];
 
