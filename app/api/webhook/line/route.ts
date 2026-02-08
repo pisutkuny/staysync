@@ -124,42 +124,33 @@ export async function POST(req: Request) {
                             baseUrl = baseUrl.replace(/\/$/, "");
 
                             // The correct path is /pay/[billId]
-                            // The correct path is /pay/[billId]
                             const payUrl = `${baseUrl}/pay/${latestBill.id}`;
 
-                            // Fallback to Text Message to ensure delivery (Debug Silent Failure)
-                            const billDate = new Date(latestBill.month).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
-                            const totalStr = latestBill.totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-
-                            const textMessage = `🧾 บิลห้อง ${resident.room?.number || '-'} (${billDate})\n\n` +
-                                `💰 ยอดรวม: ${totalStr} บาท\n` +
-                                `สถานะ: ${latestBill.paymentStatus}\n\n` +
-                                `👉 ชำระเงิน / ส่งสลิปที่นี่:\n${payUrl}`;
-
-                            if (client) {
-                                await client.replyMessage(event.replyToken, {
-                                    type: "text",
-                                    text: textMessage
-                                });
-                            }
-
-                            /* 
-                            // DISABLED FLEX MESSAGE FOR DEBUGGING
                             try {
+                                // Try to send Beautiful Flex Message
                                 const flexMessage = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
                                 if (client) {
                                     await client.replyMessage(event.replyToken, flexMessage);
                                 }
                             } catch (flexError) {
                                 console.error("Flex Message Error:", flexError);
+
+                                // Fallback to Text Message if Flex fails
+                                const billDate = new Date(latestBill.month).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+                                const totalStr = latestBill.totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+                                const textMessage = `🧾 บิลห้อง ${resident.room?.number || '-'} (${billDate})\n\n` +
+                                    `💰 ยอดรวม: ${totalStr} บาท\n` +
+                                    `สถานะ: ${latestBill.paymentStatus}\n\n` +
+                                    `👉 ชำระเงิน / ส่งสลิปที่นี่:\n${payUrl}`;
+
                                 if (client) {
                                     await client.replyMessage(event.replyToken, {
                                         type: "text",
-                                        text: "⚠️ ขออภัยครับ ไม่สามารถสร้างบิลได้ในขณะนี้\n(Error: Invalid Bill Data)"
+                                        text: textMessage
                                     });
                                 }
                             }
-                            */
                         }
 
                     } else {

@@ -44,21 +44,12 @@ export function createInvoiceFlexMessage(
     // QR Code Section (Only if Unpaid and ID exists)
     // Using promptpay.io API: https://promptpay.io/{id}/{amount}
     const qrSection = (!isPaid && hasPromptPay) ? [
-        /*
         {
             type: "image",
             url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
             size: "md",
             aspectMode: "cover",
             margin: "md"
-        },
-        */
-        {
-            type: "text",
-            text: `[QR Code Placeholder: ${sysConfig.promptPayId}]`,
-            size: "xs",
-            align: "center",
-            margin: "sm"
         },
         {
             type: "text",
