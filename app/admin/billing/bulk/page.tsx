@@ -279,7 +279,7 @@ export default function BulkMeterPage() {
             {showPreview && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowPreview(false)}>
                     <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900">
                             <AlertCircle className="text-yellow-600" />
                             ตรวจสอบบิลก่อนส่ง
                         </h2>
@@ -304,7 +304,7 @@ export default function BulkMeterPage() {
                         </div>
 
                         <div className="bg-gray-100 rounded p-4 mb-6">
-                            <div className="flex justify-between text-lg font-bold">
+                            <div className="flex justify-between text-lg font-bold text-gray-900">
                                 <span>รายได้รวม:</span>
                                 <span className="text-green-700">฿{grandTotal.toLocaleString()}</span>
                             </div>
@@ -313,7 +313,7 @@ export default function BulkMeterPage() {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowPreview(false)}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900"
                             >
                                 ยกเลิก
                             </button>
