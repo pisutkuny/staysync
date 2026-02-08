@@ -23,7 +23,6 @@ export function createInvoiceFlexMessage(
     payUrl: string
 ): FlexMessage {
     const isPaid = bill.paymentStatus === 'Paid';
-    const isReview = bill.paymentStatus === 'Review';
     const hasPromptPay = !!sysConfig.promptPayId;
 
     // Calculate Usage
@@ -41,255 +40,150 @@ export function createInvoiceFlexMessage(
         items.push({ label: "🌐 ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
     }
 
-    // QR Code Section (Only if Unpaid and ID exists)
-    // Using promptpay.io API: https://promptpay.io/{id}/{amount}
-    const qrSection = (!isPaid && hasPromptPay) ? [
-        {
-            type: "image",
-            url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
-            size: "md",
-            aspectMode: "cover",
-            margin: "md"
-        },
-        {
-            type: "text",
-            text: "สแกน QR เพื่อชำระเงิน",
-            size: "xs",
-            color: "#aaaaaa",
-            align: "center",
-            margin: "sm"
-        },
-        {
-            type: "separator",
-            margin: "lg"
-        }
-    ] : [];
-
-    // Bank Info Section (Alternative if no PromptPay)
-    const bankSection = (!isPaid && !hasPromptPay) ? [
-        {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: "#F8F9FA",
-            cornerRadius: "md",
-            paddingAll: "md",
-            margin: "md",
-            contents: [
-                {
-                    type: "box",
-                    layout: "baseline",
-                    spacing: "sm",
-                    contents: [
-                        { type: "text", text: "🏦", flex: 0 },
-                        { type: "text", text: sysConfig.bankName, weight: "bold", size: "sm", color: "#333333" }
-                    ]
-                },
-                {
-                    type: "box",
-                    layout: "baseline",
-                    spacing: "sm",
-                    margin: "sm",
-                    contents: [
-                        { type: "text", text: "🔢", flex: 0 },
-                        { type: "text", text: sysConfig.bankAccountNumber, weight: "bold", size: "lg", color: "#333333" }
-                    ]
-                },
-                {
-                    type: "text",
-                    text: `ชื่อ: ${sysConfig.bankAccountName}`,
-                    size: "xs",
-                    color: "#666666",
-                    margin: "xs",
-                    wrap: true
-                }
-            ]
-        }
-    ] : [];
-
-    // Header Color based on status
-    const headerColor = isPaid ? "#1DB446" : "#4F46E5"; // Green for Paid, Indigo for Unpaid
+    // Prepare QR Code URL
+    const amountClean = bill.totalAmount.toString(); // promptpay.io handles numbers
+    const qrImageUrl = (!isPaid && hasPromptPay)
+        ? `https://promptpay.io/${sysConfig.promptPayId}/${amountClean}`
+        : null;
 
     return {
         type: "flex",
         altText: `ใบแจ้งหนี้ห้อง ${resident.room?.number}`,
         contents: {
-            type: "bubble",
-            size: "mega",
-            header: {
-                type: "box",
-                layout: "vertical",
-                backgroundColor: headerColor,
-                paddingAll: "lg",
-                contents: [
+            "type": "bubble",
+            "size": "giga",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
                     {
-                        type: "text",
-                        text: "INVOICE",
-                        weight: "bold",
-                        color: "#ffffff66",
-                        size: "sm",
-                        letterSpacing: "2px"
+                        "type": "text",
+                        "text": "INVOICE",
+                        "weight": "bold",
+                        "color": "#1DB446",
+                        "size": "sm"
                     },
                     {
-                        type: "text",
-                        text: `ห้อง ${resident.room?.number}`,
-                        weight: "bold",
-                        size: "xxl",
-                        color: "#ffffff",
-                        margin: "sm"
+                        "type": "text",
+                        "text": `ห้อง ${resident.room?.number}`,
+                        "weight": "bold",
+                        "size": "xxl",
+                        "margin": "md"
                     },
                     {
-                        type: "text",
-                        text: resident.fullName,
-                        size: "sm",
-                        color: "#ffffffcc",
-                        margin: "xs"
+                        "type": "text",
+                        "text": `ประจำเดือน ${formatMonth(new Date(bill.month))}`,
+                        "size": "xs",
+                        "color": "#aaaaaa",
+                        "wrap": true
                     }
                 ]
             },
-            body: {
-                type: "box",
-                layout: "vertical",
-                paddingAll: "xl",
-                contents: [
-                    // PAID Stamp
-                    ...(isPaid ? [{
-                        type: "box",
-                        layout: "vertical",
-                        position: "absolute",
-                        offsetTop: "20px",
-                        offsetEnd: "20px",
-                        paddingAll: "sm",
-                        borderColor: "#1DB446",
-                        borderWidth: "medium",
-                        cornerRadius: "md",
-                        contents: [
-                            {
-                                type: "text",
-                                text: "PAID",
-                                weight: "bold",
-                                size: "xl",
-                                color: "#1DB446",
-                                align: "center"
-                            },
-                            {
-                                type: "text",
-                                text: bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString('th-TH') : "ชำระแล้ว",
-                                size: "xxs",
-                                color: "#1DB446",
-                                align: "center"
-                            }
-                        ],
-                        transform: {
-                            rotate: "-15deg"
-                        }
+            "hero": qrImageUrl ? {
+                "type": "image",
+                "url": qrImageUrl,
+                "size": "md",
+                "aspectRatio": "1:1",
+                "aspectMode": "cover",
+                "margin": "md"
+            } : undefined,
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    // Scan Instruction
+                    ...(qrImageUrl ? [{
+                        "type": "text",
+                        "text": "สแกน QR เพื่อชำระเงิน",
+                        "align": "center",
+                        "size": "xs",
+                        "color": "#999999",
+                        "margin": "none"
                     }] : []),
-
-                    // QR Code
-                    ...qrSection,
-
                     {
-                        type: "text",
-                        text: `ประจำเดือน ${formatMonth(new Date(bill.month))}`,
-                        size: "sm",
-                        color: "#888888",
-                        weight: "bold"
-                    },
-                    {
-                        type: "box",
-                        layout: "vertical",
-                        margin: "xxl",
-                        spacing: "md",
-                        contents: items.map(item => ({
-                            type: "box",
-                            layout: "baseline",
-                            contents: [
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "xxl",
+                        "spacing": "sm",
+                        "contents": items.map(item => ({
+                            "type": "box",
+                            "layout": "baseline",
+                            "contents": [
                                 {
-                                    type: "text",
-                                    text: item.label,
-                                    size: "sm",
-                                    color: "#555555",
-                                    flex: 3
+                                    "type": "text",
+                                    "text": item.label,
+                                    "size": "sm",
+                                    "color": "#555555",
+                                    "flex": 3
                                 },
                                 {
-                                    type: "text",
-                                    text: item.value,
-                                    size: "sm",
-                                    color: "#111111",
-                                    align: "end",
-                                    weight: "bold",
-                                    flex: 2
+                                    "type": "text",
+                                    "text": item.value,
+                                    "size": "sm",
+                                    "color": "#111111",
+                                    "align": "end",
+                                    "flex": 2
                                 }
                             ]
                         }))
                     },
                     {
-                        type: "separator",
-                        margin: "xxl",
-                        color: "#eeeeee"
+                        "type": "separator",
+                        "margin": "xxl"
                     },
                     {
-                        type: "box",
-                        layout: "baseline",
-                        margin: "xxl",
-                        contents: [
+                        "type": "box",
+                        "layout": "baseline",
+                        "margin": "xxl",
+                        "contents": [
                             {
-                                type: "text",
-                                text: "ยอดรวมทั้งสิ้น",
-                                size: "lg",
-                                weight: "bold",
-                                color: "#111111"
+                                "type": "text",
+                                "text": "ยอดรวมสุทธิ",
+                                "size": "md",
+                                "weight": "bold",
+                                "color": "#555555"
                             },
                             {
-                                type: "text",
-                                text: `${formatMoney(bill.totalAmount)} ฿`,
-                                size: "xxl",
-                                weight: "bold",
-                                color: isPaid ? "#1DB446" : "#E63946",
-                                align: "end"
+                                "type": "text",
+                                "text": `${formatMoney(bill.totalAmount)} ฿`,
+                                "size": "xl",
+                                "weight": "bold",
+                                "color": "#111111",
+                                "align": "end"
                             }
                         ]
                     }
                 ]
             },
-            footer: {
-                type: "box",
-                layout: "vertical",
-                spacing: "md",
-                paddingAll: "xl",
-                contents: [
-                    // Bank Info
-                    ...bankSection,
-
-                    ...(!isPaid ? [
-                        {
-                            type: "button",
-                            style: "primary",
-                            color: "#06C755",
-                            height: "md",
-                            action: {
-                                type: "uri",
-                                label: isReview ? "แจ้งโอนเพิ่มเติม" : "ชำระเงิน / แจ้งโอน",
-                                uri: payUrl
-                            }
-                        }
-                    ] : []),
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "sm",
+                "contents": [
+                    ...(!isPaid ? [{
+                        "type": "button",
+                        "style": "primary",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "ส่งสลิป / Pay Now",
+                            "uri": payUrl
+                        },
+                        "color": "#06c755"
+                    }] : []),
                     {
-                        type: "text",
-                        text: isPaid ? "ขอบพระคุณที่ชำระค่าเช่าครับ 🙏" : "กรุณาชำระเงินภายในวันที่ 5 ของเดือน",
-                        size: "xs",
-                        color: "#aaaaaa",
-                        align: "center",
-                        wrap: true
+                        "type": "text",
+                        "text": isPaid ? "ขอบพระคุณที่ชำระค่าเช่าครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน",
+                        "size": "xs",
+                        "color": "#aaaaaa",
+                        "align": "center",
+                        "margin": "md"
                     }
-                ]
-            },
-            styles: {
-                footer: {
-                    separator: true
-                }
+                ],
+                "flex": 0
             }
         }
-    } as any;
+    };
 }
 
 export function createGuestFlexMessage(): FlexMessage {

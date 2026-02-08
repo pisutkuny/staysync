@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendLineMessage, sendBillNotificationFlex } from "@/lib/line";
+import { sendLineMessage } from "@/lib/line";
+import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
 
 // Rates matching the slip image (Defaults if not provided)
 const DEFAULT_WATER_RATE = 11;
@@ -10,6 +11,9 @@ const DEFAULT_TRASH_FEE = 30;
 export async function POST(req: Request) {
     try {
         const { bills, rates } = await req.json();
+
+        // Fetch System Config for PromptPay
+        const sysConfig = await prisma.systemConfig.findFirst();
 
         // Use provided rates or fallback to defaults
         const WATER_RATE = rates?.water ?? DEFAULT_WATER_RATE;
@@ -66,23 +70,20 @@ export async function POST(req: Request) {
                 const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
 
                 // Construct Flex Message Data
-                const items = [
-                    { label: "ค่าห้อง", value: `${room.price.toLocaleString()} ฿` },
-                    { label: `ไฟ (${eUnits} หน่วย)`, value: `${eTotal.toLocaleString()} ฿` },
-                    { label: `น้ำ (${wUnits} หน่วย)`, value: `${wTotal.toLocaleString()} ฿` },
-                    { label: "ขยะ", value: `${TRASH_FEE.toLocaleString()} ฿` }
-                ];
+                // Construct Flex Message
+                const billForFlex = { ...newBill, room };
+                const flexMessage = createInvoiceFlexMessage(billForFlex, resident, sysConfig, payUrl);
 
-                if (INTERNET_FEE > 0) items.push({ label: "อินเทอร์เน็ต", value: `${INTERNET_FEE.toLocaleString()} ฿` });
-                if (OTHER_FEE > 0) items.push({ label: "ส่วนกลาง/อื่นๆ", value: `${OTHER_FEE.toLocaleString()} ฿` });
-
-                await sendBillNotificationFlex(resident.lineUserId, {
-                    roomNumber: room.number,
-                    month: new Date().toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }),
-                    totalAmount: totalAmount.toLocaleString(),
-                    payUrl: payUrl,
-                    items: items
-                });
+                // Send via Line Client
+                const { lineClient } = require("@/lib/line");
+                if (lineClient) {
+                    try {
+                        await lineClient.pushMessage(resident.lineUserId, flexMessage);
+                    } catch (e) {
+                        console.error("Failed to push bulk flex", e);
+                        await sendLineMessage(resident.lineUserId, `บิลค่าเช่ามาแล้วครับ ยอด ${totalAmount} บาท`);
+                    }
+                }
             }
         }
 
