@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 import { Loader2, Send, Image as ImageIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+declare global {
+    interface Window {
+        liff: any;
+    }
+}
 
 export default function ReportIssuePage() {
     const [loading, setLoading] = useState(false);
@@ -20,7 +27,32 @@ export default function ReportIssuePage() {
 
     // Guest State
     const [isGuest, setIsGuest] = useState(false);
-    const [guestInfo, setGuestInfo] = useState({ name: "", contact: "" });
+    const [guestInfo, setGuestInfo] = useState({ name: "", contact: "", lineUserId: "" });
+    const [liffError, setLiffError] = useState<string | null>(null);
+
+    // Initialize LIFF
+    const initLiff = async () => {
+        try {
+            if (!process.env.NEXT_PUBLIC_LINE_LIFF_ID) {
+                console.warn("LIFF ID not found");
+                return;
+            }
+            await window.liff.init({ liffId: process.env.NEXT_PUBLIC_LINE_LIFF_ID });
+            if (window.liff.isLoggedIn()) {
+                const profile = await window.liff.getProfile();
+                setGuestInfo(prev => ({ ...prev, lineUserId: profile.userId }));
+                // Auto-fill name if empty
+                if (!guestInfo.name) {
+                    setGuestInfo(prev => ({ ...prev, name: profile.displayName }));
+                }
+            } else {
+                // Determine checking logic later
+            }
+        } catch (error) {
+            console.error("LIFF Init Error", error);
+            setLiffError("Failed to connect to Line.");
+        }
+    };
 
     // Fetch Residents on Mount
     useState(() => {
@@ -104,7 +136,8 @@ export default function ReportIssuePage() {
                 photo: photoUrl,
                 residentId: null,
                 reporterName: guestInfo.name,
-                reporterContact: guestInfo.contact
+                reporterContact: guestInfo.contact,
+                reporterLineUserId: guestInfo.lineUserId || null
             } : {
                 category: formData.category,
                 description: formData.description,
@@ -121,7 +154,12 @@ export default function ReportIssuePage() {
             if (!res.ok) throw new Error("Failed");
 
             alert("Issue reported successfully!");
-            router.push("/");
+            // Close window if in LIFF
+            if (window.liff?.isInClient()) {
+                window.liff.closeWindow();
+            } else {
+                router.push("/");
+            }
         } catch (error) {
             alert("Error reporting issue.");
         } finally {
@@ -131,6 +169,12 @@ export default function ReportIssuePage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
+            <Script
+                src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+                strategy="afterInteractive"
+                onLoad={initLiff}
+            />
+
             {/* Mobile Header */}
             <div className="bg-white p-4 shadow-sm sticky top-0 z-10">
                 <h1 className="text-xl font-bold text-center text-gray-900">Report Issue</h1>
@@ -205,6 +249,11 @@ export default function ReportIssuePage() {
                                         className="w-full p-2.5 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none"
                                     />
                                 </div>
+                                {guestInfo.lineUserId && (
+                                    <div className="text-xs text-green-600 flex items-center gap-1">
+                                        ✅ Line Connected (Notifications Enabled)
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -282,6 +331,7 @@ export default function ReportIssuePage() {
                         {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
                         Submit Report
                     </button>
+                    {liffError && <p className="text-xs text-red-500 text-center">{liffError}</p>}
                 </form>
             </div>
         </div>

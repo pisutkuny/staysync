@@ -22,19 +22,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             include: { resident: true }
         });
 
-        // Notify Resident via Line
-        if (updatedIssue.resident?.lineUserId) {
+        // Notify Resident or Reporter via Line
+        const targetUserId = updatedIssue.resident?.lineUserId || updatedIssue.reporterLineUserId;
+
+        if (targetUserId) {
             try {
                 const { sendRepairStatusUpdate } = await import("@/lib/line");
                 await sendRepairStatusUpdate(
-                    updatedIssue.resident.lineUserId,
+                    targetUserId,
                     updatedIssue.id,
                     updatedIssue.status,
                     updatedIssue.description,
                     updatedIssue.afterPhoto || undefined
                 );
             } catch (e) {
-                console.error("Failed to notify resident", e);
+                console.error("Failed to notify user", e);
             }
         }
 

@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { category, description, photo, residentId, reporterName, reporterContact } = body;
+        const { category, description, photo, residentId, reporterName, reporterContact, reporterLineUserId } = body;
 
         const issue = await prisma.issue.create({
             data: {
@@ -31,7 +31,8 @@ export async function POST(request: Request) {
                 photo,
                 residentId: residentId ? Number(residentId) : null,
                 reporterName,
-                reporterContact
+                reporterContact,
+                reporterLineUserId
             },
         });
 

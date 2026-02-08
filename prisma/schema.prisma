@@ -88,6 +88,7 @@ model Issue {
   afterPhoto  String?  // Photo heavily requested by user
   reporterName    String?  // For public/guest reports
   reporterContact String?  // Phone or Line ID
+  reporterLineUserId String? // Captured from LIFF for notifications
   status      String   @default("Pending") // Pending, InProgress, Done
   createdAt   DateTime @default(now())
   completedAt DateTime?
