@@ -26,162 +26,23 @@ export function createInvoiceFlexMessage(
     const isReview = bill.paymentStatus === 'Review';
     const hasPromptPay = !!sysConfig.promptPayId;
 
-    // Calculate Usage where possible
-    const waterUsage = bill.waterMeterCurrent - bill.waterMeterLast;
-    const electricUsage = bill.electricMeterCurrent - bill.electricMeterLast;
+    // Calculate Usage
+    const waterUsage = (bill.waterMeterCurrent - bill.waterMeterLast).toFixed(1);
+    const electricUsage = (bill.electricMeterCurrent - bill.electricMeterLast).toFixed(1);
 
-    const items: BillItem[] = [
-        { label: "ค่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
-        { label: `ค่าน้ำ (${waterUsage} หน่วย)`, value: `${formatMoney(waterUsage * bill.waterRate)} ฿` },
-        { label: `ค่าไฟ (${electricUsage} หน่วย)`, value: `${formatMoney(electricUsage * bill.electricRate)} ฿` },
-        { label: "ค่าขยะ/ส่วนกลาง", value: `${formatMoney(bill.trashFee + bill.otherFees)} ฿` }
+    const items = [
+        { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
+        { label: `💧 ค่าน้ำ (${waterUsage} หน่วย)`, value: `${formatMoney(parseFloat(waterUsage) * bill.waterRate)} ฿` },
+        { label: `⚡ ค่าไฟ (${electricUsage} หน่วย)`, value: `${formatMoney(parseFloat(electricUsage) * bill.electricRate)} ฿` },
+        { label: "🧹 ค่าขยะ/ส่วนกลาง", value: `${formatMoney(bill.trashFee + bill.otherFees)} ฿` }
     ];
 
     if (bill.internetFee > 0) {
-        items.push({ label: "ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
+        items.push({ label: "🌐 ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
     }
 
-    // Status Color/Text
-    let statusColor = "#E63946"; // Red (Unpaid)
-    let statusText = "รอการชำระเงิน";
-
-    if (isPaid) {
-        statusColor = "#1DB446"; // Green
-        statusText = "PAID";
-    } else if (isReview) {
-        statusColor = "#F1C40F"; // Yellow
-        statusText = "รอตรวจสอบ";
-    }
-
-    // Header Content
-    const headerContents: any[] = [
-        {
-            type: "text",
-            text: "INVOICE",
-            weight: "bold",
-            color: "#1DB446",
-            size: "xs"
-        },
-        {
-            type: "text",
-            text: `ห้อง ${resident.room?.number}: ${resident.fullName}`,
-            weight: "bold",
-            size: "xl",
-            margin: "md",
-            wrap: true
-        },
-        {
-            type: "text",
-            text: `ประจำเดือน ${formatMonth(new Date(bill.month))}`,
-            size: "xs",
-            color: "#aaaaaa",
-            wrap: true
-        }
-    ];
-
-    // Paid Stamp (Overlay) if Paid
-    // We can't do real overlay in simple Bubble easily without absolute positioning which is tricky to get right on all devices.
-    // But we can put a big "PAID" Text in the body or header.
-    // Let's use a "stamp" style text in the top right if possible, or just huge text.
-    // Actually Flex Bubble supports absolute positioning components.
-
-    const paidStamp = isPaid ? {
-        type: "box",
-        layout: "vertical",
-        position: "absolute",
-        offsetTop: "20px",
-        offsetEnd: "20px",
-        paddingAll: "sm",
-        borderColor: "#1DB446",
-        borderWidth: "medium",
-        cornerRadius: "md",
-        contents: [
-            {
-                type: "text",
-                text: "PAID",
-                weight: "bold",
-                size: "xl",
-                color: "#1DB446",
-                align: "center"
-            },
-            {
-                type: "text",
-                text: bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString('th-TH') : "-",
-                size: "xxs",
-                color: "#1DB446",
-                align: "center"
-            }
-        ],
-        transform: {
-            rotate: "-15deg"
-        }
-    } : null;
-
-    // QR Code Section (Only if Unpaid and ID exists)
-    // Using promptpay.io API: https://promptpay.io/{id}/{amount}
-    const qrSection = (!isPaid && hasPromptPay) ? [
-        {
-            type: "image",
-            url: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`,
-            size: "md",
-            aspectMode: "cover",
-            margin: "md",
-            action: {
-                type: "uri",
-                label: "Open QR",
-                uri: `https://promptpay.io/${sysConfig.promptPayId}/${bill.totalAmount}`
-            }
-        },
-        {
-            type: "text",
-            text: "สแกน QR เพื่อชำระเงิน",
-            size: "xs",
-            color: "#aaaaaa",
-            align: "center",
-            margin: "sm"
-        }
-    ] : [];
-
-    // Bank Info Section (Fallback if no PromptPay)
-    const bankSection = (!isPaid && !hasPromptPay) ? [
-        {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: "#F8F9FA",
-            cornerRadius: "md",
-            paddingAll: "md",
-            margin: "md",
-            contents: [
-                {
-                    type: "box",
-                    layout: "baseline",
-                    spacing: "sm",
-                    contents: [
-                        { type: "text", text: "🏦", flex: 0 },
-                        { type: "text", text: sysConfig.bankName, weight: "bold", size: "sm", color: "#333333" }
-                    ]
-                },
-                {
-                    type: "box",
-                    layout: "baseline",
-                    spacing: "sm",
-                    margin: "sm",
-                    contents: [
-                        { type: "text", text: "🔢", flex: 0 },
-                        { type: "text", text: sysConfig.bankAccountNumber, weight: "bold", size: "lg", color: "#333333" }
-                    ]
-                },
-                {
-                    type: "text",
-                    text: `ชื่อ: ${sysConfig.bankAccountName}`,
-                    size: "xs",
-                    color: "#666666",
-                    margin: "xs",
-                    wrap: true
-                }
-            ]
-        }
-    ] : [];
+    // Header Color based on status
+    const headerColor = isPaid ? "#1DB446" : "#4F46E5"; // Green for Paid, Indigo for Unpaid
 
     return {
         type: "flex",
@@ -192,24 +53,84 @@ export function createInvoiceFlexMessage(
             header: {
                 type: "box",
                 layout: "vertical",
-                contents: headerContents
+                backgroundColor: headerColor,
+                paddingAll: "lg",
+                contents: [
+                    {
+                        type: "text",
+                        text: "INVOICE",
+                        weight: "bold",
+                        color: "#ffffff66",
+                        size: "sm",
+                        letterSpacing: "2px"
+                    },
+                    {
+                        type: "text",
+                        text: `ห้อง ${resident.room?.number}`,
+                        weight: "bold",
+                        size: "xxl",
+                        color: "#ffffff",
+                        margin: "sm"
+                    },
+                    {
+                        type: "text",
+                        text: resident.fullName,
+                        size: "sm",
+                        color: "#ffffffcc",
+                        margin: "xs"
+                    }
+                ]
             },
             body: {
                 type: "box",
                 layout: "vertical",
+                paddingAll: "xl",
                 contents: [
-                    // Stamp
-                    ...(paidStamp ? [paidStamp] : []),
+                    // PAID Stamp
+                    ...(isPaid ? [{
+                        type: "box",
+                        layout: "vertical",
+                        position: "absolute",
+                        offsetTop: "20px",
+                        offsetEnd: "20px",
+                        paddingAll: "sm",
+                        borderColor: "#1DB446",
+                        borderWidth: "medium",
+                        cornerRadius: "md",
+                        contents: [
+                            {
+                                type: "text",
+                                text: "PAID",
+                                weight: "bold",
+                                size: "xl",
+                                color: "#1DB446",
+                                align: "center"
+                            },
+                            {
+                                type: "text",
+                                text: bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString('th-TH') : "ชำระแล้ว",
+                                size: "xxs",
+                                color: "#1DB446",
+                                align: "center"
+                            }
+                        ],
+                        transform: {
+                            rotate: "-15deg"
+                        }
+                    }] : []),
 
-                    // QR Code (Top of body)
-                    ...qrSection,
-
-                    // Bill Items
+                    {
+                        type: "text",
+                        text: `ประจำเดือน ${formatMonth(new Date(bill.month))}`,
+                        size: "sm",
+                        color: "#888888",
+                        weight: "bold"
+                    },
                     {
                         type: "box",
                         layout: "vertical",
                         margin: "xxl",
-                        spacing: "sm",
+                        spacing: "md",
                         contents: items.map(item => ({
                             type: "box",
                             layout: "baseline",
@@ -219,21 +140,24 @@ export function createInvoiceFlexMessage(
                                     text: item.label,
                                     size: "sm",
                                     color: "#555555",
-                                    flex: 0
+                                    flex: 3
                                 },
                                 {
                                     type: "text",
                                     text: item.value,
                                     size: "sm",
                                     color: "#111111",
-                                    align: "end"
+                                    align: "end",
+                                    weight: "bold",
+                                    flex: 2
                                 }
                             ]
                         }))
                     },
                     {
                         type: "separator",
-                        margin: "xxl"
+                        margin: "xxl",
+                        color: "#eeeeee"
                     },
                     {
                         type: "box",
@@ -242,17 +166,17 @@ export function createInvoiceFlexMessage(
                         contents: [
                             {
                                 type: "text",
-                                text: "ยอดรวมสุทธิ",
-                                size: "md",
+                                text: "ยอดรวมทั้งสิ้น",
+                                size: "lg",
                                 weight: "bold",
-                                color: "#555555"
+                                color: "#111111"
                             },
                             {
                                 type: "text",
                                 text: `${formatMoney(bill.totalAmount)} ฿`,
-                                size: "xl",
+                                size: "xxl",
                                 weight: "bold",
-                                color: "#111111",
+                                color: isPaid ? "#1DB446" : "#E63946",
                                 align: "end"
                             }
                         ]
@@ -262,88 +186,100 @@ export function createInvoiceFlexMessage(
             footer: {
                 type: "box",
                 layout: "vertical",
+                spacing: "md",
+                paddingAll: "xl",
                 contents: [
-                    // Bank Info (Only if no QR)
-                    ...bankSection,
-
-                    // Buttons
-                    ...(!isPaid ? [{
-                        type: "button",
-                        style: "primary",
-                        color: "#06C755", // Line Green
-                        height: "sm",
-                        action: {
-                            type: "uri",
-                            label: isReview ? "ส่งสลิปเพิ่มเติม" : "ส่งสลิป / Pay Now",
-                            uri: payUrl
-                        },
-                        margin: "md"
-                    }] : []),
-
+                    ...(!isPaid ? [
+                        {
+                            type: "button",
+                            style: "primary",
+                            color: "#06C755",
+                            height: "md",
+                            action: {
+                                type: "uri",
+                                label: isReview ? "แจ้งโอนเพิ่มเติม" : "ชำระเงิน / แจ้งโอน",
+                                uri: payUrl
+                            }
+                        }
+                    ] : []),
                     {
                         type: "text",
-                        text: isPaid ? "ขอบคุณที่ชำระตรงเวลาครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน",
+                        text: isPaid ? "ขอบพระคุณที่ชำระค่าเช่าครับ 🙏" : "กรุณาชำระเงินภายในวันที่ 5 ของเดือน",
                         size: "xs",
                         color: "#aaaaaa",
                         align: "center",
-                        margin: "md"
+                        wrap: true
                     }
                 ]
+            },
+            styles: {
+                footer: {
+                    separator: true
+                }
             }
         }
-    } as any; // Cast as any because TS sometimes complains about complex Flex types
+    } as any;
 }
 
 export function createGuestFlexMessage(): FlexMessage {
     return {
         type: "flex",
-        altText: "สำหรับผู้เช่าหอพัก",
+        altText: "บริการเฉพาะผู้เช่าหอพัก",
         contents: {
             type: "bubble",
             size: "kilo",
-            body: {
+            header: {
                 type: "box",
                 layout: "vertical",
+                backgroundColor: "#F8F9FA",
+                paddingAll: "lg",
                 contents: [
                     {
                         type: "text",
                         text: "🔒 Residents Only",
                         weight: "bold",
                         size: "lg",
-                        color: "#1DB446"
-                    },
+                        color: "#1DB446",
+                        align: "center"
+                    }
+                ]
+            },
+            body: {
+                type: "box",
+                layout: "vertical",
+                paddingAll: "xl",
+                contents: [
                     {
                         type: "text",
-                        text: "เมนูนี้สำหรับตรวจสอบค่าใช้จ่ายของผู้เช่าหอพักเท่านั้นครับ",
+                        text: "ขออภัยครับ เมนูนี้สงวนไว้สำหรับผู้เช่าของหอพักเราเท่านั้น",
                         size: "sm",
                         color: "#555555",
                         wrap: true,
-                        margin: "md"
-                    },
-                    {
-                        type: "separator",
-                        margin: "lg"
+                        align: "center"
                     },
                     {
                         type: "text",
-                        text: "หากคุณเป็นผู้เช่า กรุณาพิมพ์รหัสยืนยันตัวตน (Code) ที่ได้รับจากเจ้าหน้าที่",
+                        text: "หากคุณเป็นผู้เช่าแล้ว กรุณาพิมพ์รหัสยืนยันตัวตน เพื่อเข้าใช้งานระบบครับ",
                         size: "xs",
                         color: "#aaaaaa",
                         wrap: true,
-                        margin: "lg"
+                        margin: "lg",
+                        align: "center"
                     }
                 ]
             },
             footer: {
                 type: "box",
                 layout: "vertical",
+                paddingAll: "lg",
                 contents: [
                     {
                         type: "button",
                         style: "secondary",
+                        height: "sm",
                         action: {
                             type: "message",
-                            label: "ติดต่อเจ้าหน้าที่",
+                            label: "ติดต่อแอดมิน",
                             text: "Menu: Contact"
                         }
                     }
