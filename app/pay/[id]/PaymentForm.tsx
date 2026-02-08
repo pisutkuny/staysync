@@ -22,25 +22,40 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
         setLoading(true);
 
         try {
-            // 1. Upload Slip
-            const uploadData = new FormData();
-            uploadData.append("file", selectedFile);
-            const uploadRes = await fetch("/api/upload", { method: "POST", body: uploadData });
+            // Convert image to base64
+            const reader = new FileReader();
+            reader.readAsDataURL(selectedFile);
 
-            if (!uploadRes.ok) throw new Error("Upload failed");
-            const { url } = await uploadRes.json();
+            await new Promise((resolve, reject) => {
+                reader.onload = async () => {
+                    try {
+                        const base64Image = reader.result as string;
 
-            // 2. Submit Payment
-            const res = await fetch(`/api/billing/${id}/pay`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slipImage: url }),
+                        // Submit to new slip upload API
+                        const res = await fetch(`/api/billing/${id}/upload-slip`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ image: base64Image }),
+                        });
+
+                        if (!res.ok) {
+                            const error = await res.json();
+                            throw new Error(error.error || "Upload failed");
+                        }
+
+                        const result = await res.json();
+                        console.log("Upload successful:", result);
+                        setSubmitted(true);
+                        resolve(result);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = reject;
             });
-
-            if (!res.ok) throw new Error("Failed to submit");
-            setSubmitted(true);
-        } catch (error) {
-            alert("Failed to submit payment.");
+        } catch (error: any) {
+            console.error("Submit error:", error);
+            alert(`เกิดข้อผิดพลาด: ${error.message || "ไม่สามารถอัปโหลดสลิปได้"}`);
         } finally {
             setLoading(false);
         }

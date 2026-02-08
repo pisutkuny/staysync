@@ -67,9 +67,18 @@ model Billing {
   note          String?
 
   totalAmount   Float
-  paymentStatus String   @default("Pending") // Pending, Review, Paid, Rejected
-  slipImage     String?
+  paymentStatus String   @default("Pending") // Pending, Review, Paid
+  
+  // Payment Slip fields
+  slipImage     String?  // Google Drive webViewLink
+  slipFileId    String?  // Google Drive file ID
   paymentDate   DateTime? // When the slip was uploaded
+  
+  // Review fields
+  reviewedBy    Int?     // User ID who reviewed
+  reviewedAt    DateTime? // When review was completed
+  reviewNote    String?  // Admin note for rejection/approval
+  
   month         DateTime @default(now()) // To track billing month
   createdAt     DateTime @default(now())
   
@@ -78,6 +87,8 @@ model Billing {
   
   resident   Resident? @relation(fields: [residentId], references: [id])
   residentId Int?
+  
+  reviewer   User?    @relation("BillingReviewer", fields: [reviewedBy], references: [id])
 }
 
 model Issue {
@@ -102,6 +113,8 @@ model User {
   username String @unique
   password String
   role     String @default("STAFF") // OWNER, STAFF, TENANT
+  
+  reviewedBills Billing[] @relation("BillingReviewer")
 }
 
 model SystemConfig {

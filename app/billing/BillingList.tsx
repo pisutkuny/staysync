@@ -18,24 +18,35 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
     const [loading, setLoading] = useState<number | null>(null);
     const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
 
-    const handleStatusUpdate = async (id: number, status: string) => {
+
+    const handleReview = async (id: number, action: "approve" | "reject", note?: string) => {
         setLoading(id);
         try {
-            const res = await fetch(`/api/billing/${id}/status`, {
-                method: "PATCH",
+            const res = await fetch(`/api/billing/${id}/review-slip`, {
+                method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status }),
+                body: JSON.stringify({ action, note, userId: 1 }),
             });
-            if (!res.ok) throw new Error("Failed");
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || "Failed to review");
+            }
+
+            const result = await res.json();
 
             // Update UI locally
-            setBills(bills.map(b => b.id === id ? { ...b, paymentStatus: status } : b));
-        } catch (error) {
-            alert("Error updating status.");
+            const newStatus = result.status;
+            setBills(bills.map(b => b.id === id ? { ...b, paymentStatus: newStatus } : b));
+
+            alert(action === "approve" ? "✅ อนุมัติการจ่ายเงินเรียบร้อย" : "❌ ปฏิเสธการจ่ายเงินเรียบร้อย");
+        } catch (error: any) {
+            alert(`เกิดข้อผิดพลาด: ${error.message}`);
         } finally {
             setLoading(null);
         }
     };
+
 
     return (
         <>
@@ -81,14 +92,17 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                             {bill.paymentStatus === "Review" && (
                                 <div className="flex gap-2 pt-2">
                                     <button
-                                        onClick={() => handleStatusUpdate(bill.id, "Paid")}
+                                        onClick={() => handleReview(bill.id, "approve")}
                                         disabled={loading === bill.id}
                                         className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-green-700"
                                     >
                                         {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} Approve
                                     </button>
                                     <button
-                                        onClick={() => handleStatusUpdate(bill.id, "Rejected")}
+                                        onClick={() => {
+                                            const note = prompt("เหตุผลการปฏิเสธ:");
+                                            if (note !== null) handleReview(bill.id, "reject", note);
+                                        }}
                                         disabled={loading === bill.id}
                                         className="flex-1 py-2 bg-red-50 text-red-600 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-100"
                                     >
@@ -148,13 +162,16 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                             {bill.paymentStatus === "Review" && (
                                                 <>
                                                     <button
-                                                        onClick={() => handleStatusUpdate(bill.id, "Paid")}
+                                                        onClick={() => handleReview(bill.id, "approve")}
                                                         disabled={loading === bill.id}
                                                         className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors shadow-sm" title="Approve Payment">
                                                         {loading === bill.id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
                                                     </button>
                                                     <button
-                                                        onClick={() => handleStatusUpdate(bill.id, "Rejected")}
+                                                        onClick={() => {
+                                                            const note = prompt("เหตุผลการปฏิเสธ:");
+                                                            if (note !== null) handleReview(bill.id, "reject", note);
+                                                        }}
                                                         disabled={loading === bill.id}
                                                         className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm" title="Reject Payment">
                                                         <XCircle size={18} />
