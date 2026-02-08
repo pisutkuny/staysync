@@ -147,8 +147,23 @@ export default function BulkMeterPage() {
                 throw new Error(result.error || "เกิดข้อผิดพลาด");
             }
 
-            alert(`สร้างบิลสำเร็จ ${result.created} ห้อง!`);
-            window.location.href = "/billing";
+            // Build result message
+            let message = `✅ สร้างบิลสำเร็จ ${result.created} ห้อง`;
+
+            if (result.skipped > 0) {
+                message += `\n⏭️ ข้าม ${result.skipped} ห้อง (จ่ایเงินแล้ว)`;
+            }
+
+            if (result.errors && result.errors.length > 0) {
+                message += `\n\n❌ ข้อผิดพลาด:\n${result.errors.join('\n')}`;
+            }
+
+            alert(message);
+
+            // Only redirect if at least one bill was created
+            if (result.created > 0) {
+                window.location.href = "/billing";
+            }
 
         } catch (error: any) {
             console.error("Submit error:", error);
