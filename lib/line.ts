@@ -48,4 +48,24 @@ export async function sendLineImageMessage(userId: string, message: string, imag
     }
 }
 
+export async function sendRepairStatusUpdate(userId: string, issueId: number, status: string, description: string) {
+    if (!lineClient) return;
+
+    let statusText = "";
+
+    switch (status) {
+        case "Pending": statusText = "⏳ รอดำเนินการ (Pending)"; break;
+        case "In Progress": statusText = "🛠️ กำลังดำเนินการ (In Progress)"; break;
+        case "Done": statusText = "✅ ดำเนินการเสร็จสิ้น (Done)"; break;
+        default: statusText = status;
+    }
+
+    const message = `🔔 อัปเดตสถานะงานซ่อม (Request #${issueId})\n\n` +
+        `รายการ: ${description}\n` +
+        `สถานะใหม่: ${statusText}\n\n` +
+        `ขอบคุณครับ 🙏`;
+
+    await sendLineMessage(userId, message);
+}
+
 

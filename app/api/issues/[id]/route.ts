@@ -14,12 +14,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             include: { resident: true }
         });
 
-        // Notify Resident via Line if Done
-        if (updatedIssue.status === "Done" && updatedIssue.resident?.lineUserId) {
+        // Notify Resident via Line
+        if (updatedIssue.resident?.lineUserId) {
             try {
-                const { sendLineMessage } = await import("@/lib/line");
-                const message = `✅ รายการแจ้งซ่อมของคุณ (ID: #${updatedIssue.id})\n"${updatedIssue.description}"\n\nได้รับการแก้ไขเรียบร้อยแล้วครับ ขอบคุณครับ 🙏`;
-                await sendLineMessage(updatedIssue.resident.lineUserId, message);
+                const { sendRepairStatusUpdate } = await import("@/lib/line");
+                await sendRepairStatusUpdate(
+                    updatedIssue.resident.lineUserId,
+                    updatedIssue.id,
+                    updatedIssue.status,
+                    updatedIssue.description
+                );
             } catch (e) {
                 console.error("Failed to notify resident", e);
             }
