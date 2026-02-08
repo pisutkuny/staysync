@@ -1,96 +1,166 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendLineMessage } from "@/lib/line";
-import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
-
-// Rates matching the slip image (Defaults if not provided)
-const DEFAULT_WATER_RATE = 11;
-const DEFAULT_ELECTRIC_RATE = 8;
-const DEFAULT_TRASH_FEE = 30;
 
 export async function POST(req: Request) {
     try {
-        const { bills, rates } = await req.json();
+        const { month, entries } = await req.json();
 
-        // Fetch System Config for PromptPay
-        const sysConfig = await prisma.systemConfig.findFirst();
+        if (!month || !entries || !Array.isArray(entries)) {
+            return NextResponse.json(
+                { error: "Invalid request. Provide month and entries array." },
+                { status: 400 }
+            );
+        }
 
-        // Use provided rates or fallback to defaults
-        const WATER_RATE = rates?.water ?? DEFAULT_WATER_RATE;
-        const ELECTRIC_RATE = rates?.electric ?? DEFAULT_ELECTRIC_RATE;
-        const TRASH_FEE = rates?.trash ?? DEFAULT_TRASH_FEE;
-        const INTERNET_FEE = rates?.internet ?? 0;
-        const OTHER_FEE = rates?.other ?? 0;
+        // Fetch system config for rates
+        const config = await prisma.systemConfig.findFirst();
+        if (!config) {
+            return NextResponse.json(
+                { error: "System configuration not found. Please configure rates first." },
+                { status: 500 }
+            );
+        }
 
-        const results = [];
+        const results = {
+            created: 0,
+            skipped: 0,
+            errors: [] as string[]
+        };
 
-        for (const bill of bills) {
-            const { roomId, wCurr, eCurr, wLast, eLast } = bill;
+        // Process each entry
+        for (const entry of entries) {
+            const { roomId, waterCurrent, electricCurrent } = entry;
 
-            // Calc logic
-            const wUnits = Math.max(0, wCurr - wLast);
-            const eUnits = Math.max(0, eCurr - eLast);
-            const wTotal = wUnits * WATER_RATE;
-            const eTotal = eUnits * ELECTRIC_RATE;
+            // Skip if incomplete
+            if (waterCurrent === null || electricCurrent === null) {
+                results.skipped++;
+                continue;
+            }
 
-            const room = await prisma.room.findUnique({
-                where: { id: roomId },
-                include: { residents: { where: { status: "Active" } } }
-            });
+            try {
+                // Fetch room with last billing
+                const room = await prisma.room.findUnique({
+                    where: { id: roomId },
+                    include: {
+                        billings: {
+                            orderBy: { createdAt: "desc" },
+                            take: 1
+                        },
+                        residents: {
+                            where: { status: "Active" },
+                            take: 1
+                        }
+                    }
+                });
 
-            if (!room) continue;
-
-            // Total Amount Calculation
-            const totalAmount = room.price + wTotal + eTotal + TRASH_FEE + INTERNET_FEE + OTHER_FEE;
-            const resident = room.residents[0];
-
-            // Create Bill
-            const newBill = await prisma.billing.create({
-                data: {
-                    roomId,
-                    residentId: resident?.id,
-                    waterMeterLast: wLast,
-                    waterMeterCurrent: wCurr,
-                    waterRate: WATER_RATE,
-                    electricMeterLast: eLast,
-                    electricMeterCurrent: eCurr,
-                    electricRate: ELECTRIC_RATE,
-                    trashFee: TRASH_FEE,
-                    internetFee: INTERNET_FEE,
-                    otherFees: OTHER_FEE,
-                    totalAmount,
-                    paymentStatus: "Pending",
-                    month: new Date(),
+                if (!room) {
+                    results.errors.push(`Room ${roomId} not found`);
+                    continue;
                 }
-            });
-            results.push(newBill);
 
-            // Send Line Notif
-            if (resident?.lineUserId) {
-                const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
+                // Check for duplicate bill in same month
+                const monthStart = new Date(month + "-01");
+                const monthEnd = new Date(monthStart);
+                monthEnd.setMonth(monthEnd.getMonth() + 1);
 
-                // Construct Flex Message Data
-                // Construct Flex Message
-                const billForFlex = { ...newBill, room };
-                const flexMessage = createInvoiceFlexMessage(billForFlex, resident, sysConfig, payUrl);
+                const existingBill = await prisma.billing.findFirst({
+                    where: {
+                        roomId,
+                        month: {
+                            gte: monthStart,
+                            lt: monthEnd
+                        },
+                        paymentStatus: { not: "Paid" }
+                    }
+                });
 
-                // Send via Line Client
-                const { lineClient } = require("@/lib/line");
-                if (lineClient) {
+                if (existingBill) {
+                    results.skipped++;
+                    continue;
+                }
+
+                // Get last meter readings
+                const lastBilling = room.billings[0];
+                const waterLast = lastBilling?.waterMeterCurrent || 0;
+                const electricLast = lastBilling?.electricMeterCurrent || 0;
+
+                // Calculate usage
+                const waterUsage = waterCurrent - waterLast;
+                const electricUsage = electricCurrent - electricLast;
+
+                // Validate readings
+                if (waterUsage < 0 || electricUsage < 0) {
+                    results.errors.push(`Room ${room.number}: Invalid meter reading (negative usage)`);
+                    continue;
+                }
+
+                // Calculate costs
+                const waterCost = waterUsage * config.waterRate;
+                const electricCost = electricUsage * config.electricRate;
+                const totalAmount = room.price + waterCost + electricCost + config.internetFee + config.trashFee + config.otherFees;
+
+                // Create billing record
+                await prisma.billing.create({
+                    data: {
+                        roomId,
+                        residentId: room.residents[0]?.id || null,
+                        waterMeterLast: waterLast,
+                        waterMeterCurrent: waterCurrent,
+                        waterRate: config.waterRate,
+                        electricMeterLast: electricLast,
+                        electricMeterCurrent: electricCurrent,
+                        electricRate: config.electricRate,
+                        internetFee: config.internetFee,
+                        trashFee: config.trashFee,
+                        otherFees: config.otherFees,
+                        totalAmount,
+                        month: new Date(month + "-01"),
+                        paymentStatus: "Pending"
+                    }
+                });
+
+                results.created++;
+
+                // Send Line notification using Flex Message
+                if (room.residents[0]?.lineUserId) {
                     try {
-                        await lineClient.pushMessage(resident.lineUserId, flexMessage);
-                    } catch (e) {
-                        console.error("Failed to push bulk flex", e);
-                        await sendLineMessage(resident.lineUserId, `บิลค่าเช่ามาแล้วครับ ยอด ${totalAmount} บาท`);
+                        const { lineClient } = await import("@/lib/line");
+                        const { createInvoiceFlexMessage } = await import("@/lib/line/flexMessages");
+
+                        const sysConfig = await prisma.systemConfig.findFirst();
+                        const resident = room.residents[0];
+
+                        // Find the bill we just created
+                        const createdBill = await prisma.billing.findFirst({
+                            where: { roomId, month: new Date(month + "-01") },
+                            include: { room: true }
+                        });
+
+                        if (createdBill && lineClient && resident.lineUserId) {
+                            const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pay/${createdBill.id}`;
+                            const billForFlex = { ...createdBill, room };
+                            const flexMessage = createInvoiceFlexMessage(billForFlex, resident, sysConfig, payUrl);
+
+                            await lineClient.pushMessage(resident.lineUserId, flexMessage);
+                        }
+                    } catch (lineError) {
+                        console.error(`Failed to send notification to room ${room.number}:`, lineError);
+                        // Don't fail the entire process if notification fails
                     }
                 }
+
+            } catch (error: any) {
+                results.errors.push(`Room ${roomId}: ${error.message}`);
             }
         }
 
-        return NextResponse.json({ success: true, count: results.length });
+        return NextResponse.json(results);
 
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Failed" }, { status: 500 });
+    } catch (error: any) {
+        console.error("Bulk billing error:", error);
+        return NextResponse.json(
+            { error: error.message || "Failed to process bulk billing" },
+            { status: 500 }
+        );
     }
 }

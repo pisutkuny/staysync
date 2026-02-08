@@ -1,5 +1,5 @@
 
-import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench } from "lucide-react";
+import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench, Calculator } from "lucide-react";
 
 export const NAV_ITEMS = [
     {
@@ -36,6 +36,12 @@ export const NAV_ITEMS = [
         label: "Broadcast",
         href: "/broadcast",
         icon: Megaphone,
+        roles: ["OWNER"]
+    },
+    {
+        label: "Bulk Meter Entry",
+        href: "/admin/billing/bulk",
+        icon: Calculator,
         roles: ["OWNER"]
     },
     {
