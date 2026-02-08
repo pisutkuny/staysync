@@ -136,16 +136,17 @@ export async function POST(req: Request) {
                                 console.error("Flex Message Error:", flexError);
 
                                 // Fallback to Text Message if Flex fails
+                                // CRITICAL: Use pushMessage because replyToken might be invalid if replyMessage failed above
                                 const billDate = new Date(latestBill.month).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
                                 const totalStr = latestBill.totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
                                 const textMessage = `🧾 บิลห้อง ${resident.room?.number || '-'} (${billDate})\n\n` +
                                     `💰 ยอดรวม: ${totalStr} บาท\n` +
                                     `สถานะ: ${latestBill.paymentStatus}\n\n` +
-                                    `👉 ชำระเงิน / ส่งสลิปที่นี่:\n${payUrl}`;
+                                    `👉 ชำระเงิน / ส่งสลิปที่นี่:\n${payUrl}\n\n(Note: การแสดงผลแบบการ์ดมีปัญหา จึงแสดงแบบข้อความแทนครับ)`;
 
-                                if (client) {
-                                    await client.replyMessage(event.replyToken, {
+                                if (client && userId) {
+                                    await client.pushMessage(userId, {
                                         type: "text",
                                         text: textMessage
                                     });

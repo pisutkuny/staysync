@@ -84,7 +84,7 @@ async function main() {
     try {
         const flex = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
         console.log("Flex Message generated successfully!");
-        // console.log(JSON.stringify(flex, null, 2));
+        console.log(JSON.stringify(flex, null, 2));
     } catch (e) {
         console.error("Error generating flex message:", e);
     }
