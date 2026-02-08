@@ -36,15 +36,12 @@ export async function uploadToDrive(file: File, folderId?: string) {
             throw new Error(`Invalid response from Script: ${responseText.substring(0, 100)}...`);
         }
 
-        if (result.status !== 'success') {
-            throw new Error(result.message || "Unknown error from Google Apps Script");
-        }
-
         return {
             id: result.id,
             url: result.url,
             downloadUrl: result.downloadUrl,
-            thumbnailLink: result.thumbnailLink || result.url // Fallback
+            // Use lh3.googleusercontent.com for direct image access (works better with Line)
+            thumbnailLink: `https://lh3.googleusercontent.com/d/${result.id}`
         };
 
     } catch (error) {

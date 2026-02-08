@@ -242,6 +242,7 @@ function IssueCard({ issue, onMove, onBack, updating, type }: {
 function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose: () => void, onComplete: (url?: string) => void }) {
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
     const handleSubmit = async () => {
         if (!file) {
@@ -267,10 +268,11 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
             const data = await res.json();
 
             if (data.success) {
-                onComplete(data.url);
+                setUploadedUrl(data.url);
+                setUploading(false);
             } else {
                 alert("Upload failed: " + data.error);
-                setUploading(false); // Stop loading to allow retry or cancel
+                setUploading(false);
             }
         } catch (e) {
             alert("Upload error");
@@ -278,26 +280,62 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
         }
     };
 
+    // Success View
+    if (uploadedUrl) {
+        return (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 p-4 rounded-xl">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-green-100 p-3 rounded-full">
+                            <CheckCircle size={32} className="text-green-600" />
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-bold mb-2">Upload Successful!</h3>
+                    <p className="text-gray-500 text-sm mb-4">The completion photo has been saved.</p>
+
+                    <div className="mb-6 p-2 bg-gray-50 rounded border border-gray-200">
+                        <img src={uploadedUrl} alt="Uploaded" className="w-full h-32 object-cover rounded mb-2" />
+                        <a href={uploadedUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline block break-all">
+                            {uploadedUrl}
+                        </a>
+                    </div>
+
+                    <button
+                        onClick={() => onComplete(uploadedUrl)}
+                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold"
+                    >
+                        Finish Job & Notify User
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 p-4 rounded-xl">
             <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
                 <h3 className="text-lg font-bold mb-4">Complete Job #{issue.id}</h3>
-                <p className="text-gray-600 mb-4 text-sm">Upload a photo of the completed repair (Optional).</p>
 
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={e => setFile(e.target.files?.[0] || null)}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-6"
-                />
+                {!file || uploading ? (
+                    <>
+                        <p className="text-gray-600 mb-4 text-sm">Upload a photo of the completed repair (Optional).</p>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => setFile(e.target.files?.[0] || null)}
+                            disabled={uploading}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-6"
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-bold">Cancel</button>
+                            <button onClick={handleSubmit} disabled={uploading} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold flex items-center gap-2">
+                                {uploading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />}
+                                Confirm Done
+                            </button>
+                        </div>
+                    </>
+                ) : null}
 
-                <div className="flex justify-end gap-2">
-                    <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-bold">Cancel</button>
-                    <button onClick={handleSubmit} disabled={uploading} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold flex items-center gap-2">
-                        {uploading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />}
-                        Confirm Done
-                    </button>
-                </div>
             </div>
         </div>
     );

@@ -44,7 +44,16 @@ export async function sendLineImageMessage(userId: string, message: string, imag
         await lineClient.pushMessage(userId, messages);
         console.log(`Line Message sent to ${userId}`);
     } catch (error) {
-        console.error("Failed to send Line message:", error);
+        console.error("Failed to send Line image message, falling back to text:", error);
+        // Fallback: Send text only with link
+        try {
+            await lineClient.pushMessage(userId, {
+                type: "text",
+                text: `${message}\n\n(รูปภาพแนบ: ${imageUrl})`
+            });
+        } catch (fallbackError) {
+            console.error("Failed to send fallback message:", fallbackError);
+        }
     }
 }
 
