@@ -236,7 +236,8 @@ export async function POST(req: Request) {
                             residentId: resident?.id || null,
                             status: "Pending",
                             reporterName: resident ? undefined : reporterName,
-                            reporterContact: resident ? undefined : `Line:${userId}`
+                            reporterContact: resident ? undefined : `Line:${userId}`,
+                            reporterLineUserId: userId // Capture Line ID for notifications
                         }
                     });
 
