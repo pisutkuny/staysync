@@ -13,15 +13,14 @@ export async function uploadToDrive(file: File, folderId?: string) {
             filename: file.name,
             mimeType: file.type,
             file: base64,
-            // folderId is hardcoded in the script or can be passed if script supports it.
-            // Our script implementation hardcodes it for security/simplicity.
+            folderId: folderId // Pass folderId if provided
         };
 
         const response = await fetch(scriptUrl, {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: {
-                'Content-Type': 'text/plain', // Use text/plain to avoid strict parsing issues
+                'Content-Type': 'text/plain',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             },
             redirect: 'follow'
@@ -33,7 +32,6 @@ export async function uploadToDrive(file: File, folderId?: string) {
         try {
             result = JSON.parse(responseText);
         } catch (e) {
-            // Include a snippet of the response in the error (e.g. "<!DOCTYPE html>...")
             console.error("GAS Non-JSON Response:", responseText);
             throw new Error(`Invalid response from Script: ${responseText.substring(0, 100)}...`);
         }
@@ -45,7 +43,8 @@ export async function uploadToDrive(file: File, folderId?: string) {
         return {
             id: result.id,
             url: result.url,
-            downloadUrl: result.downloadUrl
+            downloadUrl: result.downloadUrl,
+            thumbnailLink: result.thumbnailLink || result.url // Fallback
         };
 
     } catch (error) {

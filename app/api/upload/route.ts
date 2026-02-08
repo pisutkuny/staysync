@@ -15,16 +15,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "File too large. Max 5MB." }, { status: 400 });
         }
 
+        const folderId = formData.get("folderId") as string | undefined;
+
         // Check availability of Google Drive (Apps Script Method)
         const useDrive = !!process.env.GOOGLE_SCRIPT_URL;
 
         if (useDrive) {
             try {
                 // Upload to Google Drive via Apps Script
-                const result = await uploadToDrive(file); // No folderId needed, it's in the script
+                const result = await uploadToDrive(file, folderId);
                 return NextResponse.json({
                     success: true,
-                    url: result.url, // WebViewLink from Drive
+                    url: result.thumbnailLink, // Use thumbnailLink for better display support
+                    originalUrl: result.url,
                     provider: 'google-drive'
                 });
             } catch (driveError: any) {

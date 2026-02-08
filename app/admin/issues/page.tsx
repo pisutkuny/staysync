@@ -224,7 +224,7 @@ function IssueCard({ issue, onMove, onBack, updating, type }: {
                         onClick={onMove}
                         disabled={updating}
                         className={`flex-1 py-1.5 rounded text-white text-xs font-bold flex justify-center items-center gap-1 transition-colors ${type === "Pending" ? "bg-indigo-600 hover:bg-indigo-700" :
-                                type === "InProgress" ? "bg-green-600 hover:bg-green-700" : "bg-gray-600"
+                            type === "InProgress" ? "bg-green-600 hover:bg-green-700" : "bg-gray-600"
                             }`}
                     >
                         {updating ? <Loader2 className="animate-spin" size={14} /> : (
@@ -253,6 +253,12 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
         try {
             const formData = new FormData();
             formData.append("file", file);
+
+            // Add Folder ID if configured
+            const repairFolderId = process.env.NEXT_PUBLIC_REPAIR_FOLDER_ID;
+            if (repairFolderId) {
+                formData.append("folderId", repairFolderId);
+            }
 
             const res = await fetch("/api/upload", {
                 method: "POST",

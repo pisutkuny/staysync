@@ -118,6 +118,12 @@ export default function ReportIssuePage() {
                 const uploadData = new FormData();
                 uploadData.append("file", selectedFile);
 
+                // Add Folder ID if configured
+                const repairFolderId = process.env.NEXT_PUBLIC_REPAIR_FOLDER_ID;
+                if (repairFolderId) {
+                    uploadData.append("folderId", repairFolderId);
+                }
+
                 const uploadRes = await fetch("/api/upload", {
                     method: "POST",
                     body: uploadData,
