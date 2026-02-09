@@ -4,10 +4,11 @@ import prisma from '@/lib/prisma';
 // GET /api/expenses/[id] - Fetch single expense
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = parseInt(params.id);
+        const { id: idStr } = await params;
+        const id = parseInt(idStr);
         const expense = await prisma.expense.findUnique({
             where: { id }
         });
@@ -26,10 +27,11 @@ export async function GET(
 // PUT /api/expenses/[id] - Update expense
 export async function PUT(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = parseInt(params.id);
+        const { id: idStr } = await params;
+        const id = parseInt(idStr);
         const body = await req.json();
         const { title, amount, category, date, note, receiptUrl, receiptFileId } = body;
 
@@ -65,10 +67,11 @@ export async function PUT(
 // DELETE /api/expenses/[id] - Delete expense
 export async function DELETE(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = parseInt(params.id);
+        const { id: idStr } = await params;
+        const id = parseInt(idStr);
 
         // Fetch expense to get receiptFileId (for Drive deletion)
         const expense = await prisma.expense.findUnique({ where: { id } });
