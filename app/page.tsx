@@ -50,87 +50,90 @@ export default function Home() {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h2>
-          <p className="text-gray-500 mt-2">ภาพรวมหอพักของคุณ (Real-time)</p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">ยอดรอเก็บ (Unpaid)</p>
-          <p className="text-2xl font-bold text-red-500">฿{summary.outstanding.toLocaleString()}</p>
+      {/* Enhanced Gradient Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">📊 Dashboard</h2>
+            <p className="text-cyan-100 mt-2 text-lg">ภาพรวมหอพักของคุณ (Real-time)</p>
+          </div>
+          <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
+            <p className="text-sm font-bold text-white/90 uppercase tracking-wider">ยอดรอเก็บ</p>
+            <p className="text-3xl font-bold text-white drop-shadow-md">฿{summary.outstanding.toLocaleString()}</p>
+          </div>
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* Enhanced KPI Cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {/* Revenue */}
         <Link href="/billing">
-          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+          <div className="p-6 bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg border-2 border-green-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
-              <p className="text-sm font-medium text-gray-500">รายรับเดือนนี้</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">฿{summary.revenue.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-600">รายรับเดือนนี้</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">฿{summary.revenue.toLocaleString()}</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full text-green-600">
-              <Wallet size={24} />
+            <div className="p-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
+              <Wallet size={28} />
             </div>
           </div>
         </Link>
 
         {/* Occupancy */}
         <Link href="/rooms">
-          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+          <div className="p-6 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg border-2 border-blue-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
-              <p className="text-sm font-medium text-gray-500">อัตราการเข้าพัก</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{summary.occupancyRate}%</p>
+              <p className="text-sm font-medium text-gray-600">อัตราการเข้าพัก</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">{summary.occupancyRate}%</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-              <Users size={24} />
+            <div className="p-4 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
+              <Users size={28} />
             </div>
           </div>
         </Link>
 
         {/* Active Issues */}
         <Link href="/admin/issues">
-          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+          <div className="p-6 bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-lg border-2 border-orange-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
-              <p className="text-sm font-medium text-gray-500">แจ้งซ่อมรอจัดการ</p>
+              <p className="text-sm font-medium text-gray-600">แจ้งซ่อมรอจัดการ</p>
               <p className="text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full text-orange-600">
-              <BadgeAlert size={24} />
+            <div className="p-4 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
+              <BadgeAlert size={28} />
             </div>
           </div>
         </Link>
 
-        {/* Expenses (Placeholder / To implement later) */}
+        {/* Expenses */}
         <Link href="/expenses">
-          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer h-full">
+          <div className="p-6 bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
-              <p className="text-sm font-medium text-gray-500">จัดการรายจ่าย</p>
-              <p className="text-sm font-bold text-indigo-600 mt-2">ดูรายละเอียด &rarr;</p>
+              <p className="text-sm font-medium text-gray-600">จัดการรายจ่าย</p>
+              <p className="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">ดูรายละเอียด →</p>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full text-indigo-600">
-              <TrendingUp size={24} className="rotate-180" />
+            <div className="p-4 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
+              <TrendingUp size={28} className="rotate-180" />
             </div>
           </div>
         </Link>
       </div>
 
-      {/* Charts Section */}
+      {/* Enhanced Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <TrendingUp className="text-indigo-600" size={20} />
+        <div className="lg:col-span-2 bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 shadow-xl">
+          <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
+            <TrendingUp className="text-indigo-600" size={22} />
             แนวโน้มรายรับ (6 เดือนล่าสุด)
           </h3>
           <RevenueChart data={charts.revenue} />
         </div>
 
         {/* Occupancy Donut */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <AlertCircle className="text-indigo-600" size={20} />
+        <div className="bg-gradient-to-br from-white to-teal-50 p-6 rounded-2xl border-2 border-teal-200 shadow-xl flex flex-col">
+          <h3 className="text-lg font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
+            <AlertCircle className="text-teal-600" size={22} />
             สถานะห้องพัก
           </h3>
           <div className="flex-1 flex items-center justify-center">
@@ -141,10 +144,10 @@ export default function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
+          <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Activity className="text-indigo-600" size={20} />
+              <Activity className="text-indigo-600" size={22} />
               กิจกรรมล่าสุด
             </h3>
           </div>
@@ -153,9 +156,9 @@ export default function Home() {
               <div className="p-8 text-center text-gray-500">ไม่มีกิจกรรมล่าสุด</div>
             ) : (
               activity.map((item) => (
-                <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                  <div className={`p-2 rounded-full ${item.type === 'bill_created' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>
-                    {item.type === 'bill_created' ? <Wallet size={16} /> : <BadgeAlert size={16} />}
+                <div key={item.id} className="p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all flex items-center gap-4">
+                  <div className={`p-3 rounded-xl shadow-md ${item.type === 'bill_created' ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white' : 'bg-gradient-to-br from-orange-400 to-red-500 text-white'}`}>
+                    {item.type === 'bill_created' ? <Wallet size={18} /> : <BadgeAlert size={18} />}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{item.title}</p>
@@ -165,7 +168,7 @@ export default function Home() {
                     <p className="text-xs text-gray-400">
                       {new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
                     </p>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${item.status === 'Paid' ? 'bg-green-100 text-green-700' :
+                    <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${item.status === 'Paid' ? 'bg-green-100 text-green-700' :
                       item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
@@ -179,10 +182,10 @@ export default function Home() {
         </div>
 
         {/* Top Spenders */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
+        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
+          <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-yellow-50 to-white">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Zap className="text-yellow-500" size={20} />
+              <Zap className="text-yellow-500" size={22} />
               การใช้น้ำ/ไฟ สูงสุด
             </h3>
             <p className="text-xs text-gray-500 mt-1">(บิลเดือนปัจจุบัน)</p>
@@ -192,15 +195,15 @@ export default function Home() {
               <div className="p-8 text-center text-gray-500">-</div>
             ) : (
               topSpenders.map((room, idx) => (
-                <div key={idx} className="p-4 flex justify-between items-center">
+                <div key={idx} className="p-4 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-white transition-all flex justify-between items-center">
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-gray-700 w-8">{room.room}</span>
+                    <span className="text-xl font-bold bg-gradient-to-br from-yellow-400 to-orange-500 bg-clip-text text-transparent w-10">{room.room}</span>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-blue-600">
-                        <Droplets size={12} /> {room.water.toFixed(0)} หน่วย
+                      <div className="flex items-center gap-1 text-xs font-medium text-blue-600">
+                        <Droplets size={14} /> {room.water.toFixed(0)} หน่วย
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-yellow-600">
-                        <Zap size={12} /> {room.electric.toFixed(0)} หน่วย
+                      <div className="flex items-center gap-1 text-xs font-medium text-yellow-600">
+                        <Zap size={14} /> {room.electric.toFixed(0)} หน่วย
                       </div>
                     </div>
                   </div>
@@ -214,37 +217,40 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">เมนูลัด (Quick Actions)</h3>
+      {/* Enhanced Quick Actions */}
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 p-6 shadow-xl">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="text-2xl">⚡</span>
+          เมนูลัด (Quick Actions)
+        </h3>
         <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-4">
           <Link href="/rooms/add">
-            <button className="w-full px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold transition-all shadow-sm hover:shadow-md">
-              + เพิ่มห้องพัก
+            <button className="w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+              ➕ เพิ่มห้องพัก
             </button>
           </Link>
           <Link href="/billing">
-            <button className="w-full px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all">
-              จัดการบิล
+            <button className="w-full px-5 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105">
+              💰 จัดการบิล
             </button>
           </Link>
           <Link href="/billing/bulk">
-            <button className="w-full px-5 py-2.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl hover:bg-indigo-100 font-bold transition-all">
+            <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
               📝 จดมิเตอร์
             </button>
           </Link>
           <Link href="/broadcast">
-            <button className="w-full px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-sm hover:shadow-md">
-              Broadcast
+            <button className="w-full px-5 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+              📢 Broadcast
             </button>
           </Link>
           <Link href="/expenses">
-            <button className="w-full px-5 py-2.5 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-100 font-bold transition-all">
+            <button className="w-full px-5 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
               📉 รายจ่าย
             </button>
           </Link>
           <Link href="/settings">
-            <button className="w-full px-5 py-2.5 bg-gray-100 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-200 font-bold transition-all">
+            <button className="w-full px-5 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:from-gray-500 hover:to-gray-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
               ⚙️ ตั้งค่า
             </button>
           </Link>
