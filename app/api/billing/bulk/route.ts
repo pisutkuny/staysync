@@ -88,10 +88,10 @@ export async function POST(req: Request) {
                     });
                 }
 
-                // Get last meter readings
+                // Get last meter readings (use initial meters if this is the first bill)
                 const lastBilling = room.billings[0];
-                const waterLast = lastBilling?.waterMeterCurrent || 0;
-                const electricLast = lastBilling?.electricMeterCurrent || 0;
+                const waterLast = lastBilling?.waterMeterCurrent ?? room.waterMeterInitial;
+                const electricLast = lastBilling?.electricMeterCurrent ?? room.electricMeterInitial;
 
                 // Calculate usage
                 const waterUsage = waterCurrent - waterLast;

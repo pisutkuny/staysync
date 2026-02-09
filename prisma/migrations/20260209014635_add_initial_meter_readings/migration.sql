@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Room" ADD COLUMN     "electricMeterInitial" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "waterMeterInitial" DOUBLE PRECISION NOT NULL DEFAULT 0;

@@ -16,6 +16,11 @@ model Room {
   number    String   @unique
   status    String   @default("Available") // Available, Occupied, Maintenance
   price     Float
+  
+  // Initial meter readings (for pre-existing installations)
+  waterMeterInitial    Float  @default(0)
+  electricMeterInitial Float  @default(0)
+  
   residents Resident[]
   billings  Billing[]
 }

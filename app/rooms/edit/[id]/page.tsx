@@ -14,7 +14,9 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
 
     const [formData, setFormData] = useState({
         number: "",
-        price: 0
+        price: 0,
+        waterMeterInitial: 0,
+        electricMeterInitial: 0
     });
 
     useEffect(() => {
@@ -23,7 +25,12 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                 const res = await fetch(`/api/rooms/${id}`);
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
-                setFormData({ number: data.number, price: data.price });
+                setFormData({
+                    number: data.number,
+                    price: data.price,
+                    waterMeterInitial: data.waterMeterInitial || 0,
+                    electricMeterInitial: data.electricMeterInitial || 0
+                });
             } catch (e) {
                 alert("Failed to load room data");
             } finally {
@@ -109,6 +116,35 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                         required
                         className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
+                </div>
+
+                <div className="border-t border-gray-100 pt-4 space-y-4">
+                    <h3 className="text-sm font-semibold text-gray-900">📊 Initial Meter Readings</h3>
+                    <p className="text-xs text-gray-500">Set starting meter values for rooms with existing installations (not starting from 0)</p>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">💧 Initial Water Meter</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            value={formData.waterMeterInitial}
+                            onChange={e => setFormData({ ...formData, waterMeterInitial: parseFloat(e.target.value) || 0 })}
+                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="Leave 0 if starting from zero"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">⚡ Initial Electric Meter</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            value={formData.electricMeterInitial}
+                            onChange={e => setFormData({ ...formData, electricMeterInitial: parseFloat(e.target.value) || 0 })}
+                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="Leave 0 if starting from zero"
+                        />
+                    </div>
                 </div>
 
                 <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">

@@ -64,14 +64,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     try {
         const { id: idStr } = await params;
         const id = parseInt(idStr);
-        const body = await request.json(); // Wait, `request` variable name mismatch fix below
-        const { number, price } = body;
+        const body = await request.json();
+        const { number, price, waterMeterInitial, electricMeterInitial } = body;
 
         const updatedRoom = await prisma.room.update({
             where: { id },
             data: {
                 number,
-                price: parseFloat(price)
+                price: parseFloat(price),
+                ...(waterMeterInitial !== undefined && { waterMeterInitial: parseFloat(waterMeterInitial) }),
+                ...(electricMeterInitial !== undefined && { electricMeterInitial: parseFloat(electricMeterInitial) })
             }
         });
 
