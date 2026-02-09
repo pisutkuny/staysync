@@ -127,6 +127,48 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                         <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.otherFees.toLocaleString()}</td>
                                     </tr>
                                 )}
+                                {/* Phase 2: Common Area Fees */}
+                                {((billing.commonWaterFee || 0) + (billing.commonElectricFee || 0) + (billing.commonInternetFee || 0) + (billing.commonTrashFee || 0)) > 0 && (
+                                    <>
+                                        <tr className="border-t-2 border-purple-100 bg-purple-50">
+                                            <td colSpan={4} className="py-2 px-2 font-bold text-purple-700 text-xs uppercase">
+                                                💰 ค่าส่วนกลาง (Common Area Fees)
+                                            </td>
+                                        </tr>
+                                        {billing.commonWaterFee > 0 && (
+                                            <tr className="bg-purple-50">
+                                                <td className="py-3 font-medium text-gray-700 pl-6">├ น้ำส่วนกลาง</td>
+                                                <td className="py-3 text-right text-gray-600">-</td>
+                                                <td className="py-3 text-center text-gray-600">-</td>
+                                                <td className="py-3 text-right font-mono font-bold text-purple-700">{billing.commonWaterFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonElectricFee > 0 && (
+                                            <tr className="bg-purple-50">
+                                                <td className="py-3 font-medium text-gray-700 pl-6">├ ไฟส่วนกลาง</td>
+                                                <td className="py-3 text-right text-gray-600">-</td>
+                                                <td className="py-3 text-center text-gray-600">-</td>
+                                                <td className="py-3 text-right font-mono font-bold text-purple-700">{billing.commonElectricFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonInternetFee > 0 && (
+                                            <tr className="bg-purple-50">
+                                                <td className="py-3 font-medium text-gray-700 pl-6">├ Internet ส่วนกลาง</td>
+                                                <td className="py-3 text-right text-gray-600">-</td>
+                                                <td className="py-3 text-center text-gray-600">-</td>
+                                                <td className="py-3 text-right font-mono font-bold text-purple-700">{billing.commonInternetFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonTrashFee > 0 && (
+                                            <tr className="bg-purple-50">
+                                                <td className="py-3 font-medium text-gray-700 pl-6">└ ขยะส่วนกลาง</td>
+                                                <td className="py-3 text-right text-gray-600">-</td>
+                                                <td className="py-3 text-center text-gray-600">-</td>
+                                                <td className="py-3 text-right font-mono font-bold text-purple-700">{billing.commonTrashFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                    </>
+                                )}
                             </tbody>
                         </table>
                     </div>
