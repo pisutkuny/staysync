@@ -21,6 +21,8 @@ export default function CentralMeterPage() {
         electricMeterLast: 0,
         electricMeterCurrent: 0,
         electricRateFromUtility: 5,
+        internetCost: 0,
+        trashCost: 0,
         note: ""
     });
 
@@ -30,7 +32,8 @@ export default function CentralMeterPage() {
         waterCost: 0,
         electricLast: 0,
         electricUsage: 0,
-        electricCost: 0
+        electricCost: 0,
+        totalCost: 0
     });
 
     // Fetch existing records
@@ -236,8 +239,8 @@ export default function CentralMeterPage() {
                                 disabled={records.length > 0}
                                 required={records.length === 0}
                                 className={`w-full rounded-lg border p-3 ${records.length > 0
-                                        ? 'border-gray-200 text-gray-500 bg-gray-50'
-                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                    ? 'border-gray-200 text-gray-500 bg-gray-50'
+                                    : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
                                     }`}
                             />
                             {records.length === 0 && (
@@ -292,6 +295,38 @@ export default function CentralMeterPage() {
                     </div>
                 </div>
 
+                {/* Fixed Monthly Costs */}
+                <div className="border-t border-gray-100 pt-4 space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">💰 ค่าใช้จ่ายคงที่รายเดือน (ถ้ามี)</h3>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">📡 Internet</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={formData.internetCost}
+                                onChange={e => setFormData({ ...formData, internetCost: parseFloat(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="0"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">🗑️ ค่าขยะ</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={formData.trashCost}
+                                onChange={e => setFormData({ ...formData, trashCost: parseFloat(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="0"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Note */}
                 <div className="border-t border-gray-100 pt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
@@ -329,10 +364,22 @@ export default function CentralMeterPage() {
                         <p className="text-sm text-gray-600">ไฟ</p>
                         <p className="text-xl font-bold text-purple-600">฿{calculated.electricCost.toLocaleString()}</p>
                     </div>
+                    {(formData.internetCost > 0 || formData.trashCost > 0) && (
+                        <>
+                            <div>
+                                <p className="text-sm text-gray-600">Internet</p>
+                                <p className="text-xl font-bold text-blue-600">฿{(formData.internetCost || 0).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600">ขยะ</p>
+                                <p className="text-xl font-bold text-green-600">฿{(formData.trashCost || 0).toLocaleString()}</p>
+                            </div>
+                        </>
+                    )}
                 </div>
                 <div className="mt-3 pt-3 border-t border-indigo-200">
                     <p className="text-sm text-gray-600">รวมทั้งหมด</p>
-                    <p className="text-2xl font-bold text-gray-900">฿{(calculated.waterCost + calculated.electricCost).toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-gray-900">฿{calculated.totalCost.toLocaleString()}</p>
                     <p className="text-xs text-gray-500 mt-1">(เจ้าของออกค่าส่วนกลาง)</p>
                 </div>
             </div>

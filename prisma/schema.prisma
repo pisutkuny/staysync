@@ -192,6 +192,10 @@ model CentralMeter {
   electricRateFromUtility Float
   electricTotalCost       Float
   
+  // Fixed monthly costs (optional)
+  internetCost            Float?   // Monthly internet cost
+  trashCost               Float?   // Monthly trash collection cost
+  
   // For analysis notes
   note                    String?
   

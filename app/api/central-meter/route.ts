@@ -27,6 +27,8 @@ export async function POST(request: Request) {
             electricMeterLast: electricMeterLastOverride,
             electricMeterCurrent,
             electricRateFromUtility,
+            internetCost,
+            trashCost,
             note
         } = body;
 
@@ -64,6 +66,8 @@ export async function POST(request: Request) {
                 electricUsage,
                 electricRateFromUtility,
                 electricTotalCost,
+                internetCost: internetCost || null,
+                trashCost: trashCost || null,
                 note: note || null
             }
         });
