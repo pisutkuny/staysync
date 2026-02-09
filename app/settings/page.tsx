@@ -31,7 +31,11 @@ export default function SettingsPage() {
         adminLineIdDisplay: "",
         // Phase 2: Common Area Billing
         enableCommonAreaCharges: false,
-        commonAreaDistribution: "equal"
+        commonAreaDistribution: "equal",
+        // Phase 2 Enhancement: Fee Cap
+        commonAreaCapType: "none",
+        commonAreaCapPercentage: 100,
+        commonAreaCapFixed: 0
     });
 
     useEffect(() => {
