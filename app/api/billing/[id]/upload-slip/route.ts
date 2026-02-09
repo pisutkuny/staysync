@@ -84,7 +84,7 @@ export async function POST(
             const config = await prisma.systemConfig.findFirst();
             if (config?.adminLineUserId) {
                 const { sendLineMessage } = await import("@/lib/line");
-                const message = `🔔 มีสลิปใหม่รอตรวจสอบ!\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nเดือน: ${monthStr}\n\nกรุณาตรวจสอบและอนุมัติ`;
+                const message = `🔔 มีสลิปใหม่รอตรวจสอบ!\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nเดือน: ${monthStr}\n\nกรุณารอตรวจสอบและอนุมัติจากผู้ดูแล`;
 
                 await sendLineMessage(config.adminLineUserId, message);
             }
