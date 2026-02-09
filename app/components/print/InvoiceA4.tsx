@@ -24,7 +24,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                     <img
                         src={config.invoiceLogo}
                         alt="Watermark"
-                        className="w-[60%] h-auto object-contain opacity-[0.03] grayscale"
+                        className="w-[60%] h-auto object-contain opacity-[0.05] grayscale"
                     />
                 </div>
             )}
