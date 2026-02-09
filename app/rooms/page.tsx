@@ -14,36 +14,40 @@ export default async function RoomsPage() {
     });
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">All Rooms</h2>
-                    <p className="text-gray-500 mt-2">Manage rooms and residents.</p>
+        <div className="space-y-8">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-lime-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 All Rooms</h2>
+                        <p className="text-emerald-100 mt-2 text-lg">Manage rooms and residents.</p>
+                    </div>
+                    <Link href="/rooms/add">
+                        <button className="bg-white text-green-700 px-6 py-3 rounded-xl font-bold hover:bg-green-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30 hover:scale-105">
+                            ➕ Add New Room
+                        </button>
+                    </Link>
                 </div>
-                <Link href="/rooms/add">
-                    <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors">
-                        Add New Room
-                    </button>
-                </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Enhanced Room Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rooms.map((room) => (
-                    <div key={room.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between min-h-[13rem]">
+                    <div key={room.id} className="bg-gradient-to-br from-white to-green-50 p-6 rounded-2xl border-2 border-green-200 shadow-xl hover:shadow-2xl transition-all hover:scale-105 flex flex-col justify-between min-h-[14rem]">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className="text-2xl font-bold text-gray-900">{room.number}</h3>
-                                <p className="text-indigo-600 font-medium">฿{room.price}/mo</p>
+                                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{room.number}</h3>
+                                <p className="text-emerald-600 font-bold text-lg">฿{room.price}/mo</p>
                                 {/* Phase 2: Common Area Toggle */}
                                 <div className="mt-2">
                                     <RoomCommonAreaToggle roomId={room.id} initialValue={room.chargeCommonArea} />
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Link href={`/rooms/edit/${room.id}`} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                <Link href={`/rooms/edit/${room.id}`} className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                                 </Link>
-                                <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full ${room.status === "Occupied" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                                <span className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-full shadow-md ${room.status === "Occupied" ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white" : "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
                                     }`}>
                                     {room.status}
                                 </span>
@@ -53,11 +57,11 @@ export default async function RoomsPage() {
                         <div className="mt-4">
                             {room.status === "Occupied" ? (
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Residents ({room.residents.filter((r: any) => r.status === 'Active').length}):</p>
+                                    <p className="text-sm text-gray-600 font-medium mb-2">Residents ({room.residents.filter((r: any) => r.status === 'Active').length}):</p>
                                     <div className="space-y-1">
                                         {room.residents.filter((r: any) => r.status === 'Active').length > 0 ? (
                                             room.residents.filter((r: any) => r.status === 'Active').map((resident: any) => (
-                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-indigo-600 font-medium hover:underline text-sm">
+                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded-lg transition text-sm">
                                                     👤 {resident.fullName}
                                                 </Link>
                                             ))
@@ -71,12 +75,12 @@ export default async function RoomsPage() {
                             )}
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2 items-center">
+                        <div className="mt-4 pt-4 border-t-2 border-green-100 flex gap-2 items-center">
                             {room.status === "Available" ? (
                                 <>
                                     <Link href={`/rooms/checkin/${room.id}`} className="w-full">
-                                        <button className="w-full py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 font-medium transition-colors flex items-center justify-center gap-2">
-                                            <UserPlus size={18} />
+                                        <button className="w-full py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                                            <UserPlus size={20} />
                                             Check In
                                         </button>
                                     </Link>
@@ -84,8 +88,8 @@ export default async function RoomsPage() {
                                 </>
                             ) : (
                                 <Link href={`/rooms/checkin/${room.id}`} className="w-full">
-                                    <button className="w-full py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 font-medium transition-colors flex items-center justify-center gap-2">
-                                        <UserPlus size={18} />
+                                    <button className="w-full py-2.5 bg-gradient-to-r from-emerald-400 to-lime-500 text-white rounded-xl hover:from-emerald-500 hover:to-lime-600 font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                                        <UserPlus size={20} />
                                         Add Resident
                                     </button>
                                 </Link>
