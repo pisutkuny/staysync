@@ -123,10 +123,10 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                                     <td className="px-6 py-3 text-gray-600">
                                         {room.residents[0]?.fullName || "-"}
                                     </td>
-                                    <td className="px-6 py-3 text-right font-medium">
+                                    <td className="px-6 py-3 text-right font-medium text-gray-900">
                                         {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </td>
-                                    <td className="px-6 py-3 text-right font-medium">
+                                    <td className="px-6 py-3 text-right font-medium text-gray-900">
                                         {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </td>
                                     <td className="px-6 py-3 text-xs text-gray-400">
