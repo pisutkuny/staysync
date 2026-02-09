@@ -173,3 +173,28 @@ model LineBotState {
   data       String?  // JSON string for temp data
   updatedAt  DateTime @updatedAt
 }
+
+model CentralMeter {
+  id                      Int      @id @default(autoincrement())
+  month                   DateTime @unique
+  
+  // Water
+  waterMeterLast          Float
+  waterMeterCurrent       Float
+  waterUsage              Float    // Auto-calculated
+  waterRateFromUtility    Float    // Actual cost from utility bill (per unit)
+  waterTotalCost          Float    // Auto-calculated
+  
+  // Electric
+  electricMeterLast       Float
+  electricMeterCurrent    Float
+  electricUsage           Float
+  electricRateFromUtility Float
+  electricTotalCost       Float
+  
+  // For analysis notes
+  note                    String?
+  
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
