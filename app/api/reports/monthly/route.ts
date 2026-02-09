@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { subMonths, startOfMonth, endOfMonth, format } from "date-fns";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -11,14 +12,19 @@ export async function GET(req: Request) {
     }
 
     try {
-        const startDate = new Date(month + "-01");
-        const endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + 1);
+        const selectedDate = new Date(month + "-01");
+        const startDate = startOfMonth(selectedDate);
+        const endDate = endOfMonth(selectedDate); // Actually we want the whole month.
+        // For Prisma filter: gte startDate, lt nextMonthStart
+        const nextMonthStart = new Date(startDate);
+        nextMonthStart.setMonth(nextMonthStart.getMonth() + 1);
 
-        // Fetch all Paid billings for income
+        // ==========================================
+        // 1. Current Month Detailed Data (Existing Logic)
+        // ==========================================
         const paidBillings = await prisma.billing.findMany({
             where: {
-                month: { gte: startDate, lt: endDate },
+                month: { gte: startDate, lt: nextMonthStart },
                 paymentStatus: "Paid"
             }
         });
@@ -58,7 +64,6 @@ export async function GET(req: Request) {
             internetIncome += (bill.internetFee || 0);
             otherIncome += (bill.otherFees || 0);
 
-            // Rent is derived
             rentCheck += (bill.totalAmount - (waterCost + electricCost + commonSum + (bill.trashFee || 0) + (bill.internetFee || 0) + (bill.otherFees || 0)));
         }
 
@@ -70,22 +75,77 @@ export async function GET(req: Request) {
         const expenses = {
             waterBill: centralMeter?.waterTotalCost || 0,
             electricBill: centralMeter?.electricTotalCost || 0,
-            trashBill: centralMeter?.trashCost || 0, // Assuming central meter reflects manual trash cost? Or maybe central trash cost
+            trashBill: centralMeter?.trashCost || 0,
             internetBill: centralMeter?.internetCost || 0,
             otherBill: 0,
             total: (centralMeter?.waterTotalCost || 0) + (centralMeter?.electricTotalCost || 0) + (centralMeter?.trashCost || 0) + (centralMeter?.internetCost || 0)
         };
 
-        // Occupancy Stats
+        // Stats
         const totalRooms = await prisma.room.count();
         const occupiedRooms = await prisma.room.count({ where: { status: "Occupied" } });
-
-        // Paid/Unpaid Stats for this month
         const totalBillsThisMonth = await prisma.billing.count({
-            where: { month: { gte: startDate, lt: endDate } }
+            where: { month: { gte: startDate, lt: nextMonthStart } }
         });
         const paidCount = paidBillings.length;
         const unpaidCount = totalBillsThisMonth - paidCount;
+
+
+        // ==========================================
+        // 2. Trend Data (Last 6 Months)
+        // ==========================================
+        const trendStart = startOfMonth(subMonths(selectedDate, 5)); // 5 months ago + current = 6 months
+        // trendEnd is nextMonthStart
+
+        // Fetch aggregated paid bills for trend
+        const trendBillings = await prisma.billing.findMany({
+            where: {
+                month: { gte: trendStart, lt: nextMonthStart },
+                paymentStatus: "Paid"
+            },
+            select: {
+                month: true,
+                totalAmount: true
+            }
+        });
+
+        // Fetch aggregated central meters for trend (Expenses)
+        const trendCentralMeters = await prisma.centralMeter.findMany({
+            where: {
+                month: { gte: trendStart, lt: nextMonthStart }
+            }
+        });
+
+        // Group by month
+        const trendData = [];
+        for (let i = 0; i < 6; i++) {
+            const d = subMonths(selectedDate, 5 - i);
+            const mStart = startOfMonth(d);
+            const label = format(d, "MMM yyyy"); // e.g., "Jan 2024"
+
+            // Filter bills for this month
+            // Note: DB dates might differ slightly in time, but month/year should match.
+            // Best to compare formatted strings or ranges.
+            const monthBills = trendBillings.filter(b =>
+                b.month.getMonth() === d.getMonth() && b.month.getFullYear() === d.getFullYear()
+            );
+            const income = monthBills.reduce((sum, b) => sum + b.totalAmount, 0);
+
+            // Filter expenses
+            const monthMeter = trendCentralMeters.find(m =>
+                m.month.getMonth() === d.getMonth() && m.month.getFullYear() === d.getFullYear()
+            );
+            const expense = monthMeter
+                ? (monthMeter.waterTotalCost + monthMeter.electricTotalCost + (monthMeter.trashCost || 0) + (monthMeter.internetCost || 0))
+                : 0;
+
+            trendData.push({
+                name: label,
+                income,
+                expense,
+                profit: income - expense
+            });
+        }
 
         return NextResponse.json({
             month,
@@ -110,7 +170,8 @@ export async function GET(req: Request) {
                 totalBillsIssued: totalBillsThisMonth,
                 paidBills: paidCount,
                 unpaidBills: unpaidCount
-            }
+            },
+            trend: trendData
         });
 
     } catch (error) {

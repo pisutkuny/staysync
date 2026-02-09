@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Printer, FileText, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function ReportsPage() {
     const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
@@ -16,6 +17,7 @@ export default function ReportsPage() {
             const res = await fetch(`/api/reports/monthly?month=${month}`);
             if (res.ok) {
                 const reportData = await res.json();
+                console.log("Report Data:", reportData);
                 setData(reportData);
             }
         } catch (error) {
@@ -109,9 +111,38 @@ export default function ReportsPage() {
                         </div>
                     </div>
 
+                    {/* Trend Chart Section */}
+                    {data.trend && data.trend.length > 0 && (
+                        <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid">
+                            <h4 className="font-bold text-lg mb-4">แนวโน้มย้อนหลัง 6 เดือน (Financial Trend)</h4>
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={data.trend}
+                                        margin={{
+                                            top: 5,
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        {/* @ts-ignore */}
+                                        <XAxis dataKey="name" />
+                                        <YAxis />
+                                        <Tooltip formatter={(value) => `฿${Number(value).toLocaleString()}`} />
+                                        <Legend />
+                                        <Bar dataKey="income" name="รายรับ (Income)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="expense" name="รายจ่าย (Expense)" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Detailed Breakdown */}
                     <div className="grid grid-cols-2 gap-8 mb-8">
-                        <div>
+                        <div className="print:break-inside-avoid">
                             <h4 className="font-bold text-lg mb-4 border-b pb-2">รายรับ (Income Breakdown)</h4>
                             <table className="w-full text-sm">
                                 <tbody>
@@ -143,7 +174,7 @@ export default function ReportsPage() {
                             </table>
                         </div>
 
-                        <div>
+                        <div className="print:break-inside-avoid">
                             <h4 className="font-bold text-lg mb-4 border-b pb-2">รายจ่ายส่วนกลาง (Expenses)</h4>
                             <table className="w-full text-sm">
                                 <tbody>
@@ -204,6 +235,7 @@ export default function ReportsPage() {
                     body { -webkit-print-color-adjust: exact; }
                     nav, header, aside, .print\\:hidden { display: none !important; }
                     #printable-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 20px; box-shadow: none; border: none; }
+                    .recharts-wrapper { break-inside: avoid; }
                 }
             `}</style>
         </div>
