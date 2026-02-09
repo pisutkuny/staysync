@@ -47,10 +47,17 @@ export default async function BillingPage() {
 
     const config = await prisma.systemConfig.findFirst();
 
+    // Calculate default common fee (if fixed cap is set)
+    let defaultCommonFee = 0;
+    if (config?.enableCommonAreaCharges && config?.commonAreaCapType === 'fixed') {
+        defaultCommonFee = Math.ceil((config.commonAreaCapFixed || 0) / (allRooms.length || 1));
+    }
+
     const initialRates = {
         trash: config?.trashFee || 0,
         internet: config?.internetFee || 0,
-        other: config?.otherFees || 0
+        other: config?.otherFees || 0,
+        common: defaultCommonFee
     };
 
     return (
@@ -81,7 +88,16 @@ export default async function BillingPage() {
                         <span className="text-indigo-600 font-medium">สำหรับบันทึกมาตรประจำเดือนทั้งหมด ใช้ &quot;Record All Meters&quot;</span>
                     </p>
                 </div>
-                {rooms.length > 0 ? <BillingForm rooms={rooms} initialRates={initialRates} /> : <p className="text-gray-500">No occupied rooms to bill.</p>}
+                {rooms.length > 0 ? (
+                    <BillingForm
+                        rooms={rooms}
+                        initialRates={initialRates}
+                        config={config}
+                        totalRoomCount={allRooms.length}
+                    />
+                ) : (
+                    <p className="text-gray-500">No occupied rooms to bill.</p>
+                )}
             </div>
 
             <div className="pt-4 border-t border-gray-200">

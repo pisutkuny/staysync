@@ -105,7 +105,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                 </tr>
                                 {billing.trashFee > 0 && (
                                     <tr>
-                                        <td className="py-4 font-medium text-gray-800">ค่าส่วนกลาง/ขยะ (Common Fee)</td>
+                                        <td className="py-4 font-medium text-gray-800">ค่าขยะ (Trash Fee)</td>
                                         <td className="py-4 text-right">-</td>
                                         <td className="py-4 text-center">-</td>
                                         <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.trashFee.toLocaleString()}</td>
@@ -137,7 +137,11 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                         </tr>
                                         {billing.commonWaterFee > 0 && (
                                             <tr className="bg-purple-50">
-                                                <td className="py-3 font-medium text-gray-700 pl-6">├ น้ำส่วนกลาง</td>
+                                                <td className="py-3 font-medium text-gray-700 pl-6">
+                                                    {((billing.commonElectricFee || 0) === 0 && (billing.commonInternetFee || 0) === 0 && (billing.commonTrashFee || 0) === 0)
+                                                        ? "ค่าส่วนกลาง (Common Fee)"
+                                                        : "├ น้ำส่วนกลาง"}
+                                                </td>
                                                 <td className="py-3 text-right text-gray-600">-</td>
                                                 <td className="py-3 text-center text-gray-600">-</td>
                                                 <td className="py-3 text-right font-mono font-bold text-purple-700">{billing.commonWaterFee.toLocaleString()}</td>

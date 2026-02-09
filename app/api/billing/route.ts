@@ -14,7 +14,8 @@ export async function POST(req: Request) {
             roomId,
             waterCurrent, waterLast,
             electricCurrent, electricLast,
-            trashFee, internetFee, otherFees
+            trashFee, internetFee, otherFees,
+            commonFee
         } = body;
 
         // Parse numbers
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
         const trash = parseFloat(trashFee) || 0;
         const internet = parseFloat(internetFee) || 0;
         const other = parseFloat(otherFees) || 0;
+        const common = parseFloat(commonFee) || 0;
 
         // Calculate Usage
         const waterUnits = Math.max(0, wCurr - wLast);
@@ -42,7 +44,7 @@ export async function POST(req: Request) {
 
         if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
 
-        const totalAmount = room.price + waterCost + electricCost + trash + internet + other;
+        const totalAmount = room.price + waterCost + electricCost + trash + internet + other + common;
 
         // Create Billing Record
         const residentId = room.residents[0]?.id;
@@ -60,6 +62,7 @@ export async function POST(req: Request) {
                 trashFee: trash,
                 internetFee: internet,
                 otherFees: other,
+                commonWaterFee: common, // Storing single common fee here
                 totalAmount,
                 paymentStatus: "Pending",
                 month: new Date(),
@@ -76,9 +79,10 @@ export async function POST(req: Request) {
                     { label: "ค่าห้อง", value: `${room.price.toLocaleString()} ฿` },
                     { label: `ค่าน้ำ (${waterUnits} หน่วย)`, value: `${waterCost.toLocaleString()} ฿` },
                     { label: `ค่าไฟ (${electricUnits} หน่วย)`, value: `${electricCost.toLocaleString()} ฿` },
-                    { label: "ค่าขยะ/ส่วนกลาง", value: `${trash.toLocaleString()} ฿` }
+                    { label: "ค่าขยะ", value: `${trash.toLocaleString()} ฿` }
                 ];
 
+                if (common > 0) items.push({ label: "ค่าส่วนกลาง", value: `${common.toLocaleString()} ฿` });
                 if (internet > 0) items.push({ label: "ค่าอินเทอร์เน็ต", value: `${internet.toLocaleString()} ฿` });
                 if (other > 0) items.push({ label: "อื่นๆ", value: `${other.toLocaleString()} ฿` });
 

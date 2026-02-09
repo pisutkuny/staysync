@@ -14,9 +14,10 @@ type Rates = {
     trash: number;
     internet: number;
     other: number;
+    common: number;
 };
 
-export default function BillingForm({ rooms, initialRates }: { rooms: Room[]; initialRates: Rates }) {
+export default function BillingForm({ rooms, initialRates, config, totalRoomCount }: { rooms: Room[]; initialRates: Rates; config?: any; totalRoomCount?: number }) {
     const [loading, setLoading] = useState<number | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
 
@@ -28,7 +29,8 @@ export default function BillingForm({ rooms, initialRates }: { rooms: Room[]; in
         electricLast: "",
         trashFee: initialRates.trash.toString(),
         internetFee: initialRates.internet.toString(),
-        otherFees: initialRates.other.toString()
+        otherFees: initialRates.other.toString(),
+        commonFee: initialRates.common?.toString() || "0"
     });
 
     const handleSelectRoom = async (roomId: number) => {
@@ -52,7 +54,8 @@ export default function BillingForm({ rooms, initialRates }: { rooms: Room[]; in
                     electricLast: lastElectric,
                     trashFee: initialRates.trash.toString(),
                     internetFee: initialRates.internet.toString(),
-                    otherFees: initialRates.other.toString()
+                    otherFees: initialRates.other.toString(),
+                    commonFee: initialRates.common?.toString() || "0"
                 });
             } catch (e) {
                 console.error("Failed to fetch latest readings");
@@ -105,99 +108,108 @@ export default function BillingForm({ rooms, initialRates }: { rooms: Room[]; in
                     </div>
 
                     {selectedRoom === room.id && (
-                        <div className="px-6 pb-6 border-t border-gray-100 pt-4 bg-gray-50/50 rounded-b-xl">
-                            <form onSubmit={(e) => handleSubmit(e, room.id)} className="space-y-4">
-
-                                {/* Water */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Water Previous</label>
-                                        <input
-                                            type="number"
-                                            value={formData.waterLast}
-                                            onChange={e => setFormData({ ...formData, waterLast: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm bg-gray-100"
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-blue-600 uppercase">Water Current</label>
-                                        <input
-                                            type="number"
-                                            value={formData.waterCurrent}
-                                            onChange={e => setFormData({ ...formData, waterCurrent: e.target.value })}
-                                            className="w-full rounded-lg border border-blue-300 p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                            required
-                                            autoFocus
-                                        />
-                                    </div>
+                        <form onSubmit={(e) => handleSubmit(e, room.id)} className="p-6 pt-0 border-t border-gray-100">
+                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Water Previous</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
+                                        value={formData.waterLast}
+                                        disabled
+                                    />
                                 </div>
-
-                                {/* Electric */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Elec Previous</label>
-                                        <input
-                                            type="number"
-                                            value={formData.electricLast}
-                                            onChange={e => setFormData({ ...formData, electricLast: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm bg-gray-100"
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-yellow-600 uppercase">Elec Current</label>
-                                        <input
-                                            type="number"
-                                            value={formData.electricCurrent}
-                                            onChange={e => setFormData({ ...formData, electricCurrent: e.target.value })}
-                                            className="w-full rounded-lg border border-yellow-300 p-2 text-sm focus:ring-2 focus:ring-yellow-500 outline-none"
-                                            required
-                                        />
-                                    </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-blue-500 uppercase mb-1">Water Current</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        className="w-full border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                                        value={formData.waterCurrent}
+                                        onChange={(e) => setFormData({ ...formData, waterCurrent: e.target.value })}
+                                        autoFocus
+                                    />
                                 </div>
+                            </div>
 
-                                {/* Fees */}
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label className="text-xs text-gray-500">Trash</label>
-                                        <input
-                                            type="number"
-                                            value={formData.trashFee}
-                                            onChange={e => setFormData({ ...formData, trashFee: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500">Internet</label>
-                                        <input
-                                            type="number"
-                                            value={formData.internetFee}
-                                            onChange={e => setFormData({ ...formData, internetFee: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500">Other</label>
-                                        <input
-                                            type="number"
-                                            value={formData.otherFees}
-                                            onChange={e => setFormData({ ...formData, otherFees: e.target.value })}
-                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        />
-                                    </div>
+                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Elec Previous</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
+                                        value={formData.electricLast}
+                                        disabled
+                                    />
                                 </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">Elec Current</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        className="w-full border border-yellow-400 rounded-lg p-2 text-sm focus:ring-2 focus:ring-yellow-100 outline-none"
+                                        value={formData.electricCurrent}
+                                        onChange={(e) => setFormData({ ...formData, electricCurrent: e.target.value })}
+                                    />
+                                </div>
+                            </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading === room.id}
-                                    className="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    {loading === room.id ? <Loader2 className="animate-spin" size={18} /> : <Receipt size={18} />}
-                                    Calculate & Send Bill
-                                </button>
-                            </form>
-                        </div>
+                            <div className="grid grid-cols-3 gap-2 mt-4">
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Trash</label>
+                                    <input
+                                        type="number"
+                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                        value={formData.trashFee}
+                                        onChange={(e) => setFormData({ ...formData, trashFee: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Internet</label>
+                                    <input
+                                        type="number"
+                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                        value={formData.internetFee}
+                                        onChange={(e) => setFormData({ ...formData, internetFee: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Other</label>
+                                    <input
+                                        type="number"
+                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                        value={formData.otherFees}
+                                        onChange={(e) => setFormData({ ...formData, otherFees: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Common Area Fee Input */}
+                            <div className="mt-2">
+                                <label className="block text-xs text-purple-600 mb-1 font-medium">Common Area (ค่าส่วนกลาง)</label>
+                                <input
+                                    type="number"
+                                    className="w-full border border-purple-200 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all font-medium text-purple-700"
+                                    value={formData.commonFee}
+                                    onChange={(e) => setFormData({ ...formData, commonFee: e.target.value })}
+                                    placeholder={config?.enableCommonAreaCharges ? "Auto-calculated" : "Manual input"}
+                                />
+                                {config?.enableCommonAreaCharges && config?.commonAreaCapType === 'fixed' && (
+                                    <p className="text-[10px] text-purple-400 mt-1">
+                                        Fixed Cap: ฿{config.commonAreaCapFixed} / {totalRoomCount} rooms
+                                    </p>
+                                )}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading === room.id}
+                                className="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {loading === room.id ? <Loader2 className="animate-spin" size={18} /> : <Receipt size={18} />}
+                                Calculate & Send Bill
+                            </button>
+                        </form>
                     )}
                 </div>
             ))}
