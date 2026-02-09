@@ -99,19 +99,39 @@ export async function GET() {
             { name: 'Available', value: availableRooms, color: '#E5E7EB' }, // Gray-200
         ];
 
-        // 4. Recent Activity (Feed)
-        // Combine Bills and Issues, sort by date
+        // 4. Recent Activity (Feed) - Optimized
+        // Fetch only what we need with proper limits
         const recentBills = await prisma.billing.findMany({
-            take: 5,
+            take: 10,  // Increased to ensure we get enough after filtering
             orderBy: { createdAt: 'desc' },
-            include: { room: true },
-            where: { createdAt: { gte: subMonths(today, 1) } }
+            select: {
+                id: true,
+                createdAt: true,
+                totalAmount: true,
+                paymentStatus: true,
+                room: {
+                    select: { number: true }
+                }
+            }
         });
 
         const recentIssues = await prisma.issue.findMany({
-            take: 5,
+            take: 10,
             orderBy: { createdAt: 'desc' },
-            include: { resident: { include: { room: true } } }
+            select: {
+                id: true,
+                createdAt: true,
+                category: true,
+                description: true,
+                status: true,
+                resident: {
+                    select: {
+                        room: {
+                            select: { number: true }
+                        }
+                    }
+                }
+            }
         });
 
         const recentActivity = [
@@ -134,7 +154,7 @@ export async function GET() {
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 10); // Take top 10 combined
 
-        // 5. Top Spenders (Water/Electric) - This Month's Bills
+        // 5. Top Spenders (Water/Electric) - Optimized
         const topSpenders = await prisma.billing.findMany({
             take: 5,
             where: {
@@ -144,7 +164,16 @@ export async function GET() {
                 }
             },
             orderBy: { totalAmount: 'desc' },
-            include: { room: true }
+            select: {
+                waterMeterCurrent: true,
+                waterMeterLast: true,
+                electricMeterCurrent: true,
+                electricMeterLast: true,
+                totalAmount: true,
+                room: {
+                    select: { number: true }
+                }
+            }
         });
 
         const topSpendersData = topSpenders.map(b => ({
