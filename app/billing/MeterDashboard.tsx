@@ -70,11 +70,15 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                             <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
                                 <div>
                                     <p className="text-xs font-bold text-blue-600 mb-1">Last Water</p>
-                                    <p className="font-mono text-gray-900 font-bold">{lastBill?.waterMeterCurrent?.toLocaleString() || "0"}</p>
+                                    <p className="font-mono text-gray-900 font-bold">
+                                        {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
+                                    </p>
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-yellow-600 mb-1">Last Electric</p>
-                                    <p className="font-mono text-gray-900 font-bold">{lastBill?.electricMeterCurrent?.toLocaleString() || "0"}</p>
+                                    <p className="font-mono text-gray-900 font-bold">
+                                        {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -120,10 +124,10 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                                         {room.residents[0]?.fullName || "-"}
                                     </td>
                                     <td className="px-6 py-3 text-right font-medium">
-                                        {lastBill?.waterMeterCurrent?.toLocaleString() || "0"}
+                                        {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </td>
                                     <td className="px-6 py-3 text-right font-medium">
-                                        {lastBill?.electricMeterCurrent?.toLocaleString() || "0"}
+                                        {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </td>
                                     <td className="px-6 py-3 text-xs text-gray-400">
                                         {lastUpdate}
