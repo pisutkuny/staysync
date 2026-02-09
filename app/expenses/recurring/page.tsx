@@ -168,6 +168,18 @@ export default function RecurringExpensesPage() {
         <div className="space-y-8 pb-10">
             <div className="flex justify-between items-center">
                 <div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <button
+                            onClick={() => window.location.href = '/expenses'}
+                            className="text-gray-400 hover:text-gray-600 transition flex items-center gap-1 text-sm"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M19 12H5" />
+                                <path d="M12 19l-7-7 7-7" />
+                            </svg>
+                            Back to Expenses
+                        </button>
+                    </div>
                     <h2 className="text-3xl font-bold tracking-tight text-gray-900">Recurring Expenses</h2>
                     <p className="text-gray-500 mt-2">Manage expense templates that auto-create monthly.</p>
                 </div>
