@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Printer, FileText, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
 export default function ReportsPage() {
     const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
@@ -35,6 +35,12 @@ export default function ReportsPage() {
     const handlePrint = () => {
         window.print();
     };
+
+    // Prepare chart data for single month
+    const chartData = data ? [
+        { name: 'รายรับ (Income)', amount: data.income?.total || 0, color: '#10b981' },
+        { name: 'รายจ่าย (Expense)', amount: data.expenses?.total || 0, color: '#ef4444' }
+    ] : [];
 
     return (
         <div className="p-6">
@@ -111,34 +117,34 @@ export default function ReportsPage() {
                         </div>
                     </div>
 
-                    {/* Trend Chart Section */}
-                    {data.trend && data.trend.length > 0 && (
-                        <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid">
-                            <h4 className="font-bold text-lg mb-4">แนวโน้มย้อนหลัง 6 เดือน (Financial Trend)</h4>
-                            <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart
-                                        data={data.trend}
-                                        margin={{
-                                            top: 5,
-                                            right: 30,
-                                            left: 20,
-                                            bottom: 5,
-                                        }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        {/* @ts-ignore */}
-                                        <XAxis dataKey="name" />
-                                        <YAxis />
-                                        <Tooltip formatter={(value) => `฿${Number(value).toLocaleString()}`} />
-                                        <Legend />
-                                        <Bar dataKey="income" name="รายรับ (Income)" fill="#10b981" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="expense" name="รายจ่าย (Expense)" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
+                    {/* Single Month Chart Section */}
+                    <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid">
+                        <h4 className="font-bold text-lg mb-4 text-center">แผนภูมิเปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)</h4>
+                        <div className="h-[300px] w-full flex justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={chartData}
+                                    margin={{
+                                        top: 20,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    {/* @ts-ignore */}
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => `฿${Number(value).toLocaleString()}`} />
+                                    <Bar dataKey="amount" name="Amount" radius={[4, 4, 0, 0]}>
+                                        {chartData.map((entry: any, index: number) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
-                    )}
+                    </div>
 
                     {/* Detailed Breakdown */}
                     <div className="grid grid-cols-2 gap-8 mb-8">
