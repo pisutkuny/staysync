@@ -197,13 +197,19 @@ model SystemConfig {
 }
 
 model Expense {
-  id          Int      @id @default(autoincrement())
-  title       String
-  amount      Float
-  category    String   @default("Other") // Maintenance, Utilities, Salary, Other
-  date        DateTime @default(now())
-  note        String?
-  createdAt   DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  title         String
+  amount        Float
+  category      String   @default("Other") // Maintenance, Utilities, Salary, Other
+  date          DateTime @default(now())
+  note          String?
+  receiptUrl    String?  // Google Drive webViewLink
+  receiptFileId String?  // Google Drive file ID (for deletion)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([date])
+  @@index([category])
 }
 
 model LineBotState {

@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { title, amount, category, date, note } = body;
+        const { title, amount, category, date, note, receiptUrl, receiptFileId } = body;
 
         const expense = await prisma.expense.create({
             data: {
@@ -25,7 +25,9 @@ export async function POST(req: Request) {
                 amount: parseFloat(amount),
                 category,
                 date: new Date(date),
-                note
+                note,
+                receiptUrl: receiptUrl || null,
+                receiptFileId: receiptFileId || null
             }
         });
 
