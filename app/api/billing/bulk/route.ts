@@ -163,6 +163,96 @@ export async function POST(req: Request) {
             }
         }
 
+        // ============================================================
+        // Phase 2: Common Area Billing Calculation
+        // ============================================================
+        if (config.enableCommonAreaCharges) {
+            try {
+                // 1. Get central meter data for this month
+                const monthStart = new Date(month + "-01");
+                const centralMeter = await prisma.centralMeter.findFirst({
+                    where: { month: monthStart }
+                });
+
+                if (centralMeter) {
+                    // 2. Get all billings created for this month
+                    const monthEnd = new Date(monthStart);
+                    monthEnd.setMonth(monthEnd.getMonth() + 1);
+
+                    const allBillings = await prisma.billing.findMany({
+                        where: {
+                            month: {
+                                gte: monthStart,
+                                lt: monthEnd
+                            }
+                        },
+                        include: {
+                            room: {
+                                include: {
+                                    residents: {
+                                        where: { status: "Active" }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 3. Calculate total room usage
+                    const totalRoomWater = allBillings.reduce((sum, b) =>
+                        sum + (b.waterMeterCurrent - b.waterMeterLast), 0
+                    );
+                    const totalRoomElectric = allBillings.reduce((sum, b) =>
+                        sum + (b.electricMeterCurrent - b.electricMeterLast), 0
+                    );
+
+                    // 4. Calculate common area usage
+                    const commonWaterUsage = Math.max(0, centralMeter.waterUsage - totalRoomWater);
+                    const commonElectricUsage = Math.max(0, centralMeter.electricUsage - totalRoomElectric);
+
+                    // 5. Common area costs
+                    const commonWaterCost = commonWaterUsage * centralMeter.waterRateFromUtility;
+                    const commonElectricCost = commonElectricUsage * centralMeter.electricRateFromUtility;
+                    const commonInternetCost = centralMeter.internetCost || 0;
+                    const commonTrashCost = centralMeter.trashCost || 0;
+
+                    // 6. Count chargeable rooms (residents with chargeCommonArea = true)
+                    const chargeableBillings = allBillings.filter(b =>
+                        b.room.residents.some(r => r.chargeCommonArea === true)
+                    );
+
+                    const chargeableCount = chargeableBillings.length;
+
+                    // 7. Distribute costs if there are chargeable rooms
+                    if (chargeableCount > 0) {
+                        const waterFeePerRoom = commonWaterCost / chargeableCount;
+                        const electricFeePerRoom = commonElectricCost / chargeableCount;
+                        const internetFeePerRoom = commonInternetCost / chargeableCount;
+                        const trashFeePerRoom = commonTrashCost / chargeableCount;
+
+                        // 8. Update each chargeable billing
+                        for (const billing of chargeableBillings) {
+                            const commonFees = waterFeePerRoom + electricFeePerRoom + internetFeePerRoom + trashFeePerRoom;
+
+                            await prisma.billing.update({
+                                where: { id: billing.id },
+                                data: {
+                                    commonWaterFee: waterFeePerRoom,
+                                    commonElectricFee: electricFeePerRoom,
+                                    commonInternetFee: internetFeePerRoom,
+                                    commonTrashFee: trashFeePerRoom,
+                                    totalAmount: billing.totalAmount + commonFees
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (commonAreaError: any) {
+                console.error("Common area calculation error:", commonAreaError);
+                // Don't fail the entire process, just log the error
+                results.errors.push(`Common area calculation failed: ${commonAreaError.message}`);
+            }
+        }
+
         return NextResponse.json(results);
 
     } catch (error: any) {
