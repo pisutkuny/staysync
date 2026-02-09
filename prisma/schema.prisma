@@ -26,6 +26,9 @@ model Room {
   
   residents Resident[]
   billings  Billing[]
+  
+  // Performance Indexes
+  @@index([status])
 }
 
 model Resident {
@@ -104,6 +107,14 @@ model Billing {
   residentId Int?
   
   reviewer   User?    @relation("BillingReviewer", fields: [reviewedBy], references: [id])
+  
+  // Performance Indexes
+  @@index([paymentStatus])
+  @@index([paymentDate])
+  @@index([month])
+  @@index([roomId])
+  @@index([residentId])
+  @@index([createdAt])
 }
 
 model Issue {
@@ -121,6 +132,11 @@ model Issue {
   
   resident    Resident? @relation(fields: [residentId], references: [id])
   residentId  Int?
+  
+  // Performance Indexes
+  @@index([status])
+  @@index([createdAt])
+  @@index([residentId])
 }
 
 model User {
