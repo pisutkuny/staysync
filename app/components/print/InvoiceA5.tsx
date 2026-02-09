@@ -7,7 +7,11 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
     // Calculate Amounts safely
     const waterAmount = (billing.waterMeterCurrent - billing.waterMeterLast) * billing.waterRate;
     const electricAmount = (billing.electricMeterCurrent - billing.electricMeterLast) * billing.electricRate;
-    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0));
+
+    // Calculate total common fees
+    const commonFees = (billing.commonWaterFee || 0) + (billing.commonElectricFee || 0) + (billing.commonInternetFee || 0) + (billing.commonTrashFee || 0);
+
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
 
     // Theme Color
     const themeColor = config.invoiceColor || "#4f46e5";
