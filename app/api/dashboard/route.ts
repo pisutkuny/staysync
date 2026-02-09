@@ -47,28 +47,49 @@ export async function GET() {
             }
         });
 
-        // 2. Revenue Trend (Last 6 Months)
+        // 2. Revenue Trend (Last 6 Months) - Optimized with single query
+        const sixMonthsAgo = subMonths(today, 5);
+        const allBills = await prisma.billing.findMany({
+            where: {
+                paymentStatus: 'Paid',
+                paymentDate: {
+                    gte: startOfMonth(sixMonthsAgo),
+                    lte: endOfCurrentMonth
+                }
+            },
+            select: {
+                paymentDate: true,
+                totalAmount: true
+            }
+        });
+
+        // Group by month
+        const monthlyRevenueMap = new Map<string, number>();
+        for (let i = 5; i >= 0; i--) {
+            const date = subMonths(today, i);
+            const key = format(date, 'yyyy-MM');
+            monthlyRevenueMap.set(key, 0);
+        }
+
+        // Aggregate manually
+        allBills.forEach(bill => {
+            if (bill.paymentDate) {
+                const key = format(new Date(bill.paymentDate), 'yyyy-MM');
+                if (monthlyRevenueMap.has(key)) {
+                    monthlyRevenueMap.set(key, (monthlyRevenueMap.get(key) || 0) + bill.totalAmount);
+                }
+            }
+        });
+
+        // Build result array
         const monthlyRevenue = [];
         for (let i = 5; i >= 0; i--) {
             const date = subMonths(today, i);
-            const start = startOfMonth(date);
-            const end = endOfMonth(date);
-
-            const agg = await prisma.billing.aggregate({
-                _sum: { totalAmount: true },
-                where: {
-                    paymentStatus: 'Paid',
-                    paymentDate: {
-                        gte: start,
-                        lte: end
-                    }
-                }
-            });
-
+            const key = format(date, 'yyyy-MM');
             monthlyRevenue.push({
-                month: format(date, 'MMM'), // Jan, Feb, etc.
+                month: format(date, 'MMM'),
                 fullDate: format(date, 'MMM yyyy'),
-                amount: agg._sum.totalAmount || 0
+                amount: monthlyRevenueMap.get(key) || 0
             });
         }
 
