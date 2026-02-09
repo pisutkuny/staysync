@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { UserPlus, UserMinus } from "lucide-react";
 import DeleteRoomButton from "./DeleteRoomButton";
+import RoomCommonAreaToggle from "./RoomCommonAreaToggle";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,10 @@ export default async function RoomsPage() {
                             <div>
                                 <h3 className="text-2xl font-bold text-gray-900">{room.number}</h3>
                                 <p className="text-indigo-600 font-medium">฿{room.price}/mo</p>
+                                {/* Phase 2: Common Area Toggle */}
+                                <div className="mt-2">
+                                    <RoomCommonAreaToggle roomId={room.id} initialValue={room.chargeCommonArea} />
+                                </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Link href={`/rooms/edit/${room.id}`} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">

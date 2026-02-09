@@ -60,29 +60,26 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id: idStr } = await params;
         const id = parseInt(idStr);
-        const body = await request.json();
-        const { number, price, waterMeterInitial, electricMeterInitial } = body;
+        const body = await req.json();
+        const { number, price, status, chargeCommonArea } = body;
 
-        const updatedRoom = await prisma.room.update({
+        const updated = await prisma.room.update({
             where: { id },
             data: {
-                number,
-                price: parseFloat(price),
-                ...(waterMeterInitial !== undefined && { waterMeterInitial: parseFloat(waterMeterInitial) }),
-                ...(electricMeterInitial !== undefined && { electricMeterInitial: parseFloat(electricMeterInitial) })
+                ...(number !== undefined && { number }),
+                ...(price !== undefined && { price }),
+                ...(status !== undefined && { status }),
+                ...(chargeCommonArea !== undefined && { chargeCommonArea })
             }
         });
 
-        return NextResponse.json(updatedRoom);
+        return NextResponse.json(updated);
     } catch (error: any) {
         console.error("Update Room Error:", error);
-        if (error.code === 'P2002') {
-            return NextResponse.json({ error: "Room number already exists" }, { status: 409 });
-        }
         return NextResponse.json({ error: "Failed to update room" }, { status: 500 });
     }
 }

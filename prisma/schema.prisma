@@ -21,6 +21,9 @@ model Room {
   waterMeterInitial    Float  @default(0)
   electricMeterInitial Float  @default(0)
   
+  // Phase 2: Common Area Billing (Room-based)
+  chargeCommonArea Boolean @default(false) // Enable common area fees for this room
+  
   residents Resident[]
   billings  Billing[]
 }
@@ -37,11 +40,6 @@ model Resident {
   deposit      Float    @default(0)
   checkInDate  DateTime @default(now())
   checkOutDate DateTime?
-  
-  // Phase 2: Common Area Billing Control
-  chargeCommonArea  Boolean   @default(false) // Enable common area fees for this resident
-  contractStartDate DateTime? // Track when contract started (for old vs new tenants)
-  
   issues       Issue[]
   billings     Billing[]
   documents  Document[]

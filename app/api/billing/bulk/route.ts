@@ -215,9 +215,9 @@ export async function POST(req: Request) {
                     const commonInternetCost = centralMeter.internetCost || 0;
                     const commonTrashCost = centralMeter.trashCost || 0;
 
-                    // 6. Count chargeable rooms (residents with chargeCommonArea = true)
+                    // 6. Count chargeable rooms (rooms with chargeCommonArea = true)
                     const chargeableBillings = allBillings.filter(b =>
-                        b.room.residents.some(r => r.chargeCommonArea === true)
+                        b.room.chargeCommonArea === true
                     );
 
                     const chargeableCount = chargeableBillings.length;

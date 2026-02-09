@@ -29,7 +29,7 @@ export async function PATCH(
         const { id } = await params;
         const residentId = Number(id);
         const body = await request.json();
-        const { fullName, phone, lineUserId, roomId, chargeCommonArea, contractStartDate } = body;
+        const { fullName, phone, lineUserId, roomId } = body;
 
         // 1. Get Current Resident Data
         const currentResident = await prisma.resident.findUnique({
@@ -79,9 +79,7 @@ export async function PATCH(
                         roomId: newRoomId,
                         fullName,
                         phone,
-                        lineUserId: lineUserId || null,
-                        chargeCommonArea: chargeCommonArea || false,
-                        contractStartDate: contractStartDate ? new Date(contractStartDate) : null
+                        lineUserId: lineUserId || null
                     }
                 });
             });
@@ -92,9 +90,7 @@ export async function PATCH(
                 data: {
                     fullName,
                     phone,
-                    lineUserId: lineUserId || null,
-                    chargeCommonArea: chargeCommonArea || false,
-                    contractStartDate: contractStartDate ? new Date(contractStartDate) : null
+                    lineUserId: lineUserId || null
                 }
             });
         }

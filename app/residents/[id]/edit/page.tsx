@@ -23,10 +23,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
         fullName: "",
         phone: "",
         lineUserId: "",
-        roomId: "",
-        // Phase 2: Common Area Billing
-        chargeCommonArea: false,
-        contractStartDate: ""
+        roomId: ""
     });
 
     // Fetch initial data & Rooms
@@ -48,9 +45,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                     fullName: resident.fullName,
                     phone: resident.phone || "",
                     lineUserId: resident.lineUserId || "",
-                    roomId: resident.roomId?.toString() || "",
-                    chargeCommonArea: resident.chargeCommonArea || false,
-                    contractStartDate: resident.contractStartDate ? new Date(resident.contractStartDate).toISOString().split('T')[0] : ""
+                    roomId: resident.roomId?.toString() || ""
                 });
                 setRooms(roomsData);
             } catch (e) {
@@ -71,8 +66,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    roomId: formData.roomId ? Number(formData.roomId) : null,
-                    contractStartDate: formData.contractStartDate || null
+                    roomId: formData.roomId ? Number(formData.roomId) : null
                 }),
             });
             if (!res.ok) throw new Error("Failed");
@@ -155,39 +149,6 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                         className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                     <p className="text-xs text-gray-500 mt-1">If available, paste standard Line User ID (Uxxxxxxxx...). Leave empty to disconnect.</p>
-                </div>
-
-                {/* Phase 2: Common Area Billing */}
-                <div className="border-t border-gray-100 pt-4 space-y-4">
-                    <h3 className="text-sm font-semibold text-purple-700">💰 Common Area Billing (Phase 2)</h3>
-
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                        <label className="flex items-start gap-3 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={formData.chargeCommonArea}
-                                onChange={(e) => setFormData({ ...formData, chargeCommonArea: e.target.checked })}
-                                className="w-5 h-5 mt-0.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                            />
-                            <div>
-                                <p className="font-medium text-gray-900">เก็บค่าส่วนกลางจากผู้เช่านี้</p>
-                                <p className="text-xs text-gray-600 mt-1">
-                                    เมื่อเปิดใช้งาน ผู้เช่านี้จะถูกเก็บค่าส่วนกลาง (น้ำ, ไฟ, Internet, ขยะ) ในบิลรายเดือน
-                                </p>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มสัญญา (Contract Start Date)</label>
-                        <input
-                            type="date"
-                            value={formData.contractStartDate}
-                            onChange={e => setFormData({ ...formData, contractStartDate: e.target.value })}
-                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">ใช้สำหรับแยกผู้เช่าเก่า/ใหม่ (Optional)</p>
-                    </div>
                 </div>
 
                 <div className="pt-4 border-t border-gray-100">
