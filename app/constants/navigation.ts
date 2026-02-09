@@ -45,6 +45,12 @@ export const NAV_ITEMS = [
         roles: ["OWNER"]
     },
     {
+        label: "Monthly Report",
+        href: "/admin/reports",
+        icon: FileText,
+        roles: ["OWNER"]
+    },
+    {
         label: "Central Meter",
         href: "/admin/central-meter",
         icon: Calculator,
