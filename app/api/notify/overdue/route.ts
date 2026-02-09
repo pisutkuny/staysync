@@ -44,7 +44,8 @@ async function processOverdueReminders() {
         }
 
         if (lineUserId && lineClient) {
-            const payUrl = `${process.env.NEXT_PUBLIC_APP_URL}/rooms/${bill.room.number}/pay/${bill.id}`;
+            // Use Public Payment URL (No Login Required)
+            const payUrl = `${process.env.NEXT_PUBLIC_APP_URL}/pay/${bill.id}`;
             const flexMsg = createOverdueFlexMessage(bill, sysConfig, payUrl);
 
             try {
