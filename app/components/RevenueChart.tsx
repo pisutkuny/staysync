@@ -9,7 +9,7 @@ export default function RevenueChart({ data }: { data: any[] }) {
                 <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis
-                        dataKey="name"
+                        dataKey="month"
                         axisLine={false}
                         tickLine={false}
                         tick={{ fill: '#6b7280', fontSize: 12 }}
@@ -24,9 +24,10 @@ export default function RevenueChart({ data }: { data: any[] }) {
                     <Tooltip
                         cursor={{ fill: '#f3f4f6' }}
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        formatter={(value: any) => [`฿${Number(value || 0).toLocaleString()}`, 'Revenue']}
                     />
                     <Bar
-                        dataKey="total"
+                        dataKey="amount"
                         fill="#4f46e5"
                         radius={[4, 4, 0, 0]}
                         barSize={40}
