@@ -21,21 +21,25 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-                <Link href="/rooms" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        {resident.fullName}
-                        <Link href={`/residents/${resident.id}/edit`} className="text-gray-400 hover:text-indigo-600 transition-colors" title="Edit Profile">
-                            <span className="sr-only">Edit</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
-                        </Link>
-                    </h1>
-                    <p className="text-gray-500">Room {resident.room?.number || 'N/A'} • {resident.phone}</p>
+        <div className="space-y-8">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex items-center gap-4">
+                    <Link href="/rooms" className="p-3 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all shadow-lg border border-white/30">
+                        <ArrowLeft size={24} className="text-white" />
+                    </Link>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
+                                👤 {resident.fullName}
+                                <Link href={`/residents/${resident.id}/edit`} className="p-2 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all shadow-lg border border-white/30" title="Edit Profile">
+                                    <span className="sr-only">Edit</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
+                                </Link>
+                            </h1>
+                        </div>
+                        <p className="text-cyan-100 mt-2 text-lg font-medium">🏠 Room {resident.room?.number || 'N/A'} • 📞 {resident.phone}</p>
+                    </div>
                 </div>
             </div>
 

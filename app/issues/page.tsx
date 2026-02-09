@@ -20,40 +20,43 @@ export default async function IssuesPage({
     });
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                        {currentStatus === "Pending" ? "Pending Issues" : "Maintenance History"}
-                    </h2>
-                    <p className="text-gray-500 mt-2">
-                        {currentStatus === "Pending" ? "Manage active requests." : "View resolved issues."}
-                    </p>
+        <div className="space-y-8">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">
+                            🔧 {currentStatus === "Pending" ? "Pending Issues" : "Maintenance History"}
+                        </h2>
+                        <p className="text-pink-100 mt-2 text-lg">
+                            {currentStatus === "Pending" ? "Manage active requests." : "View resolved issues."}
+                        </p>
+                    </div>
+                    <Link href="/report" className="bg-white text-red-700 px-6 py-3 rounded-xl font-bold hover:bg-red-50 shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap border-2 border-white/30 hover:scale-105">
+                        ➕ New Issue
+                    </Link>
                 </div>
-                <Link href="/report" className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors">
-                    + New Issue
-                </Link>
             </div>
 
-            {/* Tabs */}
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit">
+            {/* Enhanced Tabs */}
+            <div className="flex space-x-2 bg-gradient-to-r from-gray-100 to-gray-200 p-1.5 rounded-2xl w-fit shadow-md">
                 <Link
                     href="/issues?status=Pending"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentStatus === "Pending"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-500 hover:text-gray-900"
+                    className={`px-6 py-3 rounded-xl text-sm font-bold transition-all ${currentStatus === "Pending"
+                        ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                         }`}
                 >
-                    Pending
+                    🔴 Pending
                 </Link>
                 <Link
                     href="/issues?status=Done"
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentStatus === "Done"
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-500 hover:text-gray-900"
+                    className={`px-6 py-3 rounded-xl text-sm font-bold transition-all ${currentStatus === "Done"
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                         }`}
                 >
-                    History
+                    ✅ History
                 </Link>
             </div>
 
