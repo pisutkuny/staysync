@@ -1,11 +1,8 @@
 {
-    "regions": [
-        "sin1"
-    ],
     "crons": [
         {
-            "path": "/api/cron/reminders",
-            "schedule": "0 3 * * *"
+            "path": "/api/notify/overdue?source=cron",
+            "schedule": "0 9 6 * *"
         }
     ]
 }

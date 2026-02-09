@@ -35,7 +35,8 @@ export default function SettingsPage() {
         // Phase 2 Enhancement: Fee Cap
         commonAreaCapType: "none",
         commonAreaCapPercentage: 100,
-        commonAreaCapFixed: 0
+        commonAreaCapFixed: 0,
+        enableAutoReminders: false
     });
 
     useEffect(() => {
@@ -374,7 +375,25 @@ export default function SettingsPage() {
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                         Admin Alerts (Line Messaging API)
                     </h2>
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* Auto Reminders Toggle */}
+                        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={config.enableAutoReminders || false}
+                                    onChange={(e) => setConfig(prev => ({ ...prev, enableAutoReminders: e.target.checked }))}
+                                    className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                />
+                                <div>
+                                    <p className="font-semibold text-gray-900">เปิดใช้งานแจ้งเตือนอัตโนมัติ (Automated Overdue Reminders)</p>
+                                    <p className="text-sm text-gray-600">
+                                        ระบบจะส่งแจ้งเตือน "ค้างชำระ" ให้ลูกบ้านอัตโนมัติ <b>ทุกวันที่ 6 ของเดือน</b> (เวลา 09:00 น.)
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Admin Line User ID</label>
                             <input

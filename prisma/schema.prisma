@@ -137,6 +137,9 @@ model SystemConfig {
   dormName          String   @default("My Dormitory")
   dormAddress       String   @default("123 Street, City")
   
+  // Automation Settings
+  enableAutoReminders Boolean @default(false)
+  
   // Bank Info
   bankName          String   @default("Bank Name")
   bankAccountName   String   @default("Account Name")
