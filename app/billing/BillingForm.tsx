@@ -8,6 +8,7 @@ type Room = {
     number: string;
     price: number;
     residents: { fullName: string }[];
+    chargeCommonArea?: boolean;
 };
 
 type Rates = {
@@ -37,6 +38,9 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
         if (selectedRoom === roomId) {
             setSelectedRoom(null); // Toggle off
         } else {
+            const room = rooms.find(r => r.id === roomId);
+            if (!room) return;
+
             setSelectedRoom(roomId);
 
             // Fetch latest readings
@@ -55,7 +59,8 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                     trashFee: initialRates.trash.toString(),
                     internetFee: initialRates.internet.toString(),
                     otherFees: initialRates.other.toString(),
-                    commonFee: initialRates.common?.toString() || "0"
+                    // Check if room has common area fee enabled
+                    commonFee: room.chargeCommonArea ? (initialRates.common?.toString() || "0") : "0"
                 });
             } catch (e) {
                 console.error("Failed to fetch latest readings");
