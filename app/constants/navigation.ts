@@ -45,6 +45,18 @@ export const NAV_ITEMS = [
         roles: ["OWNER"]
     },
     {
+        label: "Central Meter",
+        href: "/admin/central-meter",
+        icon: Calculator,
+        roles: ["OWNER"]
+    },
+    {
+        label: "Utility Analysis",
+        href: "/admin/utility-analysis",
+        icon: LayoutDashboard,
+        roles: ["OWNER"]
+    },
+    {
         label: "Settings",
         href: "/settings",
         icon: Settings,
