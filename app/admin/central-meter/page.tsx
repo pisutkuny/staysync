@@ -15,8 +15,10 @@ export default function CentralMeterPage() {
 
     const [formData, setFormData] = useState({
         month: currentMonth,
+        waterMeterLast: 0,
         waterMeterCurrent: 0,
         waterRateFromUtility: 5,
+        electricMeterLast: 0,
         electricMeterCurrent: 0,
         electricRateFromUtility: 5,
         note: ""
@@ -55,16 +57,23 @@ export default function CentralMeterPage() {
         });
 
         if (lastRecord) {
+            // Has previous record - auto-fill from that record
+            setFormData(prev => ({
+                ...prev,
+                waterMeterLast: lastRecord.waterMeterCurrent,
+                electricMeterLast: lastRecord.electricMeterCurrent
+            }));
             setCalculated(prev => ({
                 ...prev,
                 waterLast: lastRecord.waterMeterCurrent,
                 electricLast: lastRecord.electricMeterCurrent
             }));
         } else {
+            // No previous record - keep current formData values
             setCalculated(prev => ({
                 ...prev,
-                waterLast: 0,
-                electricLast: 0
+                waterLast: formData.waterMeterLast,
+                electricLast: formData.electricMeterLast
             }));
         }
     }, [formData.month, records]);
@@ -143,13 +152,24 @@ export default function CentralMeterPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">เลขครั้งก่อน</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                เลขครั้งก่อน {records.length === 0 && "*"}
+                            </label>
                             <input
                                 type="number"
-                                value={calculated.waterLast}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                step="0.01"
+                                value={formData.waterMeterLast}
+                                onChange={e => setFormData({ ...formData, waterMeterLast: parseFloat(e.target.value) || 0 })}
+                                disabled={records.length > 0}
+                                required={records.length === 0}
+                                className={`w-full rounded-lg border p-3 ${records.length > 0
+                                    ? 'border-gray-200 text-gray-500 bg-gray-50'
+                                    : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                    }`}
                             />
+                            {records.length === 0 && (
+                                <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
@@ -205,13 +225,24 @@ export default function CentralMeterPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">เลขครั้งก่อน</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                เลขครั้งก่อน {records.length === 0 && "*"}
+                            </label>
                             <input
                                 type="number"
-                                value={calculated.electricLast}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                step="0.01"
+                                value={formData.electricMeterLast}
+                                onChange={e => setFormData({ ...formData, electricMeterLast: parseFloat(e.target.value) || 0 })}
+                                disabled={records.length > 0}
+                                required={records.length === 0}
+                                className={`w-full rounded-lg border p-3 ${records.length > 0
+                                        ? 'border-gray-200 text-gray-500 bg-gray-50'
+                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                    }`}
                             />
+                            {records.length === 0 && (
+                                <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>

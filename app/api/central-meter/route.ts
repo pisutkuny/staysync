@@ -21,8 +21,10 @@ export async function POST(request: Request) {
         const body = await request.json();
         const {
             month,
+            waterMeterLast: waterMeterLastOverride,
             waterMeterCurrent,
             waterRateFromUtility,
+            electricMeterLast: electricMeterLastOverride,
             electricMeterCurrent,
             electricRateFromUtility,
             note
@@ -38,8 +40,9 @@ export async function POST(request: Request) {
             orderBy: { month: 'desc' }
         });
 
-        const waterLast = lastRecord?.waterMeterCurrent || 0;
-        const electricLast = lastRecord?.electricMeterCurrent || 0;
+        // Use override if provided (first month), otherwise use last record
+        const waterLast = waterMeterLastOverride !== undefined ? waterMeterLastOverride : (lastRecord?.waterMeterCurrent || 0);
+        const electricLast = electricMeterLastOverride !== undefined ? electricMeterLastOverride : (lastRecord?.electricMeterCurrent || 0);
 
         // Calculate usage and costs
         const waterUsage = waterMeterCurrent - waterLast;
