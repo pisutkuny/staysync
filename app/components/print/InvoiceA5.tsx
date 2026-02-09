@@ -82,11 +82,60 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                             </tr>
                             {billing.trashFee > 0 && (
                                 <tr>
-                                    <td className="py-3">ค่าจัดเก็บขยะมูลฝอย</td>
+                                    <td className="py-3">ค่าขยะ</td>
                                     <td className="py-3 text-right">{billing.trashFee.toLocaleString()}</td>
                                     <td className="py-3 text-center">1</td>
                                     <td className="py-3 text-right font-mono text-gray-900">{billing.trashFee.toLocaleString()}</td>
                                 </tr>
+                            )}
+
+                            {/* Common Fees */}
+                            {(billing.commonWaterFee > 0 || billing.commonElectricFee > 0 || billing.commonInternetFee > 0 || billing.commonTrashFee > 0) && (
+                                <>
+                                    {((billing.commonElectricFee || 0) === 0 && (billing.commonInternetFee || 0) === 0 && (billing.commonTrashFee || 0) === 0 && (billing.commonWaterFee || 0) > 0) ? (
+                                        <tr>
+                                            <td className="py-3">ค่าส่วนกลาง</td>
+                                            <td className="py-3 text-right">{billing.commonWaterFee.toLocaleString()}</td>
+                                            <td className="py-3 text-center">1</td>
+                                            <td className="py-3 text-right font-mono text-gray-900">{billing.commonWaterFee.toLocaleString()}</td>
+                                        </tr>
+                                    ) : (
+                                        <>
+                                            {billing.commonWaterFee > 0 && (
+                                                <tr>
+                                                    <td className="py-3">น้ำส่วนกลาง</td>
+                                                    <td className="py-3 text-right">{billing.commonWaterFee.toLocaleString()}</td>
+                                                    <td className="py-3 text-center">1</td>
+                                                    <td className="py-3 text-right font-mono text-gray-900">{billing.commonWaterFee.toLocaleString()}</td>
+                                                </tr>
+                                            )}
+                                            {billing.commonElectricFee > 0 && (
+                                                <tr>
+                                                    <td className="py-3">ไฟส่วนกลาง</td>
+                                                    <td className="py-3 text-right">{billing.commonElectricFee.toLocaleString()}</td>
+                                                    <td className="py-3 text-center">1</td>
+                                                    <td className="py-3 text-right font-mono text-gray-900">{billing.commonElectricFee.toLocaleString()}</td>
+                                                </tr>
+                                            )}
+                                            {billing.commonInternetFee > 0 && (
+                                                <tr>
+                                                    <td className="py-3">เน็ตส่วนกลาง</td>
+                                                    <td className="py-3 text-right">{billing.commonInternetFee.toLocaleString()}</td>
+                                                    <td className="py-3 text-center">1</td>
+                                                    <td className="py-3 text-right font-mono text-gray-900">{billing.commonInternetFee.toLocaleString()}</td>
+                                                </tr>
+                                            )}
+                                            {billing.commonTrashFee > 0 && (
+                                                <tr>
+                                                    <td className="py-3">ขยะส่วนกลาง</td>
+                                                    <td className="py-3 text-right">{billing.commonTrashFee.toLocaleString()}</td>
+                                                    <td className="py-3 text-center">1</td>
+                                                    <td className="py-3 text-right font-mono text-gray-900">{billing.commonTrashFee.toLocaleString()}</td>
+                                                </tr>
+                                            )}
+                                        </>
+                                    )}
+                                </>
                             )}
                             {billing.internetFee > 0 && (
                                 <tr>

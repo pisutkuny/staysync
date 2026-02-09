@@ -33,11 +33,22 @@ export function createInvoiceFlexMessage(
         { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
         { label: `💧 น้ำ ${bill.waterMeterLast} → ${bill.waterMeterCurrent} (${waterUsage} หน่วย)`, value: `${formatMoney(parseFloat(waterUsage) * bill.waterRate)} ฿` },
         { label: `⚡ ไฟ ${bill.electricMeterLast} → ${bill.electricMeterCurrent} (${electricUsage} หน่วย)`, value: `${formatMoney(parseFloat(electricUsage) * bill.electricRate)} ฿` },
-        { label: "🧹 ค่าขยะ/ส่วนกลาง", value: `${formatMoney(bill.trashFee + bill.otherFees)} ฿` }
+        { label: "🧹 ค่าขยะ", value: `${formatMoney(bill.trashFee)} ฿` }
     ];
+
+    // Calculate total Common Fees
+    const commonFeeTotal = (bill.commonWaterFee || 0) + (bill.commonElectricFee || 0) + (bill.commonInternetFee || 0) + (bill.commonTrashFee || 0);
+
+    if (commonFeeTotal > 0) {
+        items.push({ label: "💰 ค่าส่วนกลาง", value: `${formatMoney(commonFeeTotal)} ฿` });
+    }
 
     if (bill.internetFee > 0) {
         items.push({ label: "🌐 ค่าอินเทอร์เน็ต", value: `${formatMoney(bill.internetFee)} ฿` });
+    }
+
+    if (bill.otherFees > 0) {
+        items.push({ label: "📝 อื่นๆ", value: `${formatMoney(bill.otherFees)} ฿` });
     }
 
     // Prepare QR Code URL

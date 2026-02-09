@@ -74,6 +74,50 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
                                 <td className="py-1 font-bold">{billing.trashFee.toLocaleString()}</td>
                             </tr>
                         )}
+
+                        {/* Common Fees */}
+                        {(billing.commonWaterFee > 0 || billing.commonElectricFee > 0 || billing.commonInternetFee > 0 || billing.commonTrashFee > 0) && (
+                            <>
+                                {((billing.commonElectricFee || 0) === 0 && (billing.commonInternetFee || 0) === 0 && (billing.commonTrashFee || 0) === 0 && (billing.commonWaterFee || 0) > 0) ? (
+                                    <tr>
+                                        <td className="py-1 text-left">ค่าส่วนกลาง</td>
+                                        <td className="py-1 text-center">-</td>
+                                        <td className="py-1 font-bold">{billing.commonWaterFee.toLocaleString()}</td>
+                                    </tr>
+                                ) : (
+                                    <>
+                                        {billing.commonWaterFee > 0 && (
+                                            <tr>
+                                                <td className="py-1 text-left">น้ำส่วนกลาง</td>
+                                                <td className="py-1 text-center">-</td>
+                                                <td className="py-1 font-bold">{billing.commonWaterFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonElectricFee > 0 && (
+                                            <tr>
+                                                <td className="py-1 text-left">ไฟส่วนกลาง</td>
+                                                <td className="py-1 text-center">-</td>
+                                                <td className="py-1 font-bold">{billing.commonElectricFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonInternetFee > 0 && (
+                                            <tr>
+                                                <td className="py-1 text-left">เน็ตส่วนกลาง</td>
+                                                <td className="py-1 text-center">-</td>
+                                                <td className="py-1 font-bold">{billing.commonInternetFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                        {billing.commonTrashFee > 0 && (
+                                            <tr>
+                                                <td className="py-1 text-left">ขยะส่วนกลาง</td>
+                                                <td className="py-1 text-center">-</td>
+                                                <td className="py-1 font-bold">{billing.commonTrashFee.toLocaleString()}</td>
+                                            </tr>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        )}
                         {billing.otherFees > 0 && (
                             <tr>
                                 <td className="py-1 text-left">อื่นๆ</td>
