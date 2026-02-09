@@ -8,7 +8,8 @@ export async function GET(
     try {
         const { id } = await params;
         const resident = await prisma.resident.findUnique({
-            where: { id: Number(id) }
+            where: { id: Number(id) },
+            include: { room: true }
         });
 
         if (!resident) {
