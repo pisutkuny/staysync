@@ -224,13 +224,32 @@ export async function POST(req: Request) {
 
                     // 7. Distribute costs if there are chargeable rooms
                     if (chargeableCount > 0) {
+                        // Calculate actual total common area cost
+                        const actualCommonCost = commonWaterCost + commonElectricCost + commonInternetCost + commonTrashCost;
+
+                        // Apply fee cap based on settings
+                        let cappedCommonCost = actualCommonCost;
+                        if (config.commonAreaCapType === "percentage") {
+                            cappedCommonCost = actualCommonCost * ((config.commonAreaCapPercentage || 100) / 100);
+                        } else if (config.commonAreaCapType === "fixed") {
+                            cappedCommonCost = Math.min(actualCommonCost, config.commonAreaCapFixed || 0);
+                        }
+
+                        // Log for transparency
+                        console.log(`Common Area Fees - Actual: ฿${actualCommonCost.toFixed(2)}, Capped: ฿${cappedCommonCost.toFixed(2)} (${config.commonAreaCapType})`);
+
+                        // Calculate per-room fees based on capped amount
                         // Divide by TOTAL rooms, not just chargeable rooms
                         // Owner pays for rooms with toggle disabled (old contracts)
                         const totalRoomCount = allBillings.length;
-                        const waterFeePerRoom = commonWaterCost / totalRoomCount;
-                        const electricFeePerRoom = commonElectricCost / totalRoomCount;
-                        const internetFeePerRoom = commonInternetCost / totalRoomCount;
-                        const trashFeePerRoom = commonTrashCost / totalRoomCount;
+                        const totalFeePerRoom = cappedCommonCost / totalRoomCount;
+
+                        // Distribute proportionally based on original cost ratios
+                        const costRatio = cappedCommonCost / (actualCommonCost || 1);
+                        const waterFeePerRoom = (commonWaterCost * costRatio) / totalRoomCount;
+                        const electricFeePerRoom = (commonElectricCost * costRatio) / totalRoomCount;
+                        const internetFeePerRoom = (commonInternetCost * costRatio) / totalRoomCount;
+                        const trashFeePerRoom = (commonTrashCost * costRatio) / totalRoomCount;
 
                         // 8. Update each chargeable billing
                         for (const billing of chargeableBillings) {

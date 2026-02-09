@@ -500,6 +500,110 @@ export default function SettingsPage() {
                             </div>
                         )}
 
+                        {/* Phase 2 Enhancement: Fee Cap */}
+                        {config.enableCommonAreaCharges && (
+                            <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">📊 จำกัดค่าส่วนกลาง (Fee Cap)</label>
+                                <div className="space-y-3">
+                                    {/* Option 1: No Cap */}
+                                    <label className="flex items-start gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="commonAreaCapType"
+                                            value="none"
+                                            checked={config.commonAreaCapType === "none"}
+                                            onChange={(e) => setConfig(prev => ({ ...prev, commonAreaCapType: e.target.value }))}
+                                            className="w-4 h-4 mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <div>
+                                            <span className="text-sm text-gray-900 font-medium">ไม่จำกัด (เก็บตามค่าจริง 100%)</span>
+                                            <p className="text-xs text-gray-600 mt-0.5">ผู้เช่าจ่ายค่าส่วนกลางทั้งหมด</p>
+                                        </div>
+                                    </label>
+
+                                    {/* Option 2: Percentage Cap */}
+                                    <label className="flex items-start gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="commonAreaCapType"
+                                            value="percentage"
+                                            checked={config.commonAreaCapType === "percentage"}
+                                            onChange={(e) => setConfig(prev => ({ ...prev, commonAreaCapType: e.target.value }))}
+                                            className="w-4 h-4 mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="text-sm text-gray-900 font-medium">จำกัดตามเปอร์เซ็นต์</span>
+                                            <p className="text-xs text-gray-600 mt-0.5">เก็บเพียงบางส่วนของค่าจริง</p>
+                                            {config.commonAreaCapType === "percentage" && (
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        max="100"
+                                                        step="1"
+                                                        value={config.commonAreaCapPercentage}
+                                                        onChange={(e) => setConfig(prev => ({ ...prev, commonAreaCapPercentage: parseFloat(e.target.value) || 0 }))}
+                                                        className="w-24 rounded-lg border border-gray-300 p-2 text-sm"
+                                                    />
+                                                    <span className="text-sm text-gray-700">%</span>
+                                                    <span className="text-xs text-gray-500">(0-100)</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </label>
+
+                                    {/* Option 3: Fixed Cap */}
+                                    <label className="flex items-start gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="commonAreaCapType"
+                                            value="fixed"
+                                            checked={config.commonAreaCapType === "fixed"}
+                                            onChange={(e) => setConfig(prev => ({ ...prev, commonAreaCapType: e.target.value }))}
+                                            className="w-4 h-4 mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <div className="flex-1">
+                                            <span className="text-sm text-gray-900 font-medium">จำกัดยอดคงที่</span>
+                                            <p className="text-xs text-gray-600 mt-0.5">เก็บสูงสุดไม่เกินที่กำหนด</p>
+                                            {config.commonAreaCapType === "fixed" && (
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="10"
+                                                        value={config.commonAreaCapFixed}
+                                                        onChange={(e) => setConfig(prev => ({ ...prev, commonAreaCapFixed: parseFloat(e.target.value) || 0 }))}
+                                                        className="w-32 rounded-lg border border-gray-300 p-2 text-sm"
+                                                    />
+                                                    <span className="text-sm text-gray-700">บาท/เดือน</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </label>
+
+                                    {/* Example Calculation */}
+                                    {config.commonAreaCapType !== "none" && (
+                                        <div className="mt-3 p-3 bg-white border border-indigo-200 rounded-lg">
+                                            <p className="text-xs font-semibold text-indigo-700 mb-1">💡 ตัวอย่าง:</p>
+                                            <p className="text-xs text-gray-700">
+                                                ค่าจริง 3,000฿ →{" "}
+                                                {config.commonAreaCapType === "percentage" && (
+                                                    <span className="font-medium text-indigo-700">
+                                                        เก็บ {(3000 * (config.commonAreaCapPercentage / 100)).toLocaleString()}฿ ({config.commonAreaCapPercentage}%)
+                                                    </span>
+                                                )}
+                                                {config.commonAreaCapType === "fixed" && (
+                                                    <span className="font-medium text-indigo-700">
+                                                        เก็บ {Math.min(3000, config.commonAreaCapFixed).toLocaleString()}฿ สูงสุด
+                                                    </span>
+                                                )}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Warning Note */}
                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                             <p className="text-sm text-amber-800">

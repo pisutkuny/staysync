@@ -157,6 +157,12 @@ model SystemConfig {
   // Phase 2: Common Area Billing
   enableCommonAreaCharges Boolean @default(false) // Master toggle for common area billing
   commonAreaDistribution  String  @default("equal") // "equal" or "proportional"
+  
+  // Phase 2 Enhancement: Common Area Fee Cap
+  commonAreaCapType       String  @default("none")      // "none", "percentage", "fixed"
+  commonAreaCapPercentage Float   @default(100)         // If percentage: 0-100 (100 = no cap)
+  commonAreaCapFixed      Float   @default(0)           // If fixed: amount in baht
+  
   internetFee       Float    @default(0)
   otherFees         Float    @default(0)
 
