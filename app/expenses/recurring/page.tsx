@@ -166,39 +166,42 @@ export default function RecurringExpensesPage() {
 
     return (
         <div className="space-y-8 pb-10">
-            <div className="flex justify-between items-center">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <button
-                            onClick={() => window.location.href = '/expenses'}
-                            className="text-gray-400 hover:text-gray-600 transition flex items-center gap-1 text-sm"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M19 12H5" />
-                                <path d="M12 19l-7-7 7-7" />
-                            </svg>
-                            Back to Expenses
-                        </button>
+            {/* Enhanced Header with Gradient */}
+            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <div className="flex items-center gap-3 mb-3">
+                            <button
+                                onClick={() => window.location.href = '/expenses'}
+                                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition flex items-center gap-1 text-sm px-3 py-1.5 rounded-lg text-white font-medium border border-white/30"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M19 12H5" />
+                                    <path d="M12 19l-7-7 7-7" />
+                                </svg>
+                                Back to Expenses
+                            </button>
+                        </div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">🔁 Recurring Expenses</h2>
+                        <p className="text-pink-100 mt-2 text-lg">Manage expense templates that auto-create monthly.</p>
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">Recurring Expenses</h2>
-                    <p className="text-gray-500 mt-2">Manage expense templates that auto-create monthly.</p>
-                </div>
-                <div className="bg-purple-50 px-6 py-3 rounded-xl border border-purple-100">
-                    <p className="text-sm font-bold text-purple-600 uppercase">Monthly Total</p>
-                    <p className="text-2xl font-bold text-purple-700">฿{totalMonthly.toLocaleString()}</p>
+                    <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
+                        <p className="text-sm font-bold text-white/90 uppercase tracking-wider">Monthly Total</p>
+                        <p className="text-3xl font-bold text-white drop-shadow-md">฿{totalMonthly.toLocaleString()}</p>
+                    </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Form Section */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm h-fit">
+                {/* Enhanced Form Section */}
+                <div className="bg-gradient-to-br from-white to-purple-50 p-6 rounded-2xl border-2 border-purple-200 shadow-xl h-fit">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            {editingId ? <Edit className="text-blue-600" size={20} /> : <Plus className="text-purple-600" size={20} />}
-                            {editingId ? "Edit Template" : "New Template"}
+                        <h3 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-2">
+                            {editingId ? <Edit className="text-blue-600" size={22} /> : <Plus className="text-purple-600" size={22} />}
+                            {editingId ? "✏️ Edit Template" : "➕ New Template"}
                         </h3>
                         {editingId && (
-                            <button onClick={resetForm} className="text-gray-400 hover:text-gray-600 transition">
+                            <button onClick={resetForm} className="text-gray-400 hover:text-gray-600 transition hover:bg-gray-100 rounded-lg p-1">
                                 <X size={20} />
                             </button>
                         )}

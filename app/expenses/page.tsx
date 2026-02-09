@@ -377,44 +377,47 @@ export default function ExpensesPage() {
 
     return (
         <div className="space-y-8 pb-10">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">Expense Tracking</h2>
-                    <p className="text-gray-500 mt-2">Record and monitor operating expenses with receipt uploads.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => window.location.href = '/expenses/recurring'}
-                        className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-700 transition-all shadow-sm flex items-center gap-2"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
-                            <path d="M21 3v5h-5" />
-                        </svg>
-                        Recurring Expenses
-                    </button>
-                    <div className="bg-red-50 px-6 py-3 rounded-xl border border-red-100">
-                        <p className="text-sm font-bold text-red-600 uppercase">Total Expenses</p>
-                        <p className="text-2xl font-bold text-red-700">฿{totalStats.toLocaleString()}</p>
+            {/* Enhanced Header with Gradient */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Expense Tracking</h2>
+                        <p className="text-indigo-100 mt-2 text-lg">Record and monitor operating expenses with receipt uploads.</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => window.location.href = '/expenses/recurring'}
+                            className="bg-white text-purple-700 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                            </svg>
+                            Recurring Expenses
+                        </button>
+                        <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
+                            <p className="text-sm font-bold text-white/90 uppercase tracking-wider">Total Expenses</p>
+                            <p className="text-3xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Search & Filter Bar */}
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            {/* Enhanced Search & Filter Bar */}
+            <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                            <Search className="absolute left-3 top-3 text-indigo-400" size={20} />
                             <input
                                 type="text"
-                                placeholder="Search title or note..."
+                                placeholder="🔍 Search title or note..."
                                 value={searchQuery}
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value);
                                     setPage(1);
                                 }}
-                                className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="pl-11 w-full p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                             />
                         </div>
                     </div>
@@ -424,14 +427,14 @@ export default function ExpensesPage() {
                             setCategoryFilter(e.target.value);
                             setPage(1);
                         }}
-                        className="p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
                     >
-                        <option value="">All Categories</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Salary">Salary</option>
-                        <option value="Supplies">Supplies</option>
-                        <option value="Other">Other</option>
+                        <option value="">📁 All Categories</option>
+                        <option value="Maintenance">🔧 Maintenance</option>
+                        <option value="Utilities">⚡ Utilities</option>
+                        <option value="Salary">💼 Salary</option>
+                        <option value="Supplies">📦 Supplies</option>
+                        <option value="Other">📝 Other</option>
                     </select>
                     <div className="flex gap-2">
                         {(searchQuery || categoryFilter || dateFrom || dateTo) && (
@@ -490,17 +493,17 @@ export default function ExpensesPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Form Section */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm h-fit">
+                {/* Enhanced Form Section */}
+                <div className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 shadow-xl h-fit">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            {editingId ? <Edit className="text-blue-600" size={20} /> : <Plus className="text-indigo-600" size={20} />}
-                            {editingId ? "Edit Expense" : "Add New Expense"}
+                        <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+                            {editingId ? <Edit className="text-blue-600" size={22} /> : <Plus className="text-indigo-600" size={22} />}
+                            {editingId ? "✏️ Edit Expense" : "➕ Add New Expense"}
                         </h3>
                         {editingId && (
                             <button
                                 onClick={resetForm}
-                                className="text-gray-400 hover:text-gray-600 transition"
+                                className="text-gray-400 hover:text-gray-600 transition hover:bg-gray-100 rounded-lg p-1"
                             >
                                 <X size={20} />
                             </button>
