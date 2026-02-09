@@ -224,10 +224,13 @@ export async function POST(req: Request) {
 
                     // 7. Distribute costs if there are chargeable rooms
                     if (chargeableCount > 0) {
-                        const waterFeePerRoom = commonWaterCost / chargeableCount;
-                        const electricFeePerRoom = commonElectricCost / chargeableCount;
-                        const internetFeePerRoom = commonInternetCost / chargeableCount;
-                        const trashFeePerRoom = commonTrashCost / chargeableCount;
+                        // Divide by TOTAL rooms, not just chargeable rooms
+                        // Owner pays for rooms with toggle disabled (old contracts)
+                        const totalRoomCount = allBillings.length;
+                        const waterFeePerRoom = commonWaterCost / totalRoomCount;
+                        const electricFeePerRoom = commonElectricCost / totalRoomCount;
+                        const internetFeePerRoom = commonInternetCost / totalRoomCount;
+                        const trashFeePerRoom = commonTrashCost / totalRoomCount;
 
                         // 8. Update each chargeable billing
                         for (const billing of chargeableBillings) {
