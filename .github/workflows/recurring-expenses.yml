@@ -1,0 +1,19 @@
+name: Create Recurring Expenses
+
+on:
+  schedule:
+    # Runs daily at 00:00 UTC (07:00 Bangkok time)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  create-recurring-expenses:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Call Cron Endpoint
+        run: |
+          curl -X GET "${{ secrets.APP_URL }}/api/cron/create-recurring-expenses" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -v
