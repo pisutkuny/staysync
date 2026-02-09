@@ -484,7 +484,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setConfig(prev => ({ ...prev, commonAreaDistribution: e.target.value }))}
                                             className="w-4 h-4 text-purple-600 focus:ring-purple-500"
                                         />
-                                        <span className="text-sm">แบ่งเท่าๆ กันทุกห้อง (Equal distribution)</span>
+                                        <span className="text-sm text-gray-900 font-medium">แบ่งเท่าๆ กันทุกห้อง (Equal distribution)</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer opacity-50">
                                         <input
@@ -494,7 +494,7 @@ export default function SettingsPage() {
                                             disabled
                                             className="w-4 h-4"
                                         />
-                                        <span className="text-sm">แบ่งตามสัดส่วนการใช้ (Proportional - Coming Soon)</span>
+                                        <span className="text-sm text-gray-600">แบ่งตามสัดส่วนการใช้ (Proportional - Coming Soon)</span>
                                     </label>
                                 </div>
                             </div>
