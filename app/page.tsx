@@ -64,37 +64,43 @@ export default function Home() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {/* Revenue */}
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">รายรับเดือนนี้</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">฿{summary.revenue.toLocaleString()}</p>
+        <Link href="/billing">
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+            <div>
+              <p className="text-sm font-medium text-gray-500">รายรับเดือนนี้</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">฿{summary.revenue.toLocaleString()}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full text-green-600">
+              <Wallet size={24} />
+            </div>
           </div>
-          <div className="p-3 bg-green-100 rounded-full text-green-600">
-            <Wallet size={24} />
-          </div>
-        </div>
+        </Link>
 
         {/* Occupancy */}
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">อัตราการเข้าพัก</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{summary.occupancyRate}%</p>
+        <Link href="/rooms">
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+            <div>
+              <p className="text-sm font-medium text-gray-500">อัตราการเข้าพัก</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{summary.occupancyRate}%</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+              <Users size={24} />
+            </div>
           </div>
-          <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-            <Users size={24} />
-          </div>
-        </div>
+        </Link>
 
         {/* Active Issues */}
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">แจ้งซ่อมรอจัดการ</p>
-            <p className="text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
+        <Link href="/admin/issues">
+          <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition-all cursor-pointer h-full">
+            <div>
+              <p className="text-sm font-medium text-gray-500">แจ้งซ่อมรอจัดการ</p>
+              <p className="text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full text-orange-600">
+              <BadgeAlert size={24} />
+            </div>
           </div>
-          <div className="p-3 bg-orange-100 rounded-full text-orange-600">
-            <BadgeAlert size={24} />
-          </div>
-        </div>
+        </Link>
 
         {/* Expenses (Placeholder / To implement later) */}
         <Link href="/expenses">
@@ -160,8 +166,8 @@ export default function Home() {
                       {new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
                     </p>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${item.status === 'Paid' ? 'bg-green-100 text-green-700' :
-                        item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-gray-100 text-gray-700'
+                      item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
                       }`}>
                       {item.status}
                     </span>
