@@ -65,11 +65,14 @@ export async function POST(
             );
         }
 
+        // Convert to direct image URL for display
+        const directImageUrl = `https://lh3.googleusercontent.com/d/${uploadResult.fileId}=w1000`;
+
         // Update billing record
         const updatedBill = await prisma.billing.update({
             where: { id: billId },
             data: {
-                slipImage: uploadResult.webViewLink,
+                slipImage: directImageUrl, // Use direct image URL
                 slipFileId: uploadResult.fileId,
                 paymentDate: new Date(),
                 paymentStatus: "Review" // Status changes to Review
