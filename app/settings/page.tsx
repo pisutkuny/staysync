@@ -28,7 +28,10 @@ export default function SettingsPage() {
         rulesText: "",
         emergencyPhone: "",
         adminPhone: "",
-        adminLineIdDisplay: ""
+        adminLineIdDisplay: "",
+        // Phase 2: Common Area Billing
+        enableCommonAreaCharges: false,
+        commonAreaDistribution: "equal"
     });
 
     useEffect(() => {
@@ -442,6 +445,70 @@ export default function SettingsPage() {
                         </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">These rates will be pre-filled when you create new bulk bills.</p>
+                </section>
+
+                {/* Phase 2: Common Area Billing */}
+                <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-purple-700">
+                        💰 Common Area Billing (Phase 2)
+                    </h2>
+
+                    <div className="space-y-4">
+                        {/* Master Toggle */}
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={config.enableCommonAreaCharges || false}
+                                    onChange={(e) => setConfig(prev => ({ ...prev, enableCommonAreaCharges: e.target.checked }))}
+                                    className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                />
+                                <div>
+                                    <p className="font-semibold text-gray-900">เปิดใช้งานการเก็บค่าส่วนกลาง</p>
+                                    <p className="text-sm text-gray-600">Enable automatic common area fee calculation in bills</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {/* Distribution Method */}
+                        {config.enableCommonAreaCharges && (
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">วิธีแบ่งค่าส่วนกลาง (Distribution Method)</label>
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="commonAreaDistribution"
+                                            value="equal"
+                                            checked={config.commonAreaDistribution === "equal"}
+                                            onChange={(e) => setConfig(prev => ({ ...prev, commonAreaDistribution: e.target.value }))}
+                                            className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                                        />
+                                        <span className="text-sm">แบ่งเท่าๆ กันทุกห้อง (Equal distribution)</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer opacity-50">
+                                        <input
+                                            type="radio"
+                                            name="commonAreaDistribution"
+                                            value="proportional"
+                                            disabled
+                                            className="w-4 h-4"
+                                        />
+                                        <span className="text-sm">แบ่งตามสัดส่วนการใช้ (Proportional - Coming Soon)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Warning Note */}
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                            <p className="text-sm text-amber-800">
+                                <span className="font-semibold">⚠️ หมายเหตุ:</span> เมื่อเปิดใช้งาน ระบบจะคำนวณค่าส่วนกลางอัตโนมัติในบิลของทุกห้องที่เปิดใช้งาน
+                                <br />
+                                คุณสามารถเลือกได้ว่าห้องไหนจะเก็บค่าส่วนกลางในหน้าแก้ไขข้อมูลผู้เช่า
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
                 <div className="flex justify-end pt-4">

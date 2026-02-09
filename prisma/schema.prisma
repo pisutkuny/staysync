@@ -37,6 +37,11 @@ model Resident {
   deposit      Float    @default(0)
   checkInDate  DateTime @default(now())
   checkOutDate DateTime?
+  
+  // Phase 2: Common Area Billing Control
+  chargeCommonArea  Boolean   @default(false) // Enable common area fees for this resident
+  contractStartDate DateTime? // Track when contract started (for old vs new tenants)
+  
   issues       Issue[]
   billings     Billing[]
   documents  Document[]
@@ -69,6 +74,13 @@ model Billing {
   internetFee   Float    @default(0)
   trashFee      Float    @default(0)
   otherFees     Float    @default(0)
+  
+  // Phase 2: Common Area Fees (auto-calculated from CentralMeter)
+  commonWaterFee    Float @default(0)
+  commonElectricFee Float @default(0)
+  commonInternetFee Float @default(0)
+  commonTrashFee    Float @default(0)
+  
   note          String?
 
   totalAmount   Float
@@ -143,6 +155,10 @@ model SystemConfig {
   waterRate         Float    @default(18)
   electricRate      Float    @default(7)
   trashFee          Float    @default(0)
+  
+  // Phase 2: Common Area Billing
+  enableCommonAreaCharges Boolean @default(false) // Master toggle for common area billing
+  commonAreaDistribution  String  @default("equal") // "equal" or "proportional"
   internetFee       Float    @default(0)
   otherFees         Float    @default(0)
 
