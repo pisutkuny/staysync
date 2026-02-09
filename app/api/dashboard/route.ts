@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 
-export const dynamic = 'force-dynamic';
+// Enable caching with 2-minute revalidation
+export const revalidate = 120; // Cache for 2 minutes (120 seconds)
 
 export async function GET() {
     try {
