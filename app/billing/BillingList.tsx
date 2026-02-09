@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, ExternalLink, Loader2 } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell } from "lucide-react";
 
 type Bill = {
     id: number;
@@ -16,8 +16,28 @@ type Bill = {
 export default function BillingList({ initialBills }: { initialBills: any[] }) {
     const [bills, setBills] = useState<Bill[]>(initialBills);
     const [loading, setLoading] = useState<number | null>(null);
+    const [reminderLoading, setReminderLoading] = useState(false);
     const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
 
+    const handleSendReminders = async () => {
+        if (!confirm("ยืนยันส่งแจ้งเตือน 'ค้างชำระ' (Overdue) ให้กับลูกบ้านที่ยังไม่จ่ายบิล?")) return;
+
+        setReminderLoading(true);
+        try {
+            const res = await fetch("/api/notify/overdue", { method: "POST" });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert(`✅ ส่งแจ้งเตือนเรียบร้อยแล้ว\n- ค้างชำระทั้งหมด: ${data.overdueCount}\n- ส่งสำเร็จ: ${data.sentCount}`);
+            } else {
+                alert(`❌ เกิดข้อผิดพลาด: ${data.error}`);
+            }
+        } catch (error) {
+            alert("❌ Network Error");
+        } finally {
+            setReminderLoading(false);
+        }
+    };
 
     const handleReview = async (id: number, action: "approve" | "reject", note?: string) => {
         setLoading(id);
@@ -47,12 +67,19 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
         }
     };
 
-
     return (
         <>
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
+                <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <h3 className="font-bold text-lg text-gray-900">Billing History</h3>
+                    <button
+                        onClick={handleSendReminders}
+                        disabled={reminderLoading}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold text-sm shadow-sm hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+                    >
+                        {reminderLoading ? <Loader2 className="animate-spin" size={16} /> : <Bell size={16} />}
+                        Send Overdue Reminders
+                    </button>
                 </div>
                 {/* Mobile View: Cards */}
                 <div className="md:hidden divide-y divide-gray-100">

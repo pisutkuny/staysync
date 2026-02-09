@@ -1,3 +1,4 @@
+
 import { FlexContainer, FlexMessage, FlexComponent } from "@line/bot-sdk";
 
 // Helper to format currency
@@ -202,14 +203,14 @@ export function createGuestFlexMessage(): FlexMessage {
         type: "flex",
         altText: "บริการเฉพาะผู้เช่าหอพัก",
         contents: {
-            type: "bubble",
+            "type": "bubble",
             "size": "kilo",
             "header": {
                 "type": "box",
                 "layout": "vertical",
                 "backgroundColor": "#F8F9FA",
                 "paddingAll": "lg",
-                contents: [
+                "contents": [
                     {
                         "type": "text",
                         "text": "🔒 Residents Only",
@@ -220,11 +221,11 @@ export function createGuestFlexMessage(): FlexMessage {
                     } as FlexComponent
                 ]
             },
-            body: {
-                type: "box",
+            "body": {
+                "type": "box",
                 "layout": "vertical",
                 "paddingAll": "xl",
-                contents: [
+                "contents": [
                     {
                         "type": "text",
                         "text": "ขออภัยครับ เมนูนี้สงวนไว้สำหรับผู้เช่าของหอพักเราเท่านั้น",
@@ -244,20 +245,115 @@ export function createGuestFlexMessage(): FlexMessage {
                     } as FlexComponent
                 ]
             },
-            footer: {
-                type: "box",
+            "footer": {
+                "type": "box",
                 "layout": "vertical",
                 "paddingAll": "lg",
-                contents: [
+                "contents": [
                     {
                         "type": "button",
                         "style": "secondary",
                         "height": "sm",
                         "action": {
                             "type": "message",
-                            label: "ติดต่อแอดมิน",
-                            text: "Menu: Contact"
+                            "label": "ติดต่อแอดมิน",
+                            "text": "Menu: Contact"
                         }
+                    }
+                ]
+            }
+        }
+    };
+}
+
+export function createOverdueFlexMessage(
+    bill: any,
+    sysConfig: any,
+    payUrl: string
+): FlexMessage {
+    const items = [
+        { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },
+        { label: "💧 ค่าน้ำ", value: `${formatMoney((bill.waterMeterCurrent - bill.waterMeterLast) * bill.waterRate)} ฿` },
+        { label: "⚡ ค่าไฟ", value: `${formatMoney((bill.electricMeterCurrent - bill.electricMeterLast) * bill.electricRate)} ฿` },
+    ];
+
+    // Scan Link
+    const amountClean = bill.totalAmount.toString();
+    const qrImageUrl = (sysConfig.promptPayId)
+        ? `https://promptpay.io/${sysConfig.promptPayId}/${amountClean}`
+        : null;
+
+    return {
+        type: "flex",
+        altText: `⚠️ แจ้งเตือนค้างชำระ ห้อง ${bill.room?.number || 'N/A'}`,
+        contents: {
+            "type": "bubble",
+            "size": "giga",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "backgroundColor": "#FFEBEE",
+                "paddingAll": "lg",
+                "contents": [
+                    { "type": "text", "text": "OVERDUE (ค้างชำระ)", "weight": "bold", "color": "#D32F2F", "size": "sm" },
+                    { "type": "text", "text": `ห้อง ${bill.room?.number || 'N/A'}`, "weight": "bold", "size": "xxl", "margin": "md", "color": "#C62828" },
+                    { "type": "text", "text": `ประจำเดือน ${formatMonth(new Date(bill.month))}`, "size": "xs", "color": "#7f0000", "wrap": true }
+                ]
+            },
+            "hero": qrImageUrl ? {
+                "type": "image",
+                "url": qrImageUrl,
+                "size": "md",
+                "aspectRatio": "1:1",
+                "aspectMode": "cover",
+                "margin": "md"
+            } : undefined,
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    { "type": "text", "text": "กรุณาชำระยอดค้างจ่ายโดยเร็วที่สุด", "size": "sm", "color": "#D32F2F", "align": "center", "weight": "bold" },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "lg",
+                        "spacing": "sm",
+                        "contents": items.map(item => ({
+                            "type": "box",
+                            "layout": "baseline",
+                            "contents": [
+                                { "type": "text", "text": item.label, "size": "sm", "color": "#555555", "flex": 3 },
+                                { "type": "text", "text": item.value, "size": "sm", "color": "#111111", "align": "end", "flex": 2 }
+                            ]
+                        } as FlexComponent))
+                    },
+                    { "type": "separator", "margin": "lg" },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "margin": "lg",
+                        "contents": [
+                            { "type": "text", "text": "ยอดรวมสุทธิ", "size": "md", "weight": "bold", "color": "#555555" },
+                            { "type": "text", "text": `${formatMoney(bill.totalAmount)} ฿`, "size": "xl", "weight": "bold", "color": "#D32F2F", "align": "end" }
+                        ]
+                    }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "sm",
+                "contents": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "ชำระเงินทันที (Pay Now)",
+                            "uri": payUrl
+                        },
+                        "color": "#D32F2F"
                     }
                 ]
             }
