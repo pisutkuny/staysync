@@ -212,6 +212,21 @@ model Expense {
   @@index([category])
 }
 
+model RecurringExpense {
+  id          Int      @id @default(autoincrement())
+  title       String
+  amount      Float
+  category    String
+  note        String?
+  dayOfMonth  Int      @default(1)  // Day to create (1-28)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([isActive])
+  @@index([dayOfMonth])
+}
+
 model LineBotState {
   lineUserId String   @id
   state      String   @default("IDLE") // e.g., IDLE, REPAIR_DESC

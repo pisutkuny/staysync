@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Save, Trash2, Edit, FileText, Loader2, X, Upload, Eye, Check } from "lucide-react";
+import { Plus, Save, Trash2, Edit, FileText, Loader2, X, Upload, Eye, Check, Search, Filter, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
-import Image from "next/image";
+import imageCompression from 'browser-image-compression';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 type Expense = {
     id: number;
@@ -16,10 +19,28 @@ type Expense = {
     receiptFileId?: string | null;
 };
 
+type PaginationInfo = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
 export default function ExpensesPage() {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 });
+
+    // Search & Filter
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
 
     // Form State
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -33,6 +54,9 @@ export default function ExpensesPage() {
     const [existingReceiptUrl, setExistingReceiptUrl] = useState<string>("");
     const [existingReceiptFileId, setExistingReceiptFileId] = useState<string>("");
     const [uploadingReceipt, setUploadingReceipt] = useState(false);
+    const [compressing, setCompressing] = useState(false);
+    const [originalSize, setOriginalSize] = useState(0);
+    const [compressedSize, setCompressedSize] = useState(0);
 
     // Delete modal
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -41,9 +65,24 @@ export default function ExpensesPage() {
 
     const fetchExpenses = async () => {
         try {
-            const res = await fetch("/api/expenses");
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                ...(searchQuery && { search: searchQuery }),
+                ...(categoryFilter && { category: categoryFilter }),
+                ...(dateFrom && { dateFrom }),
+                ...(dateTo && { dateTo })
+            });
+
+            const res = await fetch(`/api/expenses?${params}`);
             const data = await res.json();
-            setExpenses(data);
+
+            if (data.expenses) {
+                setExpenses(data.expenses);
+                setPagination(data.pagination);
+            } else {
+                setExpenses(data);
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -53,7 +92,7 @@ export default function ExpensesPage() {
 
     useEffect(() => {
         fetchExpenses();
-    }, []);
+    }, [page, limit, searchQuery, categoryFilter, dateFrom, dateTo]);
 
     const resetForm = () => {
         setEditingId(null);
@@ -66,17 +105,47 @@ export default function ExpensesPage() {
         setReceiptPreview("");
         setExistingReceiptUrl("");
         setExistingReceiptFileId("");
+        setOriginalSize(0);
+        setCompressedSize(0);
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setReceiptFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setReceiptPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+            setOriginalSize(file.size);
+            setCompressing(true);
+
+            try {
+                // Compress image
+                const options = {
+                    maxSizeMB: 0.5,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true
+                };
+
+                const compressedFile = await imageCompression(file, options);
+                setCompressedSize(compressedFile.size);
+                setReceiptFile(compressedFile);
+
+                // Preview
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setReceiptPreview(reader.result as string);
+                };
+                reader.readAsDataURL(compressedFile);
+            } catch (error) {
+                console.error('Compression error:', error);
+                setReceiptFile(file);
+                setCompressedSize(file.size);
+
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setReceiptPreview(reader.result as string);
+                };
+                reader.readAsDataURL(file);
+            } finally {
+                setCompressing(false);
+            }
         }
     };
 
@@ -90,7 +159,6 @@ export default function ExpensesPage() {
                 return null;
             }
 
-            // Convert to base64
             const reader = new FileReader();
             const base64Promise = new Promise<string>((resolve) => {
                 reader.onloadend = () => {
@@ -157,9 +225,7 @@ export default function ExpensesPage() {
             let receiptUrl = existingReceiptUrl;
             let receiptFileId = existingReceiptFileId;
 
-            // Upload new receipt if provided
             if (receiptFile) {
-                // If editing and had old receipt, delete it first
                 if (editingId && existingReceiptFileId) {
                     await deleteReceiptFromDrive(existingReceiptFileId);
                 }
@@ -214,7 +280,6 @@ export default function ExpensesPage() {
         setReceiptFile(null);
         setReceiptPreview("");
 
-        // Scroll to form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -230,7 +295,6 @@ export default function ExpensesPage() {
             const data = await res.json();
 
             if (res.ok) {
-                // Delete receipt from Drive if exists
                 if (data.receiptFileId) {
                     await deleteReceiptFromDrive(data.receiptFileId);
                 }
@@ -252,6 +316,63 @@ export default function ExpensesPage() {
         setDeleteModalOpen(true);
     };
 
+    const clearFilters = () => {
+        setSearchQuery("");
+        setCategoryFilter("");
+        setDateFrom("");
+        setDateTo("");
+        setPage(1);
+    };
+
+    const exportToExcel = () => {
+        const data = expenses.map(e => ({
+            'Date': format(new Date(e.date), 'dd/MM/yyyy'),
+            'Title': e.title,
+            'Category': e.category,
+            'Amount': e.amount,
+            'Note': e.note || ''
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Expenses');
+
+        const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+        XLSX.utils.sheet_add_aoa(worksheet, [
+            ['', '', 'TOTAL:', total, '']
+        ], { origin: -1 });
+
+        XLSX.writeFile(workbook, `expenses_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+    };
+
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text('Expense Report', 14, 20);
+        doc.setFontSize(11);
+        doc.text(`Generated: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 14, 30);
+
+        const tableData = expenses.map(e => [
+            format(new Date(e.date), 'dd/MM/yyyy'),
+            e.title,
+            e.category,
+            `${e.amount.toLocaleString()}`
+        ]);
+
+        const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+        autoTable(doc, {
+            head: [['Date', 'Title', 'Category', 'Amount']],
+            body: tableData,
+            startY: 40,
+            foot: [['', '', 'TOTAL:', total.toLocaleString()]],
+            theme: 'grid'
+        });
+
+        doc.save(`expenses_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    };
+
     const totalStats = expenses.reduce((sum: number, ex) => sum + ex.amount, 0);
 
     return (
@@ -264,6 +385,95 @@ export default function ExpensesPage() {
                 <div className="bg-red-50 px-6 py-3 rounded-xl border border-red-100">
                     <p className="text-sm font-bold text-red-600 uppercase">Total Expenses</p>
                     <p className="text-2xl font-bold text-red-700">฿{totalStats.toLocaleString()}</p>
+                </div>
+            </div>
+
+            {/* Search & Filter Bar */}
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-2">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search title or note..."
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            />
+                        </div>
+                    </div>
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => {
+                            setCategoryFilter(e.target.value);
+                            setPage(1);
+                        }}
+                        className="p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                    >
+                        <option value="">All Categories</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Supplies">Supplies</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div className="flex gap-2">
+                        {(searchQuery || categoryFilter || dateFrom || dateTo) && (
+                            <button
+                                onClick={clearFilters}
+                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-2"
+                            >
+                                <X size={16} />
+                                Clear
+                            </button>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={exportToExcel}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                                title="Export to Excel"
+                            >
+                                <FileSpreadsheet size={16} />
+                            </button>
+                            <button
+                                onClick={exportToPDF}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
+                                title="Export to PDF"
+                            >
+                                <FileText size={16} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1">From Date</label>
+                        <input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => {
+                                setDateFrom(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1">To Date</label>
+                        <input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -355,7 +565,6 @@ export default function ExpensesPage() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Image (Optional)</label>
 
-                            {/* Existing Receipt */}
                             {existingReceiptUrl && !receiptPreview && (
                                 <div className="mb-2 relative">
                                     <img
@@ -374,7 +583,6 @@ export default function ExpensesPage() {
                                 </div>
                             )}
 
-                            {/* New Upload Preview */}
                             {receiptPreview && (
                                 <div className="mb-2 relative">
                                     <img
@@ -382,11 +590,18 @@ export default function ExpensesPage() {
                                         alt="New receipt"
                                         className="w-full h-32 object-cover rounded-lg border border-blue-300"
                                     />
+                                    {compressing && (
+                                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                                            <Loader2 className="animate-spin text-white" size={24} />
+                                        </div>
+                                    )}
                                     <button
                                         type="button"
                                         onClick={() => {
                                             setReceiptFile(null);
                                             setReceiptPreview("");
+                                            setOriginalSize(0);
+                                            setCompressedSize(0);
                                         }}
                                         className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600"
                                     >
@@ -395,18 +610,26 @@ export default function ExpensesPage() {
                                 </div>
                             )}
 
+                            {compressedSize > 0 && (
+                                <div className="mb-2 text-xs text-gray-600 bg-green-50 p-2 rounded">
+                                    ✓ Compressed: {(originalSize / 1024).toFixed(0)}KB → {(compressedSize / 1024).toFixed(0)}KB
+                                    ({(((originalSize - compressedSize) / originalSize) * 100).toFixed(0)}% smaller)
+                                </div>
+                            )}
+
                             <input
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                                className="w-full p-2 border rounded-lg text-sm"
+                                disabled={compressing}
+                                className="w-full p-2 border rounded-lg text-sm disabled:opacity-50"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Mobile camera supported • Max 5MB</p>
+                            <p className="text-xs text-gray-500 mt-1">Mobile camera supported • Auto-compressed to ~500KB</p>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={submitting || uploadingReceipt}
+                            disabled={submitting || uploadingReceipt || compressing}
                             className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {submitting || uploadingReceipt ? (
@@ -436,87 +659,137 @@ export default function ExpensesPage() {
 
                 {/* List Section */}
                 <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                         <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
+                        <select
+                            value={limit}
+                            onChange={(e) => {
+                                setLimit(parseInt(e.target.value));
+                                setPage(1);
+                            }}
+                            className="p-2 border rounded-lg text-sm"
+                        >
+                            <option value={10}>10 per page</option>
+                            <option value={20}>20 per page</option>
+                            <option value={50}>50 per page</option>
+                            <option value={100}>100 per page</option>
+                        </select>
                     </div>
                     {loading ? (
                         <div className="p-8 text-center text-gray-500 flex justify-center">
                             <Loader2 className="animate-spin" />
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50 text-gray-600 font-medium">
-                                    <tr>
-                                        <th className="px-2 py-3 sm:p-4">Date</th>
-                                        <th className="px-2 py-3 sm:p-4">Title</th>
-                                        <th className="px-2 py-3 sm:p-4">Category</th>
-                                        <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
-                                        <th className="px-2 py-3 sm:p-4 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {expenses.length === 0 ? (
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-600 font-medium">
                                         <tr>
-                                            <td colSpan={5} className="p-8 text-center text-gray-400">No expenses recorded yet.</td>
+                                            <th className="px-2 py-3 sm:p-4">Date</th>
+                                            <th className="px-2 py-3 sm:p-4">Title</th>
+                                            <th className="px-2 py-3 sm:p-4">Category</th>
+                                            <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
+                                            <th className="px-2 py-3 sm:p-4 text-center">Actions</th>
                                         </tr>
-                                    ) : (
-                                        expenses.map((expense) => (
-                                            <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-2 py-3 sm:p-4 text-gray-500">
-                                                    {format(new Date(expense.date), "dd MMM yyyy")}
-                                                </td>
-                                                <td className="px-2 py-3 sm:p-4">
-                                                    <div className="font-medium text-gray-900">{expense.title}</div>
-                                                    {expense.note && <div className="text-xs text-gray-400 font-normal">{expense.note}</div>}
-                                                    {expense.receiptUrl && (
-                                                        <a
-                                                            href={expense.receiptUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
-                                                        >
-                                                            <FileText size={12} />
-                                                            View Receipt
-                                                        </a>
-                                                    )}
-                                                </td>
-                                                <td className="px-2 py-3 sm:p-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold 
-                                                        ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
-                                                            expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
-                                                                expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
-                                                                    'bg-gray-100 text-gray-700'}`}>
-                                                        {expense.category}
-                                                    </span>
-                                                </td>
-                                                <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
-                                                    -฿{expense.amount.toLocaleString()}
-                                                </td>
-                                                <td className="px-2 py-3 sm:p-4">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <button
-                                                            onClick={() => handleEdit(expense)}
-                                                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openDeleteModal(expense.id)}
-                                                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {expenses.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="p-8 text-center text-gray-400">
+                                                    {searchQuery || categoryFilter || dateFrom || dateTo
+                                                        ? "No expenses found matching your filters."
+                                                        : "No expenses recorded yet."
+                                                    }
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                        ) : (
+                                            expenses.map((expense) => (
+                                                <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-2 py-3 sm:p-4 text-gray-500">
+                                                        {format(new Date(expense.date), "dd MMM yyyy")}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <div className="font-medium text-gray-900">{expense.title}</div>
+                                                        {expense.note && <div className="text-xs text-gray-400 font-normal">{expense.note}</div>}
+                                                        {expense.receiptUrl && (
+                                                            <a
+                                                                href={expense.receiptUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
+                                                            >
+                                                                <FileText size={12} />
+                                                                View Receipt
+                                                            </a>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold 
+                                                            ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
+                                                                expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
+                                                                    expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
+                                                                        'bg-gray-100 text-gray-700'}`}>
+                                                            {expense.category}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
+                                                        -฿{expense.amount.toLocaleString()}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button
+                                                                onClick={() => handleEdit(expense)}
+                                                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
+                                                                title="Edit"
+                                                            >
+                                                                <Edit size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openDeleteModal(expense.id)}
+                                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
+                                                                title="Delete"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="p-4 border-t border-gray-100 flex items-center justify-between">
+                                    <div className="text-sm text-gray-600">
+                                        Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, pagination.total)} of {pagination.total} expenses
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            disabled={page === 1}
+                                            className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                        >
+                                            <ChevronLeft size={16} />
+                                            Previous
+                                        </button>
+                                        <span className="text-sm text-gray-600">
+                                            Page {page} of {pagination.totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                                            disabled={page === pagination.totalPages}
+                                            className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                        >
+                                            Next
+                                            <ChevronRight size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
