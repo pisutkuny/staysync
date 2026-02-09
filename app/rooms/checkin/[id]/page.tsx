@@ -17,6 +17,7 @@ export default async function CheckInPage({ params }: { params: Promise<{ id: st
         <CheckInForm
             roomId={id}
             roomNumber={room.number}
+            roomPrice={room.price}
             isOccupied={room.status === "Occupied"}
         />
     );

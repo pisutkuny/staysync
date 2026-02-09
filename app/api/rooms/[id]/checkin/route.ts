@@ -9,7 +9,13 @@ export async function POST(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { fullName, phone, lineUserId } = body;
+        const { fullName, phone, lineUserId, contractDurationMonths, customDuration, deposit } = body;
+
+        // Calculate contract dates
+        const contractStartDate = new Date();
+        const duration = contractDurationMonths === 0 ? parseInt(customDuration) : contractDurationMonths;
+        const contractEndDate = new Date(contractStartDate);
+        contractEndDate.setMonth(contractEndDate.getMonth() + duration);
 
         // Transaction: Create Resident and Update Room Status
         const [resident, room] = await prisma.$transaction([
@@ -19,6 +25,11 @@ export async function POST(
                     phone,
                     lineUserId: lineUserId || null,
                     roomId: Number(id),
+                    deposit: deposit || 0,
+                    contractStartDate,
+                    contractEndDate,
+                    contractDurationMonths: duration,
+                    depositStatus: "Held"
                 },
             }),
             prisma.room.update({

@@ -12,45 +12,63 @@ datasource db {
 }
 
 model Room {
-  id        Int      @id @default(autoincrement())
-  number    String   @unique
-  status    String   @default("Available") // Available, Occupied, Maintenance
-  price     Float
-  
+  id     Int    @id @default(autoincrement())
+  number String @unique
+  status String @default("Available") // Available, Occupied, Maintenance
+  price  Float
+
   // Initial meter readings (for pre-existing installations)
-  waterMeterInitial    Float  @default(0)
-  electricMeterInitial Float  @default(0)
-  
+  waterMeterInitial    Float @default(0)
+  electricMeterInitial Float @default(0)
+
   // Phase 2: Common Area Billing (Room-based)
   chargeCommonArea Boolean @default(false) // Enable common area fees for this room
-  
+
   residents Resident[]
   billings  Billing[]
-  
+
   // Performance Indexes
   @@index([status])
 }
 
 model Resident {
-  id         Int       @id @default(autoincrement())
-  fullName   String
-  phone        String   @default("")
-  lineUserId   String?  // Line User ID for notifications
+  id             Int     @id @default(autoincrement())
+  fullName       String
+  phone          String  @default("")
+  lineUserId     String? // Line User ID for notifications
   lineVerifyCode String? @unique // Code for linking Line Account
-  room         Room?    @relation(fields: [roomId], references: [id])
-  roomId       Int?
-  status       String   @default("Active") // Active, CheckedOut
-  deposit      Float    @default(0)
-  checkInDate  DateTime @default(now())
+  room           Room?   @relation(fields: [roomId], references: [id])
+  roomId         Int?
+  status         String  @default("Active") // Active, CheckedOut
+
+  // Deposit Management
+  deposit Float @default(0)
+
+  // Contract Tracking
+  contractStartDate      DateTime  @default(now())
+  contractEndDate        DateTime? // Calculated: startDate + duration months
+  contractDurationMonths Int       @default(12) // Default 12 months
+
+  // Deposit Status Tracking
+  depositStatus         String    @default("Held") // Held, Returned, Forfeited
+  depositReturnedDate   DateTime? // When deposit was returned/forfeited
+  depositReturnedAmount Float? // Actual amount returned (may differ from deposit)
+  depositForfeitReason  String? // Reason for forfeiting (if applicable)
+
+  checkInDate  DateTime   @default(now())
   checkOutDate DateTime?
   issues       Issue[]
   billings     Billing[]
-  documents  Document[]
+  documents    Document[]
+
+  // Performance Indexes
+  @@index([depositStatus])
+  @@index([contractEndDate])
 }
 
 model Document {
   id         Int      @id @default(autoincrement())
-  type       String   // Contract, IDCard, Other
+  type       String // Contract, IDCard, Other
   url        String
   uploadedAt DateTime @default(now())
   resident   Resident @relation(fields: [residentId], references: [id])
@@ -58,56 +76,56 @@ model Document {
 }
 
 model Billing {
-  id            Int      @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   // Meter Readings
-  waterMeterLast    Float  @default(0)
-  waterMeterCurrent Float  @default(0)
-  waterRate         Float  @default(18) // Default price per unit
-  
-  electricMeterLast    Float  @default(0)
-  electricMeterCurrent Float  @default(0)
-  electricRate         Float  @default(7) // Default price per unit
-  
-  meterReading  Float @default(0) // Kept for legacy compatibility (can be removed later)
-  
+  waterMeterLast    Float @default(0)
+  waterMeterCurrent Float @default(0)
+  waterRate         Float @default(18) // Default price per unit
+
+  electricMeterLast    Float @default(0)
+  electricMeterCurrent Float @default(0)
+  electricRate         Float @default(7) // Default price per unit
+
+  meterReading Float @default(0) // Kept for legacy compatibility (can be removed later)
+
   // Fees
-  internetFee   Float    @default(0)
-  trashFee      Float    @default(0)
-  otherFees     Float    @default(0)
-  
+  internetFee Float @default(0)
+  trashFee    Float @default(0)
+  otherFees   Float @default(0)
+
   // Phase 2: Common Area Fees (auto-calculated from CentralMeter)
   commonWaterFee    Float @default(0)
   commonElectricFee Float @default(0)
   commonInternetFee Float @default(0)
   commonTrashFee    Float @default(0)
-  
-  note          String?
+
+  note String?
 
   totalAmount   Float
-  paymentStatus String   @default("Pending") // Pending, Review, Paid
-  
+  paymentStatus String @default("Pending") // Pending, Review, Paid
+
   // Payment Slip fields
-  slipImage     String?  // Google Drive webViewLink
-  slipFileId    String?  // Google Drive file ID
-  paymentDate   DateTime? // When the slip was uploaded
-  
+  slipImage   String? // Google Drive webViewLink
+  slipFileId  String? // Google Drive file ID
+  paymentDate DateTime? // When the slip was uploaded
+
   // Review fields
-  reviewedBy    Int?     // User ID who reviewed
-  reviewedAt    DateTime? // When review was completed
-  reviewNote    String?  // Admin note for rejection/approval
-  
-  month         DateTime @default(now()) // To track billing month
-  createdAt     DateTime @default(now())
-  
-  room       Room     @relation(fields: [roomId], references: [id])
-  roomId     Int
-  
+  reviewedBy Int? // User ID who reviewed
+  reviewedAt DateTime? // When review was completed
+  reviewNote String? // Admin note for rejection/approval
+
+  month     DateTime @default(now()) // To track billing month
+  createdAt DateTime @default(now())
+
+  room   Room @relation(fields: [roomId], references: [id])
+  roomId Int
+
   resident   Resident? @relation(fields: [residentId], references: [id])
   residentId Int?
-  
-  reviewer   User?    @relation("BillingReviewer", fields: [reviewedBy], references: [id])
-  
+
+  reviewer User? @relation("BillingReviewer", fields: [reviewedBy], references: [id])
+
   // Performance Indexes
   @@index([paymentStatus])
   @@index([paymentDate])
@@ -118,21 +136,21 @@ model Billing {
 }
 
 model Issue {
-  id          Int      @id @default(autoincrement())
-  category    String   // Water, Electricity, Internet, Other
-  description String
-  photo       String?
-  afterPhoto  String?  // Photo heavily requested by user
-  reporterName    String?  // For public/guest reports
-  reporterContact String?  // Phone or Line ID
+  id                 Int       @id @default(autoincrement())
+  category           String // Water, Electricity, Internet, Other
+  description        String
+  photo              String?
+  afterPhoto         String? // Photo heavily requested by user
+  reporterName       String? // For public/guest reports
+  reporterContact    String? // Phone or Line ID
   reporterLineUserId String? // Captured from LIFF for notifications
-  status      String   @default("Pending") // Pending, InProgress, Done
-  createdAt   DateTime @default(now())
-  completedAt DateTime?
-  
-  resident    Resident? @relation(fields: [residentId], references: [id])
-  residentId  Int?
-  
+  status             String    @default("Pending") // Pending, InProgress, Done
+  createdAt          DateTime  @default(now())
+  completedAt        DateTime?
+
+  resident   Resident? @relation(fields: [residentId], references: [id])
+  residentId Int?
+
   // Performance Indexes
   @@index([status])
   @@index([createdAt])
@@ -144,56 +162,56 @@ model User {
   username String @unique
   password String
   role     String @default("STAFF") // OWNER, STAFF, TENANT
-  
+
   reviewedBills Billing[] @relation("BillingReviewer")
 }
 
 model SystemConfig {
-  id                Int      @id @default(autoincrement())
-  dormName          String   @default("My Dormitory")
-  dormAddress       String   @default("123 Street, City")
-  
+  id          Int    @id @default(autoincrement())
+  dormName    String @default("My Dormitory")
+  dormAddress String @default("123 Street, City")
+
   // Automation Settings
   enableAutoReminders Boolean @default(false)
-  
+
   // Bank Info
-  bankName          String   @default("Bank Name")
-  bankAccountName   String   @default("Account Name")
-  bankAccountNumber String   @default("000-0-00000-0")
-  promptPayId       String?  // Optional PromptPay ID
-  adminLineUserId   String?  // Line User ID for Admin Alerts
+  bankName          String  @default("Bank Name")
+  bankAccountName   String  @default("Account Name")
+  bankAccountNumber String  @default("000-0-00000-0")
+  promptPayId       String? // Optional PromptPay ID
+  adminLineUserId   String? // Line User ID for Admin Alerts
 
   // Invoice Customization
-  invoiceLogo       String?  // URL of the logo image
-  invoiceNote       String?  // Custom note/footer text
-  invoiceColor      String?  // Theme color hex code (e.g. #4f46e5)
+  invoiceLogo  String? // URL of the logo image
+  invoiceNote  String? // Custom note/footer text
+  invoiceColor String? // Theme color hex code (e.g. #4f46e5)
 
   // Default Rates
-  waterRate         Float    @default(18)
-  electricRate      Float    @default(7)
-  trashFee          Float    @default(0)
-  
+  waterRate    Float @default(18)
+  electricRate Float @default(7)
+  trashFee     Float @default(0)
+
   // Phase 2: Common Area Billing
   enableCommonAreaCharges Boolean @default(false) // Master toggle for common area billing
   commonAreaDistribution  String  @default("equal") // "equal" or "proportional"
-  
+
   // Phase 2 Enhancement: Common Area Fee Cap
-  commonAreaCapType       String  @default("none")      // "none", "percentage", "fixed"
-  commonAreaCapPercentage Float   @default(100)         // If percentage: 0-100 (100 = no cap)
-  commonAreaCapFixed      Float   @default(0)           // If fixed: amount in baht
-  
-  internetFee       Float    @default(0)
-  otherFees         Float    @default(0)
+  commonAreaCapType       String @default("none") // "none", "percentage", "fixed"
+  commonAreaCapPercentage Float  @default(100) // If percentage: 0-100 (100 = no cap)
+  commonAreaCapFixed      Float  @default(0) // If fixed: amount in baht
+
+  internetFee Float @default(0)
+  otherFees   Float @default(0)
 
   // Chatbot Auto-Reply Content
-  wifiSsid          String   @default("StaySync_Residences")
-  wifiPassword      String   @default("staysync_wifi")
-  rulesText         String   @default("1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน")
-  emergencyPhone    String   @default("191")
-  adminPhone        String   @default("081-234-5678")
-  adminLineIdDisplay String  @default("@staysync_admin")
+  wifiSsid           String @default("StaySync_Residences")
+  wifiPassword       String @default("staysync_wifi")
+  rulesText          String @default("1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน")
+  emergencyPhone     String @default("191")
+  adminPhone         String @default("081-234-5678")
+  adminLineIdDisplay String @default("@staysync_admin")
 
-  updatedAt         DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model Expense {
@@ -203,26 +221,26 @@ model Expense {
   category      String   @default("Other") // Maintenance, Utilities, Salary, Other
   date          DateTime @default(now())
   note          String?
-  receiptUrl    String?  // Google Drive webViewLink
-  receiptFileId String?  // Google Drive file ID (for deletion)
+  receiptUrl    String? // Google Drive webViewLink
+  receiptFileId String? // Google Drive file ID (for deletion)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   @@index([date])
   @@index([category])
 }
 
 model RecurringExpense {
-  id          Int      @id @default(autoincrement())
-  title       String
-  amount      Float
-  category    String
-  note        String?
-  dayOfMonth  Int      @default(1)  // Day to create (1-28)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id         Int      @id @default(autoincrement())
+  title      String
+  amount     Float
+  category   String
+  note       String?
+  dayOfMonth Int      @default(1) // Day to create (1-28)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
   @@index([isActive])
   @@index([dayOfMonth])
 }
@@ -230,35 +248,35 @@ model RecurringExpense {
 model LineBotState {
   lineUserId String   @id
   state      String   @default("IDLE") // e.g., IDLE, REPAIR_DESC
-  data       String?  // JSON string for temp data
+  data       String? // JSON string for temp data
   updatedAt  DateTime @updatedAt
 }
 
 model CentralMeter {
-  id                      Int      @id @default(autoincrement())
-  month                   DateTime @unique
-  
+  id    Int      @id @default(autoincrement())
+  month DateTime @unique
+
   // Water
-  waterMeterLast          Float
-  waterMeterCurrent       Float
-  waterUsage              Float    // Auto-calculated
-  waterRateFromUtility    Float    // Actual cost from utility bill (per unit)
-  waterTotalCost          Float    // Auto-calculated
-  
+  waterMeterLast       Float
+  waterMeterCurrent    Float
+  waterUsage           Float // Auto-calculated
+  waterRateFromUtility Float // Actual cost from utility bill (per unit)
+  waterTotalCost       Float // Auto-calculated
+
   // Electric
   electricMeterLast       Float
   electricMeterCurrent    Float
   electricUsage           Float
   electricRateFromUtility Float
   electricTotalCost       Float
-  
+
   // Fixed monthly costs (optional)
-  internetCost            Float?   // Monthly internet cost
-  trashCost               Float?   // Monthly trash collection cost
-  
+  internetCost Float? // Monthly internet cost
+  trashCost    Float? // Monthly trash collection cost
+
   // For analysis notes
-  note                    String?
-  
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
