@@ -17,7 +17,9 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
         if (!effectiveRole) return false;
 
         // Check if user's role is in the allowed roles for this item
-        return (item.roles as readonly string[]).includes(effectiveRole);
+        // Safely handle if roles is undefined (though it should be defined in constants)
+        const allowedRoles = item.roles || [];
+        return (allowedRoles as readonly string[]).includes(effectiveRole);
     });
 
     return (
