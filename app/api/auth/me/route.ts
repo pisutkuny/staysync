@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
         // Get user with organization
         const user = await prisma.user.findUnique({
             where: { id: session.userId },
-            include: { organization: true },
             select: {
                 id: true,
                 email: true,

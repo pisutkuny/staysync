@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ id: string }> } // Fix: Params must be a Promise in Next.js 16
 ) {
     try {
         const session = await getCurrentSession();
