@@ -125,264 +125,275 @@ export default function CentralMeterPage() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center gap-4 mb-4">
-                <Link href="/admin/utility-analysis" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">📊 บันทึกมาตรส่วนกลาง</h1>
-                    <p className="text-sm text-gray-500">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>
+        <div className="space-y-6">
+            {/* Gradient Header */}
+            <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            📊 บันทึกมาตรส่วนกลาง
+                        </h2>
+                        <p className="text-blue-100 mt-2 text-lg">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>
+                    </div>
+                    <Link href="/admin/utility-analysis">
+                        <button className="bg-white text-blue-700 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30 hover:scale-105">
+                            <ArrowLeft size={20} />
+                            กลับไป Utility Analysis
+                        </button>
+                    </Link>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-6">
-                {/* Month Selector */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">เดือน</label>
-                    <input
-                        type="month"
-                        value={formData.month}
-                        onChange={e => setFormData({ ...formData, month: e.target.value })}
-                        required
-                        className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                    />
-                </div>
-
-                {/* Water Section */}
-                <div className="border-t border-gray-100 pt-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">💧 มาตรน้ำส่วนกลาง</h3>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                เลขครั้งก่อน {records.length === 0 && "*"}
-                            </label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.waterMeterLast}
-                                onChange={e => setFormData({ ...formData, waterMeterLast: parseFloat(e.target.value) || 0 })}
-                                disabled={records.length > 0}
-                                required={records.length === 0}
-                                className={`w-full rounded-lg border p-3 ${records.length > 0
-                                    ? 'border-gray-200 text-gray-500 bg-gray-50'
-                                    : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
-                                    }`}
-                            />
-                            {records.length === 0 && (
-                                <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.waterMeterCurrent}
-                                onChange={e => setFormData({ ...formData, waterMeterCurrent: parseFloat(e.target.value) || 0 })}
-                                required
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
-                            <input
-                                type="number"
-                                value={calculated.waterUsage.toFixed(2)}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">หน่วย</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.waterRateFromUtility}
-                                onChange={e => setFormData({ ...formData, waterRateFromUtility: parseFloat(e.target.value) || 0 })}
-                                required
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
-                            <input
-                                type="text"
-                                value={`฿${calculated.waterCost.toLocaleString()}`}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Electric Section */}
-                <div className="border-t border-gray-100 pt-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">⚡ มาตรไฟส่วนกลาง</h3>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                เลขครั้งก่อน {records.length === 0 && "*"}
-                            </label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.electricMeterLast}
-                                onChange={e => setFormData({ ...formData, electricMeterLast: parseFloat(e.target.value) || 0 })}
-                                disabled={records.length > 0}
-                                required={records.length === 0}
-                                className={`w-full rounded-lg border p-3 ${records.length > 0
-                                    ? 'border-gray-200 text-gray-500 bg-gray-50'
-                                    : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
-                                    }`}
-                            />
-                            {records.length === 0 && (
-                                <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.electricMeterCurrent}
-                                onChange={e => setFormData({ ...formData, electricMeterCurrent: parseFloat(e.target.value) || 0 })}
-                                required
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
-                            <input
-                                type="number"
-                                value={calculated.electricUsage.toFixed(2)}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">หน่วย</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.electricRateFromUtility}
-                                onChange={e => setFormData({ ...formData, electricRateFromUtility: parseFloat(e.target.value) || 0 })}
-                                required
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
-                            <input
-                                type="text"
-                                value={`฿${calculated.electricCost.toLocaleString()}`}
-                                disabled
-                                className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Fixed Monthly Costs */}
-                <div className="border-t border-gray-100 pt-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">💰 ค่าใช้จ่ายคงที่รายเดือน (ถ้ามี)</h3>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">📡 Internet</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.internetCost}
-                                onChange={e => setFormData({ ...formData, internetCost: parseFloat(e.target.value) || 0 })}
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="0"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">🗑️ ค่าขยะ</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.trashCost}
-                                onChange={e => setFormData({ ...formData, trashCost: parseFloat(e.target.value) || 0 })}
-                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                placeholder="0"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Note */}
-                <div className="border-t border-gray-100 pt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
-                    <textarea
-                        value={formData.note}
-                        onChange={e => setFormData({ ...formData, note: e.target.value })}
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                        placeholder="เช่น: มาตรไฟขัดข้อง, ประมาณการ, etc."
-                    />
-                </div>
-
-                {/* Submit */}
-                <div className="pt-4 border-t border-gray-100">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                    >
-                        {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                        บันทึกมาตรส่วนกลาง
-                    </button>
-                </div>
-            </form>
-
-            {/* Total Summary */}
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-100">
-                <h3 className="font-bold text-gray-900 mb-3">💰 สรุปค่าใช้จ่ายเดือนนี้</h3>
-                <div className="grid grid-cols-2 gap-4">
+            <div className="max-w-2xl mx-auto">
+                {/* Form Section */}
+                <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-6">
+                    {/* Month Selector */}
                     <div>
-                        <p className="text-sm text-gray-600">น้ำ</p>
-                        <p className="text-xl font-bold text-indigo-600">฿{calculated.waterCost.toLocaleString()}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">เดือน</label>
+                        <input
+                            type="month"
+                            value={formData.month}
+                            onChange={e => setFormData({ ...formData, month: e.target.value })}
+                            required
+                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
                     </div>
-                    <div>
-                        <p className="text-sm text-gray-600">ไฟ</p>
-                        <p className="text-xl font-bold text-purple-600">฿{calculated.electricCost.toLocaleString()}</p>
-                    </div>
-                    {(formData.internetCost > 0 || formData.trashCost > 0) && (
-                        <>
+
+                    {/* Water Section */}
+                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">💧 มาตรน้ำส่วนกลาง</h3>
+
+                        <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-sm text-gray-600">Internet</p>
-                                <p className="text-xl font-bold text-blue-600">฿{(formData.internetCost || 0).toLocaleString()}</p>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    เลขครั้งก่อน {records.length === 0 && "*"}
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.waterMeterLast}
+                                    onChange={e => setFormData({ ...formData, waterMeterLast: parseFloat(e.target.value) || 0 })}
+                                    disabled={records.length > 0}
+                                    required={records.length === 0}
+                                    className={`w-full rounded-lg border p-3 ${records.length > 0
+                                        ? 'border-gray-200 text-gray-500 bg-gray-50'
+                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                        }`}
+                                />
+                                {records.length === 0 && (
+                                    <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                                )}
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">ขยะ</p>
-                                <p className="text-xl font-bold text-green-600">฿{(formData.trashCost || 0).toLocaleString()}</p>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.waterMeterCurrent}
+                                    onChange={e => setFormData({ ...formData, waterMeterCurrent: parseFloat(e.target.value) || 0 })}
+                                    required
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
                             </div>
-                        </>
-                    )}
-                </div>
-                <div className="mt-3 pt-3 border-t border-indigo-200">
-                    <p className="text-sm text-gray-600">รวมทั้งหมด</p>
-                    <p className="text-2xl font-bold text-gray-900">฿{calculated.totalCost.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500 mt-1">(เจ้าของออกค่าส่วนกลาง)</p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
+                                <input
+                                    type="number"
+                                    value={calculated.waterUsage.toFixed(2)}
+                                    disabled
+                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">หน่วย</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.waterRateFromUtility}
+                                    onChange={e => setFormData({ ...formData, waterRateFromUtility: parseFloat(e.target.value) || 0 })}
+                                    required
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
+                                <input
+                                    type="text"
+                                    value={`฿${calculated.waterCost.toLocaleString()}`}
+                                    disabled
+                                    className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Electric Section */}
+                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">⚡ มาตรไฟส่วนกลาง</h3>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    เลขครั้งก่อน {records.length === 0 && "*"}
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.electricMeterLast}
+                                    onChange={e => setFormData({ ...formData, electricMeterLast: parseFloat(e.target.value) || 0 })}
+                                    disabled={records.length > 0}
+                                    required={records.length === 0}
+                                    className={`w-full rounded-lg border p-3 ${records.length > 0
+                                        ? 'border-gray-200 text-gray-500 bg-gray-50'
+                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                        }`}
+                                />
+                                {records.length === 0 && (
+                                    <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.electricMeterCurrent}
+                                    onChange={e => setFormData({ ...formData, electricMeterCurrent: parseFloat(e.target.value) || 0 })}
+                                    required
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
+                                <input
+                                    type="number"
+                                    value={calculated.electricUsage.toFixed(2)}
+                                    disabled
+                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">หน่วย</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.electricRateFromUtility}
+                                    onChange={e => setFormData({ ...formData, electricRateFromUtility: parseFloat(e.target.value) || 0 })}
+                                    required
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
+                                <input
+                                    type="text"
+                                    value={`฿${calculated.electricCost.toLocaleString()}`}
+                                    disabled
+                                    className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Fixed Monthly Costs */}
+                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">💰 ค่าใช้จ่ายคงที่รายเดือน (ถ้ามี)</h3>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">📡 Internet</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.internetCost}
+                                    onChange={e => setFormData({ ...formData, internetCost: parseFloat(e.target.value) || 0 })}
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="0"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">🗑️ ค่าขยะ</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.trashCost}
+                                    onChange={e => setFormData({ ...formData, trashCost: parseFloat(e.target.value) || 0 })}
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="0"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Note */}
+                    <div className="border-t border-gray-100 pt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
+                        <textarea
+                            value={formData.note}
+                            onChange={e => setFormData({ ...formData, note: e.target.value })}
+                            rows={3}
+                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="เช่น: มาตรไฟขัดข้อง, ประมาณการ, etc."
+                        />
+                    </div>
+
+                    {/* Submit */}
+                    <div className="pt-4 border-t border-gray-100">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
+                            บันทึกมาตรส่วนกลาง
+                        </button>
+                    </div>
+                </form>
+
+                {/* Total Summary */}
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-100">
+                    <h3 className="font-bold text-gray-900 mb-3">💰 สรุปค่าใช้จ่ายเดือนนี้</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm text-gray-600">น้ำ</p>
+                            <p className="text-xl font-bold text-indigo-600">฿{calculated.waterCost.toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-600">ไฟ</p>
+                            <p className="text-xl font-bold text-purple-600">฿{calculated.electricCost.toLocaleString()}</p>
+                        </div>
+                        {(formData.internetCost > 0 || formData.trashCost > 0) && (
+                            <>
+                                <div>
+                                    <p className="text-sm text-gray-600">Internet</p>
+                                    <p className="text-xl font-bold text-blue-600">฿{(formData.internetCost || 0).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-600">ขยะ</p>
+                                    <p className="text-xl font-bold text-green-600">฿{(formData.trashCost || 0).toLocaleString()}</p>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-indigo-200">
+                        <p className="text-sm text-gray-600">รวมทั้งหมด</p>
+                        <p className="text-2xl font-bold text-gray-900">฿{calculated.totalCost.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 mt-1">(เจ้าของออกค่าส่วนกลาง)</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

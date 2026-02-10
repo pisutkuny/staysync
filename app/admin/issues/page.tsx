@@ -90,21 +90,33 @@ export default function IssuesBoardPage() {
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
 
     return (
-        <div className="space-y-6 h-[calc(100vh-100px)] flex flex-col relative w-full">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Wrench className="text-indigo-600" />
-                        Repair Requests
-                    </h1>
-                    <p className="text-gray-500">Manage and track maintenance issues.</p>
+        <div className="space-y-6">
+            {/* Gradient Header */}
+            <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <Wrench size={40} />
+                            Repair Requests
+                        </h2>
+                        <p className="text-orange-100 mt-2 text-lg">Manage and track maintenance issues</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                            ⏳ Pending: {columns.Pending.length}
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                            🔨 In Progress: {columns.InProgress.length}
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                            ✅ Done: {columns.Done.length}
+                        </div>
+                    </div>
                 </div>
-                <button onClick={fetchIssues} className="text-sm text-indigo-600 hover:underline">
-                    Refresh Board
-                </button>
             </div>
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden min-h-0">
+            {/* Kanban Board */}
+            <div className="h-[calc(100vh-280px)] flex flex-col relative w-full min-h-0">
                 {/* Pending Column */}
                 <div className="bg-gray-50 rounded-xl flex flex-col border border-gray-200 h-full">
                     <div className="p-4 border-b border-gray-200 bg-gray-100/50 flex justify-between items-center">
