@@ -45,34 +45,46 @@ export default function ReportsPage() {
     return (
         <div className="p-6">
             {/* Controls - Hidden on Print */}
-            <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4 print:hidden">
-                <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <FileText className="text-indigo-600" size={20} />
-                        Monthly Financial Report
-                    </h1>
-                    <p className="text-sm md:text-base text-gray-500">รายงานสรุปรายรับ-รายจ่ายประจำเดือน</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full md:w-auto">
-                    <input
-                        type="month"
-                        value={month}
-                        onChange={(e) => setMonth(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-auto"
-                    />
-                    <div className="flex gap-2">
-                        <button
-                            onClick={fetchReport}
-                            className="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 text-sm flex-1 sm:flex-none"
-                        >
-                            Refresh
-                        </button>
-                        <button
-                            onClick={handlePrint}
-                            className="bg-gray-800 text-white px-3 py-2 rounded-lg hover:bg-gray-900 flex items-center justify-center gap-2 text-sm flex-1 sm:flex-none"
-                        >
-                            <Printer size={16} /> Print
-                        </button>
+            <div className="mb-8 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 rounded-3xl p-6 md:p-8 shadow-xl print:hidden text-white relative overflow-hidden">
+                {/* Decorative Background Elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-32 blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full -ml-10 -mb-20 blur-2xl pointer-events-none"></div>
+
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 relative z-10">
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3 drop-shadow-md">
+                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm shadow-inner">
+                                <FileText className="text-white" size={28} />
+                            </div>
+                            Monthly Financial Report
+                        </h1>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium opacity-90 pl-1">
+                            รายงานสรุปรายรับ-รายจ่ายประจำเดือน
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto bg-white/10 p-2 md:p-3 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg">
+                        <input
+                            type="month"
+                            value={month}
+                            onChange={(e) => setMonth(e.target.value)}
+                            className="border border-indigo-200/50 bg-white/95 text-indigo-900 rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto focus:ring-4 focus:ring-indigo-500/30 outline-none font-semibold shadow-sm"
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                onClick={fetchReport}
+                                className="bg-white text-indigo-700 px-5 py-2.5 rounded-xl hover:bg-indigo-50 font-bold shadow-sm hover:shadow-md transition-all text-sm flex-1 sm:flex-none flex items-center gap-2 justify-center"
+                            >
+                                <Loader2 size={16} className={loading ? "animate-spin" : "hidden"} />
+                                Refresh
+                            </button>
+                            <button
+                                onClick={handlePrint}
+                                className="bg-indigo-900/40 text-white border border-white/30 px-5 py-2.5 rounded-xl hover:bg-indigo-900/60 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-sm flex-1 sm:flex-none transition-all font-semibold"
+                            >
+                                <Printer size={18} /> Print
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
