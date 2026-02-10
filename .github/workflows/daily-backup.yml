@@ -1,0 +1,50 @@
+name: Daily Database Backup
+
+on:
+    # Run daily at 2:00 AM (GMT+7 = 19:00 UTC previous day)
+    schedule:
+        - cron: "0 19 * * *"
+
+    # Allow manual trigger
+    workflow_dispatch:
+
+jobs:
+    backup:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Generate Backup
+              run: |
+                  echo "🔄 Generating database backup..."
+                  curl -X POST https://staysync-sage.vercel.app/api/backup/auto-export \
+                    -H "Authorization: Bearer ${{ secrets.BACKUP_API_KEY }}" \
+                    -o backup-$(date +%Y-%m-%d).json
+
+                  echo "✅ Backup generated"
+                  ls -lh backup-*.json
+
+            - name: Upload to GitHub Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: database-backup-${{ github.run_number }}
+                  path: backup-*.json
+                  retention-days: 30
+
+            - name: Upload to Google Drive (if configured)
+              if: ${{ secrets.GOOGLE_BACKUP_SCRIPT_URL != '' }}
+              run: |
+                  echo "☁️  Uploading to Google Drive..."
+                  BACKUP_CONTENT=$(cat backup-*.json)
+                  curl -X POST "${{ secrets.GOOGLE_BACKUP_SCRIPT_URL }}" \
+                    -H "Content-Type: application/json" \
+                    -d "{\"fileName\": \"staysync-backup-$(date +%Y-%m-%d-%H%M).json\", \"content\": $(echo "$BACKUP_CONTENT" | jq -R -s .)}"
+
+                  echo "✅ Uploaded to Google Drive"
+
+            - name: Summary
+              run: |
+                  echo "📊 Backup Summary"
+                  echo "- Date: $(date)"
+                  echo "- File size: $(stat -c%s backup-*.json | numfmt --to=iec)"
+                  echo "- Retention: 30 days"
+                  echo "✅ Backup completed successfully!"
