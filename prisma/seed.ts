@@ -51,10 +51,10 @@ async function main() {
             dormAddress: '123 Street, City',
             waterRate: 18,
             electricRate: 7,
-            totalAmount: 0, // Required field
-            // otherFees: 0, // Removed or needs checking
-            // trashFee: 0, // Deprecated in favor of central meter or common fees
-            // internetFee: 0, // Deprecated
+            totalAmount: 0,
+            otherFees: 0,
+            trashFee: 0,
+            internetFee: 0,
         },
     });
     console.log(`✅ System config created`);
