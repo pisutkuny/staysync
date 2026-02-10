@@ -174,35 +174,33 @@ export default function ReportIssuePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-red-50 pb-20">
+        <div className="max-w-2xl mx-auto space-y-6">
             <Script
                 src="https://static.line-scdn.net/liff/edge/2/sdk.js"
                 strategy="afterInteractive"
                 onLoad={initLiff}
             />
 
-            {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-6 md:p-8 shadow-xl sticky top-0 z-10 rounded-b-3xl">
-                <div className="max-w-md mx-auto">
-                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                        🔧 Report Issue
-                    </h1>
-                    <p className="text-red-100 mt-2 text-sm md:text-base">แจ้งซ่อม / รายงานปัญหา</p>
-                </div>
+            {/* Enhanced Gradient Header - Card Style */}
+            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 rounded-2xl p-8 shadow-xl text-center">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center gap-3">
+                    🔧 Report Issue
+                </h1>
+                <p className="text-red-100 mt-2 text-sm md:text-base">แจ้งซ่อม / รายงานปัญหา</p>
             </div>
 
-            <div className="p-4 max-w-md mx-auto mt-6">
+            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-1">
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     {/* Room Selection */}
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">1. Select Room / เลือกห้อง</label>
                             <select
                                 required
                                 value={selectedRoomId}
                                 onChange={(e) => handleRoomChange(e.target.value)}
-                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all hover:border-indigo-300"
                             >
                                 <option value="">-- Select Room --</option>
                                 <option value="public">🔔 Public / บุคคลทั่วไป (แจ้งเหตุภายนอก)</option>
@@ -224,7 +222,7 @@ export default function ReportIssuePage() {
                                     disabled={!selectedRoomId}
                                     value={selectedResidentId}
                                     onChange={(e) => setSelectedResidentId(e.target.value)}
-                                    className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                                    className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400 transition-all hover:border-indigo-300"
                                 >
                                     <option value="">
                                         {selectedRoomId ? "-- Select Name --" : "-- Select Room First --"}
@@ -237,32 +235,32 @@ export default function ReportIssuePage() {
                                 </select>
                             </div>
                         ) : (
-                            <div className="space-y-3 bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                            <div className="space-y-4 bg-indigo-50/50 p-5 rounded-xl border border-indigo-100">
                                 <div>
-                                    <label className="block text-sm font-medium text-indigo-900 mb-1">Your Name / ชื่อผู้แจ้ง</label>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">Your Name / ชื่อผู้แจ้ง</label>
                                     <input
                                         required
                                         type="text"
                                         value={guestInfo.name}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
                                         placeholder="Enter your name"
-                                        className="w-full p-2.5 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-indigo-900 mb-1">Contact / เบอร์ติดต่อ</label>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">Contact / เบอร์ติดต่อ</label>
                                     <input
                                         required
                                         type="text"
                                         value={guestInfo.contact}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, contact: e.target.value })}
                                         placeholder="Phone number or Line ID"
-                                        className="w-full p-2.5 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 {guestInfo.lineUserId && (
-                                    <div className="text-xs text-green-600 flex items-center gap-1">
-                                        ✅ Line Connected (Notifications Enabled)
+                                    <div className="text-xs text-green-600 flex items-center gap-1 font-medium bg-green-50 px-2 py-1 rounded w-fit">
+                                        ✅ Line Connected
                                     </div>
                                 )}
                             </div>
@@ -270,17 +268,17 @@ export default function ReportIssuePage() {
                     </div>
 
                     {/* Category Selection */}
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                        <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Category / หมวดหมู่</label>
+                        <div className="grid grid-cols-2 gap-3">
                             {["Water", "Electricity", "Internet", "Other"].map((cat) => (
                                 <button
                                     key={cat}
                                     type="button"
                                     onClick={() => setFormData({ ...formData, category: cat })}
-                                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${formData.category === cat
-                                        ? "bg-indigo-600 text-white shadow-md"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    className={`py-3 px-4 rounded-xl text-sm font-bold transition-all transform hover:scale-105 ${formData.category === cat
+                                        ? "bg-indigo-600 text-white shadow-lg ring-2 ring-indigo-200"
+                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
                                         }`}
                                 >
                                     {cat}
@@ -290,44 +288,47 @@ export default function ReportIssuePage() {
                     </div>
 
                     {/* Description */}
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Description / รายละเอียด</label>
                         <textarea
                             required
                             rows={4}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="Describe the problem..."
-                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
+                            className="w-full rounded-xl border border-gray-300 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base shadow-inner transition-all hover:border-indigo-300"
                         />
                     </div>
 
                     {/* Photo Upload */}
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Photo (Optional)</label>
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Photo (Optional) / รูปถ่าย</label>
 
                         {!previewUrl ? (
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleFileChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 transition-colors">
-                                    <ImageIcon size={32} className="mb-2" />
-                                    <span className="text-sm">Tap to upload photo</span>
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-400 group-hover:bg-gray-50 group-hover:border-indigo-300 transition-all duration-300">
+                                    <div className="bg-gray-50 p-3 rounded-full mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                        <ImageIcon size={32} />
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-500 group-hover:text-indigo-600">Tap to upload photo</span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="relative rounded-lg overflow-hidden border border-gray-200">
-                                <img src={previewUrl} alt="Preview" className="w-full h-48 object-cover" />
+                            <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-md group">
+                                <img src={previewUrl} alt="Preview" className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                 <button
                                     type="button"
                                     onClick={removeFile}
-                                    className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full hover:bg-black/70"
+                                    className="absolute top-3 right-3 bg-white/90 text-gray-700 p-2 rounded-full hover:bg-red-500 hover:text-white shadow-lg transition-all transform hover:scale-110"
                                 >
-                                    <X size={16} />
+                                    <X size={18} />
                                 </button>
                             </div>
                         )}
@@ -337,12 +338,12 @@ export default function ReportIssuePage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2 text-lg"
+                        className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-xl hover:shadow-2xl hover:from-indigo-700 hover:to-violet-700 active:scale-98 transition-all flex items-center justify-center gap-3 text-lg"
                     >
-                        {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
-                        Submit Report
+                        {loading ? <Loader2 className="animate-spin" /> : <Send size={22} />}
+                        Send Report / ส่งเรื่อง
                     </button>
-                    {liffError && <p className="text-xs text-red-500 text-center">{liffError}</p>}
+                    {liffError && <p className="text-xs text-red-500 text-center bg-red-50 py-1 rounded">{liffError}</p>}
                 </form>
             </div>
         </div>
