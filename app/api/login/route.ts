@@ -5,11 +5,11 @@ import prisma from "@/lib/prisma";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { username, password } = body;
+        const { email, password } = body;
 
         // Check against Database
         const user = await prisma.user.findUnique({
-            where: { username }
+            where: { email }
         });
 
         if (user && user.password === password) {
