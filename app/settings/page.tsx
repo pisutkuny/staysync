@@ -72,6 +72,7 @@ export default function SettingsPage() {
                 trashFee: Number(config.trashFee) || 0,
                 internetFee: Number(config.internetFee) || 0,
                 otherFees: Number(config.otherFees) || 0,
+                reminderDay: Number(config.reminderDay) || 25, // Convert to number
             };
 
             const res = await fetch("/api/settings", {
