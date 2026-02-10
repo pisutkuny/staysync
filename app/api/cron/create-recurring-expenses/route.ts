@@ -37,7 +37,8 @@ export async function GET(req: Request) {
                     amount: template.amount,
                     category: template.category,
                     date: today,
-                    note: template.note ? `${template.note} (Auto-created from recurring template)` : 'Auto-created from recurring template'
+                    note: template.note ? `${template.note} (Auto-created from recurring template)` : 'Auto-created from recurring template',
+                    organizationId: template.organizationId
                 }
             });
             created.push(expense);
