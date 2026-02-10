@@ -150,32 +150,77 @@ export default function ReportsPage() {
                         </div>
                     </div>
 
-                    {/* Single Month Chart Section */}
-                    <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid print:mb-4 print:border-gray-300">
-                        <h4 className="font-bold text-lg mb-4 text-center print:text-base print:mb-2">แผนภูมิเปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)</h4>
-                        <div className="h-[300px] w-full flex justify-center print:h-[200px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={chartData}
-                                    margin={{
-                                        top: 20,
-                                        right: 30,
-                                        left: 20,
-                                        bottom: 5,
-                                    }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    {/* @ts-ignore */}
-                                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                    <YAxis tick={{ fontSize: 12 }} />
-                                    <Bar dataKey="amount" name="Amount" radius={[4, 4, 0, 0]}>
-                                        {chartData.map((entry: any, index: number) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
+                    {/* Power Bar Chart Section */}
+                    <div className="mb-8 p-6 border rounded-3xl bg-white shadow-sm print:shadow-none print:border-gray-300 print:break-inside-avoid print:p-4">
+                        <h4 className="font-bold text-lg mb-6 text-center print:text-base print:mb-4 flex items-center justify-center gap-2">
+                            <TrendingUp className="text-indigo-600 print:hidden" size={20} />
+                            เปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)
+                        </h4>
+
+                        {(() => {
+                            const maxVal = Math.max(data.income?.total || 0, data.expenses?.total || 0, 1);
+                            const incomePercent = Math.min(((data.income?.total || 0) / maxVal) * 100, 100);
+                            const expensePercent = Math.min(((data.expenses?.total || 0) / maxVal) * 100, 100);
+
+                            return (
+                                <div className="space-y-8 print:space-y-4">
+                                    {/* Income Power Bar */}
+                                    <div className="relative">
+                                        <div className="flex justify-between text-sm md:text-base font-bold mb-2">
+                                            <span className="flex items-center gap-2 text-emerald-700">
+                                                <div className="w-3 h-3 rounded-full bg-emerald-500 print:hidden"></div>
+                                                รายรับ (Income)
+                                            </span>
+                                            <span className="text-emerald-700">฿{data.income?.total?.toLocaleString()}</span>
+                                        </div>
+                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-6 relative">
+                                            {/* Pattern Overlay for Texture */}
+                                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
+
+                                            <div
+                                                style={{ width: `${incomePercent}%` }}
+                                                className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 rounded-full shadow-lg print:bg-green-600 print:shadow-none transition-all duration-1000 ease-out flex items-center relative"
+                                            >
+                                                {/* Glossy Effect */}
+                                                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
+
+                                                {/* Percentage Label inside bar if wide enough */}
+                                                {incomePercent > 15 && (
+                                                    <span className="absolute right-3 text-white text-xs font-bold drop-shadow-md print:hidden">{incomePercent.toFixed(0)}%</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-1 text-right print:hidden"> Based on paid bills </p>
+                                    </div>
+
+                                    {/* Expense Power Bar */}
+                                    <div className="relative">
+                                        <div className="flex justify-between text-sm md:text-base font-bold mb-2">
+                                            <span className="flex items-center gap-2 text-rose-700">
+                                                <div className="w-3 h-3 rounded-full bg-rose-500 print:hidden"></div>
+                                                รายจ่าย (Expenses)
+                                            </span>
+                                            <span className="text-rose-700">฿{data.expenses?.total?.toLocaleString()}</span>
+                                        </div>
+                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-6 relative">
+                                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
+
+                                            <div
+                                                style={{ width: `${expensePercent}%` }}
+                                                className="h-full bg-gradient-to-r from-rose-400 via-red-500 to-pink-600 rounded-full shadow-lg print:bg-red-600 print:shadow-none transition-all duration-1000 ease-out flex items-center relative"
+                                            >
+                                                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
+
+                                                {expensePercent > 15 && (
+                                                    <span className="absolute right-3 text-white text-xs font-bold drop-shadow-md print:hidden">{expensePercent.toFixed(0)}%</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-1 text-right print:hidden"> Utilities + Common fees </p>
+                                    </div>
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     {/* Detailed Breakdown */}
