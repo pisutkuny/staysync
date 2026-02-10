@@ -127,8 +127,8 @@ export default function SettingsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
-                                        : "text-gray-600 hover:bg-gray-100"
+                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                                    : "text-gray-600 hover:bg-gray-100"
                                     }`}
                             >
                                 <Icon size={20} />
@@ -297,15 +297,74 @@ export default function SettingsPage() {
                                         placeholder="Thank you for your payment..."
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Logo URL</label>
-                                    <input
-                                        name="invoiceLogo"
-                                        value={config.invoiceLogo}
-                                        onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                        placeholder="https://..."
-                                    />
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Logo</label>
+                                    <div className="space-y-3">
+                                        {/* Current Logo Preview */}
+                                        {config.invoiceLogo && (
+                                            <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                <img
+                                                    src={config.invoiceLogo}
+                                                    alt="Invoice Logo"
+                                                    className="h-16 w-auto object-contain"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFNUU3RUIiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzlDQTNCRiIgZm9udC1zaXplPSIxNiI+TG9nbzwvdGV4dD48L3N2Zz4=';
+                                                    }}
+                                                />
+                                                <div className="flex-1">
+                                                    <p className="text-sm text-gray-600">Current logo</p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setConfig(prev => ({ ...prev, invoiceLogo: '' }))}
+                                                        className="text-xs text-red-600 hover:text-red-700 mt-1"
+                                                    >
+                                                        Remove logo
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Upload Button */}
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        // Check file size (max 2MB)
+                                                        if (file.size > 2 * 1024 * 1024) {
+                                                            alert('File size must be less than 2MB');
+                                                            return;
+                                                        }
+
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            setConfig(prev => ({
+                                                                ...prev,
+                                                                invoiceLogo: reader.result as string
+                                                            }));
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="hidden"
+                                                id="invoice-logo-upload"
+                                            />
+                                            <label
+                                                htmlFor="invoice-logo-upload"
+                                                className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
+                                            >
+                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span className="text-sm text-gray-600">
+                                                    {config.invoiceLogo ? 'Change logo' : 'Upload logo'}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <p className="text-xs text-gray-500">Recommended: PNG or JPG, max 2MB</p>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Color (Hex)</label>
