@@ -81,44 +81,44 @@ export default function ReportsPage() {
                 <div className="flex justify-center py-12"><Loader2 className="animate-spin text-indigo-600 w-8 h-8" /></div>
             ) : data ? (
                 /* Report Container - Visible on Print */
-                <div id="printable-area" className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-gray-900 print:shadow-none print:border-none print:p-0 print:absolute print:top-0 print:left-0 print:w-full print:m-0">
+                <div id="printable-area" className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-gray-900 print:shadow-none print:border-none print:p-0 print:absolute print:top-0 print:left-0 print:w-full print:m-0 print:text-sm">
 
                     {/* Report Header */}
-                    <div className="text-center mb-8 border-b-2 border-gray-800 pb-4">
-                        <h2 className="text-3xl font-bold uppercase tracking-wide">รายงานสรุปประจำเดือน</h2>
-                        <p className="text-lg text-gray-600 mt-2">
+                    <div className="text-center mb-8 border-b-2 border-gray-800 pb-4 print:mb-4 print:pb-2">
+                        <h2 className="text-3xl font-bold uppercase tracking-wide print:text-2xl">รายงานสรุปประจำเดือน</h2>
+                        <p className="text-lg text-gray-600 mt-2 print:text-base">
                             {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}
                         </p>
-                        <p className="text-sm text-gray-400 mt-1">Generated: {new Date().toLocaleString('th-TH')}</p>
+                        <p className="text-sm text-gray-400 mt-1 print:text-xs">Generated: {new Date().toLocaleString('th-TH')}</p>
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:border print:border-gray-300">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 print:mb-4 print:gap-4">
+                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:border print:border-green-200 print:bg-white">
                             <h3 className="text-green-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingUp size={14} className="md:hidden" />
                                 <TrendingUp size={16} className="hidden md:block" />
                                 <span className="truncate">รายรับรวม (Total Income)</span>
                             </h3>
-                            <p className="text-2xl md:text-3xl font-bold text-green-700 mt-2">฿{data.income?.total?.toLocaleString()}</p>
+                            <p className="text-2xl md:text-3xl font-bold text-green-700 mt-2 print:text-xl">฿{data.income?.total?.toLocaleString()}</p>
                             <p className="text-xs text-green-600 mt-1">จากบิลที่ชำระแล้ว ({data.stats?.paidBills} บิล)</p>
                         </div>
-                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:border print:border-gray-300">
+                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:border print:border-red-200 print:bg-white">
                             <h3 className="text-red-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingDown size={14} className="md:hidden" />
                                 <TrendingDown size={16} className="hidden md:block" />
                                 <span className="truncate">รายจ่าย (Expenses)</span>
                             </h3>
-                            <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2">฿{data.expenses?.total?.toLocaleString()}</p>
+                            <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
                             <p className="text-xs text-red-600 mt-1 truncate">ค่าน้ำ/ไฟ ส่วนกลาง</p>
                         </div>
-                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:border print:border-gray-300">
+                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:border print:border-blue-200 print:bg-white">
                             <h3 className="text-blue-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <DollarSign size={14} className="md:hidden" />
                                 <DollarSign size={16} className="hidden md:block" />
                                 <span className="truncate">กำไรสุทธิ (Net Profit)</span>
                             </h3>
-                            <p className="text-2xl md:text-3xl font-bold text-blue-700 mt-2">
+                            <p className="text-2xl md:text-3xl font-bold text-blue-700 mt-2 print:text-xl">
                                 ฿{(data.income?.total - data.expenses?.total).toLocaleString()}
                             </p>
                             <p className="text-xs text-blue-600 mt-1">รายรับ - รายจ่าย</p>
@@ -126,9 +126,9 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Single Month Chart Section */}
-                    <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid">
-                        <h4 className="font-bold text-lg mb-4 text-center">แผนภูมิเปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)</h4>
-                        <div className="h-[300px] w-full flex justify-center">
+                    <div className="mb-8 p-4 border rounded-xl print:break-inside-avoid print:mb-4 print:border-gray-300">
+                        <h4 className="font-bold text-lg mb-4 text-center print:text-base print:mb-2">แผนภูมิเปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)</h4>
+                        <div className="h-[300px] w-full flex justify-center print:h-[200px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
                                     data={chartData}
@@ -141,9 +141,8 @@ export default function ReportsPage() {
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
                                     {/* @ts-ignore */}
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip formatter={(value) => `฿${Number(value).toLocaleString()}`} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
                                     <Bar dataKey="amount" name="Amount" radius={[4, 4, 0, 0]}>
                                         {chartData.map((entry: any, index: number) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -155,11 +154,11 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Detailed Breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
-                        <div className="print:break-inside-avoid">
-                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2">รายรับ (Income Breakdown</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 print:gap-4 print:mb-4">
+                        <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
+                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายรับ (Income Breakdown)</h4>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs md:text-sm">
+                                <table className="w-full text-xs md:text-sm print:text-xs">
                                     <tbody>
                                         <tr className="border-b border-gray-100">
                                             <td className="py-2 text-gray-600 pr-2">ค่าเช่าห้อง</td>
@@ -181,7 +180,7 @@ export default function ReportsPage() {
                                             <td className="py-2 text-gray-600 pr-2">ค่าขยะ/อื่นๆ</td>
                                             <td className="py-2 text-right font-medium whitespace-nowrap">฿{(data.income?.trash + data.income?.other + data.income?.internet).toLocaleString()}</td>
                                         </tr>
-                                        <tr className="font-bold text-sm md:text-base bg-gray-50">
+                                        <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
                                             <td className="py-2 pl-2">รวมรายรับ</td>
                                             <td className="py-2 pr-2 text-right whitespace-nowrap">฿{data.income?.total?.toLocaleString()}</td>
                                         </tr>
@@ -190,10 +189,10 @@ export default function ReportsPage() {
                             </div>
                         </div>
 
-                        <div className="print:break-inside-avoid">
-                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2">รายจ่าย (Expenses)</h4>
+                        <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
+                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายจ่าย (Expenses)</h4>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-xs md:text-sm">
+                                <table className="w-full text-xs md:text-sm print:text-xs">
                                     <tbody>
                                         <tr className="border-b border-gray-100">
                                             <td className="py-2 text-gray-600 pr-2">บิลค่าน้ำ (ประปา)</td>
@@ -207,7 +206,7 @@ export default function ReportsPage() {
                                             <td className="py-2 text-gray-600 pr-2">ค่าขยะ/เน็ต</td>
                                             <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
                                         </tr>
-                                        <tr className="font-bold text-sm md:text-base bg-gray-50">
+                                        <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
                                             <td className="py-2 pl-2">รวมรายจ่าย</td>
                                             <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap">-฿{data.expenses?.total?.toLocaleString()}</td>
                                         </tr>
@@ -215,10 +214,10 @@ export default function ReportsPage() {
                                 </table>
                             </div>
 
-                            <div className="mt-6 md:mt-8">
-                                <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2">สถิติ (Stats)</h4>
+                            <div className="mt-6 md:mt-8 print:mt-4">
+                                <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">สถิติ (Stats)</h4>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-xs md:text-sm">
+                                    <table className="w-full text-xs md:text-sm print:text-xs">
                                         <tbody>
                                             <tr className="border-b border-gray-100">
                                                 <td className="py-2 text-gray-600 pr-2">น้ำรวม</td>
@@ -243,7 +242,7 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Footer for Print */}
-                    <div className="text-center text-xs text-gray-400 mt-12 border-t py-4 hidden print:block">
+                    <div className="text-center text-xs text-gray-400 mt-12 border-t py-4 hidden print:block print:mt-4 print:py-2">
                         Monthly Report generated by StaySync Dorm Management System
                     </div>
                 </div>
@@ -252,9 +251,9 @@ export default function ReportsPage() {
             <style jsx global>{`
                 @media print {
                     @page { size: A4; margin: 10mm; }
-                    body { -webkit-print-color-adjust: exact; }
+                    body { -webkit-print-color-adjust: exact; background-color: white !important; }
                     nav, header, aside, .print\\:hidden { display: none !important; }
-                    #printable-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 20px; box-shadow: none; border: none; }
+                    #printable-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
                     .recharts-wrapper { break-inside: avoid; }
                 }
             `}</style>

@@ -13,7 +13,7 @@ export default function Navbar({ userRole }: { userRole?: string }) {
     return (
         <>
             {/* Universal Top Bar (Visible on Mobile & Desktop) */}
-            <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 z-40 px-4 py-3 flex items-center justify-between shadow-sm">
+            <div className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 z-40 px-4 py-3 flex items-center justify-between shadow-sm print:hidden">
                 <div className="flex items-center gap-3">
                     {/* Hamburger Button - Always Visible */}
                     <button
@@ -39,14 +39,14 @@ export default function Navbar({ userRole }: { userRole?: string }) {
             {/* Sidebar Drawer Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-50 transition-opacity backdrop-blur-sm"
+                    className="fixed inset-0 bg-black/50 z-50 transition-opacity backdrop-blur-sm print:hidden"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             {/* Sidebar Drawer Panel */}
             <aside
-                className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col print:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="p-4 flex items-center justify-between border-b border-gray-100">
