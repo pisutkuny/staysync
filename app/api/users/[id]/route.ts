@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getCurrentSession();
@@ -16,7 +16,8 @@ export async function PATCH(
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        // Get current user
+        const { id } = await params;
+        const userId = parseInt(id);
         const currentUser = await prisma.user.findUnique({
             where: { id: session.userId },
         });
@@ -25,7 +26,6 @@ export async function PATCH(
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const userId = parseInt(params.id);
         const body = await req.json();
 
         // Get user before update
@@ -93,7 +93,7 @@ export async function PATCH(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getCurrentSession();
@@ -110,7 +110,8 @@ export async function DELETE(
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const userId = parseInt(params.id);
+        const { id } = await params;
+        const userId = parseInt(id);
 
         // Get user
         const user = await prisma.user.findUnique({

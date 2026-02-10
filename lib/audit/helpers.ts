@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { getCurrentSession } from '../auth/session';
-import { logAudit, getRequestInfo, getChanges } from './logger';
+import { logAudit, getRequestInfo, getChanges, AuditEntity, AuditAction } from './logger';
 
 const prisma = new PrismaClient();
 
@@ -32,8 +32,8 @@ export async function getCurrentUserForAudit() {
  */
 export async function logCRUDAudit(params: {
     request: Request;
-    action: 'CREATE' | 'UPDATE' | 'DELETE';
-    entity: string;
+    action: AuditAction;
+    entity: AuditEntity;
     entityId: number;
     before?: any;
     after?: any;
