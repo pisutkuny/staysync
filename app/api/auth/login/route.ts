@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
         // Set session cookie
         await setSessionCookie(sessionToken);
 
-        return NextResponse.json({
+        // Set user_role cookie for layout access (middleware/client)
+        const response = NextResponse.json({
             success: true,
             user: {
                 id: user.id,
@@ -88,6 +89,17 @@ export async function POST(req: NextRequest) {
                 organization: user.organization,
             },
         });
+
+        // Set the role cookie on the response
+        response.cookies.set('user_role', user.role, {
+            httpOnly: false, // Allow client access if needed, or keep true if only for server component
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 // 7 days matches session
+        });
+
+        return response;
     } catch (error) {
         console.error('Login error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
