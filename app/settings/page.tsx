@@ -210,7 +210,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="Uxxxxxxxxxxxxxxxxxxxx"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">For receiving alert messages</p>
+                                    <p className="text-xs text-gray-500 mt-1">🔍 หาได้จาก LINE Developer Console - สำหรับรับแจ้งเตือน</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Admin LINE ID Display</label>
@@ -221,7 +221,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="@admin_line_id"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Shown to residents</p>
+                                    <p className="text-xs text-gray-500 mt-1">📱 LINE ID ที่ให้ผู้เช่าเพิ่มเพื่อติดต่อ (แสดงใน Chatbot)</p>
                                 </div>
                             </div>
                         </div>
@@ -276,6 +276,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="Phone or Tax ID"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">💳 เบอร์โทร หรือ เลขประจำตัวผู้เสียภาษี สำหรับรับเงิน</p>
                                 </div>
                             </div>
                         </div>
@@ -375,6 +376,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         placeholder="#4f46e5"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">🎨 สีหลักของใบแจ้งหนี้ (Hex Code)</p>
                                 </div>
                             </div>
                         </div>
@@ -401,6 +403,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="0.00"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">💧 อัตราที่คิดผู้เช่า ต่อหน่วย</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Electric Rate (฿/unit)</label>
@@ -413,6 +416,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="0.00"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">⚡ อัตราที่คิดผู้เช่า ต่อหน่วย</p>
                                 </div>
                             </div>
                         </div>
@@ -478,6 +482,7 @@ export default function SettingsPage() {
                                     />
                                     <label className="text-sm font-medium text-gray-700">Enable Common Area Charges</label>
                                 </div>
+                                <p className="text-xs text-gray-500 mt-1">🏢 เปิดใช้งานค่าส่วนกลาง (น้ำ-ไฟส่วนกลาง) ให้ผู้เช่าแชร์ค่าใช้จ่าย</p>
 
                                 {config.enableCommonAreaCharges && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -492,6 +497,7 @@ export default function SettingsPage() {
                                                 <option value="equal">Equal Split</option>
                                                 <option value="proportional">Proportional to Room Price</option>
                                             </select>
+                                            <p className="text-xs text-gray-500 mt-1">⚖️ วิธีแบ่งค่าส่วนกลาง: เท่าๆกัน หรือ ตามราคาห้อง</p>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Fee Cap Type</label>
@@ -558,6 +564,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="Network name"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">📶 ชื่อ WiFi ที่ให้ผู้เช่าใช้</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">WiFi Password</label>
@@ -568,6 +575,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="Password"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">🔐 รหัสผ่าน WiFi</p>
                                 </div>
                             </div>
                         </div>
@@ -585,6 +593,7 @@ export default function SettingsPage() {
                                 rows={8}
                                 placeholder="1. No pets allowed&#10;2. Quiet hours: 10 PM - 6 AM&#10;3. No smoking inside rooms..."
                             />
+                            <p className="text-xs text-gray-500 mt-2">📜 กฎระเบียบหอพัก แสดงใน Chatbot เมื่อผู้เช่าถาม</p>
                         </div>
 
                         {/* Auto Reminders */}
@@ -602,7 +611,7 @@ export default function SettingsPage() {
                                 />
                                 <label className="text-sm font-medium text-gray-700">Enable Auto Payment Reminders</label>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2">Send automatic reminders to residents with unpaid bills</p>
+                            <p className="text-sm text-gray-500 mt-2">🔔 ส่งข้อความเตือนอัตโนมัติให้ผู้เช่าที่ยังไม่ชำระเงิน</p>
                         </div>
                     </div>
                 )}
