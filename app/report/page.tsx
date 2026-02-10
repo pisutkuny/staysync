@@ -182,7 +182,7 @@ export default function ReportIssuePage() {
             />
 
             {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-6 md:p-8 shadow-xl sticky top-0 z-10">
+            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-6 md:p-8 shadow-xl sticky top-0 z-10 rounded-b-3xl">
                 <div className="max-w-md mx-auto">
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                         🔧 Report Issue
