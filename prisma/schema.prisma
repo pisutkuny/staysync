@@ -305,8 +305,12 @@ model RecurringExpense {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  organizationId Int @default(1) // Default for existing records, should be required later
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
   @@index([isActive])
   @@index([dayOfMonth])
+  @@index([organizationId])
 }
 
 model LineBotState {
