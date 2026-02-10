@@ -58,18 +58,25 @@ export default function BroadcastPage() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
-                    <Megaphone size={28} />
-                </div>
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Broadcast</h1>
-                    <p className="text-gray-500">Send announcements to all residents via Line.</p>
+        <div className="space-y-8 pb-10">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            📢 Broadcast
+                        </h1>
+                        <p className="text-purple-100 mt-2 text-lg">Send announcements to residents via LINE</p>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/30">
+                        <Users className="text-white" size={20} />
+                        <span className="text-white font-bold">{rooms.length} Total Rooms</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-white p-4 sm:p-8 rounded-xl border border-gray-100 shadow-sm">
+            {/* Main Form Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-xl">
                 <form onSubmit={handleBroadcast} className="space-y-6">
 
                     {/* Target Audience Section */}
@@ -83,7 +90,7 @@ export default function BroadcastPage() {
                                     if (e.target.value !== 'all') setRoomNumber('');
                                 }}
                                 disabled={!!roomNumber}
-                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none ${roomNumber ? 'opacity-50' : ''}`}
+                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-purple-500 outline-none ${roomNumber ? 'opacity-50' : ''}`}
                             >
                                 <option value="all">All Floors</option>
                                 <option value="1">Floor 1</option>
@@ -98,7 +105,7 @@ export default function BroadcastPage() {
                                     setRoomNumber(e.target.value);
                                     if (e.target.value) setFloor('all');
                                 }}
-                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer`}
+                                className={`flex-1 rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-purple-500 outline-none cursor-pointer`}
                             >
                                 <option value="">Select Room (Optional)</option>
                                 {rooms.map((room) => (
@@ -131,7 +138,7 @@ export default function BroadcastPage() {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             placeholder="Type your announcement here..."
-                            className="w-full rounded-xl border border-gray-300 p-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 font-medium resize-none text-lg"
+                            className="w-full rounded-xl border border-gray-300 p-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 font-medium resize-none text-lg"
                             required
                         />
                         <p className="text-sm text-gray-400 mt-2 text-right">{message.length} characters</p>
@@ -150,7 +157,7 @@ export default function BroadcastPage() {
                         <button
                             type="submit"
                             disabled={loading || !message.trim()}
-                            className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100"
+                            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
                             Send Broadcast

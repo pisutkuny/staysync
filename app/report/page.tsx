@@ -174,19 +174,24 @@ export default function ReportIssuePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-red-50 pb-20">
             <Script
                 src="https://static.line-scdn.net/liff/edge/2/sdk.js"
                 strategy="afterInteractive"
                 onLoad={initLiff}
             />
 
-            {/* Mobile Header */}
-            <div className="bg-white p-4 shadow-sm sticky top-0 z-10">
-                <h1 className="text-xl font-bold text-center text-gray-900">Report Issue</h1>
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-6 md:p-8 shadow-xl sticky top-0 z-10">
+                <div className="max-w-md mx-auto">
+                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                        🔧 Report Issue
+                    </h1>
+                    <p className="text-red-100 mt-2 text-sm md:text-base">แจ้งซ่อม / รายงานปัญหา</p>
+                </div>
             </div>
 
-            <div className="p-4 max-w-md mx-auto">
+            <div className="p-4 max-w-md mx-auto mt-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     {/* Room Selection */}
