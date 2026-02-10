@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 import Navbar from "./components/Navbar";
+import { ThemeProvider } from "./components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,13 +24,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar userRole={userRole} />
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Navbar userRole={userRole} />
 
-          {/* Main Content - No left margin needed as sidebar is now a popup */}
-          <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto">
-            {children}
-          </main>
+            {/* Main Content - No left margin needed as sidebar is now a popup */}
+            <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto">
+              {children}
+            </main>
+          </ThemeProvider>
         </div>
       </body>
     </html >

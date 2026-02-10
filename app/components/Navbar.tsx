@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import NavLinks from "./NavLinks";
 import LogoutButton from "./LogoutButton";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar({ userRole }: { userRole?: string }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,11 @@ export default function Navbar({ userRole }: { userRole?: string }) {
                             StaySync
                         </h1>
                     </Link>
+                </div>
+
+                {/* Right Side Actions */}
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
                 </div>
             </div>
 
