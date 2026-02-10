@@ -9,7 +9,7 @@ export async function POST(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { fullName, phone, lineUserId, contractDurationMonths, customDuration, deposit } = body;
+        const { fullName, phone, lineUserId, contractDurationMonths, customDuration, deposit, contractStartDate } = body;
 
         const duration = contractDurationMonths === 0 ? parseInt(customDuration) : contractDurationMonths;
         const contractEndDate = new Date(contractStartDate);
