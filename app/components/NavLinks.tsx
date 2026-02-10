@@ -21,21 +21,28 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
     });
 
     return (
-        <nav className="px-4 space-y-2">
-            {filteredItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                    <Link
-                        key={item.href}
-                        onClick={handleClick}
-                        href={item.href}
-                        className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-all font-medium"
-                    >
-                        <Icon size={20} />
-                        {item.label}
-                    </Link>
-                );
-            })}
+        <nav className="px-3 pb-4">
+            {/* Grid Layout - 2 columns */}
+            <div className="grid grid-cols-2 gap-2">
+                {filteredItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.href}
+                            onClick={handleClick}
+                            href={item.href}
+                            className="flex flex-col items-center gap-2 p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-all group"
+                        >
+                            <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 group-hover:bg-indigo-100 transition-colors">
+                                <Icon size={20} className="text-gray-600 group-hover:text-indigo-600 transition-colors" />
+                            </div>
+                            <span className="text-xs font-medium text-center leading-tight">
+                                {item.label}
+                            </span>
+                        </Link>
+                    );
+                })}
+            </div>
         </nav>
     );
 }
