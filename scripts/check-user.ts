@@ -9,32 +9,41 @@ async function checkUser() {
     console.log(`Found ${users.length} user(s):\n`);
 
     users.forEach(user => {
-        console.log(`Username: ${user.username}`);
+        console.log(`Email: ${user.email}`);
         console.log(`Password: ${user.password}`);
         console.log(`Role: ${user.role}`);
         console.log('---');
     });
 
     // If no owner user, create one
-    if (!users.find(u => u.username === 'owner')) {
-        console.log('\n❌ No "owner" user found! Creating default user...\n');
+    if (!users.find(u => u.role === 'OWNER')) {
+        console.log('\n❌ No "OWNER" user found! Creating default user...\n');
 
-        const newUser = await prisma.user.create({
-            data: {
-                username: 'owner',
-                password: 'owner123',
-                role: 'ADMIN'
-            }
-        });
+        // Need organization first
+        const org = await prisma.organization.findFirst({ where: { slug: 'my-dorm' } });
 
-        console.log('✅ Created new user:');
-        console.log(`Username: ${newUser.username}`);
-        console.log(`Password: ${newUser.password}`);
-        console.log(`Role: ${newUser.role}`);
+        if (org) {
+            const newUser = await prisma.user.create({
+                data: {
+                    email: 'owner@staysync.com',
+                    fullName: 'Owner User',
+                    password: 'owner123',
+                    role: 'OWNER',
+                    organizationId: org.id
+                }
+            });
+
+            console.log('✅ Created new user:');
+            console.log(`Email: ${newUser.email}`);
+            console.log(`Password: ${newUser.password}`);
+            console.log(`Role: ${newUser.role}`);
+        } else {
+            console.error('❌ Cannot create user: Default organization not found.');
+        }
     } else {
-        const owner = users.find(u => u.username === 'owner');
+        const owner = users.find(u => u.role === 'OWNER');
         console.log('\n✅ Owner user exists!');
-        console.log(`Current password: ${owner!.password}`);
+        console.log(`Email: ${owner?.email}`);
     }
 
     await prisma.$disconnect();
