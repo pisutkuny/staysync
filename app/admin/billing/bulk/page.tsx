@@ -189,44 +189,44 @@ export default function BulkMeterPage() {
         <div className="p-3 md:p-6 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <Calculator size={20} className="md:w-6 md:h-6" /> กรอกมาตรเป็นชุด
                     </h1>
-                    <p className="text-gray-500 text-xs md:text-sm mt-1">
-                        ⭐ <strong className="text-indigo-600">แนะนำสำหรับบันทึกมาตรประจำเดือน</strong> - กรอกมาตรน้ำ-ไฟทั้งหอพักในหน้าเดียว
+                    <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mt-1">
+                        ⭐ <strong className="text-indigo-600 dark:text-indigo-400">แนะนำสำหรับบันทึกมาตรประจำเดือน</strong> - กรอกมาตรน้ำ-ไฟทั้งหอพักในหน้าเดียว
                     </p>
                     <p className="text-xs text-gray-400 mt-1 hidden md:block">
                         💡 ระบบจะลบบิลเก่าที่ยังไม่จ่ายอัตโนมัติ เพื่อสร้างบิลใหม่แทนที่
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="text-xs md:text-sm text-gray-600">เดือน:</label>
+                    <label className="text-xs md:text-sm text-gray-600 dark:text-gray-300">เดือน:</label>
                     <input
                         type="month"
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="border rounded px-2 md:px-3 py-1.5 md:py-2 text-sm"
+                        className="border rounded px-2 md:px-3 py-1.5 md:py-2 text-sm dark:bg-slate-800 dark:text-white dark:border-slate-600"
                     />
                 </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4 mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 md:p-4 mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
                 <div>
-                    <div className="text-xs md:text-sm text-blue-800">
+                    <div className="text-xs md:text-sm text-blue-800 dark:text-blue-200">
                         ✅ กรอกแล้ว <strong>{completedEntries.length}</strong> / {entries.length} ห้อง
                     </div>
                 </div>
                 <div className="text-left sm:text-right">
-                    <div className="text-xs text-blue-600">รายได้รวม</div>
-                    <div className="text-xl md:text-2xl font-bold text-blue-900">฿{grandTotal.toLocaleString()}</div>
+                    <div className="text-xs text-blue-600 dark:text-blue-300">รายได้รวม</div>
+                    <div className="text-xl md:text-2xl font-bold text-blue-900 dark:text-white">฿{grandTotal.toLocaleString()}</div>
                 </div>
             </div>
 
             {/* Table for Desktop, Cards for Mobile */}
-            <div className="hidden md:block bg-white rounded-xl shadow overflow-auto max-h-[600px]">
+            <div className="hidden md:block bg-white dark:bg-slate-800 rounded-xl shadow overflow-auto max-h-[600px]">
                 <table className="w-full text-sm">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
-                        <tr className="text-left text-gray-700">
+                    <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10">
+                        <tr className="text-left text-gray-700 dark:text-gray-300">
                             <th className="p-3 font-semibold">ห้อง</th>
                             <th className="p-3 font-semibold text-right">มาตรน้ำเก่า</th>
                             <th className="p-3 font-semibold">มาตรน้ำปัจจุบัน</th>
@@ -243,38 +243,38 @@ export default function BulkMeterPage() {
                             return (
                                 <tr
                                     key={entry.roomId}
-                                    className={`border-b ${isComplete ? 'bg-green-50' : 'hover:bg-gray-50'}`}
+                                    className={`border-b dark:border-slate-700 ${isComplete ? 'bg-green-50 dark:bg-green-900/20' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
                                 >
-                                    <td className="p-3 font-bold text-indigo-700">{entry.roomNumber}</td>
+                                    <td className="p-3 font-bold text-indigo-700 dark:text-indigo-400">{entry.roomNumber}</td>
 
                                     {/* Water */}
-                                    <td className="p-3 text-right text-gray-500">{entry.lastWater}</td>
+                                    <td className="p-3 text-right text-gray-500 dark:text-gray-400">{entry.lastWater}</td>
                                     <td className="p-3">
                                         <input
                                             type="number"
                                             value={entry.waterCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'waterCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center"
+                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                                             placeholder="-"
                                         />
                                     </td>
-                                    <td className="p-3 text-right font-semibold text-blue-700">{entry.waterUsage}</td>
+                                    <td className="p-3 text-right font-semibold text-blue-700 dark:text-blue-400">{entry.waterUsage}</td>
 
                                     {/* Electric */}
-                                    <td className="p-3 text-right text-gray-500">{entry.lastElectric}</td>
+                                    <td className="p-3 text-right text-gray-500 dark:text-gray-400">{entry.lastElectric}</td>
                                     <td className="p-3">
                                         <input
                                             type="number"
                                             value={entry.electricCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'electricCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center"
+                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                                             placeholder="-"
                                         />
                                     </td>
-                                    <td className="p-3 text-right font-semibold text-orange-700">{entry.electricUsage}</td>
+                                    <td className="p-3 text-right font-semibold text-orange-700 dark:text-orange-400">{entry.electricUsage}</td>
 
                                     {/* Total */}
-                                    <td className="p-3 text-right font-bold text-green-700 bg-green-50">
+                                    <td className="p-3 text-right font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20">
                                         ฿{entry.totalCost.toLocaleString()}
                                     </td>
                                 </tr>
