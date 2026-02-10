@@ -25,7 +25,7 @@ export async function POST(request: Request) {
             issues,
             documents,
             centralMeters,
-            lineStates
+            lineBotStates
         ] = await Promise.all([
             prisma.user.findMany(),
             prisma.room.findMany(),
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
             prisma.issue.findMany(),
             prisma.document.findMany(),
             prisma.centralMeter.findMany(),
-            prisma.lineState.findMany()
+            prisma.lineBotState.findMany()
         ]);
 
         // Create backup object
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
                 exportDate: new Date().toISOString(),
                 totalRecords: users.length + rooms.length + residents.length +
                     billing.length + expenses.length + recurringExpenses.length +
-                    issues.length + documents.length + centralMeters.length + lineStates.length
+                    issues.length + documents.length + centralMeters.length + lineBotStates.length
             },
             data: {
                 users,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
                 issues,
                 documents,
                 centralMeters,
-                lineStates
+                lineBotStates
             }
         };
 

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
         // Delete all existing data (in reverse order of dependencies)
         console.log('🗑️  Deleting existing data...');
-        await prisma.lineState.deleteMany();
+        await prisma.lineBotState.deleteMany();
         await prisma.centralMeter.deleteMany();
         await prisma.document.deleteMany();
         await prisma.issue.deleteMany();
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
             issues: 0,
             documents: 0,
             centralMeters: 0,
-            lineStates: 0
+            lineBotStates: 0
         };
 
         // Users
@@ -107,10 +107,10 @@ export async function POST(request: Request) {
             results.centralMeters = backup.data.centralMeters.length;
         }
 
-        // Line States
-        if (backup.data.lineStates?.length > 0) {
-            await prisma.lineState.createMany({ data: backup.data.lineStates });
-            results.lineStates = backup.data.lineStates.length;
+        // Line Bot States
+        if (backup.data.lineBotStates?.length > 0) {
+            await prisma.lineBotState.createMany({ data: backup.data.lineBotStates });
+            results.lineBotStates = backup.data.lineBotStates.length;
         }
 
         console.log('✅ Restore completed successfully!');
