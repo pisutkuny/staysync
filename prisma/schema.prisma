@@ -173,6 +173,8 @@ model SystemConfig {
 
   // Automation Settings
   enableAutoReminders Boolean @default(false)
+  reminderDay         Int     @default(25) // Day of month to send reminders (1-28)
+  reminderTime        String  @default("09:00") // Time to send reminders (HH:mm)
 
   // Bank Info
   bankName          String  @default("Bank Name")

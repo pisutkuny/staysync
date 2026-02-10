@@ -34,7 +34,9 @@ export default function SettingsPage() {
         commonAreaCapType: "none",
         commonAreaCapPercentage: 100,
         commonAreaCapFixed: 0,
-        enableAutoReminders: false
+        enableAutoReminders: false,
+        reminderDay: 25,
+        reminderTime: "09:00"
     });
 
     useEffect(() => {
@@ -601,17 +603,68 @@ export default function SettingsPage() {
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-purple-700">
                                 🔔 Automation
                             </h3>
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="enableAutoReminders"
-                                    checked={config.enableAutoReminders}
-                                    onChange={handleChange}
-                                    className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                />
-                                <label className="text-sm font-medium text-gray-700">Enable Auto Payment Reminders</label>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        name="enableAutoReminders"
+                                        checked={config.enableAutoReminders}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <label className="text-sm font-medium text-gray-700">Enable Auto Payment Reminders</label>
+                                </div>
+                                <p className="text-sm text-gray-500">🔔 ส่งข้อความเตือนอัตโนมัติให้ผู้เช่าที่ยังไม่ชำระเงิน</p>
+
+                                {/* Reminder Schedule - Show when enabled */}
+                                {config.enableAutoReminders && (
+                                    <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200 space-y-4">
+                                        <h4 className="font-semibold text-sm text-purple-900 flex items-center gap-2">
+                                            ⏰ กำหนดเวลาส่งแจ้งเตือน
+                                        </h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    วันที่ส่ง (ของแต่ละเดือน)
+                                                </label>
+                                                <select
+                                                    name="reminderDay"
+                                                    value={config.reminderDay || 25}
+                                                    onChange={handleChange}
+                                                    className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                                                >
+                                                    {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                                                        <option key={day} value={day}>
+                                                            วันที่ {day}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <p className="text-xs text-gray-500 mt-1">📅 เลือกวันที่ต้องการส่งเตือน (1-28)</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    เวลาที่ส่ง
+                                                </label>
+                                                <input
+                                                    type="time"
+                                                    name="reminderTime"
+                                                    value={config.reminderTime || '09:00'}
+                                                    onChange={handleChange}
+                                                    className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">⏰ เวลาที่จะส่งข้อความเตือน</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-purple-100 p-3 rounded-lg">
+                                            <p className="text-sm text-purple-800">
+                                                💡 <strong>ตัวอย่าง:</strong> ถ้าตั้งวันที่ 25 เวลา 09:00 น.
+                                                ระบบจะส่งข้อความเตือนทุกวันที่ 25 เวลา 9 โมงเช้า
+                                                ให้กับผู้เช่าที่ยังไม่ชำระค่าห้องของเดือนนั้น
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <p className="text-sm text-gray-500 mt-2">🔔 ส่งข้อความเตือนอัตโนมัติให้ผู้เช่าที่ยังไม่ชำระเงิน</p>
                         </div>
                     </div>
                 )}
