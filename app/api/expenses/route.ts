@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
     try {
@@ -65,6 +66,11 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { title, amount, category, date, note, receiptUrl, receiptFileId } = body;
 
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const expense = await prisma.expense.create({
             data: {
                 title,
@@ -73,7 +79,8 @@ export async function POST(req: Request) {
                 date: new Date(date),
                 note,
                 receiptUrl: receiptUrl || null,
-                receiptFileId: receiptFileId || null
+                receiptFileId: receiptFileId || null,
+                organizationId: session.organizationId
             }
         });
 

@@ -11,11 +11,18 @@ export async function POST(
         const body = await request.json();
         const { fullName, phone, lineUserId, contractDurationMonths, customDuration, deposit } = body;
 
-        // Calculate contract dates
-        const contractStartDate = new Date();
         const duration = contractDurationMonths === 0 ? parseInt(customDuration) : contractDurationMonths;
         const contractEndDate = new Date(contractStartDate);
         contractEndDate.setMonth(contractEndDate.getMonth() + duration);
+
+        // Fetch room to get organizationId
+        const targetRoom = await prisma.room.findUnique({
+            where: { id: Number(id) }
+        });
+
+        if (!targetRoom) {
+            return NextResponse.json({ error: "Room not found" }, { status: 404 });
+        }
 
         // Transaction: Create Resident and Update Room Status
         const [resident, room] = await prisma.$transaction([
@@ -29,7 +36,8 @@ export async function POST(
                     contractStartDate,
                     contractEndDate,
                     contractDurationMonths: duration,
-                    depositStatus: "Held"
+                    depositStatus: "Held",
+                    organizationId: targetRoom.organizationId
                 },
             }),
             prisma.room.update({

@@ -24,6 +24,17 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { category, description, photo, residentId, reporterName, reporterContact, reporterLineUserId } = body;
 
+        let organizationId = 1; // Default to main org for guest/unknown
+
+        if (residentId) {
+            const resident = await prisma.resident.findUnique({
+                where: { id: Number(residentId) }
+            });
+            if (resident) {
+                organizationId = resident.organizationId;
+            }
+        }
+
         const issue = await prisma.issue.create({
             data: {
                 category,
@@ -32,7 +43,8 @@ export async function POST(request: Request) {
                 residentId: residentId ? Number(residentId) : null,
                 reporterName,
                 reporterContact,
-                reporterLineUserId
+                reporterLineUserId,
+                organizationId
             },
         });
 

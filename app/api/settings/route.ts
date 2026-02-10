@@ -1,31 +1,41 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { logCRUDAudit } from "@/lib/audit/helpers";
+import { getCurrentSession } from "@/lib/auth/session";
 
 export async function GET() {
     try {
-        let config = await prisma.systemConfig.findFirst();
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        let config = await prisma.systemConfig.findUnique({
+            where: { organizationId: session.organizationId }
+        });
 
         if (!config) {
-            // Seed default config if none exists
+            // Seed default config if none exists for this org
             config = await prisma.systemConfig.create({
                 data: {
-                    dormName: "หอพักมีตังค์",
-                    dormAddress: "268 หมู่ 6 ต.สันนาเม็ง อ.สันทราย จ.เชียงใหม่",
-                    bankName: "Kasikorn Bank (KBank)",
-                    bankAccountName: "หอพักมีตังค์",
+                    dormName: "My Dormitory",
+                    dormAddress: "Address",
+                    bankName: "Bank Name",
+                    bankAccountName: "Account Name",
                     bankAccountNumber: "000-0-00000-0",
                     waterRate: 18,
                     electricRate: 7,
-                    trashFee: 30,
+                    trashFee: 0,
                     internetFee: 0,
-                    otherFees: 0
+                    otherFees: 0,
+                    organizationId: session.organizationId
                 }
             });
         }
 
         return NextResponse.json(config);
     } catch (error) {
+        console.error("Settings GET Error:", error);
         return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
     }
 }
@@ -37,8 +47,15 @@ export async function POST(req: Request) {
         // 1. Remove standard fields we don't want to update manually
         const { id, updatedAt, createdAt, ...updateData } = body;
 
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         // 2. Find existing config first
-        const existing = await prisma.systemConfig.findFirst();
+        const existing = await prisma.systemConfig.findUnique({
+            where: { organizationId: session.organizationId }
+        });
 
         let config;
         if (existing) {
@@ -60,7 +77,10 @@ export async function POST(req: Request) {
         } else {
             // Create new
             config = await prisma.systemConfig.create({
-                data: updateData
+                data: {
+                    ...updateData,
+                    organizationId: session.organizationId
+                }
             });
 
             // Log audit

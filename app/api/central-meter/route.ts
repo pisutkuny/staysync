@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
 
 // GET /api/central-meter - Get all central meter records
 export async function GET() {
@@ -31,6 +32,11 @@ export async function POST(request: Request) {
             trashCost,
             note
         } = body;
+
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         // Get last record for this type to use as "last" meter
         const lastRecord = await prisma.centralMeter.findFirst({
@@ -68,7 +74,8 @@ export async function POST(request: Request) {
                 electricTotalCost,
                 internetCost: internetCost || null,
                 trashCost: trashCost || null,
-                note: note || null
+                note: note || null,
+                organizationId: session.organizationId
             }
         });
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getCurrentSession } from '@/lib/auth/session';
 
 // GET /api/recurring-expenses - Fetch all recurring expenses
 export async function GET() {
@@ -23,6 +24,11 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { title, amount, category, note, dayOfMonth } = body;
 
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const recurring = await prisma.recurringExpense.create({
             data: {
                 title,
@@ -30,7 +36,8 @@ export async function POST(req: Request) {
                 category,
                 note,
                 dayOfMonth: parseInt(dayOfMonth) || 1,
-                isActive: true
+                isActive: true,
+                organizationId: session.organizationId
             }
         });
 
