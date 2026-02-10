@@ -19,7 +19,9 @@ export type AuditEntity =
     | 'Billing'
     | 'Issue'
     | 'Expense'
-    | 'SystemConfig';
+    | 'SystemConfig'
+    | 'CentralMeter'
+    | 'RecurringExpense';
 
 export interface AuditParams {
     userId: number;
