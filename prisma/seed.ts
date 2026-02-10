@@ -51,9 +51,8 @@ async function main() {
             dormAddress: '123 Street, City',
             waterRate: 18,
             electricRate: 7,
-            totalAmount: 0,
+            // totalAmount & trashFee removed as they are not in schema
             otherFees: 0,
-            trashFee: 0,
             internetFee: 0,
         },
     });
