@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
 import { sendLineMessage, lineClient } from "@/lib/line";
 import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
 
@@ -48,6 +49,11 @@ export async function POST(req: Request) {
 
         // Create Billing Record
         const residentId = room.residents[0]?.id;
+        const session = await getCurrentSession();
+
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         const newBill = await prisma.billing.create({
             data: {
@@ -66,6 +72,7 @@ export async function POST(req: Request) {
                 totalAmount,
                 paymentStatus: "Pending",
                 month: new Date(),
+                organizationId: session.organizationId
             }
         });
 
