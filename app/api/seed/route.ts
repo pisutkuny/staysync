@@ -12,6 +12,15 @@ export async function GET() {
             { number: "202", price: 3500 },
         ];
 
+        // Fetch default organization
+        const org = await prisma.organization.findUnique({
+            where: { slug: "my-dorm" }
+        });
+
+        if (!org) {
+            return NextResponse.json({ error: "Default organization not found" }, { status: 400 });
+        }
+
         for (const r of roomsData) {
             await prisma.room.upsert({
                 where: { number: r.number },
@@ -20,6 +29,7 @@ export async function GET() {
                     number: r.number,
                     price: r.price,
                     status: "Available",
+                    organizationId: org.id
                 },
             });
         }
@@ -33,6 +43,7 @@ export async function GET() {
                     phone: "0812345678",
                     lineUserId: "U12345678",
                     roomId: room101.id,
+                    organizationId: org.id
                 },
             });
             await prisma.room.update({ where: { id: room101.id }, data: { status: "Occupied" } });
@@ -46,6 +57,7 @@ export async function GET() {
                     roomId: room101.id,
                     residentId: res.id,
                     month: new Date(),
+                    organizationId: org.id
                 }
             });
         }
@@ -58,6 +70,7 @@ export async function GET() {
                     phone: "0898765432",
                     lineUserId: "U87654321",
                     roomId: room102.id,
+                    organizationId: org.id
                 },
             });
             await prisma.room.update({ where: { id: room102.id }, data: { status: "Occupied" } });
@@ -69,6 +82,7 @@ export async function GET() {
                     description: "Leaking faucet in bathroom",
                     status: "Pending",
                     residentId: res2.id,
+                    organizationId: org.id
                 },
             });
         }
