@@ -227,14 +227,14 @@ export default function BulkMeterPage() {
                 <table className="w-full text-sm">
                     <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10">
                         <tr className="text-left text-gray-700 dark:text-gray-300">
-                            <th className="p-3 font-semibold">ห้อง</th>
-                            <th className="p-3 font-semibold text-right">มาตรน้ำเก่า</th>
-                            <th className="p-3 font-semibold">มาตรน้ำปัจจุบัน</th>
-                            <th className="p-3 font-semibold text-right">หน่วย</th>
-                            <th className="p-3 font-semibold text-right">มาตรไฟเก่า</th>
-                            <th className="p-3 font-semibold">มาตรไฟปัจจุบัน</th>
-                            <th className="p-3 font-semibold text-right">หน่วย</th>
-                            <th className="p-3 font-semibold text-right bg-green-50">ยอดรวม</th>
+                            <th className="p-3 font-semibold w-[10%]">ห้อง</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรน้ำเก่า</th>
+                            <th className="p-3 font-semibold w-[15%]">มาตรน้ำปัจจุบัน</th>
+                            <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรไฟเก่า</th>
+                            <th className="p-3 font-semibold w-[15%]">มาตรไฟปัจจุบัน</th>
+                            <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
+                            <th className="p-3 font-semibold text-right bg-green-50 dark:bg-green-900/20 w-[10%]">ยอดรวม</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -254,7 +254,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.waterCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'waterCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-500 dark:text-white dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
                                             placeholder="-"
                                         />
                                     </td>
@@ -267,7 +267,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.electricCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'electricCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-500 dark:text-white dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 outline-none"
                                             placeholder="-"
                                         />
                                     </td>
