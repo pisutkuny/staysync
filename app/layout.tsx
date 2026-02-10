@@ -24,12 +24,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300 print:bg-white print:min-h-0">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Navbar userRole={userRole} />
 
             {/* Main Content - No left margin needed as sidebar is now a popup */}
-            <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto">
+            <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto print:p-0 print:pt-0 print:max-w-none print:m-0">
               {children}
             </main>
           </ThemeProvider>

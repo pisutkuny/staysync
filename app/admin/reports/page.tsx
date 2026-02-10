@@ -95,13 +95,26 @@ export default function ReportsPage() {
                 /* Report Container - Visible on Print */
                 <div id="printable-area" className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-gray-900 print:shadow-none print:border-none print:p-0 print:absolute print:top-0 print:left-0 print:w-full print:m-0 print:text-sm">
 
-                    {/* Report Header */}
-                    <div className="text-center mb-8 border-b-2 border-gray-800 pb-4 print:mb-4 print:pb-2">
-                        <h2 className="text-3xl font-bold uppercase tracking-wide print:text-2xl">รายงานสรุปประจำเดือน</h2>
-                        <p className="text-lg text-gray-600 mt-2 print:text-base">
+                    {/* Report Header - Print Only Formal Header */}
+                    <div className="hidden print:block text-center mb-8 border-b-2 border-black pb-4">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            {/* Optional: Add Logo here if available */}
+                            <h1 className="text-2xl font-bold text-black uppercase tracking-wide">StaySync Dormitory</h1>
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-800">Monthly Financial Report (รายงานสรุปรายรับ-รายจ่าย)</h2>
+                        <div className="mt-4 flex justify-between text-sm text-gray-600">
+                            <span>Month: {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}</span>
+                            <span>Printed on: {new Date().toLocaleString('th-TH')}</span>
+                        </div>
+                    </div>
+
+                    {/* Report Header - Web Only (Hidden in Print) */}
+                    <div className="text-center mb-8 border-b-2 border-gray-800 pb-4 print:hidden">
+                        <h2 className="text-3xl font-bold uppercase tracking-wide">รายงานสรุปประจำเดือน</h2>
+                        <p className="text-lg text-gray-600 mt-2">
                             {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}
                         </p>
-                        <p className="text-sm text-gray-400 mt-1 print:text-xs">Generated: {new Date().toLocaleString('th-TH')}</p>
+                        <p className="text-sm text-gray-400 mt-1">Generated: {new Date().toLocaleString('th-TH')}</p>
                     </div>
 
                     {/* Summary Cards */}
