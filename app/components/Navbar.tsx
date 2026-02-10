@@ -55,7 +55,7 @@ export default function Navbar({ userRole }: { userRole?: string }) {
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto py-4">
+                <div className="flex-1 overflow-y-auto py-2">
                     <NavLinks userRole={userRole} onClick={() => setIsOpen(false)} />
                 </div>
 
