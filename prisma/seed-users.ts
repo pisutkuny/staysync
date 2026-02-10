@@ -7,23 +7,25 @@ async function main() {
 
     // Create Owner
     await prisma.user.upsert({
-        where: { username: "owner" },
+        where: { email: "owner@staysync.com" },
         update: {},
         create: {
-            username: "owner",
+            email: "owner@staysync.com",
+            fullName: "Owner User",
             password: "pass1234", // In production, hash this!
-            role: "OWNER",
+            role: "OWNER" as any, // Bypass strict enum check for seed
         },
     });
 
     // Create Staff
     await prisma.user.upsert({
-        where: { username: "staff" },
+        where: { email: "staff@staysync.com" },
         update: {},
         create: {
-            username: "staff",
+            email: "staff@staysync.com",
+            fullName: "Staff User",
             password: "staff1234", // In production, hash this!
-            role: "STAFF",
+            role: "STAFF" as any, // Bypass strict enum check for seed
         },
     });
 
