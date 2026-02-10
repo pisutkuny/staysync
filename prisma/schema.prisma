@@ -381,6 +381,7 @@ model Organization {
   centralMeters CentralMeter[]
   auditLogs     AuditLog[]
   systemConfig  SystemConfig?
+  recurringExpenses RecurringExpense[]
 
   @@index([slug])
   @@index([status])
