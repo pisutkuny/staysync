@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
 
 export async function POST(req: Request) {
     try {
@@ -109,6 +110,11 @@ export async function POST(req: Request) {
                 const totalAmount = room.price + waterCost + electricCost + config.internetFee + config.trashFee + config.otherFees;
 
                 // Create billing record
+                const session = await getCurrentSession();
+                if (!session) {
+                    throw new Error("Unauthorized: Session is required for billing");
+                }
+
                 await prisma.billing.create({
                     data: {
                         roomId,
@@ -124,7 +130,8 @@ export async function POST(req: Request) {
                         otherFees: config.otherFees,
                         totalAmount,
                         month: new Date(month + "-01"),
-                        paymentStatus: "Pending"
+                        paymentStatus: "Pending",
+                        organizationId: session.organizationId
                     }
                 });
 

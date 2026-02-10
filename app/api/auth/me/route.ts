@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { getCurrentSession } from '@/lib/auth/session';
 
 const prisma = new PrismaClient();
+// Force update timestamp: 2026-02-10T16:05:00
 
 export async function GET(req: NextRequest) {
     try {
