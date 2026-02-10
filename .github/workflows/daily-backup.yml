@@ -31,8 +31,13 @@ jobs:
           retention-days: 30
 
       - name: Upload to Google Drive (if configured)
-        if: secrets.GOOGLE_BACKUP_SCRIPT_URL != ''
+        continue-on-error: true
         run: |
+          if [ -z "${{ secrets.GOOGLE_BACKUP_SCRIPT_URL }}" ]; then
+            echo "⏭️  Skipping Google Drive upload (not configured)"
+            exit 0
+          fi
+
           echo "☁️  Uploading to Google Drive..."
           BACKUP_CONTENT=$(cat backup-*.json)
           curl -X POST "${{ secrets.GOOGLE_BACKUP_SCRIPT_URL }}" \
