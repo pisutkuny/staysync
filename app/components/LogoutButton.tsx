@@ -7,7 +7,7 @@ export default function LogoutButton() {
         if (!confirm("Are you sure you want to sign out?")) return;
 
         try {
-            await fetch("/api/logout", { method: "POST" });
+            await fetch("/api/auth/logout", { method: "POST" });
             window.location.href = "/login";
         } catch (error) {
             console.error("Logout failed:", error);

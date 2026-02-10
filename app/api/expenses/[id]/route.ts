@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { logCRUDAudit } from '@/lib/audit/helpers';
 
 // GET /api/expenses/[id] - Fetch single expense
 export async function GET(
@@ -35,14 +36,11 @@ export async function PUT(
         const body = await req.json();
         const { title, amount, category, date, note, receiptUrl, receiptFileId } = body;
 
-        // Check if expense exists
+        // Get expense before update
         const existing = await prisma.expense.findUnique({ where: { id } });
         if (!existing) {
             return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
         }
-
-        // If updating receipt, might need to delete old one
-        // (This will be handled by the client before calling this API)
 
         const updated = await prisma.expense.update({
             where: { id },
@@ -55,6 +53,16 @@ export async function PUT(
                 receiptUrl: receiptUrl || null,
                 receiptFileId: receiptFileId || null
             }
+        });
+
+        // Log audit
+        await logCRUDAudit({
+            request: req,
+            action: "UPDATE",
+            entity: "Expense",
+            entityId: id,
+            before: existing,
+            after: updated,
         });
 
         return NextResponse.json(updated);
@@ -73,7 +81,7 @@ export async function DELETE(
         const { id: idStr } = await params;
         const id = parseInt(idStr);
 
-        // Fetch expense to get receiptFileId (for Drive deletion)
+        // Fetch expense
         const expense = await prisma.expense.findUnique({ where: { id } });
         if (!expense) {
             return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
@@ -81,6 +89,15 @@ export async function DELETE(
 
         // Delete from database
         await prisma.expense.delete({ where: { id } });
+
+        // Log audit
+        await logCRUDAudit({
+            request: req,
+            action: "DELETE",
+            entity: "Expense",
+            entityId: id,
+            before: expense,
+        });
 
         // Return the fileId so client can delete from Drive
         return NextResponse.json({

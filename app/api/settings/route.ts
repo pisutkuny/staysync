@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logCRUDAudit } from "@/lib/audit/helpers";
 
 export async function GET() {
     try {
@@ -46,10 +47,29 @@ export async function POST(req: Request) {
                 where: { id: existing.id },
                 data: updateData
             });
+
+            // Log audit
+            await logCRUDAudit({
+                request: req,
+                action: "UPDATE",
+                entity: "SystemConfig",
+                entityId: config.id,
+                before: existing,
+                after: config,
+            });
         } else {
             // Create new
             config = await prisma.systemConfig.create({
                 data: updateData
+            });
+
+            // Log audit
+            await logCRUDAudit({
+                request: req,
+                action: "CREATE",
+                entity: "SystemConfig",
+                entityId: config.id,
+                after: config,
             });
         }
 

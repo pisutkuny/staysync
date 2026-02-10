@@ -1,6 +1,8 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
+import { logAudit, getRequestInfo, getChanges } from "@/lib/audit/logger";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -22,6 +24,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
         const { id: idStr } = await params;
         const id = parseInt(idStr);
 
@@ -50,6 +65,25 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
             where: { id }
         });
 
+        // Log audit
+        await logAudit({
+            userId: user.id,
+            userEmail: user.email,
+            userName: user.fullName,
+            action: "DELETE",
+            entity: "Room",
+            entityId: id,
+            changes: {
+                before: {
+                    number: room.number,
+                    price: room.price,
+                    status: room.status,
+                },
+            },
+            organizationId: session.organizationId,
+            ...getRequestInfo(req),
+        });
+
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("Delete Room Error:", error);
@@ -62,10 +96,32 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
         const { id: idStr } = await params;
         const id = parseInt(idStr);
         const body = await req.json();
         const { number, price, status, chargeCommonArea } = body;
+
+        // Get room before update
+        const roomBefore = await prisma.room.findUnique({
+            where: { id },
+        });
+
+        if (!roomBefore) {
+            return NextResponse.json({ error: "Room not found" }, { status: 404 });
+        }
 
         const updated = await prisma.room.update({
             where: { id },
@@ -75,6 +131,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                 ...(status !== undefined && { status }),
                 ...(chargeCommonArea !== undefined && { chargeCommonArea })
             }
+        });
+
+        // Log audit
+        await logAudit({
+            userId: user.id,
+            userEmail: user.email,
+            userName: user.fullName,
+            action: "UPDATE",
+            entity: "Room",
+            entityId: id,
+            changes: getChanges(roomBefore, updated),
+            organizationId: session.organizationId,
+            ...getRequestInfo(req),
         });
 
         return NextResponse.json(updated);

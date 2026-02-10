@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logCRUDAudit } from "@/lib/audit/helpers";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
         const body = await req.json();
         const { status, afterPhoto } = body;
+
+        // Get issue before update
+        const issueBefore = await prisma.issue.findUnique({
+            where: { id: parseInt(id) },
+        });
+
+        if (!issueBefore) {
+            return NextResponse.json({ error: "Issue not found" }, { status: 404 });
+        }
 
         const updateData: any = {
             status: status || "Done"
@@ -20,6 +30,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             where: { id: parseInt(id) },
             data: updateData,
             include: { resident: true }
+        });
+
+        // Log audit
+        await logCRUDAudit({
+            request: req,
+            action: "UPDATE",
+            entity: "Issue",
+            entityId: parseInt(id),
+            before: issueBefore,
+            after: updatedIssue,
         });
 
         // Notify Resident or Reporter via Line

@@ -8,7 +8,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
-        username: "",
+        email: "",
         password: ""
     });
 
@@ -17,7 +17,7 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -49,13 +49,13 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <input
                             required
-                            type="text"
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            placeholder="e.g. owner or staff"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="admin@staysync.com"
                             className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>

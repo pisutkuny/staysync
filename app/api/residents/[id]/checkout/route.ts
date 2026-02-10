@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logCRUDAudit } from "@/lib/audit/helpers";
 
 export async function POST(
     request: Request,
@@ -57,6 +58,21 @@ export async function POST(
                     data: { status: "Occupied" }
                 });
             }
+        });
+
+        // Get updated resident for audit
+        const updatedResident = await prisma.resident.findUnique({
+            where: { id: residentId },
+        });
+
+        // Log audit
+        await logCRUDAudit({
+            request,
+            action: "UPDATE",
+            entity: "Resident",
+            entityId: residentId,
+            before: resident,
+            after: updatedResident,
         });
 
         return NextResponse.json({ success: true });

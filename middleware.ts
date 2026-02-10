@@ -14,18 +14,15 @@ export function middleware(request: NextRequest) {
 
     // We also want to protect the root "/" but not "/report" or "/login" or "/api"
     // Specific check for root dashboard
-    if (path === "/" || path.startsWith("/billing") || path.startsWith("/rooms") || path.startsWith("/issues")) {
-        const adminSession = request.cookies.get("admin_session");
-        const userRole = request.cookies.get("user_role")?.value;
+    if (path === "/" || path.startsWith("/billing") || path.startsWith("/rooms") || path.startsWith("/issues") || path.startsWith("/users") || path.startsWith("/audit")) {
+        const sessionToken = request.cookies.get("session_token");
 
-        if (!adminSession) {
+        if (!sessionToken) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
 
-        // Protect Billing Page (Owner Only)
-        if (path.startsWith("/billing") && userRole !== "OWNER") {
-            return NextResponse.redirect(new URL("/", request.url));
-        }
+        // Note: Role-based access is now handled by API endpoints
+        // Frontend still uses JWT payload for UI rendering
     }
 
     return NextResponse.next();
@@ -37,5 +34,7 @@ export const config = {
         "/billing/:path*",
         "/rooms/:path*",
         "/issues/:path*",
+        "/users/:path*",
+        "/audit/:path*",
     ],
 };

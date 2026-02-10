@@ -24,11 +24,16 @@ model Room {
   // Phase 2: Common Area Billing (Room-based)
   chargeCommonArea Boolean @default(false) // Enable common area fees for this room
 
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
   residents Resident[]
   billings  Billing[]
 
   // Performance Indexes
   @@index([status])
+  @@index([organizationId])
 }
 
 model Resident {
@@ -40,6 +45,10 @@ model Resident {
   room           Room?   @relation(fields: [roomId], references: [id])
   roomId         Int?
   status         String  @default("Active") // Active, CheckedOut
+
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   // Deposit Management
   deposit Float @default(0)
@@ -64,6 +73,7 @@ model Resident {
   // Performance Indexes
   @@index([depositStatus])
   @@index([contractEndDate])
+  @@index([organizationId])
 }
 
 model Document {
@@ -77,6 +87,10 @@ model Document {
 
 model Billing {
   id Int @id @default(autoincrement())
+
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   // Meter Readings
   waterMeterLast    Float @default(0)
@@ -133,6 +147,7 @@ model Billing {
   @@index([roomId])
   @@index([residentId])
   @@index([createdAt])
+  @@index([organizationId])
 }
 
 model Issue {
@@ -151,25 +166,67 @@ model Issue {
   resident   Resident? @relation(fields: [residentId], references: [id])
   residentId Int?
 
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
   // Performance Indexes
   @@index([status])
   @@index([createdAt])
   @@index([residentId])
+  @@index([organizationId])
 }
 
 model User {
   id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
-  role     String @default("STAFF") // OWNER, STAFF, TENANT
+  email    String @unique
+  password String // Hashed with bcrypt
+  fullName String
+  phone    String?
+  avatar   String? // Profile picture URL
 
-  reviewedBills Billing[] @relation("BillingReviewer")
+  // Role-based access control
+  role String @default("STAFF") // OWNER, ADMIN, STAFF, TENANT
+
+  // Email verification
+  emailVerified      Boolean   @default(false)
+  verificationToken  String?   @unique
+  verificationExpiry DateTime?
+
+  // Password reset
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
+  // Account status
+  status      String    @default("Active") // Active, Suspended, Deleted
+  lastLoginAt DateTime?
+
+  // Multi-tenant
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reviewedBills Billing[]     @relation("BillingReviewer")
+  auditLogs     AuditLog[]
+  sessions      UserSession[]
+
+  @@index([email])
+  @@index([organizationId])
+  @@index([status])
 }
 
 model SystemConfig {
   id          Int    @id @default(autoincrement())
   dormName    String @default("My Dormitory")
   dormAddress String @default("123 Street, City")
+
+  // Multi-tenant support
+  organizationId Int          @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   // Automation Settings
   enableAutoReminders Boolean @default(false)
@@ -228,8 +285,13 @@ model Expense {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
   @@index([date])
   @@index([category])
+  @@index([organizationId])
 }
 
 model RecurringExpense {
@@ -256,7 +318,11 @@ model LineBotState {
 
 model CentralMeter {
   id    Int      @id @default(autoincrement())
-  month DateTime @unique
+  month DateTime
+
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   // Water
   waterMeterLast       Float
@@ -281,4 +347,81 @@ model CentralMeter {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([month, organizationId])
+  @@index([organizationId])
+}
+
+// ============================================
+// NEW MODELS FOR MULTI-TENANT SUPPORT
+// ============================================
+
+model Organization {
+  id     Int    @id @default(autoincrement())
+  name   String
+  slug   String @unique
+  email  String?
+  phone  String?
+  status String @default("Active") // Active, Suspended, Deleted
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users         User[]
+  rooms         Room[]
+  residents     Resident[]
+  billings      Billing[]
+  issues        Issue[]
+  expenses      Expense[]
+  centralMeters CentralMeter[]
+  auditLogs     AuditLog[]
+  systemConfig  SystemConfig?
+
+  @@index([slug])
+  @@index([status])
+}
+
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastActivity DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+}
+
+model AuditLog {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  user      User   @relation(fields: [userId], references: [id])
+  userEmail String
+  userName  String
+
+  action   String // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc.
+  entity   String // Room, Resident, Billing, User, etc.
+  entityId Int?
+
+  changes Json? // { before: {...}, after: {...} }
+
+  ipAddress String?
+  userAgent String?
+
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@index([action])
 }

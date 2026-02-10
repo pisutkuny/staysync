@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon, Lock, Eye, EyeOff } from "lucide-react";
+import PasswordChangeForm from "../components/PasswordChangeForm";
 
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
@@ -102,7 +103,8 @@ export default function SettingsPage() {
         { id: "basic", label: "Basic Info", icon: Building2 },
         { id: "payment", label: "Payment", icon: CreditCard },
         { id: "rates", label: "Rates & Fees", icon: Zap },
-        { id: "chatbot", label: "Chatbot", icon: MessageSquare }
+        { id: "chatbot", label: "Chatbot", icon: MessageSquare },
+        { id: "security", label: "Security", icon: Lock }
     ];
 
     return (
@@ -670,26 +672,33 @@ export default function SettingsPage() {
                     </div>
                 )}
 
-                {/* Save Button - Fixed at Bottom */}
-                <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-200">
-                    <button
-                        type="submit"
-                        disabled={saving}
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                        {saving ? (
-                            <>
-                                <Loader2 className="animate-spin" size={24} />
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <Save size={24} />
-                                Save All Settings
-                            </>
-                        )}
-                    </button>
-                </div>
+                {/* Security Tab */}
+                {activeTab === "security" && (
+                    <PasswordChangeForm />
+                )}
+
+                {/* Save Button - Fixed at Bottom (Only show for non-security tabs) */}
+                {activeTab !== "security" && (
+                    <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-200">
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {saving ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={24} />
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={24} />
+                                    Save All Settings
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </form>
         </div>
     );

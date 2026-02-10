@@ -19,28 +19,14 @@ function doPost(e) {
     const file = folder.createFile(fileName, jsonContent, 'application/json');
     Logger.log('✅ File created: ' + file.getUrl());
     
-    // Delete old backups (keep 30 days)
-    const files = folder.getFiles();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    let deletedCount = 0;
-    while (files.hasNext()) {
-      const f = files.next();
-      if (f.getDateCreated() < thirtyDaysAgo) {
-        f.setTrashed(true);
-        deletedCount++;
-      }
-    }
-    
-    Logger.log('🗑️  Deleted ' + deletedCount + ' old backups');
+    // Note: Files are kept permanently - manual deletion only
+    Logger.log('📦 Files are stored permanently in Google Drive');
     
     return ContentService.createTextOutput(JSON.stringify({
       success: true,
       fileId: file.getId(),
       fileName: fileName,
-      url: file.getUrl(),
-      deletedOldBackups: deletedCount
+      url: file.getUrl()
     })).setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
@@ -52,22 +38,30 @@ function doPost(e) {
   }
 }
 
-// Test function (optional)
+// Test function - call this to verify the script works
 function testBackup() {
+  // Create a simple test backup
   const testData = {
-    fileName: 'test-backup-' + new Date().toISOString() + '.json',
-    content: JSON.stringify({
-      metadata: { version: '1.0', exportDate: new Date().toISOString() },
-      data: { test: 'This is a test backup' }
-    })
+    metadata: { version: '1.0', exportDate: new Date().toISOString() },
+    data: { test: 'This is a test backup' }
   };
   
-  const e = {
-    postData: {
-      contents: JSON.stringify(testData)
-    }
-  };
+  const fileName = 'test-backup-' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.json';
   
-  const result = doPost(e);
-  Logger.log('Test result: ' + result.getContent());
+  Logger.log('🧪 Testing backup creation...');
+  Logger.log('📦 File name: ' + fileName);
+  
+  // Get or create backup folder
+  const folders = DriveApp.getFoldersByName('StaySync Backups');
+  const folder = folders.hasNext() ? folders.next() : DriveApp.createFolder('StaySync Backups');
+  
+  // Save test file
+  const file = folder.createFile(fileName, JSON.stringify(testData, null, 2), 'application/json');
+  
+  Logger.log('✅ Test backup created successfully!');
+  Logger.log('📁 Folder: ' + folder.getName());
+  Logger.log('📄 File: ' + fileName);
+  Logger.log('🔗 URL: ' + file.getUrl());
+  Logger.log('');
+  Logger.log('✨ Go check your Google Drive folder: "StaySync Backups"');
 }

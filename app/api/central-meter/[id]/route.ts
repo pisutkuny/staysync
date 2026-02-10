@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logCRUDAudit } from "@/lib/audit/helpers";
 
 // GET /api/central-meter/[id] - Get single record
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -37,7 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             note
         } = body;
 
-        // Fetch current record to get waterMeterLast and electricMeterLast
+        // Fetch current record
         const currentRecord = await prisma.centralMeter.findUnique({
             where: { id }
         });
@@ -68,6 +69,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             }
         });
 
+        // Log audit
+        await logCRUDAudit({
+            request,
+            action: "UPDATE",
+            entity: "CentralMeter",
+            entityId: id,
+            before: currentRecord,
+            after: updatedRecord,
+        });
+
         return NextResponse.json(updatedRecord);
     } catch (error: any) {
         console.error("Update Central Meter Error:", error);
@@ -81,8 +92,26 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         const { id: idStr } = await params;
         const id = parseInt(idStr);
 
+        // Fetch record before delete
+        const record = await prisma.centralMeter.findUnique({
+            where: { id }
+        });
+
+        if (!record) {
+            return NextResponse.json({ error: "Record not found" }, { status: 404 });
+        }
+
         await prisma.centralMeter.delete({
             where: { id }
+        });
+
+        // Log audit
+        await logCRUDAudit({
+            request: req,
+            action: "DELETE",
+            entity: "CentralMeter",
+            entityId: id,
+            before: record,
         });
 
         return NextResponse.json({ success: true });
