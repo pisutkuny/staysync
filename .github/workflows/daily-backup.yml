@@ -31,7 +31,7 @@ jobs:
           retention-days: 30
 
       - name: Upload to Google Drive (if configured)
-        if: ${{ secrets.GOOGLE_BACKUP_SCRIPT_URL != '' }}
+        if: secrets.GOOGLE_BACKUP_SCRIPT_URL != '''
         run: |
           echo "☁️  Uploading to Google Drive..."
           BACKUP_CONTENT=$(cat backup-*.json)
