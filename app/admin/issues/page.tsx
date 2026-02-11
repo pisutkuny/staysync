@@ -92,14 +92,14 @@ export default function IssuesBoardPage() {
     return (
         <div className="space-y-6">
             {/* Gradient Header */}
-            <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center md:justify-start gap-3">
                             <Wrench size={32} className="md:w-10 md:h-10" />
                             Repair Requests
                         </h2>
-                        <p className="text-orange-100 mt-2 text-lg">Manage and track maintenance issues</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Manage and track maintenance issues</p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-3 w-full md:w-auto">
                         <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap text-sm">

@@ -63,11 +63,11 @@ export default async function BillingPage() {
     return (
         <div className="space-y-8 pb-10">
             {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Monthly Billing</h2>
-                        <p className="text-orange-100 mt-2 text-lg">Manage billing and view utility usage.</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Manage billing and view utility usage.</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 w-full md:w-auto min-w-[300px]">
                         <ExportButton />

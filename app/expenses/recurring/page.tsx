@@ -167,7 +167,7 @@ export default function RecurringExpensesPage() {
     return (
         <div className="space-y-8 pb-10">
             {/* Enhanced Header with Gradient */}
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
                         <div className="flex items-center gap-3 mb-3">
@@ -183,7 +183,7 @@ export default function RecurringExpensesPage() {
                             </button>
                         </div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🔁 Recurring Expenses</h2>
-                        <p className="text-pink-100 mt-2 text-lg">Manage expense templates that auto-create monthly.</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Manage expense templates that auto-create monthly.</p>
                     </div>
                     <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
                         <p className="text-sm font-bold text-white/90 uppercase tracking-wider">Monthly Total</p>

@@ -73,9 +73,9 @@ export default function Home() {
   if ((data as any).userRole === 'TENANT') {
     return (
       <div className="space-y-8 pb-10">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 shadow-xl text-white">
-          <h2 className="text-xl md:text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
-          <p className="text-indigo-100">ระบบจัดการหอพักสำหรับผู้เช่า</p>
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl text-white">
+          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
+          <p className="text-indigo-100 text-sm md:text-base">ระบบจัดการหอพักสำหรับผู้เช่า</p>
         </div>
 
         <div className="bg-white rounded-xl shadow p-8 text-center border border-gray-100">

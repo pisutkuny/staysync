@@ -127,13 +127,13 @@ export default function CentralMeterPage() {
     return (
         <div className="space-y-6">
             {/* Gradient Header */}
-            <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                             📊 บันทึกมาตรส่วนกลาง
                         </h2>
-                        <p className="text-blue-100 mt-2 text-lg">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>
                     </div>
                     <Link href="/admin/utility-analysis">
                         <button className="bg-white text-blue-700 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30 hover:scale-105">

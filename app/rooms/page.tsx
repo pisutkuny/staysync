@@ -16,11 +16,11 @@ export default async function RoomsPage() {
     return (
         <div className="space-y-8">
             {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-lime-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 All Rooms</h2>
-                        <p className="text-emerald-100 mt-2 text-lg">Manage rooms and residents.</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Manage rooms and residents.</p>
                     </div>
                     <Link href="/rooms/add">
                         <button className="bg-white text-green-700 px-4 py-2.5 rounded-lg font-bold hover:bg-green-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm">

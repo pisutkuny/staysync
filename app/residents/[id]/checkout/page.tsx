@@ -92,13 +92,16 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href={`/residents/${id}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
-                </Link>
-                <div>
-                    <h1 className="text-xl md:text-3xl font-bold text-gray-900">Check Out Resident</h1>
-                    <p className="text-gray-500">{resident.fullName} • Room {resident.room.number}</p>
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl mb-8">
+                <div className="flex items-center gap-4">
+                    <Link href={`/residents/${resident.id}`} className="p-3 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all shadow-lg border border-white/30">
+                        <ArrowLeft size={24} className="text-white" />
+                    </Link>
+                    <div>
+                        <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">Check Out Resident</h1>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">{resident.fullName} • Room {resident.room.number}</p>
+                    </div>
                 </div>
             </div>
 

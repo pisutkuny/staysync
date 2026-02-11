@@ -184,21 +184,21 @@ export default function UsersPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
+                {/* Gradient Header */}
+                <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl mb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
-                                <Users className="text-indigo-600" size={32} />
+                            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                                <Users className="text-white" size={32} />
                                 User Management
                             </h1>
-                            <p className="text-gray-500 mt-1">
+                            <p className="text-indigo-100 mt-2 text-sm md:text-base">
                                 Manage organization users and permissions
                             </p>
                         </div>
                         <button
                             onClick={() => setShowInviteModal(true)}
-                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
+                            className="bg-white text-indigo-700 px-4 py-2.5 rounded-lg font-bold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm"
                         >
                             <UserPlus size={20} />
                             Invite User

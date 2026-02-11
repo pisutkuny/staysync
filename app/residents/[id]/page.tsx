@@ -23,7 +23,7 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
     return (
         <div className="space-y-8">
             {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex items-center gap-4">
                     <Link href="/rooms" className="p-3 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all shadow-lg border border-white/30">
                         <ArrowLeft size={24} className="text-white" />
@@ -38,7 +38,7 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                                 </Link>
                             </h1>
                         </div>
-                        <p className="text-cyan-100 mt-2 text-lg font-medium">🏠 Room {resident.room?.number || 'N/A'} • 📞 {resident.phone}</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">🏠 Room {resident.room?.number || 'N/A'} • 📞 {resident.phone}</p>
                     </div>
                 </div>
             </div>

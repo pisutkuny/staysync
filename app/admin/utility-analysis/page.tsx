@@ -80,14 +80,15 @@ export default async function UtilityAnalysisPage() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border border-gray-100 dark:border-slate-700">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-lg md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">📈 วิเคราะห์สาธารณูปโภค</h2>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2">เปรียบเทียบมาตรส่วนกลางกับห้องย่อย</p>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">📈 วิเคราะห์สาธารณูปโภค</h2>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">เปรียบเทียบมาตรส่วนกลางกับห้องย่อย</p>
                     </div>
                     <Link href="/admin/central-meter">
-                        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors shadow-sm">
+                        <button className="bg-white text-indigo-700 px-4 py-2.5 rounded-lg font-bold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm">
                             📊 บันทึกมาตรส่วนกลาง
                         </button>
                     </Link>

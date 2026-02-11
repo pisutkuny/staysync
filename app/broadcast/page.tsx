@@ -60,13 +60,14 @@ export default function BroadcastPage() {
     return (
         <div className="space-y-8 pb-10">
             {/* Enhanced Gradient Header */}
-            <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 rounded-2xl p-8 shadow-xl">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                            📢 Broadcast
+                        <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <Megaphone size={32} className="md:w-10 md:h-10" />
+                            Broadcast
                         </h1>
-                        <p className="text-purple-100 mt-2 text-lg">Send announcements to residents via LINE</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Send announcements to residents via LINE</p>
                     </div>
                     <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/30">
                         <Users className="text-white" size={20} />

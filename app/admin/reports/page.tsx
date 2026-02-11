@@ -45,7 +45,7 @@ export default function ReportsPage() {
     return (
         <div className="p-6">
             {/* Controls - Hidden on Print */}
-            <div className="mb-8 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 rounded-3xl p-6 md:p-8 shadow-xl print:hidden text-white relative overflow-hidden">
+            <div className="mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-6 md:p-8 shadow-xl print:hidden text-white relative overflow-hidden">
                 {/* Decorative Background Elements */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-32 blur-3xl pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full -ml-10 -mb-20 blur-2xl pointer-events-none"></div>

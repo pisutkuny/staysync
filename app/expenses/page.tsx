@@ -382,7 +382,7 @@ export default function ExpensesPage() {
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Expense Tracking</h2>
-                        <p className="text-indigo-100 mt-2 text-lg">Record and monitor operating expenses with receipt uploads.</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Record and monitor operating expenses with receipt uploads.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <button
