@@ -102,13 +102,13 @@ export default function IssuesBoardPage() {
                         <p className="text-orange-100 mt-2 text-lg">Manage and track maintenance issues</p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-3 w-full md:w-auto">
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
+                        <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap text-sm">
                             ⏳ Pending: {columns.Pending.length}
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
+                        <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap text-sm">
                             🔨 In Progress: {columns.InProgress.length}
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
+                        <div className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap text-sm">
                             ✅ Done: {columns.Done.length}
                         </div>
                     </div>

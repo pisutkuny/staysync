@@ -298,32 +298,32 @@ export default function Home() {
         </h3>
         <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-4">
           <Link href="/rooms/add">
-            <button className="w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
               ➕ เพิ่มห้องพัก
             </button>
           </Link>
           <Link href="/billing">
-            <button className="w-full px-5 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 text-sm flex items-center justify-center gap-2">
               💰 จัดการบิล
             </button>
           </Link>
           <Link href="/billing/bulk">
-            <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
               📝 จดมิเตอร์
             </button>
           </Link>
           <Link href="/broadcast">
-            <button className="w-full px-5 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
               📢 Broadcast
             </button>
           </Link>
           <Link href="/expenses">
-            <button className="w-full px-5 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
               📉 รายจ่าย
             </button>
           </Link>
           <Link href="/settings">
-            <button className="w-full px-5 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:from-gray-500 hover:to-gray-600 font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
               ⚙️ ตั้งค่า
             </button>
           </Link>

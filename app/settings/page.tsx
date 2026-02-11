@@ -683,16 +683,16 @@ export default function SettingsPage() {
                         <button
                             type="submit"
                             disabled={saving}
-                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                         >
                             {saving ? (
                                 <>
-                                    <Loader2 className="animate-spin" size={24} />
+                                    <Loader2 className="animate-spin" size={20} />
                                     Saving...
                                 </>
                             ) : (
                                 <>
-                                    <Save size={24} />
+                                    <Save size={20} />
                                     Save All Settings
                                 </>
                             )}

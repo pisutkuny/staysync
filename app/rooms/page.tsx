@@ -23,7 +23,7 @@ export default async function RoomsPage() {
                         <p className="text-emerald-100 mt-2 text-lg">Manage rooms and residents.</p>
                     </div>
                     <Link href="/rooms/add">
-                        <button className="bg-white text-green-700 px-6 py-3 rounded-xl font-bold hover:bg-green-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30 hover:scale-105">
+                        <button className="bg-white text-green-700 px-4 py-2.5 rounded-lg font-bold hover:bg-green-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm">
                             ➕ Add New Room
                         </button>
                     </Link>
@@ -79,8 +79,8 @@ export default async function RoomsPage() {
                             {room.status === "Available" ? (
                                 <>
                                     <Link href={`/rooms/checkin/${room.id}`} className="w-full">
-                                        <button className="w-full py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                                            <UserPlus size={20} />
+                                        <button className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm">
+                                            <UserPlus size={18} />
                                             Check In
                                         </button>
                                     </Link>
@@ -88,8 +88,8 @@ export default async function RoomsPage() {
                                 </>
                             ) : (
                                 <Link href={`/rooms/checkin/${room.id}`} className="w-full">
-                                    <button className="w-full py-2.5 bg-gradient-to-r from-emerald-400 to-lime-500 text-white rounded-xl hover:from-emerald-500 hover:to-lime-600 font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                                        <UserPlus size={20} />
+                                    <button className="w-full py-2 bg-gradient-to-r from-emerald-400 to-lime-500 text-white rounded-lg hover:from-emerald-500 hover:to-lime-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm">
+                                        <UserPlus size={18} />
                                         Add Resident
                                     </button>
                                 </Link>

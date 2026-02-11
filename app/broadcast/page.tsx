@@ -157,9 +157,9 @@ export default function BroadcastPage() {
                         <button
                             type="submit"
                             disabled={loading || !message.trim()}
-                            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
+                            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md hover:shadow-lg text-sm"
                         >
-                            {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
+                            {loading ? <Loader2 className="animate-spin" /> : <Send size={18} />}
                             Send Broadcast
                         </button>
                     </div>

@@ -74,7 +74,7 @@ export default async function BillingPage() {
                             <ExportButton />
                         </div>
                         <Link href="/billing/bulk" className="w-full sm:w-auto">
-                            <button className="w-full sm:w-auto bg-white text-orange-700 px-6 py-3 rounded-xl font-bold hover:bg-orange-50 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap border-2 border-white/30 hover:scale-105">
+                            <button className="w-full sm:w-auto bg-white text-orange-700 px-4 py-2.5 rounded-lg font-bold hover:bg-orange-50 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap border border-white/30 hover:scale-105 text-sm">
                                 <span>📝</span> Record All Meters
                             </button>
                         </Link>

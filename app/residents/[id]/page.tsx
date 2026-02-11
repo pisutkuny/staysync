@@ -119,9 +119,9 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                         <h2 className="text-lg font-bold text-gray-900 mb-4">Management</h2>
                         <Link
                             href={`/residents/${resident.id}/checkout`}
-                            className="w-full py-3 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-2.5 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
-                            <Trash2 size={20} />
+                            <Trash2 size={18} />
                             Check Out Resident
                         </Link>
                     </div>
