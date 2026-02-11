@@ -1,0 +1,147 @@
+"use client";
+
+import { useState } from "react";
+import { Loader2, UserPlus, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+export default function RegisterPage() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (formData.password !== formData.confirmPassword) {
+            alert("รหัสผ่านไม่ตรงกัน");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    password: formData.password
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "การลงทะเบียนล้มเหลว");
+            }
+
+            alert("ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ");
+            router.push("/login");
+        } catch (error: any) {
+            alert(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6">
+                <div className="text-center space-y-2">
+                    <div className="bg-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mx-auto text-white shadow-lg mb-4">
+                        <UserPlus size={24} />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900">สมัครสมาชิก</h1>
+                    <p className="text-gray-500">สร้างบัญชีใหม่เพื่อเข้าใช้งาน StaySync</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">ชื่อ-นามสกุล</label>
+                        <input
+                            required
+                            type="text"
+                            value={formData.fullName}
+                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                            placeholder="สมชาย ใจดี"
+                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์ (ถ้ามี)</label>
+                        <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            placeholder="0812345678"
+                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
+                        <input
+                            required
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="somchai@example.com"
+                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                        <input
+                            required
+                            type="password"
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            placeholder="อย่างน้อย 6 ตัวอักษร"
+                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">ยืนยันรหัสผ่าน</label>
+                        <input
+                            required
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                            placeholder="กรอกรหัสผ่านอีกครั้ง"
+                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 mt-6"
+                    >
+                        {loading ? <Loader2 className="animate-spin" /> : "ลงทะเบียน"}
+                    </button>
+                </form>
+
+                <div className="text-center pt-4 border-t border-gray-100">
+                    <p className="text-sm text-gray-500">
+                        มีบัญชีอยู่แล้ว?{" "}
+                        <Link href="/login" className="text-indigo-600 font-semibold hover:underline">
+                            เข้าสู่ระบบ
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}

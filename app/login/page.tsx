@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false);
@@ -80,6 +81,15 @@ export default function LoginPage() {
                         {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
                     </button>
                 </form>
+
+                <div className="text-center pt-4 border-t border-gray-100">
+                    <p className="text-sm text-gray-500">
+                        ยังไม่มีบัญชี?{" "}
+                        <Link href="/register" className="text-indigo-600 font-semibold hover:underline">
+                            สมัครสมาชิก
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

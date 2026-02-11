@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
         path === prefix || (path.startsWith(prefix) && path !== "/")
     );
 
-    // We also want to protect the root "/" but not "/report" or "/login" or "/api"
+    // We also want to protect the root "/" but not "/report" or "/login" or "/register" or "/api"
     // Specific check for root dashboard
     if (path === "/" || path.startsWith("/billing") || path.startsWith("/rooms") || path.startsWith("/issues") || path.startsWith("/users") || path.startsWith("/audit")) {
         const sessionToken = request.cookies.get("session_token");
