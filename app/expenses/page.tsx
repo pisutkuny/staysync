@@ -381,7 +381,7 @@ export default function ExpensesPage() {
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Expense Tracking</h2>
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Expense Tracking</h2>
                         <p className="text-indigo-100 mt-2 text-lg">Record and monitor operating expenses with receipt uploads.</p>
                     </div>
                     <div className="flex items-center gap-4">

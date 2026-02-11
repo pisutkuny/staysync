@@ -130,7 +130,7 @@ export default function CentralMeterPage() {
             <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                             📊 บันทึกมาตรส่วนกลาง
                         </h2>
                         <p className="text-blue-100 mt-2 text-lg">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>

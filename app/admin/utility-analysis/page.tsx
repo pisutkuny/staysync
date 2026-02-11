@@ -83,7 +83,7 @@ export default async function UtilityAnalysisPage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border border-gray-100 dark:border-slate-700">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">📈 วิเคราะห์สาธารณูปโภค</h2>
+                        <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">📈 วิเคราะห์สาธารณูปโภค</h2>
                         <p className="text-gray-500 dark:text-gray-400 mt-2">เปรียบเทียบมาตรส่วนกลางกับห้องย่อย</p>
                     </div>
                     <Link href="/admin/central-meter">
