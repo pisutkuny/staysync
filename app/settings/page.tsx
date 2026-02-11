@@ -113,8 +113,8 @@ export default function SettingsPage() {
             <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                            <SettingsIcon size={28} className="md:w-10 md:h-10" />
+                        <h2 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <SettingsIcon size={24} className="md:w-10 md:h-10" />
                             System Settings
                         </h2>
                         <p className="text-indigo-100 mt-2 text-lg">Configure your dormitory management system</p>

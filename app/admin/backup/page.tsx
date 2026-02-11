@@ -99,7 +99,7 @@ export default function BackupPage() {
     return (
         <div className="p-6 max-w-4xl mx-auto">
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 mb-8 border border-gray-100 dark:border-slate-700">
-                <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <h1 className="text-lg md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                     <Database className="text-indigo-600 dark:text-indigo-400" size={24} />
                     Database Backup & Restore
                 </h1>

@@ -89,7 +89,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
         <div className="space-y-6 pb-10">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">End of Month Recording</h2>
+                    <h2 className="text-lg md:text-2xl font-bold text-gray-900">End of Month Recording</h2>
                     <p className="text-gray-500">Global rates will be applied to all bills created here.</p>
                 </div>
                 <button

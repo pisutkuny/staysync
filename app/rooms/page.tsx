@@ -19,7 +19,7 @@ export default async function RoomsPage() {
             <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-lime-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 All Rooms</h2>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 All Rooms</h2>
                         <p className="text-emerald-100 mt-2 text-lg">Manage rooms and residents.</p>
                     </div>
                     <Link href="/rooms/add">
