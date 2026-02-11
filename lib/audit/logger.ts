@@ -10,7 +10,12 @@ export type AuditAction =
     | 'LOGOUT'
     | 'INVITE_USER'
     | 'CHANGE_ROLE'
-    | 'CHANGE_PASSWORD';
+    | 'CHANGE_PASSWORD'
+    | 'ENABLE_2FA'
+    | 'DISABLE_2FA'
+    | 'REQUEST_PASSWORD_RESET'
+    | 'RESET_PASSWORD'
+    | 'VERIFY_EMAIL';
 
 export type AuditEntity =
     | 'User'

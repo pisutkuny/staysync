@@ -12,30 +12,37 @@ export default function LoginPage() {
         email: "",
         password: ""
     });
+    const [show2FA, setShow2FA] = useState(false);
+    const [twoFactorCode, setTwoFactorCode] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const payload = { ...formData, code: twoFactorCode };
             const res = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
-            if (!res.ok) {
-                throw new Error("Invalid password");
+            const data = await res.json();
+
+            if (res.status === 403 && data.require2FA) {
+                setShow2FA(true);
+                setLoading(false);
+                return;
             }
 
-            // Force full reload to ensure cookies are sent and middleware/server components see the new session
-            // window.location.href = "/";
+            if (!res.ok) {
+                throw new Error(data.error || "Invalid credentials");
+            }
+
             router.push("/");
-            // Use router.refresh() to ensure server components update with new cookie
             router.refresh();
-        } catch (error) {
-            alert("Invalid password");
-        } finally {
+        } catch (error: any) {
+            alert(error.message);
             setLoading(false);
         }
     };
@@ -52,37 +59,73 @@ export default function LoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input
-                            required
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder="admin@staysync.com"
-                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        />
-                    </div>
+                    {!show2FA ? (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input
+                                    required
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="admin@staysync.com"
+                                    className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                            </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <input
-                            required
-                            type="password"
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            placeholder="Enter password"
-                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        />
-                    </div>
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-sm font-medium text-gray-700">Password</label>
+                                    <Link href="/forgot-password" className="text-xs text-indigo-600 hover:underline">
+                                        Forgot Password?
+                                    </Link>
+                                </div>
+                                <input
+                                    required
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    placeholder="Enter password"
+                                    className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="bg-indigo-50 p-4 rounded-lg mb-4 text-center">
+                                <p className="text-indigo-800 font-medium">Two-Factor Authentication Required</p>
+                                <p className="text-indigo-600 text-sm">Please enter the code from your app.</p>
+                            </div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">2FA Code</label>
+                            <input
+                                required
+                                type="text"
+                                value={twoFactorCode}
+                                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                placeholder="000000"
+                                className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg font-mono"
+                                autoFocus
+                            />
+                        </div>
+                    )}
 
                     <button
                         type="submit"
                         disabled={loading}
                         className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                     >
-                        {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
+                        {loading ? <Loader2 className="animate-spin" /> : (show2FA ? "Verify & Login" : "Sign In")}
                     </button>
+
+                    {show2FA && (
+                        <button
+                            type="button"
+                            onClick={() => setShow2FA(false)}
+                            className="w-full text-sm text-gray-500 hover:text-gray-700"
+                        >
+                            Back to Login
+                        </button>
+                    )}
                 </form>
 
                 <div className="text-center pt-4 border-t border-gray-100">

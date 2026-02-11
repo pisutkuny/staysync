@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon, Lock, Eye, EyeOff } from "lucide-react";
 import PasswordChangeForm from "../components/PasswordChangeForm";
+import Setup2FA from "../components/Setup2FA";
 
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
