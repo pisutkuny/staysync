@@ -119,15 +119,15 @@ export default function UserManagementPage() {
 
     return (
         <div className="p-3 md:p-6 max-w-7xl mx-auto space-y-6">
-            {/* Header Card */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border border-gray-100 dark:border-slate-700">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                            <Users className="text-indigo-600 dark:text-indigo-400" size={32} />
+                        <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <Users className="text-white" size={32} />
                             จัดการผู้ใช้งาน
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 mt-2">
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">
                             จัดการสิทธิ์การใช้งานและสถานะของผู้ใช้ในระบบ
                         </p>
                     </div>
@@ -138,7 +138,7 @@ export default function UserManagementPage() {
                             placeholder="ค้นหาชื่อ, อีเมล..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-white border-0 shadow-sm"
                         />
                     </div>
                 </div>
