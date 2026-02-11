@@ -74,7 +74,7 @@ export default function Home() {
     return (
       <div className="space-y-8 pb-10">
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 shadow-xl text-white">
-          <h2 className="text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
+          <h2 className="text-xl md:text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
           <p className="text-indigo-100">ระบบจัดการหอพักสำหรับผู้เช่า</p>
         </div>
 
@@ -132,7 +132,7 @@ export default function Home() {
           </div>
           <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg w-full md:w-auto text-center md:text-right">
             <p className="text-sm font-bold text-white/90 uppercase tracking-wider">ยอดรอเก็บ</p>
-            <p className="text-3xl font-bold text-white drop-shadow-md">฿{summary.outstanding.toLocaleString()}</p>
+            <p className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">฿{summary.outstanding.toLocaleString()}</p>
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function Home() {
           <div className="p-6 bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg border-2 border-green-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
               <p className="text-sm font-medium text-gray-600">รายรับเดือนนี้</p>
-              <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">฿{summary.revenue.toLocaleString()}</p>
+              <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">฿{summary.revenue.toLocaleString()}</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
               <Wallet size={28} />
@@ -157,7 +157,7 @@ export default function Home() {
           <div className="p-6 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg border-2 border-blue-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
               <p className="text-sm font-medium text-gray-600">อัตราการเข้าพัก</p>
-              <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">{summary.occupancyRate}%</p>
+              <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">{summary.occupancyRate}%</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
               <Users size={28} />
@@ -170,7 +170,7 @@ export default function Home() {
           <div className="p-6 bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-lg border-2 border-orange-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
             <div>
               <p className="text-sm font-medium text-gray-600">แจ้งซ่อมรอจัดการ</p>
-              <p className="text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
+              <p className="text-2xl md:text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
               <BadgeAlert size={28} />

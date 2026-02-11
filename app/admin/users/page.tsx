@@ -123,7 +123,7 @@ export default function UserManagementPage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border border-gray-100 dark:border-slate-700">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                        <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                             <Users className="text-indigo-600 dark:text-indigo-400" size={32} />
                             จัดการผู้ใช้งาน
                         </h1>

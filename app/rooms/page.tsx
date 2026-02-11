@@ -36,7 +36,7 @@ export default async function RoomsPage() {
                     <div key={room.id} className="bg-gradient-to-br from-white to-green-50 p-6 rounded-2xl border-2 border-green-200 shadow-xl hover:shadow-2xl transition-all hover:scale-105 flex flex-col justify-between min-h-[14rem]">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{room.number}</h3>
+                                <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{room.number}</h3>
                                 <p className="text-emerald-600 font-bold text-lg">฿{room.price}/mo</p>
                                 {/* Phase 2: Common Area Toggle */}
                                 <div className="mt-2">

@@ -46,7 +46,7 @@ export default function AddRoomPage() {
                     <ArrowLeft size={20} className="text-gray-500" />
                 </Link>
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">Add New Room</h2>
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">Add New Room</h2>
                     <p className="text-gray-500 mt-2">Create a new room in the dormitory.</p>
                 </div>
             </div>

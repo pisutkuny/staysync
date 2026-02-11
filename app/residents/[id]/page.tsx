@@ -30,7 +30,7 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                     </Link>
                     <div className="flex-1">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
+                            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
                                 👤 {resident.fullName}
                                 <Link href={`/residents/${resident.id}/edit`} className="p-2 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all shadow-lg border border-white/30" title="Edit Profile">
                                     <span className="sr-only">Edit</span>

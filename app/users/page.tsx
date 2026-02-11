@@ -188,7 +188,7 @@ export default function UsersPage() {
                 <div className="mb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                            <h1 className="text-xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
                                 <Users className="text-indigo-600" size={32} />
                                 User Management
                             </h1>

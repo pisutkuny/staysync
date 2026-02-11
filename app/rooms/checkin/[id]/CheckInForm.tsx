@@ -66,7 +66,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                     <ArrowLeft size={20} className="text-gray-500" />
                 </Link>
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">
                         {isOccupied ? "Add Resident" : "Check In Resident"}
                     </h2>
                     <p className="text-gray-500 mt-2">

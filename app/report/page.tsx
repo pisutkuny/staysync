@@ -183,7 +183,7 @@ export default function ReportIssuePage() {
 
             {/* Enhanced Gradient Header - Card Style */}
             <div className="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 rounded-2xl p-8 shadow-xl text-center">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center gap-3">
+                <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center gap-3">
                     🔧 Report Issue
                 </h1>
                 <p className="text-red-100 mt-2 text-sm md:text-base">แจ้งซ่อม / รายงานปัญหา</p>

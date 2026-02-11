@@ -97,7 +97,7 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                     <ArrowLeft size={24} className="text-gray-600" />
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Check Out Resident</h1>
+                    <h1 className="text-xl md:text-3xl font-bold text-gray-900">Check Out Resident</h1>
                     <p className="text-gray-500">{resident.fullName} • Room {resident.room.number}</p>
                 </div>
             </div>

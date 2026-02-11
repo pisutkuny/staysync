@@ -25,7 +25,7 @@ export default async function IssuesPage({
             <div className="bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">
                             🔧 {currentStatus === "Pending" ? "Pending Issues" : "Maintenance History"}
                         </h2>
                         <p className="text-pink-100 mt-2 text-lg">

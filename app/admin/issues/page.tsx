@@ -95,8 +95,8 @@ export default function IssuesBoardPage() {
             <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                            <Wrench size={40} />
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <Wrench size={32} className="md:w-10 md:h-10" />
                             Repair Requests
                         </h2>
                         <p className="text-orange-100 mt-2 text-lg">Manage and track maintenance issues</p>

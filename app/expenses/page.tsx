@@ -397,7 +397,7 @@ export default function ExpensesPage() {
                         </button>
                         <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
                             <p className="text-sm font-bold text-white/90 uppercase tracking-wider">Total Expenses</p>
-                            <p className="text-3xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
+                            <p className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
                         </div>
                     </div>
                 </div>

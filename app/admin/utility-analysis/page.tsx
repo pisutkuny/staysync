@@ -207,7 +207,7 @@ export default async function UtilityAnalysisPage() {
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">กำไรสุทธิ</p>
-                                    <p className={`text-3xl font-bold ${latestMonth.totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    <p className={`text-xl md:text-3xl font-bold ${latestMonth.totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         ฿{latestMonth.totalProfit.toLocaleString()}
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">

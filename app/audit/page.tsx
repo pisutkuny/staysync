@@ -115,7 +115,7 @@ export default function AuditPage() {
                 <div className="mb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                            <h1 className="text-xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
                                 <FileText className="text-indigo-600" size={32} />
                                 Audit Logs
                             </h1>

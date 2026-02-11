@@ -182,12 +182,12 @@ export default function RecurringExpensesPage() {
                                 Back to Expenses
                             </button>
                         </div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">🔁 Recurring Expenses</h2>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🔁 Recurring Expenses</h2>
                         <p className="text-pink-100 mt-2 text-lg">Manage expense templates that auto-create monthly.</p>
                     </div>
                     <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
                         <p className="text-sm font-bold text-white/90 uppercase tracking-wider">Monthly Total</p>
-                        <p className="text-3xl font-bold text-white drop-shadow-md">฿{totalMonthly.toLocaleString()}</p>
+                        <p className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">฿{totalMonthly.toLocaleString()}</p>
                     </div>
                 </div>
             </div>

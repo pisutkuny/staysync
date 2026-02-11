@@ -63,7 +63,7 @@ export default function BroadcastPage() {
             <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                             📢 Broadcast
                         </h1>
                         <p className="text-purple-100 mt-2 text-lg">Send announcements to residents via LINE</p>

@@ -52,9 +52,9 @@ export default function ReportsPage() {
 
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 relative z-10">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3 drop-shadow-md">
+                        <h1 className="text-xl md:text-3xl font-bold flex items-center gap-3 drop-shadow-md">
                             <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm shadow-inner">
-                                <FileText className="text-white" size={28} />
+                                <FileText className="text-white" size={24} />
                             </div>
                             Monthly Financial Report
                         </h1>
@@ -110,7 +110,7 @@ export default function ReportsPage() {
 
                     {/* Report Header - Web Only (Hidden in Print) */}
                     <div className="text-center mb-8 border-b-2 border-gray-800 pb-4 print:hidden">
-                        <h2 className="text-3xl font-bold uppercase tracking-wide">รายงานสรุปประจำเดือน</h2>
+                        <h2 className="text-xl md:text-3xl font-bold uppercase tracking-wide">รายงานสรุปประจำเดือน</h2>
                         <p className="text-lg text-gray-600 mt-2">
                             {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}
                         </p>
