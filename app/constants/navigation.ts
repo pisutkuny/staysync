@@ -90,6 +90,12 @@ export const NAV_ITEMS = [
         roles: ["OWNER"]
     },
     {
+        label: "User Management",
+        href: "/admin/users",
+        icon: Users,
+        roles: ["OWNER"]
+    },
+    {
         label: "Settings",
         href: "/settings",
         icon: Settings,
