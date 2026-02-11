@@ -17,7 +17,7 @@ export default function ExportButton() {
     return (
         <button
             onClick={handleExport}
-            className="bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-green-700 shadow-sm transition-all flex items-center gap-2 text-sm"
+            className="w-full justify-center bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-green-700 shadow-sm transition-all flex items-center gap-2 text-sm"
         >
             <span>📊</span> Export Excel
         </button>
