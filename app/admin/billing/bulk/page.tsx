@@ -187,26 +187,28 @@ export default function BulkMeterPage() {
 
     return (
         <div className="p-3 md:p-6 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <Calculator size={20} className="md:w-6 md:h-6" /> กรอกมาตรเป็นชุด
-                    </h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mt-1">
-                        ⭐ <strong className="text-indigo-600 dark:text-indigo-400">แนะนำสำหรับบันทึกมาตรประจำเดือน</strong> - กรอกมาตรน้ำ-ไฟทั้งหอพักในหน้าเดียว
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1 hidden md:block">
-                        💡 ระบบจะลบบิลเก่าที่ยังไม่จ่ายอัตโนมัติ เพื่อสร้างบิลใหม่แทนที่
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <label className="text-xs md:text-sm text-gray-600 dark:text-gray-300">เดือน:</label>
-                    <input
-                        type="month"
-                        value={selectedMonth}
-                        onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="border rounded px-2 md:px-3 py-1.5 md:py-2 text-sm dark:bg-slate-800 dark:text-white dark:border-slate-600"
-                    />
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow p-4 md:p-6 mb-6 border border-gray-100 dark:border-slate-700">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <div>
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                            <Calculator size={20} className="md:w-6 md:h-6" /> กรอกมาตรเป็นชุด
+                        </h1>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mt-1">
+                            ⭐ <strong className="text-indigo-600 dark:text-indigo-400">แนะนำสำหรับบันทึกมาตรประจำเดือน</strong> - กรอกมาตรน้ำ-ไฟทั้งหอพักในหน้าเดียว
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1 hidden md:block">
+                            💡 ระบบจะลบบิลเก่าที่ยังไม่จ่ายอัตโนมัติ เพื่อสร้างบิลใหม่แทนที่
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs md:text-sm text-gray-600 dark:text-gray-300">เดือน:</label>
+                        <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="border rounded px-2 md:px-3 py-1.5 md:py-2 text-sm dark:bg-slate-800 dark:text-white dark:border-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
+                    </div>
                 </div>
             </div>
 
