@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { logAudit, getRequestInfo } from "@/lib/audit/logger";
 // @ts-ignore
-import { authenticator } from "otplib";
+import { generateSecret, generateURI } from "otplib";
 import qrcode from "qrcode";
 
 import { getCurrentSession } from "@/lib/auth/session";
@@ -18,8 +18,13 @@ export async function POST(req: Request) {
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const secret = authenticator.generateSecret();
-        const otpauth = authenticator.keyuri(user.email, "StaySync", secret);
+        const secret = generateSecret();
+        // @ts-ignore
+        const otpauth = generateURI({
+            issuer: "StaySync",
+            label: user.email,
+            secret
+        });
         const qrCodeUrl = await qrcode.toDataURL(otpauth);
 
         // Ideally, store secret temporarily or encrypt it.

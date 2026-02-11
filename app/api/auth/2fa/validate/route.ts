@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 // @ts-ignore
-import { authenticator } from "otplib";
+import { verify } from "otplib";
 
 export async function POST(req: Request) {
     try {
@@ -14,7 +14,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "2FA not enabled" }, { status: 400 });
         }
 
-        const isValidToken = authenticator.verify({
+        // @ts-ignore
+        const isValidToken = await verify({
             token,
             // @ts-ignore
             secret: user.twoFactorSecret

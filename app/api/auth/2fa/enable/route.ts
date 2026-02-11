@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { logAudit, getRequestInfo } from "@/lib/audit/logger";
 // @ts-ignore
-import { authenticator } from "otplib";
+import { verify } from "otplib";
 
 import { getCurrentSession } from "@/lib/auth/session";
 
@@ -22,7 +22,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "2FA not setup" }, { status: 400 });
         }
 
-        const isValidToken = authenticator.verify({
+        // @ts-ignore
+        const isValidToken = await verify({
             token,
             // @ts-ignore
             secret: user.twoFactorSecret

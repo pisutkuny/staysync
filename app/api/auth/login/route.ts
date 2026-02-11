@@ -4,7 +4,7 @@ import { verifyPassword } from '@/lib/auth/password';
 import { createSession, setSessionCookie } from '@/lib/auth/session';
 import { logAudit, getRequestInfo } from '@/lib/audit/logger';
 // @ts-ignore
-import { authenticator } from 'otplib';
+import { verify } from 'otplib';
 
 const prisma = new PrismaClient();
 
@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
             // Verify 2FA code
             // @ts-ignore
             if ((user as any).twoFactorSecret) {
-                const isValidToken = authenticator.verify({
+                // @ts-ignore
+                const isValidToken = await verify({
                     token: body.code,
                     // @ts-ignore
                     secret: (user as any).twoFactorSecret
