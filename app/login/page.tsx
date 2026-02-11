@@ -29,7 +29,10 @@ export default function LoginPage() {
             }
 
             // Force full reload to ensure cookies are sent and middleware/server components see the new session
-            window.location.href = "/";
+            // window.location.href = "/";
+            router.push("/");
+            // Use router.refresh() to ensure server components update with new cookie
+            router.refresh();
         } catch (error) {
             alert("Invalid password");
         } finally {

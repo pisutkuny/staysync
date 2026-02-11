@@ -24,40 +24,113 @@ interface DashboardData {
 export default function Home() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/dashboard")
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return null;
+        }
+        if (!res.ok) {
+          throw new Error("Failed to load");
+        }
+        return res.json();
+      })
       .then((data) => {
-        setData(data);
+        if (data) {
+          setData(data);
+        }
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to fetch dashboard data", err);
+        setError("ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading Dashboard...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-gray-500 gap-2">
+        <span className="loading loading-spinner text-indigo-600"></span> กำลังโหลดข้อมูล...
+      </div>
+    );
   }
 
-  if (!data) {
-    return <div className="p-8 text-center text-red-500">Failed to load data.</div>;
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-red-500 gap-2">
+        <AlertCircle /> {error}
+      </div>
+    );
   }
 
+  if (!data) return null;
+
+  // Tenant View (Simplified)
+  if ((data as any).userRole === 'TENANT') {
+    return (
+      <div className="space-y-8 pb-10">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 shadow-xl text-white">
+          <h2 className="text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
+          <p className="text-indigo-100">ระบบจัดการหอพักสำหรับผู้เช่า</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-8 text-center border border-gray-100">
+          <div className="bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
+            <DoorOpen size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">รอการยืนยันห้องพัก</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            กรุณาติดต่อเจ้าหน้าที่หอพักเพื่อเชื่อมโยงบัญชีของคุณกับห้องพัก <br />
+            เมื่อเชื่อมโยงแล้ว คุณจะสามารถดูบิลค่าน้ำค่าไฟและแจ้งซ่อมได้ที่นี่
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/report" className="block p-6 bg-white rounded-xl shadow hover:shadow-md transition-shadow border border-gray-100 group">
+            <div className="flex items-center gap-4">
+              <div className="bg-orange-100 p-3 rounded-lg text-orange-600 group-hover:bg-orange-200 transition-colors">
+                <BadgeAlert size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">แจ้งปัญหาทั่วไป</h3>
+                <p className="text-sm text-gray-500">แจ้งเรื่องร้องเรียน หรือสอบถามข้อมูล</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/settings" className="block p-6 bg-white rounded-xl shadow hover:shadow-md transition-shadow border border-gray-100 group">
+            <div className="flex items-center gap-4">
+              <div className="bg-gray-100 p-3 rounded-lg text-gray-600 group-hover:bg-gray-200 transition-colors">
+                <div className="w-6 h-6 flex items-center justify-center">⚙️</div>
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">ตั้งค่าบัญชี</h3>
+                <p className="text-sm text-gray-500">จัดการข้อมูลส่วนตัว</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Owner View (Full Dashboard)
   const { summary, charts, activity, topSpenders } = data;
 
   return (
     <div className="space-y-8 pb-10">
       {/* Enhanced Gradient Header */}
       <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
             <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg">📊 Dashboard</h2>
             <p className="text-cyan-100 mt-2 text-lg">ภาพรวมหอพักของคุณ (Real-time)</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg">
+          <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg w-full md:w-auto text-center md:text-right">
             <p className="text-sm font-bold text-white/90 uppercase tracking-wider">ยอดรอเก็บ</p>
             <p className="text-3xl font-bold text-white drop-shadow-md">฿{summary.outstanding.toLocaleString()}</p>
           </div>

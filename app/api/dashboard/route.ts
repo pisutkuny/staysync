@@ -1,15 +1,44 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
+import { getCurrentSession } from '@/lib/auth/session';
 
 // Enable caching with 2-minute revalidation
 export const revalidate = 120; // Cache for 2 minutes (120 seconds)
 
 export async function GET() {
     try {
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        }
+
         const today = new Date();
         const startOfCurrentMonth = startOfMonth(today);
         const endOfCurrentMonth = endOfMonth(today);
+
+        // If user is a TENANT, return simplified/empty data to prevent crash
+        if (session.role === 'TENANT') {
+            // Fetch logged-in user's room info if needed, or just return empty for now
+            // For now, return a safe "empty" structure
+            return NextResponse.json({
+                userRole: 'TENANT',
+                summary: {
+                    revenue: 0,
+                    outstanding: 0,
+                    occupancyRate: 0,
+                    activeIssues: 0
+                },
+                charts: {
+                    revenue: [],
+                    occupancy: []
+                },
+                activity: [],
+                topSpenders: []
+            });
+        }
+
+        // --- OWNER / ADMIN LOGIC BELOW ---
 
         // 1. Summary Cards Data
         // Total Revenue (This Month) - Only Paid bills
@@ -185,6 +214,7 @@ export async function GET() {
         }));
 
         return NextResponse.json({
+            userRole: session.role,
             summary: {
                 revenue: revenueAgg._sum.totalAmount || 0,
                 outstanding: outstandingAgg._sum.totalAmount || 0,
