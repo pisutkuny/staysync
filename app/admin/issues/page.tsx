@@ -93,22 +93,22 @@ export default function IssuesBoardPage() {
         <div className="space-y-6">
             {/* Gradient Header */}
             <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-2xl p-8 shadow-xl">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     <div>
-                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center md:justify-start gap-3">
                             <Wrench size={32} className="md:w-10 md:h-10" />
                             Repair Requests
                         </h2>
                         <p className="text-orange-100 mt-2 text-lg">Manage and track maintenance issues</p>
                     </div>
-                    <div className="flex gap-3">
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                    <div className="flex flex-wrap justify-center gap-3 w-full md:w-auto">
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
                             ⏳ Pending: {columns.Pending.length}
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
                             🔨 In Progress: {columns.InProgress.length}
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium">
+                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white font-medium flex-1 md:flex-none text-center whitespace-nowrap">
                             ✅ Done: {columns.Done.length}
                         </div>
                     </div>

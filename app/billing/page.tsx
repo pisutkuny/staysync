@@ -69,10 +69,12 @@ export default async function BillingPage() {
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Monthly Billing</h2>
                         <p className="text-orange-100 mt-2 text-lg">Manage billing and view utility usage.</p>
                     </div>
-                    <div className="flex gap-3 w-full md:w-auto">
-                        <ExportButton />
-                        <Link href="/admin/billing/bulk">
-                            <button className="bg-white text-orange-700 px-6 py-3 rounded-xl font-bold hover:bg-orange-50 shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap border-2 border-white/30 hover:scale-105">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div className="w-full sm:w-auto">
+                            <ExportButton />
+                        </div>
+                        <Link href="/billing/bulk" className="w-full sm:w-auto">
+                            <button className="w-full sm:w-auto bg-white text-orange-700 px-6 py-3 rounded-xl font-bold hover:bg-orange-50 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap border-2 border-white/30 hover:scale-105">
                                 <span>📝</span> Record All Meters
                             </button>
                         </Link>
