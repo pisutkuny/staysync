@@ -385,469 +385,468 @@ export default function ExpensesPage() {
                         <p className="text-indigo-100 mt-2 text-lg">Record and monitor operating expenses with receipt uploads.</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => window.location.href = '/expenses/recurring'}
-                                className="bg-white text-purple-700 px-4 py-2.5 rounded-lg font-bold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 text-sm"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
-                                    <path d="M21 3v5h-5" />
-                                </svg>
-                                Recurring Expenses
-                            </button>
-                            <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-xl border border-white/30 shadow-lg">
-                                <p className="text-xs font-bold text-white/90 uppercase tracking-wider">Total Expenses</p>
-                                <p className="text-xl md:text-2xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
-                            </div>
+                        <button
+                            onClick={() => window.location.href = '/expenses/recurring'}
+                            className="bg-white text-purple-700 px-4 py-2.5 rounded-lg font-bold hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 text-sm"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                            </svg>
+                            Recurring Expenses
+                        </button>
+                        <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-xl border border-white/30 shadow-lg">
+                            <p className="text-xs font-bold text-white/90 uppercase tracking-wider">Total Expenses</p>
+                            <p className="text-xl md:text-2xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Enhanced Search & Filter Bar */}
-                <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-lg">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="md:col-span-2">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-3 text-indigo-400" size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="🔍 Search title or note..."
-                                    value={searchQuery}
-                                    onChange={(e) => {
-                                        setSearchQuery(e.target.value);
-                                        setPage(1);
-                                    }}
-                                    className="pl-11 w-full p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                                />
-                            </div>
+            {/* Enhanced Search & Filter Bar */}
+            <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-lg">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-2">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-3 text-indigo-400" size={20} />
+                            <input
+                                type="text"
+                                placeholder="🔍 Search title or note..."
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="pl-11 w-full p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                            />
                         </div>
-                        <select
-                            value={categoryFilter}
+                    </div>
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => {
+                            setCategoryFilter(e.target.value);
+                            setPage(1);
+                        }}
+                        className="p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
+                    >
+                        <option value="">📁 All Categories</option>
+                        <option value="Maintenance">🔧 Maintenance</option>
+                        <option value="Utilities">⚡ Utilities</option>
+                        <option value="Salary">💼 Salary</option>
+                        <option value="Supplies">📦 Supplies</option>
+                        <option value="Other">📝 Other</option>
+                    </select>
+                    <div className="flex gap-2">
+                        {(searchQuery || categoryFilter || dateFrom || dateTo) && (
+                            <button
+                                onClick={clearFilters}
+                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-2"
+                            >
+                                <X size={16} />
+                                Clear
+                            </button>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={exportToExcel}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                                title="Export to Excel"
+                            >
+                                <FileSpreadsheet size={16} />
+                            </button>
+                            <button
+                                onClick={exportToPDF}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
+                                title="Export to PDF"
+                            >
+                                <FileText size={16} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1">From Date</label>
+                        <input
+                            type="date"
+                            value={dateFrom}
                             onChange={(e) => {
-                                setCategoryFilter(e.target.value);
+                                setDateFrom(e.target.value);
                                 setPage(1);
                             }}
-                            className="p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
-                        >
-                            <option value="">📁 All Categories</option>
-                            <option value="Maintenance">🔧 Maintenance</option>
-                            <option value="Utilities">⚡ Utilities</option>
-                            <option value="Salary">💼 Salary</option>
-                            <option value="Supplies">📦 Supplies</option>
-                            <option value="Other">📝 Other</option>
-                        </select>
-                        <div className="flex gap-2">
-                            {(searchQuery || categoryFilter || dateFrom || dateTo) && (
-                                <button
-                                    onClick={clearFilters}
-                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-2"
-                                >
-                                    <X size={16} />
-                                    Clear
-                                </button>
-                            )}
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={exportToExcel}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
-                                    title="Export to Excel"
-                                >
-                                    <FileSpreadsheet size={16} />
-                                </button>
-                                <button
-                                    onClick={exportToPDF}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
-                                    title="Export to PDF"
-                                >
-                                    <FileText size={16} />
-                                </button>
-                            </div>
-                        </div>
+                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">From Date</label>
-                            <input
-                                type="date"
-                                value={dateFrom}
-                                onChange={(e) => {
-                                    setDateFrom(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">To Date</label>
-                            <input
-                                type="date"
-                                value={dateTo}
-                                onChange={(e) => {
-                                    setDateTo(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm text-gray-600 mb-1">To Date</label>
+                        <input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
                     </div>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Enhanced Form Section */}
-                    <div className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 shadow-xl h-fit">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
-                                {editingId ? <Edit className="text-blue-600" size={22} /> : <Plus className="text-indigo-600" size={22} />}
-                                {editingId ? "✏️ Edit Expense" : "➕ Add New Expense"}
-                            </h3>
-                            {editingId && (
-                                <button
-                                    onClick={resetForm}
-                                    className="text-gray-400 hover:text-gray-600 transition hover:bg-gray-100 rounded-lg p-1"
-                                >
-                                    <X size={20} />
-                                </button>
-                            )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Enhanced Form Section */}
+                <div className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 shadow-xl h-fit">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+                            {editingId ? <Edit className="text-blue-600" size={22} /> : <Plus className="text-indigo-600" size={22} />}
+                            {editingId ? "✏️ Edit Expense" : "➕ Add New Expense"}
+                        </h3>
+                        {editingId && (
+                            <button
+                                onClick={resetForm}
+                                className="text-gray-400 hover:text-gray-600 transition hover:bg-gray-100 rounded-lg p-1"
+                            >
+                                <X size={20} />
+                            </button>
+                        )}
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <div className="relative">
+                                <FileText className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                                <input
+                                    type="text"
+                                    required
+                                    value={title}
+                                    onChange={e => setTitle(e.target.value)}
+                                    className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="e.g. Fix Aircon Room 101"
+                                />
+                            </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <div className="relative">
-                                    <FileText className="absolute left-3 top-2.5 text-gray-400" size={16} />
-                                    <input
-                                        type="text"
-                                        required
-                                        value={title}
-                                        onChange={e => setTitle(e.target.value)}
-                                        className="pl-10 w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        placeholder="e.g. Fix Aircon Room 101"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        step="0.01"
-                                        value={amount}
-                                        onChange={e => setAmount(e.target.value)}
-                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        placeholder="0.00"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        value={date}
-                                        onChange={e => setDate(e.target.value)}
-                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                <select
-                                    value={category}
-                                    onChange={e => setCategory(e.target.value)}
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                                <input
+                                    type="number"
+                                    required
+                                    step="0.01"
+                                    value={amount}
+                                    onChange={e => setAmount(e.target.value)}
                                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                >
-                                    <option value="Maintenance">Maintenance</option>
-                                    <option value="Utilities">Utilities</option>
-                                    <option value="Salary">Salary</option>
-                                    <option value="Supplies">Supplies</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
-                                <textarea
-                                    value={note}
-                                    onChange={e => setNote(e.target.value)}
-                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none h-20"
-                                    placeholder="Additional details..."
+                                    placeholder="0.00"
                                 />
                             </div>
-
-                            {/* Receipt Upload */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Image (Optional)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={date}
+                                    onChange={e => setDate(e.target.value)}
+                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                            </div>
+                        </div>
 
-                                {existingReceiptUrl && !receiptPreview && (
-                                    <div className="mb-2 relative">
-                                        <img
-                                            src={existingReceiptUrl}
-                                            alt="Existing receipt"
-                                            className="w-full h-32 object-cover rounded-lg border"
-                                        />
-                                        <a
-                                            href={existingReceiptUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-gray-100"
-                                        >
-                                            <Eye size={16} />
-                                        </a>
-                                    </div>
-                                )}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select
+                                value={category}
+                                onChange={e => setCategory(e.target.value)}
+                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            >
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Supplies">Supplies</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
 
-                                {receiptPreview && (
-                                    <div className="mb-2 relative">
-                                        <img
-                                            src={receiptPreview}
-                                            alt="New receipt"
-                                            className="w-full h-32 object-cover rounded-lg border border-blue-300"
-                                        />
-                                        {compressing && (
-                                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                                                <Loader2 className="animate-spin text-white" size={24} />
-                                            </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
+                            <textarea
+                                value={note}
+                                onChange={e => setNote(e.target.value)}
+                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none h-20"
+                                placeholder="Additional details..."
+                            />
+                        </div>
+
+                        {/* Receipt Upload */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Image (Optional)</label>
+
+                            {existingReceiptUrl && !receiptPreview && (
+                                <div className="mb-2 relative">
+                                    <img
+                                        src={existingReceiptUrl}
+                                        alt="Existing receipt"
+                                        className="w-full h-32 object-cover rounded-lg border"
+                                    />
+                                    <a
+                                        href={existingReceiptUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-gray-100"
+                                    >
+                                        <Eye size={16} />
+                                    </a>
+                                </div>
+                            )}
+
+                            {receiptPreview && (
+                                <div className="mb-2 relative">
+                                    <img
+                                        src={receiptPreview}
+                                        alt="New receipt"
+                                        className="w-full h-32 object-cover rounded-lg border border-blue-300"
+                                    />
+                                    {compressing && (
+                                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                                            <Loader2 className="animate-spin text-white" size={24} />
+                                        </div>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setReceiptFile(null);
+                                            setReceiptPreview("");
+                                            setOriginalSize(0);
+                                            setCompressedSize(0);
+                                        }}
+                                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {compressedSize > 0 && (
+                                <div className="mb-2 text-xs text-gray-600 bg-green-50 p-2 rounded">
+                                    ✓ Compressed: {(originalSize / 1024).toFixed(0)}KB → {(compressedSize / 1024).toFixed(0)}KB
+                                    ({(((originalSize - compressedSize) / originalSize) * 100).toFixed(0)}% smaller)
+                                </div>
+                            )}
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                disabled={compressing}
+                                className="w-full p-2 border rounded-lg text-sm disabled:opacity-50"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Mobile camera supported • Auto-compressed to ~500KB</p>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={submitting || uploadingReceipt || compressing}
+                            className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {submitting || uploadingReceipt ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={20} />
+                                    {uploadingReceipt ? "Uploading..." : editingId ? "Updating..." : "Saving..."}
+                                </>
+                            ) : (
+                                <>
+                                    {editingId ? <Check size={20} /> : <Save size={20} />}
+                                    {editingId ? "Update Record" : "Save Record"}
+                                </>
+                            )}
+                        </button>
+
+                        {editingId && (
+                            <button
+                                type="button"
+                                onClick={resetForm}
+                                className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-all"
+                            >
+                                Cancel
+                            </button>
+                        )}
+                    </form>
+                </div>
+
+                {/* List Section */}
+                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
+                        <select
+                            value={limit}
+                            onChange={(e) => {
+                                setLimit(parseInt(e.target.value));
+                                setPage(1);
+                            }}
+                            className="p-2 border rounded-lg text-sm"
+                        >
+                            <option value={10}>10 per page</option>
+                            <option value={20}>20 per page</option>
+                            <option value={50}>50 per page</option>
+                            <option value={100}>100 per page</option>
+                        </select>
+                    </div>
+                    {loading ? (
+                        <div className="p-8 text-center text-gray-500 flex justify-center">
+                            <Loader2 className="animate-spin" />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-600 font-medium">
+                                        <tr>
+                                            <th className="px-2 py-3 sm:p-4">Date</th>
+                                            <th className="px-2 py-3 sm:p-4">Title</th>
+                                            <th className="px-2 py-3 sm:p-4">Category</th>
+                                            <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
+                                            <th className="px-2 py-3 sm:p-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {expenses.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="p-8 text-center text-gray-400">
+                                                    {searchQuery || categoryFilter || dateFrom || dateTo
+                                                        ? "No expenses found matching your filters."
+                                                        : "No expenses recorded yet."
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            expenses.map((expense) => (
+                                                <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-2 py-3 sm:p-4 text-gray-500">
+                                                        {format(new Date(expense.date), "dd MMM yyyy")}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <div className="font-medium text-gray-900">{expense.title}</div>
+                                                        {expense.note && <div className="text-xs text-gray-400 font-normal">{expense.note}</div>}
+                                                        {expense.receiptUrl && (
+                                                            <a
+                                                                href={expense.receiptUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
+                                                            >
+                                                                <FileText size={12} />
+                                                                View Receipt
+                                                            </a>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold 
+                                                            ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
+                                                                expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
+                                                                    expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
+                                                                        'bg-gray-100 text-gray-700'}`}>
+                                                            {expense.category}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
+                                                        -฿{expense.amount.toLocaleString()}
+                                                    </td>
+                                                    <td className="px-2 py-3 sm:p-4">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button
+                                                                onClick={() => handleEdit(expense)}
+                                                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
+                                                                title="Edit"
+                                                            >
+                                                                <Edit size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openDeleteModal(expense.id)}
+                                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
+                                                                title="Delete"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
                                         )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="p-4 border-t border-gray-100 flex items-center justify-between">
+                                    <div className="text-sm text-gray-600">
+                                        Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, pagination.total)} of {pagination.total} expenses
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         <button
-                                            type="button"
-                                            onClick={() => {
-                                                setReceiptFile(null);
-                                                setReceiptPreview("");
-                                                setOriginalSize(0);
-                                                setCompressedSize(0);
-                                            }}
-                                            className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600"
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            disabled={page === 1}
+                                            className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                                         >
-                                            <X size={16} />
+                                            <ChevronLeft size={16} />
+                                            Previous
+                                        </button>
+                                        <span className="text-sm text-gray-600">
+                                            Page {page} of {pagination.totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                                            disabled={page === pagination.totalPages}
+                                            className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                        >
+                                            Next
+                                            <ChevronRight size={16} />
                                         </button>
                                     </div>
-                                )}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
 
-                                {compressedSize > 0 && (
-                                    <div className="mb-2 text-xs text-gray-600 bg-green-50 p-2 rounded">
-                                        ✓ Compressed: {(originalSize / 1024).toFixed(0)}KB → {(compressedSize / 1024).toFixed(0)}KB
-                                        ({(((originalSize - compressedSize) / originalSize) * 100).toFixed(0)}% smaller)
-                                    </div>
-                                )}
-
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    disabled={compressing}
-                                    className="w-full p-2 border rounded-lg text-sm disabled:opacity-50"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Mobile camera supported • Auto-compressed to ~500KB</p>
-                            </div>
-
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Expense?</h3>
+                        <p className="text-gray-600 mb-6">This action cannot be undone. The receipt will also be deleted from Google Drive.</p>
+                        <div className="flex gap-3">
                             <button
-                                type="submit"
-                                disabled={submitting || uploadingReceipt || compressing}
-                                className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                onClick={() => {
+                                    setDeleteModalOpen(false);
+                                    setDeleteTargetId(null);
+                                }}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition disabled:opacity-50"
                             >
-                                {submitting || uploadingReceipt ? (
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {deleting ? (
                                     <>
-                                        <Loader2 className="animate-spin" size={20} />
-                                        {uploadingReceipt ? "Uploading..." : editingId ? "Updating..." : "Saving..."}
+                                        <Loader2 className="animate-spin" size={16} />
+                                        Deleting...
                                     </>
                                 ) : (
                                     <>
-                                        {editingId ? <Check size={20} /> : <Save size={20} />}
-                                        {editingId ? "Update Record" : "Save Record"}
+                                        <Trash2 size={16} />
+                                        Delete
                                     </>
                                 )}
                             </button>
-
-                            {editingId && (
-                                <button
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                            )}
-                        </form>
-                    </div>
-
-                    {/* List Section */}
-                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
-                            <select
-                                value={limit}
-                                onChange={(e) => {
-                                    setLimit(parseInt(e.target.value));
-                                    setPage(1);
-                                }}
-                                className="p-2 border rounded-lg text-sm"
-                            >
-                                <option value={10}>10 per page</option>
-                                <option value={20}>20 per page</option>
-                                <option value={50}>50 per page</option>
-                                <option value={100}>100 per page</option>
-                            </select>
                         </div>
-                        {loading ? (
-                            <div className="p-8 text-center text-gray-500 flex justify-center">
-                                <Loader2 className="animate-spin" />
-                            </div>
-                        ) : (
-                            <>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-gray-50 text-gray-600 font-medium">
-                                            <tr>
-                                                <th className="px-2 py-3 sm:p-4">Date</th>
-                                                <th className="px-2 py-3 sm:p-4">Title</th>
-                                                <th className="px-2 py-3 sm:p-4">Category</th>
-                                                <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
-                                                <th className="px-2 py-3 sm:p-4 text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {expenses.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={5} className="p-8 text-center text-gray-400">
-                                                        {searchQuery || categoryFilter || dateFrom || dateTo
-                                                            ? "No expenses found matching your filters."
-                                                            : "No expenses recorded yet."
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                expenses.map((expense) => (
-                                                    <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
-                                                        <td className="px-2 py-3 sm:p-4 text-gray-500">
-                                                            {format(new Date(expense.date), "dd MMM yyyy")}
-                                                        </td>
-                                                        <td className="px-2 py-3 sm:p-4">
-                                                            <div className="font-medium text-gray-900">{expense.title}</div>
-                                                            {expense.note && <div className="text-xs text-gray-400 font-normal">{expense.note}</div>}
-                                                            {expense.receiptUrl && (
-                                                                <a
-                                                                    href={expense.receiptUrl}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
-                                                                >
-                                                                    <FileText size={12} />
-                                                                    View Receipt
-                                                                </a>
-                                                            )}
-                                                        </td>
-                                                        <td className="px-2 py-3 sm:p-4">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold 
-                                                            ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
-                                                                    expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
-                                                                        expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
-                                                                            'bg-gray-100 text-gray-700'}`}>
-                                                                {expense.category}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
-                                                            -฿{expense.amount.toLocaleString()}
-                                                        </td>
-                                                        <td className="px-2 py-3 sm:p-4">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                <button
-                                                                    onClick={() => handleEdit(expense)}
-                                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
-                                                                    title="Edit"
-                                                                >
-                                                                    <Edit size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => openDeleteModal(expense.id)}
-                                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
-                                                                    title="Delete"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                {/* Pagination */}
-                                {pagination.totalPages > 1 && (
-                                    <div className="p-4 border-t border-gray-100 flex items-center justify-between">
-                                        <div className="text-sm text-gray-600">
-                                            Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, pagination.total)} of {pagination.total} expenses
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                                disabled={page === 1}
-                                                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                            >
-                                                <ChevronLeft size={16} />
-                                                Previous
-                                            </button>
-                                            <span className="text-sm text-gray-600">
-                                                Page {page} of {pagination.totalPages}
-                                            </span>
-                                            <button
-                                                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
-                                                disabled={page === pagination.totalPages}
-                                                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                            >
-                                                Next
-                                                <ChevronRight size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </>
-                        )}
                     </div>
                 </div>
-
-                {/* Delete Confirmation Modal */}
-                {deleteModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Expense?</h3>
-                            <p className="text-gray-600 mb-6">This action cannot be undone. The receipt will also be deleted from Google Drive.</p>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => {
-                                        setDeleteModalOpen(false);
-                                        setDeleteTargetId(null);
-                                    }}
-                                    disabled={deleting}
-                                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition disabled:opacity-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    disabled={deleting}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    {deleting ? (
-                                        <>
-                                            <Loader2 className="animate-spin" size={16} />
-                                            Deleting...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Trash2 size={16} />
-                                            Delete
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-            );
+            )}
+        </div>
+    );
 }
