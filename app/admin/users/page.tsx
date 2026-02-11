@@ -150,11 +150,11 @@ export default function UserManagementPage() {
                     <table className="w-full text-left text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700">
                             <tr>
-                                <th className="p-4 font-semibold text-gray-700 dark:text-gray-300">ผู้ใช้งาน</th>
-                                <th className="p-4 font-semibold text-gray-700 dark:text-gray-300">บทบาท</th>
-                                <th className="p-4 font-semibold text-gray-700 dark:text-gray-300">สถานะ</th>
-                                <th className="p-4 font-semibold text-gray-700 dark:text-gray-300">ใช้งานล่าสุด</th>
-                                <th className="p-4 font-semibold text-gray-700 dark:text-gray-300 text-right">จัดการ</th>
+                                <th className="p-3 md:p-4 font-semibold text-gray-700 dark:text-gray-300">ผู้ใช้งาน</th>
+                                <th className="p-3 md:p-4 font-semibold text-gray-700 dark:text-gray-300">บทบาท</th>
+                                <th className="p-3 md:p-4 font-semibold text-gray-700 dark:text-gray-300">สถานะ</th>
+                                <th className="p-3 md:p-4 font-semibold text-gray-700 dark:text-gray-300">ใช้งานล่าสุด</th>
+                                <th className="p-3 md:p-4 font-semibold text-gray-700 dark:text-gray-300 text-right">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y dark:divide-slate-700">
