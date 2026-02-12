@@ -42,8 +42,8 @@ export default function LoginPage() {
                 throw new Error(data.error || "Invalid credentials");
             }
 
-            router.push("/");
-            router.refresh();
+            // Force hard redirect to ensure middleware/session are picked up
+            window.location.href = "/";
         } catch (error: any) {
             setError(error.message);
             setLoading(false);
