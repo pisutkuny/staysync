@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export const generateVerificationToken = async (email: string) => {
     const token = uuidv4();
-    const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
+    const expires = new Date(new Date().getTime() + 24 * 3600 * 1000); // 24 hours
 
     const existingToken = await prisma.user.findFirst({
         where: { email }
@@ -18,6 +18,8 @@ export const generateVerificationToken = async (email: string) => {
                 verificationExpiry: expires
             }
         });
+    } else {
+        throw new Error(`User not found for token generation: ${email}`);
     }
 
     return token;
@@ -25,7 +27,7 @@ export const generateVerificationToken = async (email: string) => {
 
 export const generatePasswordResetToken = async (email: string) => {
     const token = uuidv4();
-    const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
+    const expires = new Date(new Date().getTime() + 24 * 3600 * 1000); // 24 hours
 
     await prisma.user.update({
         where: { email },
