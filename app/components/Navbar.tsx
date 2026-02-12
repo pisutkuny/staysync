@@ -43,7 +43,7 @@ export default function Navbar({ userRole }: { userRole?: string }) {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setLanguage(language === 'TH' ? 'EN' : 'TH')}
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xs font-bold transition-colors"
+                        className="w-9 h-9 rounded-full bg-white border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 flex items-center justify-center text-xs font-bold transition-all shadow-sm"
                     >
                         {language}
                     </button>
