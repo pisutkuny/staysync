@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getCurrentSession } from '@/lib/auth/session';
@@ -6,18 +7,30 @@ import { logAudit, getRequestInfo, getChanges } from '@/lib/audit/logger';
 
 const prisma = new PrismaClient();
 
+// Helper to safely get params
+async function getParams(paramsPromise: Promise<{ id: string }>) {
+    const params = await paramsPromise;
+    return params;
+}
+
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> } // Fix: Params must be a Promise in Next.js 16
+    props: { params: Promise<{ id: string }> }
 ) {
     try {
+        const params = await props.params;
+        const id = params.id;
+
         const session = await getCurrentSession();
         if (!session) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        const { id } = await params;
         const userId = parseInt(id);
+        if (isNaN(userId)) {
+            return NextResponse.json({ error: 'Invalid User ID' }, { status: 400 });
+        }
+
         const currentUser = await prisma.user.findUnique({
             where: { id: session.userId },
         });
@@ -85,20 +98,28 @@ export async function PATCH(
                 status: updatedUser.status,
             },
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Update user error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal server error: ' + error.message }, { status: 500 });
     }
 }
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    props: { params: Promise<{ id: string }> }
 ) {
     try {
+        const params = await props.params;
+        const id = params.id;
+
         const session = await getCurrentSession();
         if (!session) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        }
+
+        const userId = parseInt(id);
+        if (isNaN(userId)) {
+            return NextResponse.json({ error: 'Invalid User ID' }, { status: 400 });
         }
 
         // Get current user
@@ -110,10 +131,7 @@ export async function DELETE(
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const { id } = await params;
-        const userId = parseInt(id);
-
-        // Get user
+        // Get user target
         const user = await prisma.user.findUnique({
             where: { id: userId },
         });
@@ -158,8 +176,8 @@ export async function DELETE(
         });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Delete user error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal server error: ' + error.message }, { status: 500 });
     }
 }
