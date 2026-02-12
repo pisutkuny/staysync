@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { createSession, setSessionCookie } from '@/lib/auth/session';
 import { logAudit, getRequestInfo } from '@/lib/audit/logger';
 import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from 'otplib';
 import { verifyPassword } from '@/lib/auth/password';
 
-const prisma = new PrismaClient();
+
 
 export async function POST(req: NextRequest) {
     try {
