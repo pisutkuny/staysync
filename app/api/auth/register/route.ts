@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+
 import { hashPassword } from "@/lib/auth/password";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
 
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
     try {
@@ -78,11 +78,14 @@ export async function POST(req: NextRequest) {
 
         // Send verification email
         try {
+            console.log(`[Register] Attempting to send verification email to ${email}`);
             const token = await generateVerificationToken(email);
+            console.log(`[Register] Generated token for ${email}`);
             await sendVerificationEmail(email, token);
+            console.log(`[Register] Verification email sent to ${email}`);
         } catch (emailError) {
-            console.error("Failed to send verification email:", emailError);
-            // Continue even if email fails, user can resend later (if we impl that)
+            console.error("[Register] Failed to send verification email:", emailError);
+            // Continue even if email fails, user can resend later
         }
 
         // Remove password from response
