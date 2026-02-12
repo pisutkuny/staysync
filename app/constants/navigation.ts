@@ -1,7 +1,15 @@
 
-import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench, Calculator, Database, AlertCircle, Users, BedDouble } from "lucide-react";
+import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench, Calculator, Database, AlertCircle, Users, BedDouble, PieChart, Activity } from "lucide-react";
 
-export const NAV_ITEMS = [
+export interface NavItem {
+    label: string;
+    href?: string;
+    icon?: any;
+    roles?: string[];
+    children?: NavItem[];
+}
+
+export const NAV_ITEMS: NavItem[] = [
     {
         label: "Dashboard",
         href: "/dashboard",
@@ -9,111 +17,111 @@ export const NAV_ITEMS = [
         roles: ["OWNER", "STAFF", "TENANT"]
     },
     {
-        label: "Book Room",
-        href: "/booking",
-        icon: BedDouble,
-        roles: ["OWNER", "STAFF", "TENANT"]
-    },
-    {
-        label: "Rooms (Admin)",
-        href: "/rooms",
+        label: "Room Management",
         icon: DoorOpen,
-        roles: ["OWNER", "STAFF"]
+        roles: ["OWNER", "STAFF", "TENANT"],
+        children: [
+            {
+                label: "Book Room",
+                href: "/booking",
+                roles: ["OWNER", "STAFF", "TENANT"]
+            },
+            {
+                label: "Bookings",
+                href: "/admin/bookings",
+                roles: ["OWNER", "STAFF"]
+            },
+            {
+                label: "Rooms",
+                href: "/rooms",
+                roles: ["OWNER", "STAFF"]
+            }
+        ]
     },
     {
-        label: "Bookings",
-        href: "/admin/bookings",
-        icon: FileText,
-        roles: ["OWNER", "STAFF"]
-    },
-    {
-        label: "Issues",
-        href: "/issues",
-        icon: AlertCircle,
-        // color: "text-red-600",
-        // description: "Track and manage maintenance requests",
-        roles: ["OWNER", "STAFF"]
-    },
-    {
-        label: "Users",
-        href: "/users",
-        icon: Users,
-        // color: "text-purple-600",
-        // description: "Manage organization users and roles",
-        roles: ["OWNER"]
-    },
-    {
-        label: "Audit",
-        href: "/audit",
-        icon: FileText,
-        // color: "text-gray-600",
-        // description: "View activity logs and changes",
-        roles: ["OWNER"]
-    },
-    {
-        label: "Billing",
-        href: "/billing",
+        label: "Billing & Utilities",
         icon: Receipt,
-        roles: ["OWNER"]
+        roles: ["OWNER"],
+        children: [
+            {
+                label: "Billing",
+                href: "/billing",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Bulk Meter Entry",
+                href: "/admin/billing/bulk",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Monthly Report",
+                href: "/admin/reports",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Central Meter",
+                href: "/admin/central-meter",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Utility Analysis",
+                href: "/admin/utility-analysis",
+                roles: ["OWNER"]
+            }
+        ]
     },
     {
-        label: "Repair Requests",
-        href: "/admin/issues",
+        label: "Maintenance",
         icon: Wrench,
-        roles: ["OWNER", "STAFF"]
+        roles: ["OWNER", "STAFF", "TENANT"],
+        children: [
+            {
+                label: "Report Issue",
+                href: "/report",
+                roles: ["OWNER", "STAFF", "TENANT"]
+            },
+            {
+                label: "Repair Requests",
+                href: "/admin/issues",
+                roles: ["OWNER", "STAFF"]
+            },
+            {
+                label: "Issues Log",
+                href: "/issues",
+                roles: ["OWNER", "STAFF"]
+            }
+        ]
     },
     {
-        label: "Report Issue",
-        href: "/report",
-        icon: FileText,
-        roles: ["OWNER", "STAFF", "TENANT"]
-    },
-    {
-        label: "Broadcast",
-        href: "/broadcast",
-        icon: Megaphone,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Bulk Meter Entry",
-        href: "/admin/billing/bulk",
-        icon: Calculator,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Monthly Report",
-        href: "/admin/reports",
-        icon: FileText,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Central Meter",
-        href: "/admin/central-meter",
-        icon: Calculator,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Utility Analysis",
-        href: "/admin/utility-analysis",
-        icon: LayoutDashboard,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Backup & Restore",
-        href: "/admin/backup",
-        icon: Database,
-        roles: ["OWNER"]
-    },
-    {
-        label: "User Management",
-        href: "/admin/users",
-        icon: Users,
-        roles: ["OWNER"]
-    },
-    {
-        label: "Settings",
-        href: "/settings",
+        label: "System",
         icon: Settings,
-        roles: ["OWNER"]
+        roles: ["OWNER"],
+        children: [
+            {
+                label: "User Management",
+                href: "/admin/users",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Broadcast",
+                href: "/broadcast",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Audit Logs",
+                href: "/audit",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Backup & Restore",
+                href: "/admin/backup",
+                roles: ["OWNER"]
+            },
+            {
+                label: "Settings",
+                href: "/settings",
+                roles: ["OWNER"]
+            }
+        ]
     }
 ];
