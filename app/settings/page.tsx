@@ -5,11 +5,44 @@ import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as S
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import Setup2FA from "../components/Setup2FA";
 
+interface SystemConfig {
+    dormName: string;
+    dormAddress: string;
+    bankName: string;
+    bankAccountName: string;
+    bankAccountNumber: string;
+    promptPayId: string;
+    waterRate: number;
+    electricRate: number;
+    trashFee: number;
+    internetFee: number;
+    otherFees: number;
+    adminLineUserId: string;
+    invoiceLogo: string;
+    invoiceNote: string;
+    invoiceColor: string;
+    wifiSsid: string;
+    wifiPassword: string;
+    rulesText: string;
+    emergencyPhone: string;
+    adminPhone: string;
+    adminLineIdDisplay: string;
+    enableCommonAreaCharges: boolean;
+    commonAreaDistribution: string;
+    commonAreaCapType: string;
+    commonAreaCapPercentage: number;
+    commonAreaCapFixed: number;
+    enableAutoReminders: boolean;
+    reminderDay: number;
+    reminderTime: string;
+    emailVerificationRequired?: boolean;
+}
+
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState("basic");
-    const [config, setConfig] = useState({
+    const [config, setConfig] = useState<SystemConfig>({
         dormName: "",
         dormAddress: "",
         bankName: "",
@@ -38,7 +71,8 @@ export default function SettingsPage() {
         commonAreaCapFixed: 0,
         enableAutoReminders: false,
         reminderDay: 25,
-        reminderTime: "09:00"
+        reminderTime: "09:00",
+        emailVerificationRequired: false
     });
 
     const [userRole, setUserRole] = useState<string>("");
