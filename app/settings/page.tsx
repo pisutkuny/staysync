@@ -41,7 +41,23 @@ export default function SettingsPage() {
         reminderTime: "09:00"
     });
 
+    const [userRole, setUserRole] = useState<string>("");
+
     useEffect(() => {
+        // Fetch user profile to get role
+        fetch("/api/auth/me")
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    setUserRole(data.user.role);
+                    // If regular user, force security tab
+                    if (data.user.role !== "OWNER" && data.user.role !== "ADMIN") {
+                        setActiveTab("security");
+                    }
+                }
+            })
+            .catch(err => console.error("Failed to fetch user:", err));
+
         fetch("/api/settings")
             .then(res => res.json())
             .then(data => {
@@ -100,13 +116,15 @@ export default function SettingsPage() {
 
     if (loading) return <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-indigo-500" size={40} /></div>;
 
-    const tabs = [
-        { id: "basic", label: "Basic Info", icon: Building2 },
-        { id: "payment", label: "Payment", icon: CreditCard },
-        { id: "rates", label: "Rates & Fees", icon: Zap },
-        { id: "chatbot", label: "Chatbot", icon: MessageSquare },
-        { id: "security", label: "Security", icon: Lock }
+    const allTabs = [
+        { id: "basic", label: "Basic Info", icon: Building2, roles: ["OWNER", "ADMIN"] },
+        { id: "payment", label: "Payment", icon: CreditCard, roles: ["OWNER", "ADMIN"] },
+        { id: "rates", label: "Rates & Fees", icon: Zap, roles: ["OWNER", "ADMIN"] },
+        { id: "chatbot", label: "Chatbot", icon: MessageSquare, roles: ["OWNER", "ADMIN"] },
+        { id: "security", label: "Security", icon: Lock, roles: ["OWNER", "ADMIN", "STAFF", "TENANT", "USER"] }
     ];
+
+    const tabs = allTabs.filter(tab => tab.roles.includes(userRole));
 
     return (
         <div className="space-y-6">
@@ -675,7 +693,10 @@ export default function SettingsPage() {
 
                 {/* Security Tab */}
                 {activeTab === "security" && (
-                    <PasswordChangeForm />
+                    <div className="space-y-6">
+                        <PasswordChangeForm />
+                        <Setup2FA />
+                    </div>
                 )}
 
                 {/* Save Button - Fixed at Bottom (Only show for non-security tabs) */}
