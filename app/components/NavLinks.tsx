@@ -29,7 +29,6 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                 }
             }
         });
-        // Only set if not already set to avoid overriding user interaction
         setExpandedGroups(prev => Array.from(new Set([...prev, ...groupsToExpand])));
     }, [pathname]);
 
@@ -43,8 +42,76 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
         if (onClick) onClick();
     };
 
+    // Helper to get color classes based on group color
+    const getColorClasses = (color: string | undefined, isActive: boolean, isGroup: boolean = false) => {
+        const baseColor = color || "gray";
+
+        // Define color mappings for dynamic classes (Tailwind requires full class names for safe purging, but dynamic string interpolation works if classes are Safelisted or if we Map explicitly)
+        // Better approach: explicit mapping for supported colors
+        const colorMap: Record<string, any> = {
+            indigo: {
+                activeBg: "bg-indigo-50",
+                activeText: "text-indigo-600",
+                icon: "text-indigo-600",
+                hoverBg: "hover:bg-indigo-50",
+                hoverText: "hover:text-indigo-600"
+            },
+            blue: {
+                activeBg: "bg-blue-50",
+                activeText: "text-blue-600",
+                icon: "text-blue-600",
+                hoverBg: "hover:bg-blue-50",
+                hoverText: "hover:text-blue-600"
+            },
+            emerald: {
+                activeBg: "bg-emerald-50",
+                activeText: "text-emerald-600",
+                icon: "text-emerald-600",
+                hoverBg: "hover:bg-emerald-50",
+                hoverText: "hover:text-emerald-600"
+            },
+            orange: {
+                activeBg: "bg-orange-50",
+                activeText: "text-orange-600",
+                icon: "text-orange-600",
+                hoverBg: "hover:bg-orange-50",
+                hoverText: "hover:text-orange-600"
+            },
+            slate: {
+                activeBg: "bg-slate-100",
+                activeText: "text-slate-700",
+                icon: "text-slate-600",
+                hoverBg: "hover:bg-slate-100",
+                hoverText: "hover:text-slate-700"
+            },
+            gray: {
+                activeBg: "bg-gray-100",
+                activeText: "text-gray-900",
+                icon: "text-gray-600",
+                hoverBg: "hover:bg-gray-50",
+                hoverText: "hover:text-gray-900"
+            }
+        };
+
+        const theme = colorMap[baseColor] || colorMap["gray"];
+
+        if (isGroup) {
+            // style for Group Header
+            if (isActive) { // Group is expanded or has active child
+                return `${theme.activeText} ${theme.activeBg} font-semibold`;
+            }
+            return `text-gray-600 ${theme.hoverBg} ${theme.hoverText}`;
+        } else {
+            // Style for single link or child link
+            if (isActive) {
+                return `${theme.activeBg} ${theme.activeText} font-semibold shadow-sm`;
+            }
+            return `text-gray-500 ${theme.hoverBg} ${theme.hoverText}`;
+        }
+    };
+
     return (
-        <nav className="px-3 pb-2 space-y-1">
+        <nav className="px-3 pb-4 space-y-2">
             {NAV_ITEMS.map((item) => {
                 if (!hasRole(item.roles)) return null;
 
@@ -52,25 +119,23 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                 if (!item.children) {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
+                    const colorClass = getColorClasses(item.color, isActive);
+
                     return (
                         <Link
                             key={item.href}
                             onClick={handleClick}
                             href={item.href!}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive
-                                    ? "bg-indigo-50 text-indigo-600"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }`}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${colorClass}`}
                         >
-                            <div className={`transition-colors ${isActive ? "text-indigo-600" : "text-gray-500 group-hover:text-gray-700"
-                                }`}>
-                                {Icon && <Icon size={20} strokeWidth={2} />}
+                            <div className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? "" : "text-gray-400 group-hover:text-current"}`}>
+                                {Icon && <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />}
                             </div>
                             <span className="text-sm font-medium leading-none">
                                 {item.label}
                             </span>
                             {isActive && (
-                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-600"></div>
+                                <div className={`ml-auto w-2 h-2 rounded-full ${item.color === 'indigo' ? 'bg-indigo-500' : 'bg-current opacity-60'}`}></div>
                             )}
                         </Link>
                     );
@@ -80,53 +145,58 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                 const isExpanded = expandedGroups.includes(item.label);
                 const Icon = item.icon;
                 const hasActiveChild = item.children.some(child => child.href === pathname);
+                const colorClass = getColorClasses(item.color, hasActiveChild || isExpanded, true);
 
                 return (
                     <div key={item.label} className="space-y-1">
                         <button
                             onClick={() => toggleGroup(item.label)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${hasActiveChild
-                                    ? "text-indigo-700 bg-indigo-50/50"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }`}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${colorClass}`}
                         >
-                            <div className={`transition-colors ${hasActiveChild ? "text-indigo-600" : "text-gray-500 group-hover:text-gray-700"
-                                }`}>
-                                {Icon && <Icon size={20} strokeWidth={2} />}
+                            {/* Accent line for active groups */}
+                            {hasActiveChild && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-current opacity-40"></div>
+                            )}
+
+                            <div className={`transition-transform duration-200 group-hover:scale-110 ${hasActiveChild ? "" : "text-gray-400 group-hover:text-current"}`}>
+                                {Icon && <Icon size={22} strokeWidth={hasActiveChild ? 2.5 : 2} />}
                             </div>
                             <span className="text-sm font-medium leading-none flex-1 text-left">
                                 {item.label}
                             </span>
-                            <div className="text-gray-400">
-                                {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            <div className="text-current opacity-50">
+                                {isExpanded ? <ChevronDown size={16} strokeWidth={3} /> : <ChevronRight size={16} strokeWidth={3} />}
                             </div>
                         </button>
 
                         {/* Submenu */}
-                        {isExpanded && (
-                            <div className="pl-4 space-y-1">
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+                            <div className="pl-4 space-y-0.5 mt-1 border-l-2 border-gray-100 ml-4 mb-2">
                                 {item.children.map(child => {
                                     if (!hasRole(child.roles)) return null;
                                     const isChildActive = pathname === child.href;
+
+                                    // Child inherits color theme from parent
+                                    const theme = getColorClasses(item.color, isChildActive);
 
                                     return (
                                         <Link
                                             key={child.href}
                                             onClick={handleClick}
                                             href={child.href!}
-                                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ml-5 border-l border-gray-100 ${isChildActive
-                                                    ? "text-indigo-600 font-medium"
+                                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ml-2 ${isChildActive
+                                                    ? `${theme} bg-opacity-50` // Softer bg for child
                                                     : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                                                 }`}
                                         >
-                                            <span className="text-sm leading-none">
+                                            <span className={`text-[13px] ${isChildActive ? "font-semibold" : "font-medium"}`}>
                                                 {child.label}
                                             </span>
                                         </Link>
                                     );
                                 })}
                             </div>
-                        )}
+                        </div>
                     </div>
                 );
             })}

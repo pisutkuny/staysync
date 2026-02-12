@@ -7,6 +7,7 @@ export interface NavItem {
     icon?: any;
     roles?: string[];
     children?: NavItem[];
+    color?: string; // Tailwind color class prefix e.g. "blue", "green"
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -14,12 +15,14 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
-        roles: ["OWNER", "STAFF", "TENANT"]
+        roles: ["OWNER", "STAFF", "TENANT"],
+        color: "indigo"
     },
     {
         label: "Room Management",
         icon: DoorOpen,
         roles: ["OWNER", "STAFF", "TENANT"],
+        color: "blue",
         children: [
             {
                 label: "Book Room",
@@ -42,6 +45,7 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Billing & Utilities",
         icon: Receipt,
         roles: ["OWNER"],
+        color: "emerald",
         children: [
             {
                 label: "Billing",
@@ -74,6 +78,7 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Maintenance",
         icon: Wrench,
         roles: ["OWNER", "STAFF", "TENANT"],
+        color: "orange",
         children: [
             {
                 label: "Report Issue",
@@ -96,6 +101,7 @@ export const NAV_ITEMS: NavItem[] = [
         label: "System",
         icon: Settings,
         roles: ["OWNER"],
+        color: "slate",
         children: [
             {
                 label: "User Management",
