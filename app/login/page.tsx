@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [show2FA, setShow2FA] = useState(false);
     const [twoFactorCode, setTwoFactorCode] = useState("");
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState<string | React.ReactNode>("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,14 +39,54 @@ export default function LoginPage() {
             }
 
             if (!res.ok) {
-                throw new Error(data.error || "Invalid credentials");
+                const errorMessage = data.error || "Invalid credentials";
+                if (errorMessage === 'Please verify your email address') {
+                    setError(
+                        <div className="flex flex-col gap-2">
+                            <span>{errorMessage}</span>
+                            <button
+                                type="button"
+                                onClick={() => handleResendVerification(formData.email)}
+                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 underline"
+                            >
+                                Resend Verification Email
+                            </button>
+                        </div>
+                    );
+                } else {
+                    setError(errorMessage);
+                }
+                throw new Error(errorMessage); // Throw to reach catch block (optional, or just return)
             }
 
             // Force hard redirect to ensure middleware/session are picked up
             window.location.href = "/";
         } catch (error: any) {
-            setError(error.message);
+            if (typeof error === 'string' || React.isValidElement(error)) {
+                // Error already set
+            } else if (error.message !== 'Please verify your email address') {
+                setError(error.message);
+            }
             setLoading(false);
+        }
+    };
+
+    const handleResendVerification = async (emailToResend: string) => {
+        if (!emailToResend) return;
+        try {
+            const res = await fetch("/api/auth/verify-email/resend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailToResend })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("Verification email sent! Please check your inbox.");
+            } else {
+                alert(data.error || "Failed to send email");
+            }
+        } catch (e) {
+            alert("Failed to send request");
         }
     };
 

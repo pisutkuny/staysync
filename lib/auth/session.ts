@@ -65,4 +65,5 @@ export async function setSessionCookie(token: string) {
 export async function clearSessionCookie() {
     const cookieStore = await cookies();
     cookieStore.delete('session_token');
+    cookieStore.delete('user_role'); // Clear role cookie as well
 }

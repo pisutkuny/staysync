@@ -10,16 +10,29 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
 
-    const user = await prisma.user.findFirst({
-        where: {
-            verificationToken: token,
-            verificationExpiry: { gt: new Date() }
-        }
+    const userWithToken = await prisma.user.findUnique({
+        where: { verificationToken: token }
     });
 
-    if (!user) {
-        return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
+
+    if (!userWithToken) {
+        console.error(`Verify Email Failed: Token not found (${token})`);
+        return NextResponse.json({
+            error: "Token invalid or not found. Please request a new verification email."
+        }, { status: 400 });
     }
+
+    if (userWithToken.verificationExpiry && new Date() > userWithToken.verificationExpiry) {
+        console.error(`Verify Email Failed: Token expired for user ${userWithToken.email}`);
+        return NextResponse.json({
+            error: "Token has expired. Please request a new verification email."
+        }, { status: 400 });
+    }
+
+    const user = userWithToken; // Re-assign for compatibility with existing code if needed, or just use userWithToken
+
+    // Note: The previous code used findFirst with expiry check in the query. 
+    // Splitting it allows us to know WHY it failed.
 
     await prisma.user.update({
         where: { id: user.id },

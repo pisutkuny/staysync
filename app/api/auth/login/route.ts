@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
             where: { organizationId: user.organizationId }
         });
 
-        const isVerificationRequired = systemConfig?.emailVerificationRequired ?? false;
+        // Cast to any to avoid type errors if Prisma client types are not yet refreshed in the editor/build environment
+        const isVerificationRequired = (systemConfig as any)?.emailVerificationRequired ?? false;
 
         if (isVerificationRequired && !user.emailVerified) {
             return NextResponse.json({ error: 'Please verify your email address' }, { status: 403 });
