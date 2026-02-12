@@ -17,12 +17,17 @@ export async function GET() {
         const startOfCurrentMonth = startOfMonth(today);
         const endOfCurrentMonth = endOfMonth(today);
 
+        // Fetch System Config for Dorm Name
+        const config = await prisma.systemConfig.findFirst();
+        const dormName = config?.dormName || "StaySync";
+
         // If user is a TENANT, return simplified/empty data to prevent crash
         if (session.role === 'TENANT') {
             // Fetch logged-in user's room info if needed, or just return empty for now
             // For now, return a safe "empty" structure
             return NextResponse.json({
                 userRole: 'TENANT',
+                dormName,
                 summary: {
                     revenue: 0,
                     outstanding: 0,
@@ -215,6 +220,7 @@ export async function GET() {
 
         return NextResponse.json({
             userRole: session.role,
+            dormName,
             summary: {
                 revenue: revenueAgg._sum.totalAmount || 0,
                 outstanding: outstandingAgg._sum.totalAmount || 0,

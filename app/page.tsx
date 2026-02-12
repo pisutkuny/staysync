@@ -7,6 +7,7 @@ import RevenueChart from "./components/RevenueChart";
 import OccupancyChart from "./components/OccupancyChart";
 
 interface DashboardData {
+  dormName?: string;
   summary: {
     revenue: number;
     outstanding: number;
@@ -74,7 +75,7 @@ export default function Home() {
     return (
       <div className="space-y-8 pb-10">
         <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl text-white">
-          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg mb-2">👋 ยินดีต้อนรับสู่ StaySync</h2>
+          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg mb-2">👋 ยินดีต้อนรับสู่ {data.dormName || "StaySync"}</h2>
           <p className="text-indigo-100 text-sm md:text-base">ระบบจัดการหอพักสำหรับผู้เช่า</p>
         </div>
 
@@ -127,7 +128,7 @@ export default function Home() {
       <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">📊 Dashboard</h2>
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">👋 ยินดีต้อนรับสู่ {data.dormName || "StaySync"}</h2>
             <p className="text-cyan-100 mt-2 text-lg">ภาพรวมหอพักของคุณ (Real-time)</p>
           </div>
           <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg w-full md:w-auto text-center md:text-right">
