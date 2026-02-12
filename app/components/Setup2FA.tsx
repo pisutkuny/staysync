@@ -73,7 +73,7 @@ export default function Setup2FA() {
         setLoading(true);
         setError("");
         try {
-            const res = await fetch("/api/auth/2fa/verify", {
+            const res = await fetch("/api/auth/2fa/enable", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: code, secret })
