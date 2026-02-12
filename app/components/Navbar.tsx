@@ -53,7 +53,7 @@ export default function Navbar({ userRole }: { userRole?: string }) {
 
             {/* Sidebar Drawer Panel */}
             <aside
-                className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col print:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col print:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="p-4 flex items-center justify-between border-b border-gray-100">
