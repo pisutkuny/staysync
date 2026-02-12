@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Search, Edit2, Shield, UserX, CheckCircle, AlertTriangle, X } from "lucide-react";
+import { Users, Search, Edit2, Shield, UserX, CheckCircle, AlertTriangle, X, Plus, Trash2, Save } from "lucide-react";
 
 interface User {
     id: number;
@@ -18,11 +18,23 @@ export default function UserManagementPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Edit State
     const [editingUser, setEditingUser] = useState<User | null>(null);
+
+    // Create State
+    const [isCreating, setIsCreating] = useState(false);
+
     const [saving, setSaving] = useState(false);
+
+    // Shared Form Data
     const [formData, setFormData] = useState({
-        role: "",
-        status: ""
+        email: "",
+        password: "",
+        fullName: "",
+        phone: "",
+        role: "TENANT",
+        status: "Active"
     });
 
     useEffect(() => {
@@ -60,32 +72,89 @@ export default function UserManagementPage() {
     function handleEdit(user: User) {
         setEditingUser(user);
         setFormData({
+            email: user.email,
+            password: "", // Password not needed for edit unless changing
+            fullName: user.fullName,
+            phone: user.phone || "",
             role: user.role,
             status: user.status
         });
+        setIsCreating(false);
+    }
+
+    function handleCreate() {
+        setEditingUser(null);
+        setFormData({
+            email: "",
+            password: "",
+            fullName: "",
+            phone: "",
+            role: "TENANT",
+            status: "Active"
+        });
+        setIsCreating(true);
+    }
+
+    async function handleDelete(user: User) {
+        if (!confirm(`คุณต้องการลบผู้ใช้ "${user.fullName}" ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้ (Soft Delete)`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/users/${user.id}`, {
+                method: "DELETE"
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Delete failed");
+            }
+
+            // Update local state (mark as deleted or remove)
+            // Option 1: Mark as Deleted
+            setUsers(users.map(u => u.id === user.id ? { ...u, status: 'Deleted' } : u));
+            alert("ลบผู้ใช้งานสำเร็จ");
+        } catch (error: any) {
+            console.error(error);
+            alert(`เกิดข้อผิดพลาด: ${error.message}`);
+        }
     }
 
     async function handleSave() {
-        if (!editingUser) return;
-
         try {
             setSaving(true);
-            const res = await fetch(`/api/users/${editingUser.id}`, {
-                method: "PATCH",
+
+            const url = isCreating ? "/api/users" : `/api/users/${editingUser?.id}`;
+            const method = isCreating ? "POST" : "PATCH";
+
+            // Filter out empty password if editing
+            const bodyData = { ...formData };
+            if (!isCreating && !bodyData.password) {
+                delete (bodyData as any).password;
+            }
+
+            const res = await fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(bodyData)
             });
 
             const result = await res.json();
 
             if (!res.ok) {
-                throw new Error(result.error || "Update failed");
+                throw new Error(result.error || "Operation failed");
             }
 
-            // Update local state
-            setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
+            if (isCreating) {
+                setUsers([result.user, ...users]);
+                alert("สร้างผู้ใช้งานสำเร็จ");
+            } else {
+                setUsers(users.map(u => u.id === editingUser!.id ? { ...u, ...formData } : u));
+                alert("บันทึกข้อมูลสำเร็จ");
+            }
+
             setEditingUser(null);
-            alert("บันทึกข้อมูลสำเร็จ");
+            setIsCreating(false);
         } catch (error: any) {
             console.error(error);
             alert(`เกิดข้อผิดพลาด: ${error.message}`);
@@ -131,15 +200,24 @@ export default function UserManagementPage() {
                             จัดการสิทธิ์การใช้งานและสถานะของผู้ใช้ในระบบ
                         </p>
                     </div>
-                    <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                        <input
-                            type="text"
-                            placeholder="ค้นหาชื่อ, อีเมล..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-white border-0 shadow-sm"
-                        />
+                    <div className="flex gap-2 w-full md:w-auto">
+                        <div className="relative flex-1 md:w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                            <input
+                                type="text"
+                                placeholder="ค้นหาชื่อ, อีเมล..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-white border-0 shadow-sm"
+                            />
+                        </div>
+                        <button
+                            onClick={handleCreate}
+                            className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg backdrop-blur-sm transition-colors border border-white/30"
+                            title="สร้างผู้ใช้งานใหม่"
+                        >
+                            <Plus size={24} />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -179,13 +257,24 @@ export default function UserManagementPage() {
                                         {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString('th-TH') : '-'}
                                     </td>
                                     <td className="p-4 text-right">
-                                        <button
-                                            onClick={() => handleEdit(user)}
-                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                            title="แก้ไข"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleEdit(user)}
+                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                title="แก้ไข"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            {user.status !== 'Deleted' && (
+                                                <button
+                                                    onClick={() => handleDelete(user)}
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="ลบผู้ใช้งาน"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -201,63 +290,116 @@ export default function UserManagementPage() {
                 </div>
             </div>
 
-            {/* Edit Modal */}
-            {editingUser && (
+            {/* Edit/Create Modal */}
+            {(editingUser || isCreating) && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
                         <div className="flex justify-between items-start mb-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <Shield className="text-indigo-600" />
-                                แก้ไขสิทธิ์ผู้ใช้งาน
+                                {isCreating ? <Plus className="text-indigo-600" /> : <Shield className="text-indigo-600" />}
+                                {isCreating ? "สร้างผู้ใช้งานใหม่" : "แก้ไขข้อมูลผู้ใช้งาน"}
                             </h2>
                             <button
-                                onClick={() => setEditingUser(null)}
+                                onClick={() => { setEditingUser(null); setIsCreating(false); }}
                                 className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                             >
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <div className="mb-6">
-                            <div className="font-semibold text-gray-900 dark:text-white text-lg">{editingUser.fullName}</div>
-                            <div className="text-gray-500 dark:text-gray-400 text-sm">{editingUser.email}</div>
-                        </div>
-
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    บทบาท (Role)
+                                    ชื่อ-นามสกุล
                                 </label>
-                                <select
-                                    value={formData.role}
-                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                <input
+                                    type="text"
+                                    value={formData.fullName}
+                                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                     className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                >
-                                    <option value="STAFF">STAFF (พนักงาน - ดูข้อมูลได้ แก้ไขได้บางส่วน)</option>
-                                    <option value="ADMIN">ADMIN (ผู้ดูแล - จัดการได้เกือบทุกอย่าง)</option>
-                                    <option value="OWNER">OWNER (เจ้าของ - จัดการได้ทุกอย่าง + ผู้ใช้)</option>
-                                    <option value="TENANT">TENANT (ผู้เช่า - ดูได้เฉพาะข้อมูลตัวเอง)</option>
-                                </select>
+                                    placeholder="เช่น สมชาย ใจดี"
+                                />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    สถานะ (Status)
+                                    อีเมล
                                 </label>
-                                <select
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                >
-                                    <option value="Active">Active (ใช้งานปกติ)</option>
-                                    <option value="Suspended">Suspended (ระงับการใช้งาน)</option>
-                                </select>
+                                    placeholder="email@example.com"
+                                    disabled={!isCreating} // Email should generally be immutable or handled carefully
+                                />
+                            </div>
+
+                            {isCreating && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        รหัสผ่าน
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        placeholder="กำหนดรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
+                                    />
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    เบอร์โทรศัพท์
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="08X-XXX-XXXX"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        บทบาท (Role)
+                                    </label>
+                                    <select
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                        className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    >
+                                        <option value="STAFF">STAFF</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                        <option value="OWNER">OWNER</option>
+                                        <option value="TENANT">TENANT</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        สถานะ (Status)
+                                    </label>
+                                    <select
+                                        value={formData.status}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        className="w-full border rounded-lg p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    >
+                                        <option value="Active">Active</option>
+                                        <option value="Suspended">Suspended</option>
+                                        <option value="Deleted">Deleted</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div className="mt-8 flex gap-3">
                             <button
-                                onClick={() => setEditingUser(null)}
+                                onClick={() => { setEditingUser(null); setIsCreating(false); }}
                                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-medium"
                             >
                                 ยกเลิก
