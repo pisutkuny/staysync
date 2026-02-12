@@ -15,9 +15,12 @@ export default function LoginPage() {
     const [show2FA, setShow2FA] = useState(false);
     const [twoFactorCode, setTwoFactorCode] = useState("");
 
+    const [error, setError] = useState("");
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError("");
 
         try {
             const payload = { ...formData, code: twoFactorCode };
@@ -42,7 +45,7 @@ export default function LoginPage() {
             router.push("/");
             router.refresh();
         } catch (error: any) {
-            alert(error.message);
+            setError(error.message);
             setLoading(false);
         }
     };
@@ -57,6 +60,12 @@ export default function LoginPage() {
                     <h1 className="text-2xl font-bold text-gray-900">StaySync Login</h1>
                     <p className="text-gray-500">Sign in to manage dormitory</p>
                 </div>
+
+                {error && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {!show2FA ? (

@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { verifyPassword } from '@/lib/auth/password';
 import { createSession, setSessionCookie } from '@/lib/auth/session';
 import { logAudit, getRequestInfo } from '@/lib/audit/logger';
-// @ts-ignore
-import { verify } from 'otplib';
+import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from 'otplib';
+import { verifyPassword } from '@/lib/auth/password';
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { email, password } = body;
+        const { email, password, code } = body;
 
         if (!email || !password) {
             return NextResponse.json(
@@ -30,37 +29,48 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
+        // Verify password
+        const isPasswordValid = await verifyPassword(password, user.password);
+        if (!isPasswordValid) {
+            return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+        }
+
         // Check if user is active
         if (user.status !== 'Active') {
             return NextResponse.json({ error: 'Account is not active' }, { status: 403 });
         }
 
+        // Check email verification (if applicable)
+        if (process.env.NEXT_PUBLIC_ENABLE_EMAIL_VERIFICATION === 'true' && !user.emailVerified) {
+            return NextResponse.json({ error: 'Please verify your email address' }, { status: 403 });
+        }
+
         // Check 2FA
-        // @ts-ignore
-        if ((user as any).twoFactorEnabled) {
+        if (user.twoFactorEnabled) {
             // If 2FA is enabled but no code provided, return 403 with requirement
-            if (!body.code) {
+            if (!code) {
                 return NextResponse.json({ require2FA: true }, { status: 403 });
             }
 
             // Verify 2FA code
-            // @ts-ignore
-            if ((user as any).twoFactorSecret) {
-                // @ts-ignore
-                const isValidToken = await verify({
-                    token: body.code,
-                    // @ts-ignore
-                    secret: (user as any).twoFactorSecret
-                });
+            if (user.twoFactorSecret) {
+                try {
+                    const totp = new TOTP({
+                        crypto: new NobleCryptoPlugin(),
+                        base32: new ScureBase32Plugin(),
+                    });
 
-                if (!isValidToken) {
+                    const { valid } = await totp.verify(code, { secret: user.twoFactorSecret });
+
+                    if (!valid) {
+                        return NextResponse.json({ error: 'Invalid 2FA Code' }, { status: 401 });
+                    }
+                } catch (e) {
+                    console.error("2FA Error", e);
                     return NextResponse.json({ error: 'Invalid 2FA Code' }, { status: 401 });
                 }
             }
         }
-
-
-
 
         // Create session token
         const sessionToken = createSession({
