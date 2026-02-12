@@ -50,6 +50,14 @@ export async function POST(req: NextRequest) {
         const isVerificationRequired = (systemConfig as any)?.emailVerificationRequired ?? false;
 
         if (isVerificationRequired && !user.emailVerified) {
+            // Optional: Auto-send if no token exists or it's expired
+            /*
+            if (!user.verificationToken || (user.verificationExpiry && new Date() > user.verificationExpiry)) {
+                 const token = await generateVerificationToken(user.email);
+                 await sendVerificationEmail(user.email, token);
+            }
+            */
+            // For now, keep it manual via the UI button to prevent abuse, but clearer message
             return NextResponse.json({ error: 'Please verify your email address' }, { status: 403 });
         }
 
