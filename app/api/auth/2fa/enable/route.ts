@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
             base32: new ScureBase32Plugin(),
         });
 
-        const isValid = await totp.verify({ token, secret });
+        const { valid } = await totp.verify(token, { secret });
 
-        if (!isValid) {
+        if (!valid) {
             return NextResponse.json({ error: "Invalid code" }, { status: 400 });
         }
 
