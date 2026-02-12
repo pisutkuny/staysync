@@ -21,7 +21,10 @@ interface Booking {
         fullName: string;
         email: string;
         phone: string;
-    };
+    } | null;
+    guestName?: string;
+    guestPhone?: string;
+    guestLineId?: string;
 }
 
 export default function AdminBookingsPage() {
@@ -116,9 +119,19 @@ export default function AdminBookingsPage() {
                                         <td className="px-6 py-4 text-sm font-mono text-gray-500">#{booking.id}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-gray-900">{booking.user.fullName}</span>
-                                                <span className="text-xs text-gray-500">{booking.user.email}</span>
-                                                <span className="text-xs text-gray-500">{booking.user.phone}</span>
+                                                {booking.user ? (
+                                                    <>
+                                                        <span className="font-bold text-gray-900">{booking.user.fullName}</span>
+                                                        <span className="text-xs text-gray-500">{booking.user.email}</span>
+                                                        <span className="text-xs text-gray-500">{booking.user.phone}</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="font-bold text-gray-900">{booking.guestName} <span className="bg-yellow-100 text-yellow-800 text-[10px] px-1 rounded ml-1">GUEST</span></span>
+                                                        <span className="text-xs text-gray-500">{booking.guestPhone}</span>
+                                                        {booking.guestLineId && <span className="text-xs text-green-600">Line: {booking.guestLineId}</span>}
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

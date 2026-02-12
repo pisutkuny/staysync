@@ -60,12 +60,17 @@ model Booking {
   // Details
   specialRequest String?
   
+  // Guest Details (if no user account)
+  guestName   String?
+  guestPhone  String?
+  guestLineId String?
+  
   // Relations
   roomId Int
   room   Room @relation(fields: [roomId], references: [id])
   
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 
   // Multi-tenant support
   organizationId Int

@@ -24,11 +24,28 @@ export default function BookingPage() {
     const [bookingRoom, setBookingRoom] = useState<Room | null>(null);
     const [checkInDate, setCheckInDate] = useState("");
     const [specialRequest, setSpecialRequest] = useState("");
+
+    // Guest Fields
+    const [guestName, setGuestName] = useState("");
+    const [guestPhone, setGuestPhone] = useState("");
+    const [guestLineId, setGuestLineId] = useState("");
+
     const [submitting, setSubmitting] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         fetchRooms();
+        checkLoginStatus();
     }, []);
+
+    const checkLoginStatus = async () => {
+        try {
+            // We use the booking API to check if we are authenticated
+            // If 401, we are guest.
+            const resCheck = await fetch("/api/bookings");
+            if (resCheck.ok) setIsLoggedIn(true);
+        } catch (e) { }
+    };
 
     const fetchRooms = async () => {
         try {
@@ -46,7 +63,6 @@ export default function BookingPage() {
 
     const handleBookClick = (room: Room) => {
         setBookingRoom(room);
-        // Default check-in date to tomorrow
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         setCheckInDate(tomorrow.toISOString().split('T')[0]);
@@ -54,6 +70,12 @@ export default function BookingPage() {
 
     const handleConfirmBooking = async () => {
         if (!bookingRoom || !checkInDate) return;
+
+        // Frontend validation for guest
+        if (!isLoggedIn && (!guestName || !guestPhone)) {
+            alert("กรุณากรอกชื่อและเบอร์โทรศัพท์สำหรับติดต่อ");
+            return;
+        }
 
         setSubmitting(true);
         try {
@@ -63,25 +85,29 @@ export default function BookingPage() {
                 body: JSON.stringify({
                     roomId: bookingRoom.id,
                     checkInDate: checkInDate,
-                    specialRequest
+                    specialRequest,
+                    guestName: isLoggedIn ? undefined : guestName,
+                    guestPhone: isLoggedIn ? undefined : guestPhone,
+                    guestLineId: isLoggedIn ? undefined : guestLineId
                 })
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                if (res.status === 401) {
-                    alert("กรุณาเข้าสู่ระบบก่อนทำการจอง");
-                    router.push(`/login?redirect=/booking`);
-                    return;
-                }
                 throw new Error(data.error || "Booking failed");
             }
 
             alert("ส่งคำขอจองสำเร็จ! เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจอง");
             setBookingRoom(null);
-            fetchRooms(); // Refresh list
-            router.push("/dashboard"); // Redirect to dashboard to see booking status?
+
+            // Clear fields
+            setGuestName("");
+            setGuestPhone("");
+            setGuestLineId("");
+
+            fetchRooms();
+            if (isLoggedIn) router.push("/dashboard");
 
         } catch (error: any) {
             alert(error.message);
@@ -180,10 +206,51 @@ export default function BookingPage() {
             {/* Booking Modal */}
             {bookingRoom && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all overflow-y-auto max-h-[90vh]">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Book Room {bookingRoom.number}</h2>
 
                         <div className="space-y-4">
+                            {!isLoggedIn && (
+                                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                                    <h3 className="text-sm font-bold text-yellow-800 mb-2">Guest Booking Details</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
+                                            <input
+                                                type="text"
+                                                value={guestName}
+                                                onChange={(e) => setGuestName(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                                placeholder="Your Name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Phone <span className="text-red-500">*</span></label>
+                                            <input
+                                                type="tel"
+                                                value={guestPhone}
+                                                onChange={(e) => setGuestPhone(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                                placeholder="08X-XXX-XXXX"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Line ID</label>
+                                            <input
+                                                type="text"
+                                                value={guestLineId}
+                                                onChange={(e) => setGuestLineId(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                                placeholder="Optional"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-2 text-xs text-yellow-700">
+                                        Already a member? <a href={`/login?redirect=/booking`} className="text-indigo-600 underline font-bold">Log in</a>
+                                    </div>
+                                </div>
+                            )}
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
                                 <div className="relative">
