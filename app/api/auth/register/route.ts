@@ -80,11 +80,13 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        let emailSent = false;
         // Send verification email
         try {
             console.log(`[Register] Attempting to send verification email to ${email}`);
             await sendVerificationEmail(email, verificationToken);
             console.log(`[Register] Verification email sent to ${email}`);
+            emailSent = true;
         } catch (emailError) {
             console.error("[Register] Failed to send verification email:", emailError);
             // Continue even if email fails, user can resend later via Login screen
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
                 success: true,
                 message: "ลงทะเบียนสำเร็จ",
                 user: userWithoutPassword,
+                emailSent
             },
             { status: 201 }
         );

@@ -44,7 +44,11 @@ export default function RegisterPage() {
                 throw new Error(data.error || "การลงทะเบียนล้มเหลว");
             }
 
-            alert("ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ");
+            if (data.emailSent) {
+                alert("ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน ก่อนเข้าสู่ระบบ");
+            } else {
+                alert("ลงทะเบียนสำเร็จ! แต่ระบบไม่สามารถส่งอีเมลยืนยันได้ในขณะนี้\nกรุณาเข้าสู่ระบบ แล้วกดปุ่ม 'ส่งอีเมลยืนยันอีกครั้ง' (Resend Verification Email)");
+            }
             router.push("/login");
         } catch (error: any) {
             alert(error.message);
