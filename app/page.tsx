@@ -1,335 +1,152 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Users, DoorOpen, BadgeAlert, Wallet, TrendingUp, AlertCircle, Activity, Droplets, Zap } from "lucide-react";
 import Link from "next/link";
-import RevenueChart from "./components/RevenueChart";
-import OccupancyChart from "./components/OccupancyChart";
+import { ArrowRight, CheckCircle, MapPin, Shield, Wifi, Zap } from "lucide-react";
 
-interface DashboardData {
-  dormName?: string;
-  summary: {
-    revenue: number;
-    outstanding: number;
-    occupancyRate: number;
-    activeIssues: number;
-  };
-  charts: {
-    revenue: any[];
-    occupancy: any[];
-  };
-  activity: any[];
-  topSpenders: any[];
-}
-
-export default function Home() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/dashboard")
-      .then((res) => {
-        if (res.status === 401) {
-          window.location.href = "/login";
-          return null;
-        }
-        if (!res.ok) {
-          throw new Error("Failed to load");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setData(data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch dashboard data", err);
-        setError("ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-gray-500 gap-2">
-        <span className="loading loading-spinner text-indigo-600"></span> กำลังโหลดข้อมูล...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-red-500 gap-2">
-        <AlertCircle /> {error}
-      </div>
-    );
-  }
-
-  if (!data) return null;
-
-  // Tenant View (Simplified)
-  if ((data as any).userRole === 'TENANT') {
-    return (
-      <div className="space-y-8 pb-10">
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl text-white">
-          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg mb-2">👋 ยินดีต้อนรับสู่ {data.dormName || "StaySync"}</h2>
-          <p className="text-indigo-100 text-sm md:text-base">ระบบจัดการหอพักสำหรับผู้เช่า</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow p-8 text-center border border-gray-100">
-          <div className="bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
-            <DoorOpen size={32} />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">รอการยืนยันห้องพัก</h3>
-          <p className="text-gray-500 max-w-md mx-auto">
-            กรุณาติดต่อเจ้าหน้าที่หอพักเพื่อเชื่อมโยงบัญชีของคุณกับห้องพัก <br />
-            เมื่อเชื่อมโยงแล้ว คุณจะสามารถดูบิลค่าน้ำค่าไฟและแจ้งซ่อมได้ที่นี่
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/report" className="block p-6 bg-white rounded-xl shadow hover:shadow-md transition-shadow border border-gray-100 group">
-            <div className="flex items-center gap-4">
-              <div className="bg-orange-100 p-3 rounded-lg text-orange-600 group-hover:bg-orange-200 transition-colors">
-                <BadgeAlert size={24} />
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900">แจ้งปัญหาทั่วไป</h3>
-                <p className="text-sm text-gray-500">แจ้งเรื่องร้องเรียน หรือสอบถามข้อมูล</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/settings" className="block p-6 bg-white rounded-xl shadow hover:shadow-md transition-shadow border border-gray-100 group">
-            <div className="flex items-center gap-4">
-              <div className="bg-gray-100 p-3 rounded-lg text-gray-600 group-hover:bg-gray-200 transition-colors">
-                <div className="w-6 h-6 flex items-center justify-center">⚙️</div>
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900">ตั้งค่าบัญชี</h3>
-                <p className="text-sm text-gray-500">จัดการข้อมูลส่วนตัว</p>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Owner View (Full Dashboard)
-  const { summary, charts, activity, topSpenders } = data;
-
+export default function LandingPage() {
   return (
-    <div className="space-y-8 pb-10">
-      {/* Enhanced Gradient Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 shadow-xl">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>
-            <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">👋 ยินดีต้อนรับสู่ {data.dormName || "StaySync"}</h2>
-            <p className="text-cyan-100 mt-2 text-lg">ภาพรวมหอพักของคุณ (Real-time)</p>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-indigo-600 to-purple-700 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 relative z-10">
+          <div className="text-center">
+            <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl text-shadow-lg">
+              <span className="block">StaySync Dormitory</span>
+              <span className="block text-indigo-200 mt-2 text-3xl sm:text-4xl md:text-5xl">Living Made Simple</span>
+            </h1>
+            <p className="mt-3 max-w-md mx-auto text-base text-indigo-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+              Experience the best in dormitory living. Modern rooms, great facilities, and a seamless digital experience for all your needs.
+            </p>
+            <div className="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center gap-4">
+              <Link href="/booking">
+                <button className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-full text-indigo-700 bg-white hover:bg-indigo-50 md:py-4 md:text-lg md:px-10 shadow-xl transition-transform hover:scale-105">
+                  Book A Room
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
+              </Link>
+              <Link href="/login">
+                <button className="w-full flex items-center justify-center px-8 py-4 border-2 border-indigo-300 text-base font-bold rounded-full text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 transition-colors">
+                  Tenant Login
+                </button>
+              </Link>
+            </div>
           </div>
-          <div className="bg-white/20 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/30 shadow-lg w-full md:w-auto text-center md:text-right">
-            <p className="text-sm font-bold text-white/90 uppercase tracking-wider">ยอดรอเก็บ</p>
-            <p className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">฿{summary.outstanding.toLocaleString()}</p>
+        </div>
+
+        {/* Decorative Wave */}
+        <div className="absolute bottom-0 w-full">
+          <svg className="w-full h-24 lg:h-48 text-white" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path fill="currentColor" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          </svg>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Why Choose Us</h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Everything You Need for Comfortable Living
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center p-6 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 text-indigo-600 mx-auto mb-6">
+                <Wifi className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">High-Speed Wifi</h3>
+              <p className="text-gray-500">
+                Stay connected with our fiber-optic internet, perfect for streaming, gaming, and remote work.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 text-indigo-600 mx-auto mb-6">
+                <Shield className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">24/7 Security</h3>
+              <p className="text-gray-500">
+                Your safety is our priority with CCTV surveillance, keycard access, and nightly patrols.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 text-indigo-600 mx-auto mb-6">
+                <MapPin className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Prime Location</h3>
+              <p className="text-gray-500">
+                Located near universities, convenience stores, and public transport stations.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Enhanced KPI Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Revenue */}
-        <Link href="/billing">
-          <div className="p-6 bg-gradient-to-br from-white to-green-50 rounded-2xl shadow-lg border-2 border-green-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
-            <div>
-              <p className="text-sm font-medium text-gray-600">รายรับเดือนนี้</p>
-              <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">฿{summary.revenue.toLocaleString()}</p>
-            </div>
-            <div className="p-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
-              <Wallet size={28} />
-            </div>
-          </div>
-        </Link>
-
-        {/* Occupancy */}
-        <Link href="/rooms">
-          <div className="p-6 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg border-2 border-blue-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
-            <div>
-              <p className="text-sm font-medium text-gray-600">อัตราการเข้าพัก</p>
-              <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">{summary.occupancyRate}%</p>
-            </div>
-            <div className="p-4 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
-              <Users size={28} />
-            </div>
-          </div>
-        </Link>
-
-        {/* Active Issues */}
-        <Link href="/admin/issues">
-          <div className="p-6 bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-lg border-2 border-orange-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
-            <div>
-              <p className="text-sm font-medium text-gray-600">แจ้งซ่อมรอจัดการ</p>
-              <p className="text-2xl md:text-3xl font-bold text-orange-600 mt-2">{summary.activeIssues}</p>
-            </div>
-            <div className="p-4 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
-              <BadgeAlert size={28} />
-            </div>
-          </div>
-        </Link>
-
-        {/* Expenses */}
-        <Link href="/expenses">
-          <div className="p-6 bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
-            <div>
-              <p className="text-sm font-medium text-gray-600">จัดการรายจ่าย</p>
-              <p className="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">ดูรายละเอียด →</p>
-            </div>
-            <div className="p-4 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
-              <TrendingUp size={28} className="rotate-180" />
-            </div>
-          </div>
-        </Link>
-      </div>
-
-      {/* Enhanced Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-white to-indigo-50 p-6 rounded-2xl border-2 border-indigo-200 shadow-xl">
-          <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
-            <TrendingUp className="text-indigo-600" size={22} />
-            แนวโน้มรายรับ (6 เดือนล่าสุด)
-          </h3>
-          <RevenueChart data={charts.revenue} />
+      {/* Showcase / CTA Section */}
+      <div className="bg-gray-900 py-24 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          {/* Abstract Background */}
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-24 right-0 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
         </div>
 
-        {/* Occupancy Donut */}
-        <div className="bg-gradient-to-br from-white to-teal-50 p-6 rounded-2xl border-2 border-teal-200 shadow-xl flex flex-col">
-          <h3 className="text-lg font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
-            <AlertCircle className="text-teal-600" size={22} />
-            สถานะห้องพัก
-          </h3>
-          <div className="flex-1 flex items-center justify-center">
-            <OccupancyChart data={charts.occupancy} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="text-left lg:w-1/2">
+            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+              Ready to move in?
+              <span className="block text-indigo-400 mt-2">Check availability today.</span>
+            </h2>
+            <p className="mt-4 text-xl text-gray-300">
+              Browse our available rooms, view details, and book your spot instantly online. No hassle, no waiting.
+            </p>
+            <div className="mt-8">
+              <Link href="/booking">
+                <button className="inline-flex items-center px-8 py-3 border border-transparent text-base font-bold rounded-lg text-gray-900 bg-white hover:bg-gray-100 transition-colors">
+                  Check Room Availability
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Simple Visual Rep */}
+          <div className="lg:w-1/3 bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <div className="flex items-center space-x-4 mb-6">
+              <CheckCircle className="text-green-400 w-6 h-6" />
+              <span className="text-white text-lg font-medium">Instant Confirmation</span>
+            </div>
+            <div className="flex items-center space-x-4 mb-6">
+              <CheckCircle className="text-green-400 w-6 h-6" />
+              <span className="text-white text-lg font-medium">Transparent Pricing</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <CheckCircle className="text-green-400 w-6 h-6" />
+              <span className="text-white text-lg font-medium">Online Bill Payment</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-          <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Activity className="text-indigo-600" size={22} />
-              กิจกรรมล่าสุด
-            </h3>
+      {/* Footer */}
+      <footer className="bg-gray-50 py-12 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="mb-4 md:mb-0">
+            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              StaySync
+            </span>
+            <p className="text-sm text-gray-500 mt-1">© 2026 StaySync. All rights reserved.</p>
           </div>
-          <div className="divide-y divide-gray-100">
-            {activity.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">ไม่มีกิจกรรมล่าสุด</div>
-            ) : (
-              activity.map((item) => (
-                <div key={item.id} className="p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white transition-all flex items-center gap-4">
-                  <div className={`p-3 rounded-xl shadow-md ${item.type === 'bill_created' ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white' : 'bg-gradient-to-br from-orange-400 to-red-500 text-white'}`}>
-                    {item.type === 'bill_created' ? <Wallet size={18} /> : <BadgeAlert size={18} />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{item.title}</p>
-                    <p className="text-xs text-gray-500">{item.desc}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">
-                      {new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
-                    </p>
-                    <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${item.status === 'Paid' ? 'bg-green-100 text-green-700' :
-                      item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                      {item.status}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="flex space-x-6 text-gray-400">
+            <a href="#" className="hover:text-gray-500">Privacy Policy</a>
+            <a href="#" className="hover:text-gray-500">Terms of Service</a>
+            <a href="#" className="hover:text-gray-500">Contact</a>
           </div>
         </div>
-
-        {/* Top Spenders */}
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-          <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-yellow-50 to-white">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Zap className="text-yellow-500" size={22} />
-              การใช้น้ำ/ไฟ สูงสุด
-            </h3>
-            <p className="text-xs text-gray-500 mt-1">(บิลเดือนปัจจุบัน)</p>
-          </div>
-          <div className="divide-y divide-gray-100">
-            {topSpenders.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">-</div>
-            ) : (
-              topSpenders.map((room, idx) => (
-                <div key={idx} className="p-4 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-white transition-all flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl font-bold bg-gradient-to-br from-yellow-400 to-orange-500 bg-clip-text text-transparent w-10">{room.room}</span>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs font-medium text-blue-600">
-                        <Droplets size={14} /> {room.water.toFixed(0)} หน่วย
-                      </div>
-                      <div className="flex items-center gap-1 text-xs font-medium text-yellow-600">
-                        <Zap size={14} /> {room.electric.toFixed(0)} หน่วย
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-gray-900">฿{room.total.toLocaleString()}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Quick Actions */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span className="text-2xl">⚡</span>
-          เมนูลัด (Quick Actions)
-        </h3>
-        <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-4">
-          <Link href="/rooms/add">
-            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
-              ➕ เพิ่มห้องพัก
-            </button>
-          </Link>
-          <Link href="/billing">
-            <button className="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 text-sm flex items-center justify-center gap-2">
-              💰 จัดการบิล
-            </button>
-          </Link>
-          <Link href="/billing/bulk">
-            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
-              📝 จดมิเตอร์
-            </button>
-          </Link>
-          <Link href="/broadcast">
-            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:from-pink-600 hover:to-rose-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
-              📢 Broadcast
-            </button>
-          </Link>
-          <Link href="/expenses">
-            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
-              📉 รายจ่าย
-            </button>
-          </Link>
-          <Link href="/settings">
-            <button className="w-full px-4 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:from-gray-500 hover:to-gray-600 font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 text-sm flex items-center justify-center gap-2">
-              ⚙️ ตั้งค่า
-            </button>
-          </Link>
-        </div>
-      </div>
+      </footer>
     </div>
   );
 }

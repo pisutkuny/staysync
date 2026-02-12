@@ -30,7 +30,7 @@ export default function AddRoomPage() {
             if (!res.ok) throw new Error("Failed");
 
             alert("Room added successfully!");
-            router.push("/"); // Redirect back to dashboard
+            router.push("/dashboard"); // Redirect back to dashboard
             router.refresh(); // Refresh data
         } catch (error) {
             alert("Error adding room.");
@@ -42,7 +42,7 @@ export default function AddRoomPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <ArrowLeft size={20} className="text-gray-500" />
                 </Link>
                 <div>

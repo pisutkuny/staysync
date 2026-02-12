@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
 
     // We also want to protect the root "/" but not "/report" or "/login" or "/register" or "/api"
     // Specific check for root dashboard
-    if (path === "/" || path.startsWith("/billing") || path.startsWith("/rooms") || path.startsWith("/issues") || path.startsWith("/users") || path.startsWith("/audit")) {
+    if (path.startsWith("/billing") || path.startsWith("/rooms") || path.startsWith("/issues") || path.startsWith("/users") || path.startsWith("/audit") || path.startsWith("/dashboard")) {
         const sessionToken = request.cookies.get("session_token");
 
         if (!sessionToken) {
@@ -31,6 +31,7 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         "/",
+        "/dashboard/:path*",
         "/billing/:path*",
         "/rooms/:path*",
         "/issues/:path*",

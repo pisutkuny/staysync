@@ -84,6 +84,8 @@ async function main() {
     try {
         const flex = createInvoiceFlexMessage(latestBill, resident, sysConfig, payUrl);
         console.log("Flex Message generated successfully!");
+        const bodyContent = flex.contents.body.contents;
+        // The QR code image is inside the body contents, we loop to find it or just dump it
         console.log(JSON.stringify(flex, null, 2));
     } catch (e) {
         console.error("Error generating flex message:", e);

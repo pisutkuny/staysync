@@ -164,7 +164,7 @@ export default function ReportIssuePage() {
             if (window.liff?.isInClient()) {
                 window.liff.closeWindow();
             } else {
-                router.push("/");
+                router.push("/dashboard");
             }
         } catch (error) {
             alert("Error reporting issue.");

@@ -60,7 +60,7 @@ export default function LoginPage() {
             }
 
             // Force hard redirect to ensure middleware/session are picked up
-            window.location.href = "/";
+            window.location.href = "/dashboard";
         } catch (error: any) {
             if (typeof error === 'string' || React.isValidElement(error)) {
                 // Error already set

@@ -53,9 +53,9 @@ export function createInvoiceFlexMessage(
     }
 
     // Prepare QR Code URL
-    const amountClean = bill.totalAmount.toString(); // promptpay.io handles numbers
+    const amountClean = bill.totalAmount.toString();
     const qrImageUrl = (!isPaid && hasPromptPay)
-        ? `https://promptpay.io/${sysConfig.promptPayId}/${amountClean}`
+        ? `https://promptpay.io/${sysConfig.promptPayId.replace(/\s+/g, '')}/${amountClean}`
         : null;
 
     return {

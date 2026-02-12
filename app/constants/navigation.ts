@@ -4,7 +4,7 @@ import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wren
 export const NAV_ITEMS = [
     {
         label: "Dashboard",
-        href: "/",
+        href: "/dashboard",
         icon: LayoutDashboard,
         roles: ["OWNER", "STAFF", "TENANT"]
     },
