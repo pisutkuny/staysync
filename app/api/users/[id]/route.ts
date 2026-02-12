@@ -71,6 +71,7 @@ export async function PATCH(
                 phone: body.phone ?? userBefore.phone,
                 role: body.role ?? userBefore.role,
                 status: body.status ?? userBefore.status,
+                emailVerified: body.emailVerified ?? userBefore.emailVerified,
             },
         });
 

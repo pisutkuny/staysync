@@ -10,6 +10,7 @@ interface User {
     phone: string | null;
     role: string;
     status: string;
+    emailVerified: boolean;
     lastLoginAt: string | null;
     createdAt: string;
 }
@@ -34,7 +35,8 @@ export default function UserManagementPage() {
         fullName: "",
         phone: "",
         role: "TENANT",
-        status: "Active"
+        status: "Active",
+        emailVerified: false
     });
 
     useEffect(() => {
@@ -77,7 +79,8 @@ export default function UserManagementPage() {
             fullName: user.fullName,
             phone: user.phone || "",
             role: user.role,
-            status: user.status
+            status: user.status,
+            emailVerified: user.emailVerified
         });
         setIsCreating(false);
     }
@@ -90,7 +93,8 @@ export default function UserManagementPage() {
             fullName: "",
             phone: "",
             role: "TENANT",
-            status: "Active"
+            status: "Active",
+            emailVerified: true
         });
         setIsCreating(true);
     }
@@ -394,6 +398,20 @@ export default function UserManagementPage() {
                                         <option value="Deleted">Deleted</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <div className="flex items-center mt-4">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.emailVerified}
+                                        onChange={(e) => setFormData({ ...formData, emailVerified: e.target.checked })}
+                                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        ยืนยันอีเมลแล้ว (Email Verified)
+                                    </span>
+                                </label>
                             </div>
                         </div>
 
