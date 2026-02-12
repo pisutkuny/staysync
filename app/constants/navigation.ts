@@ -1,39 +1,54 @@
 
-import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench, Calculator, Database, AlertCircle, Users } from "lucide-react";
+import { LayoutDashboard, Receipt, FileText, DoorOpen, Megaphone, Settings, Wrench, Calculator, Database, AlertCircle, Users, BedDouble } from "lucide-react";
 
 export const NAV_ITEMS = [
     {
         label: "Dashboard",
         href: "/",
         icon: LayoutDashboard,
-        roles: ["OWNER", "STAFF", "TENANT"] // Visible to all (or logic handled in component)
+        roles: ["OWNER", "STAFF", "TENANT"]
     },
     {
-        label: "Rooms",
+        label: "Book Room",
+        href: "/booking",
+        icon: BedDouble,
+        roles: ["OWNER", "STAFF", "TENANT"]
+    },
+    {
+        label: "Rooms (Admin)",
         href: "/rooms",
         icon: DoorOpen,
         roles: ["OWNER", "STAFF"]
     },
     {
-        name: "Issues",
+        label: "Bookings",
+        href: "/admin/bookings",
+        icon: FileText,
+        roles: ["OWNER", "STAFF"]
+    },
+    {
+        label: "Issues",
         href: "/issues",
         icon: AlertCircle,
-        color: "text-red-600",
-        description: "Track and manage maintenance requests",
+        // color: "text-red-600",
+        // description: "Track and manage maintenance requests",
+        roles: ["OWNER", "STAFF"]
     },
     {
-        name: "Users",
+        label: "Users",
         href: "/users",
         icon: Users,
-        color: "text-purple-600",
-        description: "Manage organization users and roles",
+        // color: "text-purple-600",
+        // description: "Manage organization users and roles",
+        roles: ["OWNER"]
     },
     {
-        name: "Audit",
+        label: "Audit",
         href: "/audit",
         icon: FileText,
-        color: "text-gray-600",
-        description: "View activity logs and changes",
+        // color: "text-gray-600",
+        // description: "View activity logs and changes",
+        roles: ["OWNER"]
     },
     {
         label: "Billing",

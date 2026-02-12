@@ -14,8 +14,14 @@ datasource db {
 model Room {
   id     Int    @id @default(autoincrement())
   number String @unique
-  status String @default("Available") // Available, Occupied, Maintenance
+  status String @default("Available") // Available, Occupied, Maintenance, Reserved
   price  Float
+  
+  // Room Details
+  floor    Int?
+  size     Float? // Square meters
+  features Json?  // Array of strings: ["Air Con", "Balcony"]
+  images   String[] // Array of image URLs
 
   // Initial meter readings (for pre-existing installations)
   waterMeterInitial    Float @default(0)
@@ -30,9 +36,48 @@ model Room {
 
   residents Resident[]
   billings  Billing[]
+  bookings  Booking[] // Relation to Booking
 
   // Performance Indexes
   @@index([status])
+  @@index([organizationId])
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  
+  // Dates
+  checkInDate  DateTime
+  checkOutDate DateTime?
+  
+  // Status
+  status String @default("Pending") // Pending, Confirmed, Rejected, Cancelled, Completed
+  
+  // Financial
+  depositAmount Float?
+  bookingSlip   String? // URL to slip image
+  
+  // Details
+  specialRequest String?
+  
+  // Relations
+  roomId Int
+  room   Room @relation(fields: [roomId], references: [id])
+  
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  // Multi-tenant support
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([checkInDate])
+  @@index([roomId])
+  @@index([userId])
   @@index([organizationId])
 }
 
@@ -215,6 +260,7 @@ model User {
 
   // Relations
   reviewedBills Billing[]     @relation("BillingReviewer")
+  bookings      Booking[]
   auditLogs     AuditLog[]
   sessions      UserSession[]
 
@@ -383,6 +429,7 @@ model Organization {
   rooms         Room[]
   residents     Resident[]
   billings      Billing[]
+  bookings      Booking[]
   issues        Issue[]
   expenses      Expense[]
   centralMeters CentralMeter[]

@@ -19,12 +19,16 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { number, price } = body;
+        const { number, price, floor, size, features, images } = body;
 
         const room = await prisma.room.create({
             data: {
                 number,
                 price,
+                floor,
+                size,
+                features,
+                images,
                 status: "Available",
                 organizationId: session.organizationId,
             },
@@ -60,10 +64,10 @@ export async function GET() {
         const rooms = await prisma.room.findMany({
             orderBy: { number: 'asc' },
             include: {
-                billings: {
-                    orderBy: { createdAt: 'desc' },
-                    take: 1
-                },
+                // billings: {
+                //     orderBy: { createdAt: 'desc' },
+                //     take: 1
+                // },
                 residents: {
                     where: { status: 'Active' }
                 }

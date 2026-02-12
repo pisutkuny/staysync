@@ -24,7 +24,8 @@ export type AuditEntity =
     | 'Expense'
     | 'SystemConfig'
     | 'CentralMeter'
-    | 'RecurringExpense';
+    | 'RecurringExpense'
+    | 'Booking';
 
 export interface AuditParams {
     userId: number;
