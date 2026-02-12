@@ -6,7 +6,7 @@ import { logAudit, getRequestInfo } from "@/lib/audit/logger";
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getCurrentSession();
@@ -14,7 +14,8 @@ export async function GET(
             return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
         }
 
-        const roomId = parseInt(params.id);
+        const { id } = await params;
+        const roomId = parseInt(id);
         const room = await prisma.room.findUnique({
             where: { id: roomId },
             include: {
@@ -41,7 +42,7 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getCurrentSession();
@@ -57,7 +58,8 @@ export async function PUT(
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        const roomId = parseInt(params.id);
+        const { id } = await params;
+        const roomId = parseInt(id);
         const body = await request.json();
         const { number, price, status, floor, size, features, images, chargeCommonArea } = body;
 
