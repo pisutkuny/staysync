@@ -1,60 +1,47 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth/session";
+import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from "otplib";
 import prisma from "@/lib/prisma";
-import { logAudit, getRequestInfo } from "@/lib/audit/logger";
-// @ts-ignore
-import { verify } from "otplib";
 
-import { getCurrentSession } from "@/lib/auth/session";
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const session = await getCurrentSession();
-        if (!session) {
+        const session = await getSession();
+        if (!session || !session.userId) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-        const { userId } = session;
-        const { token } = await req.json();
 
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        // Check if secret exists
-        // @ts-ignore
-        if (!user || !user.twoFactorSecret) {
-            return NextResponse.json({ error: "2FA not setup" }, { status: 400 });
+        const body = await req.json();
+        const { secret, token } = body;
+
+        if (!secret || !token) {
+            return NextResponse.json({ error: "Missing secret or token" }, { status: 400 });
         }
 
-        // @ts-ignore
-        const isValidToken = await verify({
-            token,
-            // @ts-ignore
-            secret: user.twoFactorSecret
+        // Verify logic
+        const totp = new TOTP({
+            crypto: new NobleCryptoPlugin(),
+            base32: new ScureBase32Plugin(),
         });
 
-        if (!isValidToken) {
+        const isValid = await totp.verify({ token, secret });
+
+        if (!isValid) {
             return NextResponse.json({ error: "Invalid code" }, { status: 400 });
         }
 
-        // Enable 2FA
+        // Save to User
         await prisma.user.update({
-            where: { id: userId },
+            where: { id: session.userId },
             data: {
-                // @ts-ignore
-                twoFactorEnabled: true
-            }
+                twoFactorEnabled: true,
+                twoFactorSecret: secret,
+            },
         });
 
-        // Audit Log
-        await logAudit({
-            userId: user.id,
-            userEmail: user.email,
-            userName: user.fullName,
-            action: 'ENABLE_2FA',
-            entity: 'User',
-            entityId: user.id,
-            organizationId: user.organizationId,
-            ...getRequestInfo(req)
-        });
-        return NextResponse.json({ message: "2FA enabled successfully" });
+        return NextResponse.json({ success: true });
+
     } catch (error) {
-        return NextResponse.json({ error: "Failed to enable 2FA" }, { status: 500 });
+        console.error("2FA Enable Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
