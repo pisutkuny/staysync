@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 import Navbar from "./components/Navbar";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,12 +27,14 @@ export default async function RootLayout({
       <body>
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300 print:bg-white print:min-h-0">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Navbar userRole={userRole} />
+            <LanguageProvider>
+              <Navbar userRole={userRole} />
 
-            {/* Main Content - No left margin needed as sidebar is now a popup */}
-            <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto print:p-0 print:pt-0 print:max-w-none print:m-0">
-              {children}
-            </main>
+              {/* Main Content - No left margin needed as sidebar is now a popup */}
+              <main className="pt-20 p-4 md:p-8 md:pt-24 max-w-7xl mx-auto print:p-0 print:pt-0 print:max-w-none print:m-0">
+                {children}
+              </main>
+            </LanguageProvider>
           </ThemeProvider>
         </div>
       </body>

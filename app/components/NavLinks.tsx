@@ -5,10 +5,40 @@ import { NAV_ITEMS, NavItem } from "../constants/navigation";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight, Circle } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function NavLinks({ userRole, onClick }: { userRole?: string, onClick?: () => void }) {
+    const { t } = useLanguage();
     const pathname = usePathname();
     const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+
+    // Helper to map labels
+    const getLabel = (label: string) => {
+        const map: Record<string, string> = {
+            "Dashboard": t.sidebar.dashboard,
+            "Room Management": t.sidebar.roomManagement,
+            "Book Room": t.sidebar.bookRoom,
+            "Bookings": t.sidebar.bookings,
+            "Rooms": t.sidebar.rooms,
+            "Billing & Utilities": t.sidebar.billingUtilities,
+            "Billing": t.sidebar.billing,
+            "Bulk Meter Entry": t.sidebar.bulkMeter,
+            "Monthly Report": t.sidebar.monthlyReport,
+            "Central Meter": t.sidebar.centralMeter,
+            "Utility Analysis": t.sidebar.utilityAnalysis,
+            "Maintenance": t.sidebar.maintenance,
+            "Report Issue": t.sidebar.reportIssue,
+            "Repair Requests": t.sidebar.repairRequests,
+            "Issues Log": t.sidebar.issuesLog,
+            "System": t.sidebar.system,
+            "User Management": t.sidebar.users,
+            "Broadcast": t.sidebar.broadcast,
+            "Audit Logs": t.sidebar.auditLogs,
+            "Backup & Restore": t.sidebar.backupRestore,
+            "Settings": t.sidebar.generalSettings,
+        };
+        return map[label] || label;
+    };
 
     // Helper to check role
     const hasRole = (roles?: string[]) => {
