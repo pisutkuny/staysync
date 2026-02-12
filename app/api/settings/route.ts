@@ -28,6 +28,7 @@ export async function GET() {
                     trashFee: 0,
                     internetFee: 0,
                     otherFees: 0,
+                    emailVerificationRequired: false,
                     organizationId: session.organizationId
                 }
             });

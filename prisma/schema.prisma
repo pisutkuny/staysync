@@ -237,6 +237,9 @@ model SystemConfig {
   reminderDay         Int     @default(25) // Day of month to send reminders (1-28)
   reminderTime        String  @default("09:00") // Time to send reminders (HH:mm)
 
+  // Security Settings
+  emailVerificationRequired Boolean @default(false)
+
   // Bank Info
   bankName          String  @default("Bank Name")
   bankAccountName   String  @default("Account Name")

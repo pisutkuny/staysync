@@ -41,7 +41,14 @@ export async function POST(req: NextRequest) {
         }
 
         // Check email verification (if applicable)
-        if (process.env.NEXT_PUBLIC_ENABLE_EMAIL_VERIFICATION === 'true' && !user.emailVerified) {
+        // Fetch system config to see if verification is required
+        const systemConfig = await prisma.systemConfig.findFirst({
+            where: { organizationId: user.organizationId }
+        });
+
+        const isVerificationRequired = systemConfig?.emailVerificationRequired ?? false;
+
+        if (isVerificationRequired && !user.emailVerified) {
             return NextResponse.json({ error: 'Please verify your email address' }, { status: 403 });
         }
 
