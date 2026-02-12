@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import NavLinks from "./NavLinks";
 import LogoutButton from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar({ userRole }: { userRole?: string }) {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+
+    // Hide Navbar on authentication pages
+    const isAuthPage = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"].some(path => pathname?.startsWith(path));
+
+    if (isAuthPage) return null;
 
     return (
         <>
