@@ -32,7 +32,7 @@ export default function Setup2FA() {
             // Correct approach: Fetch /api/auth/me (User Profile)
             // I'll implement a quick check here.
 
-            const res = await fetch("/api/auth/me");
+            const res = await fetch("/api/auth/me", { cache: "no-store" });
             if (res.ok) {
                 const data = await res.json();
                 setIsEnabled(data.user.twoFactorEnabled);
