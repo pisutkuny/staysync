@@ -1,10 +1,9 @@
+
 import { NextRequest, NextResponse } from "next/server";
-
 import { hashPassword } from "@/lib/auth/password";
-import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
-
 import prisma from "@/lib/prisma";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest) {
     try {
@@ -41,16 +40,13 @@ export async function POST(req: NextRequest) {
         // Hash password
         const hashedPassword = await hashPassword(password);
 
-        // Find default organization (ID 1) or create if not exists (for safety)
+        // Find default organization (ID 1) or create if not exists
         let organizationId = 1;
-
-        // Check if org 1 exists
         const defaultOrg = await prisma.organization.findUnique({
             where: { id: 1 }
         });
 
         if (!defaultOrg) {
-            // Find first available org or error
             const firstOrg = await prisma.organization.findFirst();
             if (firstOrg) {
                 organizationId = firstOrg.id;
@@ -62,30 +58,36 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Create new user
+        // Prepare Verification Token (Atomic Config)
+        const verificationToken = uuidv4();
+        const verificationExpiry = new Date(new Date().getTime() + 24 * 3600 * 1000); // 24 hours
+
+        console.log(`[Register] Creating user ${email} with pre-generated token`);
+
+        // Create new user with verification token
         const newUser = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
                 fullName,
                 phone: phone || null,
-                role: "TENANT", // Default role
+                role: "TENANT",
                 status: "Active",
                 organizationId,
                 emailVerified: false,
+                verificationToken,
+                verificationExpiry
             },
         });
 
         // Send verification email
         try {
             console.log(`[Register] Attempting to send verification email to ${email}`);
-            const token = await generateVerificationToken(email);
-            console.log(`[Register] Generated token for ${email}`);
-            await sendVerificationEmail(email, token);
+            await sendVerificationEmail(email, verificationToken);
             console.log(`[Register] Verification email sent to ${email}`);
         } catch (emailError) {
             console.error("[Register] Failed to send verification email:", emailError);
-            // Continue even if email fails, user can resend later
+            // Continue even if email fails, user can resend later via Login screen
         }
 
         // Remove password from response
