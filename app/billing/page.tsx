@@ -141,7 +141,7 @@ export default function BillingPage() {
             </div>
 
             <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">{t.billing.recent}</h3>
+
                 <BillingList initialBills={bills} />
             </div>
         </div>
