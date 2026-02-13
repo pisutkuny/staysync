@@ -57,7 +57,7 @@ export default function RoomsPage() {
                     <div key={room.id} className="bg-gradient-to-br from-white to-green-50 p-6 rounded-2xl border-2 border-green-200 shadow-xl hover:shadow-2xl transition-all hover:scale-105 flex flex-col justify-between min-h-[14rem]">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{room.number}</h3>
+                                <h3 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent truncate" title={room.number}>{room.number}</h3>
                                 <p className="text-emerald-600 font-bold text-lg">฿{room.price}/mo</p>
                                 {/* Phase 2: Common Area Toggle */}
                                 <div className="mt-2">
@@ -104,22 +104,22 @@ export default function RoomsPage() {
                             {room.status === "Occupied" ? (
                                 <div>
                                     <p className="text-sm text-gray-600 font-medium mb-2">{t.rooms.residents} ({room.residents?.length || 0}):</p>
-                                    <div className="space-y-1">
+                                    <div className="grid grid-cols-2 gap-2">
                                         {room.residents && room.residents.length > 0 ? (
                                             room.residents.map((resident: any) => (
-                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="flex items-center justify-between text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1.5 rounded-lg transition text-sm group">
-                                                    <span className="flex items-center gap-1">
-                                                        👤 {resident.fullName}
+                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="flex items-center justify-between text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1.5 rounded-lg transition text-xs group border border-transparent hover:border-emerald-100">
+                                                    <span className="truncate flex-1 flex items-center gap-1">
+                                                        👤 <span className="truncate">{resident.fullName}</span>
                                                     </span>
                                                     {resident.isChild && (
-                                                        <span className="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full border border-orange-200 flex items-center gap-0.5">
-                                                            👶 Child
+                                                        <span title="Child" className="shrink-0 bg-orange-100 text-orange-600 text-[10px] px-1 rounded-full border border-orange-200">
+                                                            👶
                                                         </span>
                                                     )}
                                                 </Link>
                                             ))
                                         ) : (
-                                            <p className="font-medium text-gray-900">{t.rooms.unknown}</p>
+                                            <p className="font-medium text-gray-900 col-span-2">{t.rooms.unknown}</p>
                                         )}
                                     </div>
                                 </div>
