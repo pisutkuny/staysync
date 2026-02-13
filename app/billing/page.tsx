@@ -19,21 +19,47 @@ export default function BillingPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [roomsRes, billsRes, allRoomsRes, configRes] = await Promise.all([
+                const results = await Promise.allSettled([
                     fetch("/api/rooms").then(res => res.json()),
                     fetch("/api/billing").then(res => res.json()),
                     fetch("/api/rooms").then(res => res.json()),
                     fetch("/api/settings").then(res => res.json())
                 ]);
 
-                // Filter occupied rooms on client side for safety
-                const occupiedRooms = roomsRes.filter((r: any) => r.status === "Occupied");
-                setRooms(occupiedRooms);
-                setBills(billsRes);
-                setAllRooms(allRoomsRes);
-                setConfig(configRes);
+                // 1. Rooms for billing (Occupied)
+                if (results[0].status === 'fulfilled') {
+                    const allRooms = results[0].value;
+                    if (Array.isArray(allRooms)) {
+                        const occupiedRooms = allRooms.filter((r: any) => r.status === "Occupied");
+                        setRooms(occupiedRooms);
+                    }
+                } else {
+                    console.error("Failed to fetch rooms for billing:", results[0].reason);
+                }
+
+                // 2. Bills History
+                if (results[1].status === 'fulfilled') {
+                    setBills(results[1].value);
+                } else {
+                    console.error("Failed to fetch bills:", results[1].reason);
+                }
+
+                // 3. All Rooms (for dashboard/calc)
+                if (results[2].status === 'fulfilled') {
+                    setAllRooms(results[2].value);
+                } else {
+                    console.error("Failed to fetch all rooms:", results[2].reason);
+                }
+
+                // 4. Settings
+                if (results[3].status === 'fulfilled') {
+                    setConfig(results[3].value);
+                } else {
+                    console.error("Failed to fetch settings:", results[3].reason);
+                }
+
             } catch (error) {
-                console.error("Failed to fetch billing data", error);
+                console.error("Critical error in billing page", error);
             } finally {
                 setLoading(false);
             }
