@@ -100,8 +100,8 @@ export async function PUT(
             await prisma.resident.update({
                 where: { id: existingRoom.residents[0].id },
                 data: {
-                    checkInDate: new Date(checkInDate),
-                    contractStartDate: new Date(checkInDate) // Sync contract start date for backdated entries
+                    checkInDate: new Date(checkInDate + 'T12:00:00Z'), // Set to noon UTC to avoid timezone shifts
+                    contractStartDate: new Date(checkInDate + 'T12:00:00Z') // Sync contract start date
                 }
             });
         }
