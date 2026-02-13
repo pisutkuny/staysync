@@ -35,7 +35,7 @@ export async function PATCH(
         const { id } = await params;
         const residentId = Number(id);
         const body = await request.json();
-        const { fullName, phone, lineUserId, roomId } = body;
+        const { fullName, phone, lineUserId, roomId, isChild } = body;
 
         // 1. Get Current Resident Data
         const currentResident = await prisma.resident.findUnique({
@@ -85,7 +85,8 @@ export async function PATCH(
                         roomId: newRoomId,
                         fullName,
                         phone,
-                        lineUserId: lineUserId || null
+                        lineUserId: lineUserId || null,
+                        isChild: isChild !== undefined ? isChild : currentResident.isChild
                     }
                 });
             });
@@ -96,7 +97,8 @@ export async function PATCH(
                 data: {
                     fullName,
                     phone,
-                    lineUserId: lineUserId || null
+                    lineUserId: lineUserId || null,
+                    isChild: isChild !== undefined ? isChild : currentResident.isChild
                 }
             });
         }

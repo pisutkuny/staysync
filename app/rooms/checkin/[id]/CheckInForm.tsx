@@ -26,6 +26,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied,
         fullName: "",
         phone: "",
         lineUserId: "",
+        isChild: false,
         contractDurationMonths: defaultContractDuration, // Use default from room
         customDuration: "",
         deposit: defaultDeposit // Use default from room
@@ -50,6 +51,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
+                    isChild: formData.isChild, // Explicitly include isChild
                     contractStartDate: new Date().toISOString()
                 }),
             });
@@ -112,8 +114,20 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied,
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             placeholder="081XXXXXXX"
-                            className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="isChild"
+                            checked={formData.isChild}
+                            onChange={(e) => setFormData({ ...formData, isChild: e.target.checked })}
+                            className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
+                        />
+                        <label htmlFor="isChild" className="text-sm font-medium text-gray-700 select-none cursor-pointer">
+                            👶 {t.common?.residentsUnder18 || "Resident is under 18 (Child)"}
+                        </label>
                     </div>
 
                     {/* Contract Duration (Read Only) */}

@@ -75,15 +75,47 @@ export default function RoomsPage() {
                             </div>
                         </div>
 
-                        <div className="mt-4">
+                        <div className="mt-4 space-y-3">
+                            {/* Contract & Meter Info */}
+                            <div className="bg-white/50 rounded-lg p-3 text-sm space-y-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-semibold uppercase">Initial Water</p>
+                                        <p className="font-mono font-bold text-gray-700">{room.waterMeterInitial}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 font-semibold uppercase">Initial Electric</p>
+                                        <p className="font-mono font-bold text-gray-700">{room.electricMeterInitial}</p>
+                                    </div>
+                                </div>
+                                {room.status === "Occupied" && room.residents && room.residents[0] && (
+                                    <div className="pt-2 border-t border-gray-200/50">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Contract</p>
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span title="Start Date">📅 {new Date(room.residents[0].contractStartDate).toLocaleDateString('th-TH')}</span>
+                                            <span className="text-gray-400">→</span>
+                                            <span title="End Date">🏁 {room.residents[0].contractEndDate ? new Date(room.residents[0].contractEndDate).toLocaleDateString('th-TH') : "N/A"}</span>
+                                        </div>
+                                        <p className="text-xs text-green-600 font-medium mt-1">⏳ {room.residents[0].contractDurationMonths} Months</p>
+                                    </div>
+                                )}
+                            </div>
+
                             {room.status === "Occupied" ? (
                                 <div>
                                     <p className="text-sm text-gray-600 font-medium mb-2">{t.rooms.residents} ({room.residents?.length || 0}):</p>
                                     <div className="space-y-1">
                                         {room.residents && room.residents.length > 0 ? (
                                             room.residents.map((resident: any) => (
-                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded-lg transition text-sm">
-                                                    👤 {resident.fullName}
+                                                <Link key={resident.id} href={`/residents/${resident.id}`} className="flex items-center justify-between text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1.5 rounded-lg transition text-sm group">
+                                                    <span className="flex items-center gap-1">
+                                                        👤 {resident.fullName}
+                                                    </span>
+                                                    {resident.isChild && (
+                                                        <span className="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded-full border border-orange-200 flex items-center gap-0.5">
+                                                            👶 Child
+                                                        </span>
+                                                    )}
                                                 </Link>
                                             ))
                                         ) : (
@@ -92,7 +124,7 @@ export default function RoomsPage() {
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-400 italic">{t.rooms.emptyRoom}</p>
+                                <p className="text-sm text-gray-400 italic text-center py-4">{t.rooms.emptyRoom}</p>
                             )}
                         </div>
 

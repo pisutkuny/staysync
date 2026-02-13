@@ -99,6 +99,7 @@ model Resident {
   room           Room?   @relation(fields: [roomId], references: [id])
   roomId         Int?
   status         String  @default("Active") // Active, CheckedOut
+  isChild        Boolean @default(false) // Resident is under 18
 
   // Multi-tenant support
   organizationId Int

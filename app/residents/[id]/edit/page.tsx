@@ -27,7 +27,8 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
         fullName: "",
         phone: "",
         lineUserId: "",
-        roomId: ""
+        roomId: "",
+        isChild: false
     });
 
     // Fetch initial data & Rooms
@@ -49,7 +50,8 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                     fullName: resident.fullName,
                     phone: resident.phone || "",
                     lineUserId: resident.lineUserId || "",
-                    roomId: resident.roomId?.toString() || ""
+                    roomId: resident.roomId?.toString() || "",
+                    isChild: resident.isChild || false
                 });
                 setRooms(roomsData);
             } catch (e) {
@@ -70,7 +72,8 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    roomId: formData.roomId ? Number(formData.roomId) : null
+                    roomId: formData.roomId ? Number(formData.roomId) : null,
+                    isChild: formData.isChild
                 }),
             });
             if (!res.ok) throw new Error("Failed");
@@ -122,6 +125,19 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                             <p>{t.residents.roomOccupiedWarning}</p>
                         </div>
                     )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="isChild"
+                        checked={formData.isChild}
+                        onChange={(e) => setFormData({ ...formData, isChild: e.target.checked })}
+                        className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
+                    />
+                    <label htmlFor="isChild" className="text-sm font-medium text-gray-700 select-none cursor-pointer">
+                        👶 {t.common?.residentsUnder18 || "Resident is under 18 (Child)"}
+                    </label>
                 </div>
 
                 <div>
