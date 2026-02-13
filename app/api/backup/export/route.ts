@@ -2,13 +2,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { getCurrentSession } from '@/lib/auth/session';
+
 export async function POST(request: Request) {
     try {
         // Check admin auth
-        const cookieStore = await import('next/headers').then(m => m.cookies());
-        const session = (await cookieStore).get('admin_session');
+        const session = await getCurrentSession();
 
-        if (!session) {
+        if (!session || (session.role !== 'ADMIN' && session.role !== 'OWNER')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -25,7 +26,10 @@ export async function POST(request: Request) {
             issues,
             documents,
             centralMeters,
-            lineBotStates
+            lineBotStates,
+            organizations,
+            systemConfigs,
+            auditLogs
         ] = await Promise.all([
             prisma.user.findMany(),
             prisma.room.findMany(),
@@ -36,7 +40,10 @@ export async function POST(request: Request) {
             prisma.issue.findMany(),
             prisma.document.findMany(),
             prisma.centralMeter.findMany(),
-            prisma.lineBotState.findMany()
+            prisma.lineBotState.findMany(),
+            prisma.organization.findMany(),
+            prisma.systemConfig.findMany(),
+            prisma.auditLog.findMany()
         ]);
 
         // Create backup object
@@ -46,7 +53,8 @@ export async function POST(request: Request) {
                 exportDate: new Date().toISOString(),
                 totalRecords: users.length + rooms.length + residents.length +
                     billing.length + expenses.length + recurringExpenses.length +
-                    issues.length + documents.length + centralMeters.length + lineBotStates.length
+                    issues.length + documents.length + centralMeters.length +
+                    lineBotStates.length + organizations.length + systemConfigs.length + auditLogs.length
             },
             data: {
                 users,
@@ -58,7 +66,10 @@ export async function POST(request: Request) {
                 issues,
                 documents,
                 centralMeters,
-                lineBotStates
+                lineBotStates,
+                organizations,
+                systemConfigs,
+                auditLogs
             }
         };
 
