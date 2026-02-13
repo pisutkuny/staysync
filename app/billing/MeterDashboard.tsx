@@ -47,7 +47,7 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
             {/* Mobile View: Cards */}
             <div className="md:hidden divide-y divide-gray-100">
                 {filteredRooms.map((room) => {
-                    const lastBill = room.billings[0];
+                    const lastBill = room.billings?.[0];
                     const lastUpdate = lastBill ? new Date(lastBill.createdAt).toLocaleDateString() : "-";
 
                     return (
@@ -108,7 +108,7 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                         {filteredRooms.map((room) => {
-                            const lastBill = room.billings[0];
+                            const lastBill = room.billings?.[0];
                             const lastUpdate = lastBill ? new Date(lastBill.createdAt).toLocaleDateString() : "-";
 
                             return (
