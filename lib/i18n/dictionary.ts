@@ -25,6 +25,7 @@ export const dictionary = {
             error: "เกิดข้อผิดพลาด",
             confirmDelete: "คุณแน่ใจหรือไม่ที่จะลบรายการนี้?",
             noData: "ไม่พบข้อมูล",
+            ok: "ตกลง",
         },
         sidebar: {
             dashboard: "ภาพรวม",
@@ -203,6 +204,7 @@ export const dictionary = {
             confirmCheckIn: "ยืนยันเช็คอิน",
             addSuccess: "เพิ่มผู้เช่าเรียบร้อยแล้ว!",
             checkInSuccess: "เช็คอินเรียบร้อยแล้ว!",
+            checkInSuccessDesc: "ดำเนินการเช็คอินผู้เช่าเรียบร้อยแล้ว",
             errorProcessing: "เกิดข้อผิดพลาด",
             notFound: "ไม่พบข้อมูลผู้เช่า",
             room: "ห้อง",
@@ -704,6 +706,7 @@ export const dictionary = {
             error: "Error",
             confirmDelete: "Are you sure you want to delete this item?",
             noData: "No data found",
+            ok: "OK",
         },
         sidebar: {
             dashboard: "Dashboard",
@@ -882,6 +885,7 @@ export const dictionary = {
             confirmCheckIn: "Confirm Check In",
             addSuccess: "Resident added successfully!",
             checkInSuccess: "Check-in successful!",
+            checkInSuccessDesc: "Check-in operation completed successfully.",
             errorProcessing: "Error processing request.",
             notFound: "Resident not found",
             room: "Room",
