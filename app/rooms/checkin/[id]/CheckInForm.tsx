@@ -64,14 +64,14 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/rooms" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={20} className="text-gray-500" />
+                <Link href="/rooms" className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <ArrowLeft size={20} className="text-white" />
                 </Link>
                 <div>
-                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white">
                         {isOccupied ? t.residents.addResident : t.residents.checkInTitle}
                     </h2>
-                    <p className="text-gray-500 mt-2">
+                    <p className="text-gray-300 mt-2">
                         {isOccupied
                             ? `${t.residents.addResidentDesc} ${roomNumber}.`
                             : `${t.residents.checkInDesc} ${roomNumber}.`

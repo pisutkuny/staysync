@@ -32,10 +32,10 @@ export default function UploadDocumentPage({ params }: { params: Promise<{ id: s
     return (
         <div className="max-w-md mx-auto space-y-6">
             <div className="flex items-center gap-4 mb-8">
-                <Link href={`/residents/${id}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
+                <Link href={`/residents/${id}`} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <ArrowLeft size={24} className="text-white" />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">{t.residents.uploadDocument}</h1>
+                <h1 className="text-2xl font-bold text-white">{t.residents.uploadDocument}</h1>
             </div>
 
             <UploadForm

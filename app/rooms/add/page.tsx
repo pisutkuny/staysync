@@ -44,12 +44,12 @@ export default function AddRoomPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={20} className="text-gray-500" />
+                <Link href="/dashboard" className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <ArrowLeft size={20} className="text-white" />
                 </Link>
                 <div>
-                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">{t.rooms.addNewRoom}</h2>
-                    <p className="text-gray-500 mt-2">{t.rooms.createRoomDesc}</p>
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white">{t.rooms.addNewRoom}</h2>
+                    <p className="text-gray-300 mt-2">{t.rooms.createRoomDesc}</p>
                 </div>
             </div>
 

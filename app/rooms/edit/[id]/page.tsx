@@ -160,12 +160,12 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/rooms" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={20} className="text-gray-500" />
+                <Link href="/rooms" className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <ArrowLeft size={20} className="text-white" />
                 </Link>
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t.rooms.editRoom} {formData.number}</h2>
-                    <p className="text-gray-500">{t.rooms.editRoomDesc}</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-white">{t.rooms.editRoom} {formData.number}</h2>
+                    <p className="text-gray-300">{t.rooms.editRoomDesc}</p>
                 </div>
             </div>
 

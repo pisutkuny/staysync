@@ -91,10 +91,10 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
     return (
         <div className="max-w-md mx-auto space-y-6">
             <div className="flex items-center gap-4 mb-4">
-                <Link href={`/residents/${id}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeft size={24} className="text-gray-600" />
+                <Link href={`/residents/${id}`} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <ArrowLeft size={24} className="text-white" />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">{t.residents.editProfile}</h1>
+                <h1 className="text-2xl font-bold text-white">{t.residents.editProfile}</h1>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
