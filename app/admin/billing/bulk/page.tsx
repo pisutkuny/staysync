@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Calculator, CheckCircle, AlertCircle } from "lucide-react";
+import AlertModal from "@/app/components/AlertModal";
 
 interface MeterEntry {
     roomId: number;
@@ -42,6 +43,19 @@ export default function BulkMeterPage() {
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }
+
+    const [alertState, setAlertState] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        type: 'success' | 'error' | 'warning' | 'info';
+        onAction?: () => void;
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "success"
+    });
 
     useEffect(() => {
         loadData();
@@ -90,7 +104,12 @@ export default function BulkMeterPage() {
             setEntries(meterEntries);
         } catch (error) {
             console.error("Failed to load data:", error);
-            alert("ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อี กครั้ง");
+            setAlertState({
+                isOpen: true,
+                title: "Error",
+                message: "ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
+                type: "error"
+            });
         } finally {
             setLoading(false);
         }
@@ -99,10 +118,8 @@ export default function BulkMeterPage() {
     function updateMeter(roomId: number, field: 'waterCurrent' | 'electricCurrent' | 'lastWater' | 'lastElectric', value: string) {
         if (!config) return;
 
-        const numValue = value === '' ? 0 : parseFloat(value); // Default to 0 if empty for Last, null for Current?
-        // Actually for lastWater/lastElectric, 0 is a valid number, empty string might mean 0 or keep as is.
-        // Let's use 0 for safety if empty for Last values.
-        // For Current values, null is used to verify completeness.
+        // Disabling editing of last values is handled in UI, but logic remains same
+        const numValue = value === '' ? 0 : parseFloat(value);
 
         setEntries(prev => prev.map(entry => {
             if (entry.roomId !== roomId) return entry;
@@ -138,7 +155,12 @@ export default function BulkMeterPage() {
 
     async function handleSubmit() {
         if (completedEntries.length === 0) {
-            alert("กรุณากรอกมาตรอย่างน้อย 1 ห้อง");
+            setAlertState({
+                isOpen: true,
+                title: "แจ้งเตือน",
+                message: "กรุณากรอกมาตรอย่างน้อย 1 ห้อง",
+                type: "warning"
+            });
             return;
         }
 
@@ -169,26 +191,40 @@ export default function BulkMeterPage() {
             }
 
             // Build result message
-            let message = `✅ สร้างบิลสำเร็จ ${result.created} ห้อง`;
+            let message = `สร้างบิลสำเร็จ ${result.created} ห้อง`;
 
             if (result.skipped > 0) {
-                message += `\n⏭️ ข้าม ${result.skipped} ห้อง (จ่ายเงินแล้ว)`;
+                message += `\n(ข้าม ${result.skipped} ห้องที่จ่ายแล้ว)`;
             }
 
             if (result.errors && result.errors.length > 0) {
-                message += `\n\n❌ ข้อผิดพลาด:\n${result.errors.join('\n')}`;
+                message += `\n\nข้อผิดพลาด:\n${result.errors.join('\n')}`;
             }
 
-            alert(message);
-
-            // Only redirect if at least one bill was created
-            if (result.created > 0) {
-                window.location.href = "/billing";
-            }
+            // Show success modal
+            setAlertState({
+                isOpen: true,
+                title: "สำเร็จ!",
+                message: message,
+                type: "success",
+                onAction: () => {
+                    // Only redirect if at least one bill was created
+                    if (result.created > 0) {
+                        window.location.href = "/billing";
+                    } else {
+                        setAlertState(prev => ({ ...prev, isOpen: false }));
+                    }
+                }
+            });
 
         } catch (error: any) {
             console.error("Submit error:", error);
-            alert(`เกิดข้อผิดพลาด: ${error.message}`);
+            setAlertState({
+                isOpen: true,
+                title: "เกิดข้อผิดพลาด",
+                message: error.message,
+                type: "error"
+            });
         } finally {
             setSubmitting(false);
             setShowPreview(false);
@@ -205,6 +241,15 @@ export default function BulkMeterPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 pb-20">
+            <AlertModal
+                isOpen={alertState.isOpen}
+                onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+                title={alertState.title}
+                message={alertState.message}
+                type={alertState.type}
+                onAction={alertState.onAction}
+            />
+
             {/* Enhanced Gradient Header */}
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex items-center gap-4">
@@ -249,10 +294,10 @@ export default function BulkMeterPage() {
                     <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10">
                         <tr className="text-left text-gray-700 dark:text-gray-300">
                             <th className="p-3 font-semibold w-[10%]">ห้อง</th>
-                            <th className="p-3 font-semibold text-right w-[15%]">มาตรน้ำเก่า (แก้ไขได้)</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรน้ำเก่า</th>
                             <th className="p-3 font-semibold w-[15%]">มาตรน้ำปัจจุบัน</th>
                             <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
-                            <th className="p-3 font-semibold text-right w-[15%]">มาตรไฟเก่า (แก้ไขได้)</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรไฟเก่า</th>
                             <th className="p-3 font-semibold w-[15%]">มาตรไฟปัจจุบัน</th>
                             <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
                             <th className="p-3 font-semibold text-right bg-green-50 dark:bg-green-900/20 w-[10%]">ยอดรวม</th>
@@ -273,8 +318,8 @@ export default function BulkMeterPage() {
                                         <input
                                             type="number"
                                             value={entry.lastWater}
-                                            onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
-                                            className="w-full border border-blue-200 dark:border-slate-600 rounded px-2 py-1 text-right text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            disabled
+                                            className="w-full border border-gray-200 dark:border-slate-700 rounded px-2 py-1 text-right text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-800 cursor-not-allowed"
                                         />
                                     </td>
                                     <td className="p-3">
@@ -293,8 +338,8 @@ export default function BulkMeterPage() {
                                         <input
                                             type="number"
                                             value={entry.lastElectric}
-                                            onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
-                                            className="w-full border border-orange-200 dark:border-slate-600 rounded px-2 py-1 text-right text-gray-700 dark:text-gray-300 bg-orange-50/30 dark:bg-slate-900 focus:ring-2 focus:ring-orange-500 outline-none"
+                                            disabled
+                                            className="w-full border border-gray-200 dark:border-slate-700 rounded px-2 py-1 text-right text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-800 cursor-not-allowed"
                                         />
                                     </td>
                                     <td className="p-3">
@@ -342,13 +387,10 @@ export default function BulkMeterPage() {
                                 <div className="text-xs font-semibold text-blue-800 mb-2">💧 มาตรน้ำ</div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
-                                        <div className="text-gray-500 mb-1">เก่า (แก้ไขได้)</div>
-                                        <input
-                                            type="number"
-                                            value={entry.lastWater}
-                                            onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
-                                            className="w-full border border-blue-200 rounded px-2 py-1 text-center text-sm bg-white text-gray-700"
-                                        />
+                                        <div className="text-gray-500 mb-1">เก่า</div>
+                                        <div className="font-mono bg-white px-2 py-1 rounded border text-gray-500 text-center">
+                                            {entry.lastWater}
+                                        </div>
                                     </div>
                                     <div>
                                         <div className="text-gray-500 mb-1">ปัจจุบัน</div>
@@ -372,13 +414,10 @@ export default function BulkMeterPage() {
                                 <div className="text-xs font-semibold text-orange-800 mb-2">⚡ มาตรไฟ</div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
-                                        <div className="text-gray-500 mb-1">เก่า (แก้ไขได้)</div>
-                                        <input
-                                            type="number"
-                                            value={entry.lastElectric}
-                                            onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
-                                            className="w-full border border-orange-200 rounded px-2 py-1 text-center text-sm bg-white text-gray-700"
-                                        />
+                                        <div className="text-gray-500 mb-1">เก่า</div>
+                                        <div className="font-mono bg-white px-2 py-1 rounded border text-gray-500 text-center">
+                                            {entry.lastElectric}
+                                        </div>
                                     </div>
                                     <div>
                                         <div className="text-gray-500 mb-1">ปัจจุบัน</div>

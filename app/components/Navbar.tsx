@@ -14,10 +14,11 @@ export default function Navbar({ userRole }: { userRole?: string }) {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
 
-    // Hide Navbar on authentication pages
+    // Hide Navbar on authentication pages or payment pages
     const isAuthPage = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"].some(path => pathname?.startsWith(path));
+    const isPaymentPage = pathname?.startsWith("/pay");
 
-    if (isAuthPage) return null;
+    if (isAuthPage || isPaymentPage) return null;
 
     return (
         <>

@@ -21,3 +21,10 @@ export default async function PaymentPage({ params }: { params: Promise<{ id: st
 
     return <PaymentForm id={id} config={config} billDetails={billing} />;
 }
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+    const config = await prisma.systemConfig.findFirst();
+    return {
+        title: config?.dormName || "Payment"
+    };
+}
