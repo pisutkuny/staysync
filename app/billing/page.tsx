@@ -20,13 +20,15 @@ export default function BillingPage() {
         const fetchData = async () => {
             try {
                 const [roomsRes, billsRes, allRoomsRes, configRes] = await Promise.all([
-                    fetch("/api/rooms?status=Occupied").then(res => res.json()),
+                    fetch("/api/rooms").then(res => res.json()),
                     fetch("/api/billing").then(res => res.json()),
                     fetch("/api/rooms").then(res => res.json()),
                     fetch("/api/settings").then(res => res.json())
                 ]);
 
-                setRooms(roomsRes);
+                // Filter occupied rooms on client side for safety
+                const occupiedRooms = roomsRes.filter((r: any) => r.status === "Occupied");
+                setRooms(occupiedRooms);
                 setBills(billsRes);
                 setAllRooms(allRoomsRes);
                 setConfig(configRes);
