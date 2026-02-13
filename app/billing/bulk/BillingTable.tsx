@@ -47,11 +47,11 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
         const wUnits = Math.max(0, wc - room.lastWater);
         const eUnits = Math.max(0, ec - room.lastElectric);
 
-        const wTotal = wUnits * rates.water;
-        const eTotal = eUnits * rates.electric;
+        const wTotal = wUnits * Number(rates.water);
+        const eTotal = eUnits * Number(rates.electric);
 
         // Sum all fees
-        return room.roomPrice + wTotal + eTotal + rates.trash + rates.internet + rates.other;
+        return Number(room.roomPrice) + wTotal + eTotal + Number(rates.trash) + Number(rates.internet) + Number(rates.other);
     };
 
     const handleSubmit = async () => {
