@@ -68,6 +68,10 @@ export async function GET() {
             include: {
                 residents: {
                     where: { status: 'Active' }
+                },
+                billings: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1
                 }
             }
         });
