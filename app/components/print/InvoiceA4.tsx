@@ -96,7 +96,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                         ค่าเช่าห้อง (Room Rent)
                                         <span className="block text-xs text-gray-500 font-normal mt-0.5">ประจำเดือน {rentMonth}</span>
                                     </td>
-                                    <td className="py-4 text-right">-</td>
+                                    <td className="py-4 text-right">{rentAmount.toLocaleString()}</td>
                                     <td className="py-4 text-center">1 เดือน</td>
                                     <td className="py-4 text-right font-mono font-bold text-gray-900">{rentAmount.toLocaleString()}</td>
                                 </tr>
@@ -124,8 +124,8 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                             ค่าขยะ (Trash Fee)
                                             <span className="block text-xs text-gray-500 font-normal mt-0.5">ประจำเดือน {utilityMonth}</span>
                                         </td>
-                                        <td className="py-4 text-right">-</td>
-                                        <td className="py-4 text-center">-</td>
+                                        <td className="py-4 text-right">{billing.trashFee.toLocaleString()}</td>
+                                        <td className="py-4 text-center">1</td>
                                         <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.trashFee.toLocaleString()}</td>
                                     </tr>
                                 )}
