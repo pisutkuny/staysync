@@ -10,9 +10,9 @@ import { useState, useEffect } from "react";
 
 export default function BillingPage() {
     const { t } = useLanguage();
-    const [rooms, setRooms] = useState([]);
-    const [bills, setBills] = useState([]);
-    const [allRooms, setAllRooms] = useState([]);
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [bills, setBills] = useState<any[]>([]);
+    const [allRooms, setAllRooms] = useState<any[]>([]);
     const [config, setConfig] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
