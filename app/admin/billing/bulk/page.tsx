@@ -226,7 +226,7 @@ export default function BulkMeterPage() {
                         type="month"
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="bg-white/90 text-gray-900 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-white font-medium"
+                        className="bg-white text-indigo-950 rounded-lg px-4 py-2 focus:outline-none focus:ring-4 focus:ring-white/30 font-bold shadow-lg cursor-pointer hover:bg-indigo-50 transition-colors"
                     />
                 </div>
             </div>
@@ -249,10 +249,10 @@ export default function BulkMeterPage() {
                     <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10">
                         <tr className="text-left text-gray-700 dark:text-gray-300">
                             <th className="p-3 font-semibold w-[10%]">ห้อง</th>
-                            <th className="p-3 font-semibold text-right w-[15%]">มาตรน้ำเก่า</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรน้ำเก่า (แก้ไขได้)</th>
                             <th className="p-3 font-semibold w-[15%]">มาตรน้ำปัจจุบัน</th>
                             <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
-                            <th className="p-3 font-semibold text-right w-[15%]">มาตรไฟเก่า</th>
+                            <th className="p-3 font-semibold text-right w-[15%]">มาตรไฟเก่า (แก้ไขได้)</th>
                             <th className="p-3 font-semibold w-[15%]">มาตรไฟปัจจุบัน</th>
                             <th className="p-3 font-semibold text-right w-[10%]">หน่วย</th>
                             <th className="p-3 font-semibold text-right bg-green-50 dark:bg-green-900/20 w-[10%]">ยอดรวม</th>
@@ -274,7 +274,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.lastWater}
                                             onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
-                                            className="w-20 text-right border-b border-gray-300 focus:border-blue-500 outline-none bg-transparent"
+                                            className="w-full border border-blue-200 dark:border-slate-600 rounded px-2 py-1 text-right text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </td>
                                     <td className="p-3">
@@ -282,7 +282,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.waterCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'waterCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-500 dark:text-white dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full border-2 border-blue-300 dark:border-slate-500 rounded px-2 py-1 text-center font-bold text-gray-900 dark:text-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
                                             placeholder="-"
                                         />
                                     </td>
@@ -294,7 +294,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.lastElectric}
                                             onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
-                                            className="w-20 text-right border-b border-gray-300 focus:border-orange-500 outline-none bg-transparent"
+                                            className="w-full border border-orange-200 dark:border-slate-600 rounded px-2 py-1 text-right text-gray-700 dark:text-gray-300 bg-orange-50/30 dark:bg-slate-900 focus:ring-2 focus:ring-orange-500 outline-none"
                                         />
                                     </td>
                                     <td className="p-3">
@@ -302,7 +302,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.electricCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'electricCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center dark:bg-slate-700 dark:border-slate-500 dark:text-white dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 outline-none"
+                                            className="w-full border-2 border-orange-300 dark:border-slate-500 rounded px-2 py-1 text-center font-bold text-gray-900 dark:text-white dark:bg-slate-700 focus:ring-2 focus:ring-orange-500 outline-none"
                                             placeholder="-"
                                         />
                                     </td>
@@ -342,12 +342,12 @@ export default function BulkMeterPage() {
                                 <div className="text-xs font-semibold text-blue-800 mb-2">💧 มาตรน้ำ</div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
-                                        <div className="text-gray-500 mb-1">เก่า</div>
+                                        <div className="text-gray-500 mb-1">เก่า (แก้ไขได้)</div>
                                         <input
                                             type="number"
                                             value={entry.lastWater}
                                             onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                            className="w-full border border-blue-200 rounded px-2 py-1 text-center text-sm bg-white text-gray-700"
                                         />
                                     </div>
                                     <div>
@@ -356,7 +356,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.waterCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'waterCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                            className="w-full border-2 border-blue-300 rounded px-2 py-1 text-center text-sm font-bold text-gray-900 bg-white"
                                             placeholder="-"
                                         />
                                     </div>
@@ -372,12 +372,12 @@ export default function BulkMeterPage() {
                                 <div className="text-xs font-semibold text-orange-800 mb-2">⚡ มาตรไฟ</div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
-                                        <div className="text-gray-500 mb-1">เก่า</div>
+                                        <div className="text-gray-500 mb-1">เก่า (แก้ไขได้)</div>
                                         <input
                                             type="number"
                                             value={entry.lastElectric}
                                             onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                            className="w-full border border-orange-200 rounded px-2 py-1 text-center text-sm bg-white text-gray-700"
                                         />
                                     </div>
                                     <div>
@@ -386,7 +386,7 @@ export default function BulkMeterPage() {
                                             type="number"
                                             value={entry.electricCurrent ?? ''}
                                             onChange={(e) => updateMeter(entry.roomId, 'electricCurrent', e.target.value)}
-                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                            className="w-full border-2 border-orange-300 rounded px-2 py-1 text-center text-sm font-bold text-gray-900 bg-white"
                                             placeholder="-"
                                         />
                                     </div>
