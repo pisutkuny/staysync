@@ -23,8 +23,8 @@ export default async function BulkPage() {
         number: room.number,
         residentName: room.residents[0]?.fullName || "Unknown",
         roomPrice: room.price,
-        lastWater: room.billings[0]?.waterMeterCurrent || 0,
-        lastElectric: room.billings[0]?.electricMeterCurrent || 0,
+        lastWater: room.billings[0]?.waterMeterCurrent ?? room.waterMeterInitial ?? 0,
+        lastElectric: room.billings[0]?.electricMeterCurrent ?? room.electricMeterInitial ?? 0,
     }));
 
     const config = await prisma.systemConfig.findFirst();

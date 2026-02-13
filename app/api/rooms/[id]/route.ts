@@ -61,11 +61,12 @@ export async function PUT(
         const { id } = await params;
         const roomId = parseInt(id);
         const body = await request.json();
-        const { number, price, status, floor, size, features, images, chargeCommonArea, defaultContractDuration, defaultDeposit } = body;
+        const { number, price, status, floor, size, features, images, chargeCommonArea, defaultContractDuration, defaultDeposit, waterMeterInitial, electricMeterInitial, checkInDate } = body;
 
         // Check existing room
         const existingRoom = await prisma.room.findUnique({
-            where: { id: roomId }
+            where: { id: roomId },
+            include: { residents: { where: { status: 'Active' } } }
         });
 
         if (!existingRoom) {
@@ -88,9 +89,19 @@ export async function PUT(
                 images, // Array of strings
                 chargeCommonArea,
                 defaultContractDuration: defaultContractDuration ? parseInt(defaultContractDuration) : 12,
-                defaultDeposit: defaultDeposit ? parseFloat(defaultDeposit) : 0
+                defaultDeposit: defaultDeposit ? parseFloat(defaultDeposit) : 0,
+                waterMeterInitial: waterMeterInitial ? parseFloat(waterMeterInitial) : 0,
+                electricMeterInitial: electricMeterInitial ? parseFloat(electricMeterInitial) : 0,
             },
         });
+
+        // Update Resident Check-in Date if provided and room has active resident
+        if (checkInDate && existingRoom.residents.length > 0) {
+            await prisma.resident.update({
+                where: { id: existingRoom.residents[0].id },
+                data: { checkInDate: new Date(checkInDate) }
+            });
+        }
 
         // Log audit
         await logAudit({

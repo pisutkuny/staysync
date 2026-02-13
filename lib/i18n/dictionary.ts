@@ -178,6 +178,7 @@ export const dictionary = {
             loadError: "ไม่สามารถโหลดข้อมูลห้องพักได้",
             residents: "ผู้เช่า",
             unknown: "ไม่ทราบ",
+            initialReadings: "เลขมาตรเริ่มต้น",
             emptyRoom: "ห้องว่าง",
             checkIn: "เช็คอิน / เข้าพัก",
             addResident: "เพิ่มผู้เช่า",
@@ -186,6 +187,7 @@ export const dictionary = {
         residents: {
             checkInTitle: "เช็คอินผู้เช่า",
             addResident: "เพิ่มผู้เช่า",
+            moveInDate: "วันที่เข้าพัก",
             addResidentDesc: "เพิ่มผู้เช่าหรือสมาชิกในห้อง",
             checkInDesc: "กำหนดผู้เช่าหลักคนใหม่สำหรับห้อง",
             fullName: "ชื่อ-นามสกุล",
@@ -860,6 +862,7 @@ export const dictionary = {
             loadError: "Failed to load room data",
             residents: "Residents",
             unknown: "Unknown",
+            initialReadings: "Initial Meter Readings",
             emptyRoom: "Empty room",
             checkIn: "Check In",
             addResident: "Add Resident",
@@ -868,6 +871,7 @@ export const dictionary = {
         residents: {
             checkInTitle: "Check In Resident",
             addResident: "Add Resident",
+            moveInDate: "Move-In Date",
             addResidentDesc: "Add another resident/family member to Room",
             checkInDesc: "Assign a new main tenant to Room",
             fullName: "Full Name",

@@ -11,6 +11,8 @@ type Room = {
     price: number;
     residents: { fullName: string }[];
     chargeCommonArea?: boolean;
+    waterMeterInitial?: number;
+    electricMeterInitial?: number;
 };
 
 type Rates = {
@@ -52,8 +54,8 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                 const res = await fetch(`/api/rooms/${roomId}/billing/latest`);
                 const data = await res.json();
 
-                const lastWater = data.water?.toString() || "0";
-                const lastElectric = data.electric?.toString() || "0";
+                const lastWater = (data.water !== undefined && data.water !== null) ? data.water.toString() : (room.waterMeterInitial?.toString() || "0");
+                const lastElectric = (data.electric !== undefined && data.electric !== null) ? data.electric.toString() : (room.electricMeterInitial?.toString() || "0");
 
                 setFormData({
                     waterCurrent: lastWater, // Default to last reading

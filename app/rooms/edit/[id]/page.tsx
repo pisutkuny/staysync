@@ -26,7 +26,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         images: [] as string[],
         chargeCommonArea: false,
         defaultContractDuration: 12,
-        defaultDeposit: 0
+        defaultDeposit: 0,
+        waterMeterInitial: 0,
+        electricMeterInitial: 0,
+        checkInDate: ""
     });
 
     const [newImageLink, setNewImageLink] = useState("");
@@ -59,7 +62,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     images: Array.isArray(data.images) ? data.images : [],
                     chargeCommonArea: data.chargeCommonArea || false,
                     defaultContractDuration: data.defaultContractDuration || 12,
-                    defaultDeposit: data.defaultDeposit || 0
+                    defaultDeposit: data.defaultDeposit || 0,
+                    waterMeterInitial: data.waterMeterInitial || 0,
+                    electricMeterInitial: data.electricMeterInitial || 0,
+                    checkInDate: data.residents && data.residents.length > 0 ? data.residents[0].checkInDate.split('T')[0] : ""
                 });
             } catch (error) {
                 console.error(error);
@@ -141,7 +147,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     floor: formData.floor ? parseInt(formData.floor) : null,
                     size: formData.size ? parseFloat(formData.size) : null,
                     defaultContractDuration: formData.defaultContractDuration,
-                    defaultDeposit: formData.defaultDeposit
+                    defaultDeposit: formData.defaultDeposit,
+                    waterMeterInitial: formData.waterMeterInitial,
+                    electricMeterInitial: formData.electricMeterInitial,
+                    checkInDate: formData.checkInDate
                 })
             });
 
@@ -244,6 +253,43 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                                 type="number"
                                 value={formData.defaultDeposit}
                                 onChange={e => setFormData({ ...formData, defaultDeposit: parseFloat(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Initial Readings & Move In */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2">🔄 {t.rooms.initialReadings} & 📅 {t.residents.moveInDate}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {formData.status === 'Occupied' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.residents.moveInDate}</label>
+                                <input
+                                    type="date"
+                                    value={formData.checkInDate}
+                                    onChange={e => setFormData({ ...formData, checkInDate: e.target.value })}
+                                    className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Updates current resident's start date</p>
+                            </div>
+                        )}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">💧 Initial Water Meter</label>
+                            <input
+                                type="number"
+                                value={formData.waterMeterInitial}
+                                onChange={e => setFormData({ ...formData, waterMeterInitial: parseFloat(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">⚡ Initial Electric Meter</label>
+                            <input
+                                type="number"
+                                value={formData.electricMeterInitial}
+                                onChange={e => setFormData({ ...formData, electricMeterInitial: parseFloat(e.target.value) || 0 })}
                                 className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
