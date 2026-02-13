@@ -12,9 +12,11 @@ interface CheckInFormProps {
     roomNumber: string;
     roomPrice: number;
     isOccupied: boolean;
+    defaultContractDuration: number;
+    defaultDeposit: number;
 }
 
-export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied }: CheckInFormProps) {
+export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied, defaultContractDuration, defaultDeposit }: CheckInFormProps) {
     const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -23,17 +25,14 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
         fullName: "",
         phone: "",
         lineUserId: "",
-        contractDurationMonths: 12,
+        contractDurationMonths: defaultContractDuration, // Use default from room
         customDuration: "",
-        deposit: roomPrice
+        deposit: defaultDeposit // Use default from room
     });
 
     // Calculate contract end date
     const calculateEndDate = () => {
-        const duration = formData.contractDurationMonths === 0
-            ? parseInt(formData.customDuration) || 0
-            : formData.contractDurationMonths;
-
+        const duration = formData.contractDurationMonths;
         const startDate = new Date();
         const endDate = new Date(startDate);
         endDate.setMonth(endDate.getMonth() + duration);
@@ -123,37 +122,14 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                         />
                     </div>
 
-                    {/* Contract Duration */}
+                    {/* Contract Duration (Read Only) */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">📅 {t.residents.contractDuration}</label>
-                        <select
-                            value={formData.contractDurationMonths}
-                            onChange={(e) => setFormData({ ...formData, contractDurationMonths: parseInt(e.target.value) })}
-                            className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                            <option value={6}>{t.residents.months6}</option>
-                            <option value={12}>{t.residents.months12}</option>
-                            <option value={24}>{t.residents.months24}</option>
-                            <option value={0}>{t.residents.customDuration}</option>
-                        </select>
-                    </div>
-
-                    {/* Custom Duration Input */}
-                    {formData.contractDurationMonths === 0 && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.customMonthsLabel}</label>
-                            <input
-                                required
-                                type="number"
-                                min="1"
-                                max="36"
-                                value={formData.customDuration}
-                                onChange={(e) => setFormData({ ...formData, customDuration: e.target.value })}
-                                placeholder={t.residents.enterMonthsPlaceholder}
-                                className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
+                        <div className="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-gray-600">
+                            {formData.contractDurationMonths} {t.residents.months}
                         </div>
-                    )}
+                        <p className="text-xs text-gray-400 mt-1">* Set in Room Settings</p>
+                    </div>
 
                     {/* Contract End Date Display */}
                     <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
@@ -161,19 +137,13 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                         <p className="text-lg font-bold text-indigo-700">{calculateEndDate()}</p>
                     </div>
 
-                    {/* Deposit */}
+                    {/* Deposit (Read Only) */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">💰 {t.residents.deposit}</label>
-                        <input
-                            required
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={formData.deposit}
-                            onChange={(e) => setFormData({ ...formData, deposit: parseFloat(e.target.value) })}
-                            className="w-full rounded-lg border-2 border-purple-300 p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg font-bold"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">💡 {t.residents.depositDefault.replace('1 Month Rent', `${roomPrice.toLocaleString()} THB`)}</p>
+                        <div className="w-full rounded-lg border-2 border-purple-100 bg-purple-50 p-3 text-lg font-bold text-purple-700">
+                            ฿{formData.deposit.toLocaleString()}
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">* Set in Room Settings</p>
                     </div>
 
                     <div>

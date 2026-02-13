@@ -27,6 +27,10 @@ model Room {
   waterMeterInitial    Float @default(0)
   electricMeterInitial Float @default(0)
 
+  // Contract & Deposit Settings
+  defaultContractDuration Int @default(12) // Months
+  defaultDeposit          Float @default(0)
+
   // Phase 2: Common Area Billing (Room-based)
   chargeCommonArea Boolean @default(false) // Enable common area fees for this room
 

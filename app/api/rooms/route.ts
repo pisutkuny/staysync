@@ -19,7 +19,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { number, price, floor, size, features, images } = body;
+        const { number, price, floor, size, features, images, defaultContractDuration, defaultDeposit } = body;
 
         const room = await prisma.room.create({
             data: {
@@ -29,6 +29,8 @@ export async function POST(request: Request) {
                 size,
                 features,
                 images,
+                defaultContractDuration: defaultContractDuration ? parseInt(defaultContractDuration) : 12,
+                defaultDeposit: defaultDeposit ? parseFloat(defaultDeposit) : 0,
                 status: "Available",
                 organizationId: session.organizationId,
             },

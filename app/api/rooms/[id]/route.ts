@@ -61,7 +61,7 @@ export async function PUT(
         const { id } = await params;
         const roomId = parseInt(id);
         const body = await request.json();
-        const { number, price, status, floor, size, features, images, chargeCommonArea } = body;
+        const { number, price, status, floor, size, features, images, chargeCommonArea, defaultContractDuration, defaultDeposit } = body;
 
         // Check existing room
         const existingRoom = await prisma.room.findUnique({
@@ -86,7 +86,9 @@ export async function PUT(
                 size: size ? parseFloat(size) : null,
                 features,
                 images, // Array of strings
-                chargeCommonArea
+                chargeCommonArea,
+                defaultContractDuration: defaultContractDuration ? parseInt(defaultContractDuration) : 12,
+                defaultDeposit: defaultDeposit ? parseFloat(defaultDeposit) : 0
             },
         });
 

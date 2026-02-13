@@ -21,7 +21,9 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         size: "",
         features: [] as string[],
         images: [] as string[],
-        chargeCommonArea: false
+        chargeCommonArea: false,
+        defaultContractDuration: 12,
+        defaultDeposit: 0
     });
 
     const [newImageLink, setNewImageLink] = useState("");
@@ -52,7 +54,9 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     size: data.size ? data.size.toString() : "",
                     features: Array.isArray(data.features) ? data.features : [],
                     images: Array.isArray(data.images) ? data.images : [],
-                    chargeCommonArea: data.chargeCommonArea || false
+                    chargeCommonArea: data.chargeCommonArea || false,
+                    defaultContractDuration: data.defaultContractDuration || 12,
+                    defaultDeposit: data.defaultDeposit || 0
                 });
             } catch (error) {
                 console.error(error);
@@ -133,7 +137,9 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     ...formData,
                     price: parseFloat(formData.price),
                     floor: formData.floor ? parseInt(formData.floor) : null,
-                    size: formData.size ? parseFloat(formData.size) : null
+                    size: formData.size ? parseFloat(formData.size) : null,
+                    defaultContractDuration: formData.defaultContractDuration,
+                    defaultDeposit: formData.defaultDeposit
                 })
             });
 
@@ -217,6 +223,26 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                                 />
                                 <span className="text-gray-600 text-sm">{t.rooms.enableCommonAreaFee}</span>
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.residents.contractDuration} ({t.residents.months})</label>
+                            <input
+                                type="number"
+                                value={formData.defaultContractDuration}
+                                onChange={e => setFormData({ ...formData, defaultContractDuration: parseInt(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.residents.deposit} (฿)</label>
+                            <input
+                                type="number"
+                                value={formData.defaultDeposit}
+                                onChange={e => setFormData({ ...formData, defaultDeposit: parseFloat(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,8 @@ export default function AddRoomPage() {
     const [formData, setFormData] = useState({
         number: "",
         price: "",
+        defaultContractDuration: 12,
+        defaultDeposit: 0
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,6 +28,8 @@ export default function AddRoomPage() {
                 body: JSON.stringify({
                     number: formData.number,
                     price: Number(formData.price),
+                    defaultContractDuration: formData.defaultContractDuration,
+                    defaultDeposit: formData.defaultDeposit
                 }),
             });
 
@@ -77,6 +81,29 @@ export default function AddRoomPage() {
                             placeholder="e.g. 3500"
                             className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.contractDuration} ({t.residents.months})</label>
+                            <input
+                                type="number"
+                                value={formData.defaultContractDuration}
+                                onChange={(e) => setFormData({ ...formData, defaultContractDuration: parseInt(e.target.value) || 0 })}
+                                placeholder="12"
+                                className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.deposit} (฿)</label>
+                            <input
+                                type="number"
+                                value={formData.defaultDeposit}
+                                onChange={(e) => setFormData({ ...formData, defaultDeposit: parseFloat(e.target.value) || 0 })}
+                                placeholder="0"
+                                className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
                     </div>
 
                     <button

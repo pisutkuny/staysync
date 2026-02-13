@@ -19,6 +19,8 @@ export default async function CheckInPage({ params }: { params: Promise<{ id: st
             roomNumber={room.number}
             roomPrice={room.price}
             isOccupied={room.status === "Occupied"}
+            defaultContractDuration={room.defaultContractDuration}
+            defaultDeposit={room.defaultDeposit}
         />
     );
 }

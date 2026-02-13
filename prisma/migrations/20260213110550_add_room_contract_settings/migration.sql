@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Room" ADD COLUMN     "defaultContractDuration" INTEGER NOT NULL DEFAULT 12,
+ADD COLUMN     "defaultDeposit" DOUBLE PRECISION NOT NULL DEFAULT 0;
