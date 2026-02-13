@@ -287,6 +287,7 @@ export const dictionary = {
             depositReturned: "คืนเงินประกัน",
             checkoutError: "เกิดข้อผิดพลาดในการย้ายออก",
             isChild: "ผู้พักอาศัยอายุต่ำกว่า 18 ปี",
+            updateSuccess: "อัปเดตข้อมูลผู้พักอาศัยสำเร็จ!",
         },
         issues: {
             title: "แจ้งซ่อม / รายงานปัญหา",
@@ -975,6 +976,7 @@ export const dictionary = {
             depositReturned: "Deposit Returned",
             checkoutError: "Error processing check-out",
             isChild: "Resident under 18",
+            updateSuccess: "Resident updated successfully!",
         },
         issues: {
             title: "Report Issue",
