@@ -8,6 +8,25 @@ import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
 const WATER_RATE = 18;
 const ELECTRIC_RATE = 7;
 
+export async function GET() {
+    try {
+        const bills = await prisma.billing.findMany({
+            include: {
+                room: true,
+                resident: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        return NextResponse.json(bills);
+    } catch (error) {
+        console.error("Failed to fetch bills:", error);
+        return NextResponse.json({ error: "Failed to fetch bills" }, { status: 500 });
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();
