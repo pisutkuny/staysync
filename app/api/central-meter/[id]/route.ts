@@ -36,6 +36,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             waterMeterMaintenanceFee,
             electricMeterCurrent,
             electricRateFromUtility,
+            electricTotalCost, // New field from body
             note
         } = body;
 
@@ -54,7 +55,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
         const electricUsage = electricMeterCurrent - currentRecord.electricMeterLast;
-        const electricTotalCost = electricUsage * electricRateFromUtility;
+
+        // Prioritize manual total cost if provided, otherwise calculate
+        const finalElectricTotalCost = electricTotalCost !== undefined
+            ? Number(electricTotalCost)
+            : (electricUsage * electricRateFromUtility);
 
         const updatedRecord = await prisma.centralMeter.update({
             where: { id },
@@ -67,7 +72,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                 electricMeterCurrent,
                 electricUsage,
                 electricRateFromUtility,
-                electricTotalCost,
+                electricTotalCost: finalElectricTotalCost,
                 note: note || null
             }
         });

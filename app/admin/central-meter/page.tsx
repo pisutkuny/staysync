@@ -23,7 +23,8 @@ export default function CentralMeterPage() {
         waterMeterMaintenanceFee: 0,
         electricMeterLast: 0,
         electricMeterCurrent: 0,
-        electricRateFromUtility: 5,
+        electricRateFromUtility: 0,
+        electricTotalCost: 0,
         internetCost: 0,
         trashCost: 0,
         note: ""
@@ -73,21 +74,35 @@ export default function CentralMeterPage() {
 
     // Auto-calculate usage and costs
     useEffect(() => {
+        // Water: Calculate Cost from Rate (Standard)
         const waterUsage = Math.max(0, formData.waterMeterCurrent - formData.waterMeterLast);
         const waterCost = (waterUsage * formData.waterRateFromUtility) + (formData.waterMeterMaintenanceFee || 0);
 
+        // Electric: Calculate Rate from Cost (User Request)
         const electricUsage = Math.max(0, formData.electricMeterCurrent - formData.electricMeterLast);
-        const electricCost = electricUsage * formData.electricRateFromUtility;
+        // Cost is now an input (formData.electricTotalCost)
+        // We calculate Rate for reference/API
+        let electricRate = 0;
+        if (electricUsage > 0 && formData.electricTotalCost > 0) {
+            electricRate = formData.electricTotalCost / electricUsage;
+        }
 
-        const totalCost = waterCost + electricCost + (formData.internetCost || 0) + (formData.trashCost || 0);
+        const totalCost = waterCost + (formData.electricTotalCost || 0) + (formData.internetCost || 0) + (formData.trashCost || 0);
 
         setCalculated({
             waterUsage,
             waterCost,
             electricUsage,
-            electricCost,
+            electricCost: formData.electricTotalCost || 0,
             totalCost
         });
+
+        // Sync calculated rate back to formData for submission (avoid infinite loop by checking diff)
+        // We use a small epsilon for float comparison or just simple check
+        if (Math.abs(formData.electricRateFromUtility - electricRate) > 0.0001) {
+            setFormData(prev => ({ ...prev, electricRateFromUtility: electricRate }));
+        }
+
     }, [
         formData.waterMeterCurrent,
         formData.waterMeterLast,
@@ -95,9 +110,11 @@ export default function CentralMeterPage() {
         formData.waterMeterMaintenanceFee,
         formData.electricMeterCurrent,
         formData.electricMeterLast,
-        formData.electricRateFromUtility,
+        formData.electricTotalCost, // Changed dependency
+        // formData.electricRateFromUtility, // Removed to avoid loop
         formData.internetCost,
-        formData.trashCost
+        formData.trashCost,
+        formData.electricRateFromUtility // Need this to check for consistency? No, checking logic inside.
     ]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -297,25 +314,27 @@ export default function CentralMeterPage() {
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.unit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.rate} *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost} (Payment)</label>
                                 <input
                                     type="number"
                                     step="0.01"
-                                    value={formData.electricRateFromUtility}
-                                    onChange={e => setFormData({ ...formData, electricRateFromUtility: parseFloat(e.target.value) || 0 })}
+                                    value={formData.electricTotalCost}
+                                    onChange={e => setFormData({ ...formData, electricTotalCost: parseFloat(e.target.value) || 0 })}
                                     required
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
+                                <p className="text-xs text-gray-400 mt-1">กรอกยอดจ่ายจริง</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost}</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.rate} (Calc)</label>
                                 <input
-                                    type="text"
-                                    value={`฿${calculated.electricCost.toLocaleString()}`}
+                                    type="number"
+                                    step="0.0001"
+                                    value={formData.electricRateFromUtility.toFixed(4)}
                                     disabled
-                                    className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
+                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
                                 />
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
                         </div>
                     </div>

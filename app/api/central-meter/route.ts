@@ -28,9 +28,11 @@ export async function POST(request: Request) {
             electricMeterLast: electricMeterLastOverride,
             electricMeterCurrent,
             electricRateFromUtility,
+            electricTotalCost, // New field from body
             internetCost,
             trashCost,
-            note
+            note,
+            waterMeterMaintenanceFee
         } = body;
 
         const session = await getCurrentSession();
@@ -54,11 +56,14 @@ export async function POST(request: Request) {
 
         // Calculate usage and costs
         const waterUsage = waterMeterCurrent - waterLast;
-        const waterMaintenanceFee = Number(body.waterMeterMaintenanceFee) || 0;
+        const waterMaintenanceFee = Number(waterMeterMaintenanceFee) || 0;
         const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
         const electricUsage = electricMeterCurrent - electricLast;
-        const electricTotalCost = electricUsage * electricRateFromUtility;
+        // Prioritize manual total cost if provided, otherwise calculate
+        const finalElectricTotalCost = electricTotalCost !== undefined
+            ? Number(electricTotalCost)
+            : (electricUsage * electricRateFromUtility);
 
         const record = await prisma.centralMeter.create({
             data: {
@@ -73,7 +78,7 @@ export async function POST(request: Request) {
                 electricMeterCurrent,
                 electricUsage,
                 electricRateFromUtility,
-                electricTotalCost,
+                electricTotalCost: finalElectricTotalCost,
                 internetCost: internetCost || null,
                 trashCost: trashCost || null,
                 note: note || null,
