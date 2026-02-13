@@ -1,9 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import AlertModal, { AlertType } from "@/app/components/AlertModal";
-import ConfirmModal from "@/app/components/ConfirmModal";
+import React, { createContext, useContext, useCallback, ReactNode } from "react";
+import Swal, { SweetAlertIcon } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const MySwal = withReactContent(Swal);
+
+// Define AlertType to match previous usage or mapping
+export type AlertType = SweetAlertIcon;
 
 interface ModalContextType {
     showAlert: (title: string, message: string, type?: AlertType, onAction?: () => void) => void;
@@ -15,100 +20,36 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 export function ModalProvider({ children }: { children: ReactNode }) {
     const { t } = useLanguage();
 
-    // Alert State
-    const [alertState, setAlertState] = useState<{
-        isOpen: boolean;
-        title: string;
-        message: string;
-        type: AlertType;
-        onAction?: () => void;
-    }>({
-        isOpen: false,
-        title: "",
-        message: "",
-        type: "success",
-    });
-
-    // Confirm State
-    const [confirmState, setConfirmState] = useState<{
-        isOpen: boolean;
-        title: string;
-        message: string;
-        isDestructive: boolean;
-        resolve: ((value: boolean) => void) | null;
-    }>({
-        isOpen: false,
-        title: "",
-        message: "",
-        isDestructive: false,
-        resolve: null,
-    });
-
     const showAlert = useCallback((title: string, message: string, type: AlertType = "success", onAction?: () => void) => {
-        setAlertState({
-            isOpen: true,
-            title,
-            message,
-            type,
-            onAction,
+        MySwal.fire({
+            title: title,
+            text: message,
+            icon: type,
+            confirmButtonText: t.common?.ok || "OK",
+            confirmButtonColor: type === 'error' ? '#EF4444' : '#4F46E5', // Red or Indigo
+        }).then(() => {
+            if (onAction) onAction();
         });
-    }, []);
+    }, [t]);
 
     const showConfirm = useCallback((title: string, message: string, isDestructive: boolean = false) => {
-        return new Promise<boolean>((resolve) => {
-            setConfirmState({
-                isOpen: true,
-                title,
-                message,
-                isDestructive,
-                resolve,
-            });
+        return MySwal.fire({
+            title: title,
+            text: message,
+            icon: isDestructive ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonText: t.common?.confirm || "Confirm",
+            cancelButtonText: t.common?.cancel || "Cancel",
+            confirmButtonColor: isDestructive ? '#EF4444' : '#4F46E5',
+            cancelButtonColor: '#9CA3AF',
+        }).then((result) => {
+            return result.isConfirmed;
         });
-    }, []);
-
-    const handleAlertClose = () => {
-        setAlertState((prev) => ({ ...prev, isOpen: false }));
-        if (alertState.onAction) {
-            // Optional: execute action on close if not explicitly executed? 
-            // Usually alert just closes. Action is for "OK" button.
-            // But if user clicks backdrop, maybe we shouldn't trigger action?
-            // Current AlertModal calls onAction OR onClose. 
-            // Here we just close.
-        }
-    };
-
-    const handleConfirmClose = (result: boolean) => {
-        setConfirmState((prev) => ({ ...prev, isOpen: false }));
-        if (confirmState.resolve) {
-            confirmState.resolve(result);
-        }
-    };
+    }, [t]);
 
     return (
         <ModalContext.Provider value={{ showAlert, showConfirm }}>
             {children}
-            <AlertModal
-                isOpen={alertState.isOpen}
-                onClose={handleAlertClose}
-                title={alertState.title}
-                message={alertState.message}
-                type={alertState.type}
-                onAction={() => {
-                    handleAlertClose();
-                    if (alertState.onAction) alertState.onAction();
-                }}
-                actionLabel={t.common?.ok || "OK"}
-            />
-            <ConfirmModal
-                isOpen={confirmState.isOpen}
-                onClose={() => handleConfirmClose(false)}
-                onConfirm={() => handleConfirmClose(true)}
-                title={confirmState.title}
-                message={confirmState.message}
-                isDestructive={confirmState.isDestructive}
-                confirmLabel={t.common?.confirm || "Confirm"}
-                cancelLabel={t.common?.cancel || "Cancel"}
-            />
         </ModalContext.Provider>
     );
 }

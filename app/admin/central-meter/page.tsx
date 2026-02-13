@@ -5,10 +5,12 @@ import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function CentralMeterPage() {
     const { t } = useLanguage();
     const router = useRouter();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const [records, setRecords] = useState<any[]>([]);
 
@@ -133,11 +135,12 @@ export default function CentralMeterPage() {
                 throw new Error(err.error || "Failed to save");
             }
 
-            alert(t.centralMeter.saveSuccess);
-            router.push("/admin/utility-analysis");
-            router.refresh();
+            showAlert(t.common.success, t.centralMeter.saveSuccess, "success", () => {
+                router.push("/admin/utility-analysis");
+                router.refresh();
+            });
         } catch (error: any) {
-            alert(error.message);
+            showAlert(t.common.error, error.message, "error");
         } finally {
             setLoading(false);
         }
