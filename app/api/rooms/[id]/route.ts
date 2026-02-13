@@ -99,7 +99,10 @@ export async function PUT(
         if (checkInDate && existingRoom.residents.length > 0) {
             await prisma.resident.update({
                 where: { id: existingRoom.residents[0].id },
-                data: { checkInDate: new Date(checkInDate) }
+                data: {
+                    checkInDate: new Date(checkInDate),
+                    contractStartDate: new Date(checkInDate) // Sync contract start date for backdated entries
+                }
             });
         }
 

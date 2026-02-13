@@ -16,8 +16,8 @@ export async function GET(
 
         if (!latestBill) {
             return NextResponse.json({
-                water: 0,
-                electric: 0
+                water: null,
+                electric: null
             });
         }
 
