@@ -20,6 +20,14 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
     // Theme Color
     const themeColor = config.invoiceColor || "#4f46e5";
 
+    // Date Formatters
+    const billDate = new Date(billing.createdAt);
+    const rentMonth = billDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+
+    const prevDate = new Date(billDate);
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const utilityMonth = prevDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+
     return (
         <div className="w-[210mm] min-h-[297mm] bg-white p-12 mx-auto text-black relative font-sans print:w-full print:h-full">
             {/* Watermark Background */}
@@ -84,7 +92,10 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                             </thead>
                             <tbody className="divide-y divide-gray-100 text-sm">
                                 <tr>
-                                    <td className="py-4 font-medium text-gray-800">ค่าเช่าห้อง (Room Rent)</td>
+                                    <td className="py-4 font-medium text-gray-800">
+                                        ค่าเช่าห้อง (Room Rent)
+                                        <span className="block text-xs text-gray-500 font-normal mt-0.5">ประจำเดือน {rentMonth}</span>
+                                    </td>
                                     <td className="py-4 text-right">-</td>
                                     <td className="py-4 text-center">1 เดือน</td>
                                     <td className="py-4 text-right font-mono font-bold text-gray-900">{rentAmount.toLocaleString()}</td>
@@ -92,7 +103,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                 <tr>
                                     <td className="py-4">
                                         <div className="font-medium text-gray-800">ค่าน้ำ (Water Usage)</div>
-                                        <div className="text-xs text-gray-500 mt-1">มิเตอร์: {billing.waterMeterLast} → {billing.waterMeterCurrent}</div>
+                                        <div className="text-xs text-gray-500 mt-1">ประจำเดือน {utilityMonth} (มิเตอร์: {billing.waterMeterLast} → {billing.waterMeterCurrent})</div>
                                     </td>
                                     <td className="py-4 text-right">{billing.waterRate}</td>
                                     <td className="py-4 text-center">{(billing.waterMeterCurrent - billing.waterMeterLast).toLocaleString()} หน่วย</td>
@@ -101,7 +112,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                 <tr>
                                     <td className="py-4">
                                         <div className="font-medium text-gray-800">ค่าไฟ (Electric Usage)</div>
-                                        <div className="text-xs text-gray-500 mt-1">มิเตอร์: {billing.electricMeterLast} → {billing.electricMeterCurrent}</div>
+                                        <div className="text-xs text-gray-500 mt-1">ประจำเดือน {utilityMonth} (มิเตอร์: {billing.electricMeterLast} → {billing.electricMeterCurrent})</div>
                                     </td>
                                     <td className="py-4 text-right">{billing.electricRate}</td>
                                     <td className="py-4 text-center">{(billing.electricMeterCurrent - billing.electricMeterLast).toLocaleString()} หน่วย</td>
@@ -109,7 +120,10 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                 </tr>
                                 {billing.trashFee > 0 && (
                                     <tr>
-                                        <td className="py-4 font-medium text-gray-800">ค่าขยะ (Trash Fee)</td>
+                                        <td className="py-4 font-medium text-gray-800">
+                                            ค่าขยะ (Trash Fee)
+                                            <span className="block text-xs text-gray-500 font-normal mt-0.5">ประจำเดือน {utilityMonth}</span>
+                                        </td>
                                         <td className="py-4 text-right">-</td>
                                         <td className="py-4 text-center">-</td>
                                         <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.trashFee.toLocaleString()}</td>
@@ -117,7 +131,10 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                 )}
                                 {billing.internetFee > 0 && (
                                     <tr>
-                                        <td className="py-4 font-medium text-gray-800">ค่าอินเทอร์เน็ต (Internet)</td>
+                                        <td className="py-4 font-medium text-gray-800">
+                                            ค่าอินเทอร์เน็ต (Internet)
+                                            <span className="block text-xs text-gray-500 font-normal mt-0.5">ประจำเดือน {rentMonth}</span>
+                                        </td>
                                         <td className="py-4 text-right">-</td>
                                         <td className="py-4 text-center">-</td>
                                         <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.internetFee.toLocaleString()}</td>

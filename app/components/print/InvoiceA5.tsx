@@ -16,6 +16,14 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
     // Theme Color
     const themeColor = config.invoiceColor || "#4f46e5";
 
+    // Date Formatters
+    const billDate = new Date(billing.createdAt);
+    const rentMonth = billDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+
+    const prevDate = new Date(billDate);
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const utilityMonth = prevDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -67,26 +75,37 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                         </thead>
                         <tbody className="text-xs font-medium text-gray-700">
                             <tr>
-                                <td className="py-3">ค่าเช่าห้อง ({billing.room.number})</td>
+                                <td className="py-3">
+                                    ค่าเช่าห้อง ({billing.room.number})
+                                    <span className="ml-1 text-[10px] text-gray-500">({rentMonth})</span>
+                                </td>
                                 <td className="py-3 text-right">{rentAmount.toLocaleString()}</td>
                                 <td className="py-3 text-center">1</td>
                                 <td className="py-3 text-right font-mono text-gray-900">{rentAmount.toLocaleString()}</td>
                             </tr>
                             <tr>
-                                <td className="py-3">ค่าน้ำ Meter: {billing.waterMeterLast} → {billing.waterMeterCurrent}</td>
+                                <td className="py-3">
+                                    <div>ค่าน้ำ Meter: {billing.waterMeterLast} → {billing.waterMeterCurrent}</div>
+                                    <div className="text-[10px] text-gray-500">({utilityMonth})</div>
+                                </td>
                                 <td className="py-3 text-right">{billing.waterRate}</td>
                                 <td className="py-3 text-center">{(billing.waterMeterCurrent - billing.waterMeterLast).toLocaleString()}</td>
                                 <td className="py-3 text-right font-mono text-gray-900">{waterAmount.toLocaleString()}</td>
                             </tr>
                             <tr>
-                                <td className="py-3">ค่าไฟ Meter: {billing.electricMeterLast} → {billing.electricMeterCurrent}</td>
+                                <td className="py-3">
+                                    <div>ค่าไฟ Meter: {billing.electricMeterLast} → {billing.electricMeterCurrent}</div>
+                                    <div className="text-[10px] text-gray-500">({utilityMonth})</div>
+                                </td>
                                 <td className="py-3 text-right">{billing.electricRate}</td>
                                 <td className="py-3 text-center">{(billing.electricMeterCurrent - billing.electricMeterLast).toLocaleString()}</td>
                                 <td className="py-3 text-right font-mono text-gray-900">{electricAmount.toLocaleString()}</td>
                             </tr>
                             {billing.trashFee > 0 && (
                                 <tr>
-                                    <td className="py-3">ค่าขยะ</td>
+                                    <td className="py-3">
+                                        ค่าขยะ <span className="text-[10px] text-gray-500">({utilityMonth})</span>
+                                    </td>
                                     <td className="py-3 text-right">{billing.trashFee.toLocaleString()}</td>
                                     <td className="py-3 text-center">1</td>
                                     <td className="py-3 text-right font-mono text-gray-900">{billing.trashFee.toLocaleString()}</td>
@@ -143,7 +162,9 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                             )}
                             {billing.internetFee > 0 && (
                                 <tr>
-                                    <td className="py-3">ค่าอินเทอร์เน็ต</td>
+                                    <td className="py-3">
+                                        ค่าอินเทอร์เน็ต <span className="text-[10px] text-gray-500">({rentMonth})</span>
+                                    </td>
                                     <td className="py-3 text-right">{billing.internetFee.toLocaleString()}</td>
                                     <td className="py-3 text-center">1</td>
                                     <td className="py-3 text-right font-mono text-gray-900">{billing.internetFee.toLocaleString()}</td>
