@@ -77,26 +77,26 @@ export default function RoomsPage() {
 
                         <div className="mt-4 space-y-3">
                             {/* Contract & Meter Info */}
-                            <div className="bg-white/50 rounded-lg p-3 text-sm space-y-2">
+                            <div className="bg-white/50 rounded-lg p-2 text-xs space-y-1.5">
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <p className="text-xs text-gray-500 font-semibold uppercase">Initial Water</p>
+                                        <p className="text-[10px] text-gray-500 font-semibold uppercase">{t.rooms.initialWater}</p>
                                         <p className="font-mono font-bold text-gray-700">{room.waterMeterInitial}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 font-semibold uppercase">Initial Electric</p>
+                                        <p className="text-[10px] text-gray-500 font-semibold uppercase">{t.rooms.initialElectric}</p>
                                         <p className="font-mono font-bold text-gray-700">{room.electricMeterInitial}</p>
                                     </div>
                                 </div>
                                 {room.status === "Occupied" && room.residents && room.residents[0] && (
-                                    <div className="pt-2 border-t border-gray-200/50">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Contract</p>
-                                        <div className="flex justify-between items-center text-xs">
+                                    <div className="pt-1.5 border-t border-gray-200/50">
+                                        <p className="text-[10px] text-gray-500 font-semibold uppercase mb-0.5">{t.rooms.contract}</p>
+                                        <div className="flex justify-between items-center text-[11px] text-gray-700 font-medium">
                                             <span title="Start Date">📅 {new Date(room.residents[0].contractStartDate).toLocaleDateString('th-TH')}</span>
                                             <span className="text-gray-400">→</span>
                                             <span title="End Date">🏁 {room.residents[0].contractEndDate ? new Date(room.residents[0].contractEndDate).toLocaleDateString('th-TH') : "N/A"}</span>
                                         </div>
-                                        <p className="text-xs text-green-600 font-medium mt-1">⏳ {room.residents[0].contractDurationMonths} Months</p>
+                                        <p className="text-[10px] text-green-600 font-medium mt-0.5">⏳ {room.residents[0].contractDurationMonths} {t.residents.months}</p>
                                     </div>
                                 )}
                             </div>
