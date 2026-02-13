@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 type Expense = {
     id: number;
@@ -29,6 +30,7 @@ type PaginationInfo = {
 
 export default function ExpensesPage() {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -157,7 +159,7 @@ export default function ExpensesPage() {
             const scriptUrl = process.env.NEXT_PUBLIC_EXPENSE_RECEIPT_SCRIPT_URL;
 
             if (!scriptUrl) {
-                alert("Expense receipt upload not configured");
+                showAlert("Warning", "Expense receipt upload not configured", "warning");
                 return null;
             }
 
@@ -195,7 +197,7 @@ export default function ExpensesPage() {
             }
         } catch (error) {
             console.error('Receipt upload error:', error);
-            alert('Failed to upload receipt');
+            showAlert("Error", "Failed to upload receipt", "error");
             return null;
         } finally {
             setUploadingReceipt(false);
@@ -261,10 +263,10 @@ export default function ExpensesPage() {
             if (res.ok) {
                 resetForm();
                 fetchExpenses();
-                alert(editingId ? t.expenses.saveSuccess : t.expenses.saveSuccess);
+                showAlert("Success", editingId ? t.expenses.saveSuccess : t.expenses.saveSuccess, "success");
             }
         } catch (error) {
-            alert("Failed to save expense");
+            showAlert("Error", "Failed to save expense", "error");
         } finally {
             setSubmitting(false);
         }
@@ -304,10 +306,10 @@ export default function ExpensesPage() {
                 fetchExpenses();
                 setDeleteModalOpen(false);
                 setDeleteTargetId(null);
-                alert(t.expenses.deleteSuccess);
+                showAlert("Success", t.expenses.deleteSuccess, "success");
             }
         } catch (error) {
-            alert("Failed to delete expense");
+            showAlert("Error", "Failed to delete expense", "error");
         } finally {
             setDeleting(false);
         }

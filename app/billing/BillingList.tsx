@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 type Bill = {
     id: number;
@@ -16,13 +17,17 @@ type Bill = {
 
 export default function BillingList({ initialBills }: { initialBills: any[] }) {
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useModal();
     const [bills, setBills] = useState<Bill[]>(initialBills);
     const [loading, setLoading] = useState<number | null>(null);
     const [reminderLoading, setReminderLoading] = useState(false);
     const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
+    const [rejectingId, setRejectingId] = useState<number | null>(null);
+    const [rejectReason, setRejectReason] = useState("");
 
     const handleSendReminders = async () => {
-        if (!confirm(t.billing.confirmRemind)) return;
+        const confirmed = await showConfirm("Confirm", t.billing.confirmRemind, true);
+        if (!confirmed) return;
 
         setReminderLoading(true);
         try {
@@ -30,12 +35,12 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
             const data = await res.json();
 
             if (res.ok) {
-                alert(`✅ ${t.billing.remindSuccess} \n- Overdue: ${data.overdueCount}\n- Sent: ${data.sentCount}`);
+                showAlert("Success", `✅ ${t.billing.remindSuccess} \n- Overdue: ${data.overdueCount}\n- Sent: ${data.sentCount}`, "success");
             } else {
-                alert(`❌ ${t.billing.remindError}: ${data.error}`);
+                showAlert("Error", `❌ ${t.billing.remindError}: ${data.error}`, "error");
             }
         } catch (error) {
-            alert("❌ Network Error");
+            showAlert("Error", "❌ Network Error", "error");
         } finally {
             setReminderLoading(false);
         }
@@ -61,11 +66,15 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
             const newStatus = result.status;
             setBills(bills.map(b => b.id === id ? { ...b, paymentStatus: newStatus } : b));
 
-            alert(action === "approve" ? `✅ ${t.billing.approveSuccess}` : `❌ ${t.billing.rejectSuccess}`);
+            showAlert(action === "approve" ? "Success" : "Rejected", action === "approve" ? `✅ ${t.billing.approveSuccess}` : `❌ ${t.billing.rejectSuccess}`, action === "approve" ? "success" : "info");
         } catch (error: any) {
-            alert(`เกิดข้อผิดพลาด: ${error.message}`);
+            showAlert("Error", `เกิดข้อผิดพลาด: ${error.message}`, "error");
         } finally {
             setLoading(null);
+            if (action === "reject") {
+                setRejectingId(null);
+                setRejectReason("");
+            }
         }
     };
 
@@ -128,10 +137,7 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                         {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} Approve
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            const note = prompt("เหตุผลการปฏิเสธ:");
-                                            if (note !== null) handleReview(bill.id, "reject", note);
-                                        }}
+                                        onClick={() => setRejectingId(bill.id)}
                                         disabled={loading === bill.id}
                                         className="flex-1 py-2 bg-red-50 text-red-600 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-100"
                                     >
@@ -197,10 +203,7 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                                         {loading === bill.id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
                                                     </button>
                                                     <button
-                                                        onClick={() => {
-                                                            const note = prompt(t.billing.rejectReason);
-                                                            if (note !== null) handleReview(bill.id, "reject", note);
-                                                        }}
+                                                        onClick={() => setRejectingId(bill.id)}
                                                         disabled={loading === bill.id}
                                                         className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm" title={t.billing.reject}>
                                                         <XCircle size={18} />
@@ -257,6 +260,40 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                             >
                                 <span>⬇️</span> Download Image
                             </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reject Reason Modal */}
+            {rejectingId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">{t.billing.rejectReason}</h3>
+                        <textarea
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none h-32 resize-none"
+                            placeholder="Enter reason for rejection..."
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-3 mt-4">
+                            <button
+                                onClick={() => {
+                                    setRejectingId(null);
+                                    setRejectReason("");
+                                }}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleReview(rejectingId, "reject", rejectReason)}
+                                disabled={!rejectReason.trim()}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 disabled:opacity-50"
+                            >
+                                Reject Payment
+                            </button>
                         </div>
                     </div>
                 </div>

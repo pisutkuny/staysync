@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Calendar, DollarSign, CheckCircle } from "lucide-react";
 import Image from "next/image";
+import { useModal } from "@/app/context/ModalContext";
 
 interface Room {
     id: number;
@@ -19,6 +20,7 @@ interface Room {
 
 export default function BookingPage() {
     const router = useRouter();
+    const { showAlert } = useModal();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [loading, setLoading] = useState(true);
     const [bookingRoom, setBookingRoom] = useState<Room | null>(null);
@@ -73,7 +75,7 @@ export default function BookingPage() {
 
         // Frontend validation for guest
         if (!isLoggedIn && (!guestName || !guestPhone)) {
-            alert("กรุณากรอกชื่อและเบอร์โทรศัพท์สำหรับติดต่อ");
+            showAlert("Warning", "กรุณากรอกชื่อและเบอร์โทรศัพท์สำหรับติดต่อ", "warning");
             return;
         }
 
@@ -98,7 +100,7 @@ export default function BookingPage() {
                 throw new Error(data.error || "Booking failed");
             }
 
-            alert("ส่งคำขอจองสำเร็จ! เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจอง");
+            showAlert("Success", "ส่งคำขอจองสำเร็จ! เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันการจอง", "success");
             setBookingRoom(null);
 
             // Clear fields
@@ -110,7 +112,7 @@ export default function BookingPage() {
             if (isLoggedIn) router.push("/dashboard");
 
         } catch (error: any) {
-            alert(error.message);
+            showAlert("Error", error.message, "error");
         } finally {
             setSubmitting(false);
         }

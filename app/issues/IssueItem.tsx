@@ -4,14 +4,18 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function IssueItem({ issue }: { issue: any }) {
     const { t } = useLanguage();
     const router = useRouter();
+    const { showAlert, showConfirm } = useModal();
     const [loading, setLoading] = useState(false);
 
     const handleMarkDone = async () => {
-        if (!confirm(t.issues.confirmMarkDone)) return;
+        const confirmed = await showConfirm("Confirm", t.issues.confirmMarkDone, true);
+        if (!confirmed) return;
+
         setLoading(true);
 
         try {
@@ -25,7 +29,7 @@ export default function IssueItem({ issue }: { issue: any }) {
 
             router.refresh();
         } catch (error) {
-            alert("Failed to update status");
+            showAlert("Error", "Failed to update status", "error");
         } finally {
             setLoading(false);
         }

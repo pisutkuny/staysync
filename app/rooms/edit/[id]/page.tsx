@@ -6,9 +6,12 @@ import Link from "next/link";
 import { ArrowLeft, Save, Loader2, Plus, X, Image as ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
+import { useModal } from "@/app/context/ModalContext";
+
 export default function EditRoomPage({ params }: { params: Promise<{ id: string }> }) {
     const { t } = useLanguage();
     const router = useRouter();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [roomId, setRoomId] = useState<string | null>(null);
@@ -60,15 +63,14 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                 });
             } catch (error) {
                 console.error(error);
-                alert(t.rooms.loadError);
-                router.push("/rooms");
+                showAlert(t.common.error, t.rooms.loadError, "error", () => router.push("/rooms"));
             } finally {
                 setLoading(false);
             }
         };
 
         fetchRoom();
-    }, [roomId, router]);
+    }, [roomId, router, t, showAlert]);
 
     // Google Drive Link Converter
     const convertDriveLink = (url: string) => {
@@ -145,11 +147,12 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
 
             if (!res.ok) throw new Error("Failed to update");
 
-            alert(t.rooms.updateSuccess);
-            router.push("/rooms");
-            router.refresh();
+            showAlert(t.common.success, t.rooms.updateSuccess, "success", () => {
+                router.push("/rooms");
+                router.refresh();
+            });
         } catch (error) {
-            alert(t.rooms.updateError);
+            showAlert(t.common.error, t.rooms.updateError, "error");
         } finally {
             setSaving(false);
         }

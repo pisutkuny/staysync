@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Save, Copy, Loader2, FileText, Check } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 type RoomData = {
     id: number;
@@ -23,6 +24,7 @@ type Rates = {
 
 export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomData[]; initialRates: Rates }) {
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useModal();
     const [readings, setReadings] = useState<Record<number, { wCurr: string; eCurr: string }>>({});
     const [rates, setRates] = useState<Rates>(initialRates);
     const [loading, setLoading] = useState(false);
@@ -53,7 +55,8 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
     };
 
     const handleSubmit = async () => {
-        if (!confirm(t.bulkBilling.confirmCreate)) return;
+        const confirmed = await showConfirm("Confirm", t.bulkBilling.confirmCreate, true);
+        if (!confirmed) return;
         setLoading(true);
 
         const billsToCreate = rooms
@@ -76,12 +79,12 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 })
             });
             if (res.ok) {
-                alert(t.bulkBilling.success);
+                showAlert("Success", t.bulkBilling.success, "success");
                 setSubmitted(billsToCreate.map(b => b.roomId));
             }
         } catch (e) {
             console.error(e);
-            alert(t.bulkBilling.error);
+            showAlert("Error", t.bulkBilling.error, "error");
         } finally {
             setLoading(false);
         }

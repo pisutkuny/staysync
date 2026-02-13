@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function RoomCommonAreaToggle({ roomId, initialValue }: { roomId: number, initialValue: boolean }) {
     const [enabled, setEnabled] = useState(initialValue);
     const [loading, setLoading] = useState(false);
+    const { showAlert } = useModal();
 
     const handleToggle = async () => {
         setLoading(true);
@@ -19,7 +21,7 @@ export default function RoomCommonAreaToggle({ roomId, initialValue }: { roomId:
 
             setEnabled(!enabled);
         } catch (error) {
-            alert("เกิดข้อผิดพลาดในการอัพเดต");
+            showAlert("Error", "เกิดข้อผิดพลาดในการอัพเดต", "error");
         } finally {
             setLoading(false);
         }

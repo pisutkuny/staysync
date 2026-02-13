@@ -5,7 +5,8 @@ import { Loader2, UserCheck, UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import SuccessModal from "@/app/components/SuccessModal";
+import { useModal } from "@/app/context/ModalContext";
+
 
 interface CheckInFormProps {
     roomId: string;
@@ -18,8 +19,8 @@ interface CheckInFormProps {
 
 export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied, defaultContractDuration, defaultDeposit }: CheckInFormProps) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
         fullName: "",
@@ -55,30 +56,23 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied,
 
             if (!res.ok) throw new Error("Failed");
 
-            setShowSuccess(true);
+            showAlert(
+                isOccupied ? t.residents.addSuccess : t.residents.checkInSuccess,
+                t.residents.checkInSuccessDesc || "Operation completed successfully.",
+                "success",
+                () => {
+                    router.push("/rooms");
+                    router.refresh();
+                }
+            );
         } catch (error) {
-            alert(t.residents.errorProcessing);
+            showAlert(t.common.error, t.residents.errorProcessing, "error");
             setLoading(false);
         }
     };
 
-    const handleSuccessClose = () => {
-        setShowSuccess(false);
-        router.push("/rooms");
-        router.refresh();
-    };
-
     return (
         <div className="space-y-6">
-            <SuccessModal
-                isOpen={showSuccess}
-                onClose={handleSuccessClose}
-                title={isOccupied ? t.residents.addSuccess : t.residents.checkInSuccess}
-                message={t.residents.checkInSuccessDesc || "Operation completed successfully."}
-                actionLabel={t.common?.ok || "OK"}
-                onAction={handleSuccessClose}
-            />
-
             <div className="flex items-center gap-4">
                 <Link href="/rooms" className="p-2 hover:bg-white/10 rounded-full transition-colors">
                     <ArrowLeft size={20} className="text-white" />

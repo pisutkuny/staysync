@@ -5,6 +5,7 @@ import { Loader2, Upload, File, ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 interface UploadFormProps {
     residentId: number;
@@ -14,6 +15,7 @@ interface UploadFormProps {
 
 export default function UploadForm({ residentId, roomFolder, profileFolder }: UploadFormProps) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [docType, setDocType] = useState("Contract");
@@ -140,13 +142,14 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
 
             if (!res.ok) throw new Error("Failed to save record to database");
 
-            alert(t.residents.saveSuccess);
-            router.push(`/residents/${residentId}`);
-            router.refresh();
+            showAlert(t.common.success, t.residents.saveSuccess, "success", () => {
+                router.push(`/residents/${residentId}`);
+                router.refresh();
+            });
 
         } catch (error: any) {
             console.error("Upload Logic Error:", error);
-            alert(`${t.residents.uploadError}: ${error.message}`);
+            showAlert(t.common.error, `${t.residents.uploadError}: ${error.message}`, "error");
         } finally {
             setLoading(false);
         }

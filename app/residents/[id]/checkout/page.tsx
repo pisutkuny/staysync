@@ -5,6 +5,7 @@ import { Loader2, LogOut, ArrowLeft, AlertTriangle, CheckCircle } from "lucide-r
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 interface ResidentData {
     id: number;
@@ -18,6 +19,7 @@ interface ResidentData {
 
 export default function CheckOutPage({ params }: { params: Promise<{ id: string }> }) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
             setResident(data);
             setDepositReturn(data.deposit); // Default: full return
         } catch (error) {
-            alert(t.residents.loadError);
+            showAlert(t.common.error, t.residents.loadError, "error");
         }
     };
 
@@ -77,11 +79,17 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
 
             if (!res.ok) throw new Error("Checkout failed");
 
-            alert(`✅ ${t.residents.checkoutSuccess}\\n${early ? t.residents.depositForfeited : `${t.residents.depositReturned}: ${depositReturn.toLocaleString()} THB`}`);
-            router.push("/rooms");
-            router.refresh();
+            showAlert(
+                t.common.success,
+                `${t.residents.checkoutSuccess}\n${early ? t.residents.depositForfeited : `${t.residents.depositReturned}: ${depositReturn.toLocaleString()} THB`}`,
+                "success",
+                () => {
+                    router.push("/rooms");
+                    router.refresh();
+                }
+            );
         } catch (error) {
-            alert(t.residents.checkoutError);
+            showAlert(t.common.error, t.residents.checkoutError, "error");
         } finally {
             setLoading(false);
         }

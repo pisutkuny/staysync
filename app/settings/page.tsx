@@ -5,6 +5,7 @@ import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as S
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import Setup2FA from "../components/Setup2FA";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 interface SystemConfig {
     dormName: string;
@@ -41,6 +42,7 @@ interface SystemConfig {
 
 export default function SettingsPage() {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState("basic");
@@ -141,10 +143,10 @@ export default function SettingsPage() {
                 throw new Error(data.error || "Failed to save settings");
             }
 
-            alert(t.settings.success);
+            showAlert(t.common.success, t.settings.success, "success");
         } catch (error: any) {
             console.error(error);
-            alert(`Error: ${error.message}`);
+            showAlert(t.common.error, `Error: ${error.message}`, "error");
         } finally {
             setSaving(false);
         }
@@ -395,7 +397,7 @@ export default function SettingsPage() {
                                                     if (file) {
                                                         // Check file size (max 2MB)
                                                         if (file.size > 2 * 1024 * 1024) {
-                                                            alert('File size must be less than 2MB');
+                                                            showAlert(t.common.error, 'File size must be less than 2MB', 'error');
                                                             return;
                                                         }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Save, Trash2, Edit, Loader2, X, Check, Calendar, Power, PowerOff } from "lucide-react";
 import { format, addMonths } from "date-fns";
+import { useModal } from "@/app/context/ModalContext";
 
 type RecurringExpense = {
     id: number;
@@ -17,6 +18,7 @@ type RecurringExpense = {
 };
 
 export default function RecurringExpensesPage() {
+    const { showAlert } = useModal();
     const [recurring, setRecurring] = useState<RecurringExpense[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -87,10 +89,10 @@ export default function RecurringExpensesPage() {
             if (res.ok) {
                 resetForm();
                 fetchRecurring();
-                alert(editingId ? "Recurring expense updated!" : "Recurring expense created!");
+                showAlert("Success", editingId ? "Recurring expense updated!" : "Recurring expense created!", "success");
             }
         } catch (error) {
-            alert("Failed to save recurring expense");
+            showAlert("Error", "Failed to save recurring expense", "error");
         } finally {
             setSubmitting(false);
         }
@@ -125,7 +127,7 @@ export default function RecurringExpensesPage() {
                 fetchRecurring();
             }
         } catch (error) {
-            alert("Failed to toggle status");
+            showAlert("Error", "Failed to toggle status", "error");
         }
     };
 
@@ -142,10 +144,10 @@ export default function RecurringExpensesPage() {
                 fetchRecurring();
                 setDeleteModalOpen(false);
                 setDeleteTargetId(null);
-                alert("Recurring expense deleted!");
+                showAlert("Success", "Recurring expense deleted!", "success");
             }
         } catch (error) {
-            alert("Failed to delete");
+            showAlert("Error", "Failed to delete", "error");
         } finally {
             setDeleting(false);
         }

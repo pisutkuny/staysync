@@ -1,10 +1,19 @@
-"use client";
-
 import { LogOut } from "lucide-react";
+import { useModal } from "../context/ModalContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function LogoutButton({ label = "Sign Out" }: { label?: string }) {
+    const { showConfirm } = useModal();
+    const { t } = useLanguage();
+
     const handleLogout = async () => {
-        if (!confirm("Are you sure you want to sign out?")) return;
+        const confirmed = await showConfirm(
+            t.common.logout,
+            t.common.confirmDelete ? t.common.confirmDelete.replace("delete this item", "sign out").replace("ลบรายการนี้", "ออกจากระบบ") : "Are you sure you want to sign out?",
+            true
+        );
+
+        if (!confirmed) return;
 
         try {
             await fetch("/api/auth/logout", { method: "POST" });

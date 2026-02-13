@@ -5,10 +5,12 @@ import { Loader2, UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function RegisterPage() {
     const { t } = useLanguage();
     const router = useRouter();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
@@ -22,7 +24,7 @@ export default function RegisterPage() {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert(t.auth.passwordsDoNotMatch);
+            showAlert(t.common.error, t.auth.passwordsDoNotMatch, "error");
             return;
         }
 
@@ -47,13 +49,13 @@ export default function RegisterPage() {
             }
 
             if (data.emailSent) {
-                alert(t.auth.verificationSent);
+                showAlert(t.common.success, t.auth.verificationSent, "success");
             } else {
-                alert(t.auth.verificationFailed);
+                showAlert(t.common.error, t.auth.verificationFailed, "error");
             }
             router.push("/login");
         } catch (error: any) {
-            alert(error.message);
+            showAlert(t.common.error, error.message, "error");
         } finally {
             setLoading(false);
         }

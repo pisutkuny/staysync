@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Loader2, Send, Image as ImageIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 declare global {
     interface Window {
@@ -14,6 +15,7 @@ declare global {
 
 export default function ReportIssuePage() {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -102,11 +104,11 @@ export default function ReportIssuePage() {
         e.preventDefault();
 
         if (!isGuest && !selectedResidentId) {
-            alert("Please select your name.");
+            showAlert("Warning", "Please select your name.", "warning");
             return;
         }
         if (isGuest && (!guestInfo.name || !guestInfo.contact)) {
-            alert("Please fill in your name and contact info.");
+            showAlert("Warning", "Please fill in your name and contact info.", "warning");
             return;
         }
 
@@ -161,17 +163,16 @@ export default function ReportIssuePage() {
 
             if (!res.ok) throw new Error("Failed");
 
-            if (!res.ok) throw new Error("Failed");
-
-            alert(t.issues.success);
-            // Close window if in LIFF
-            if (window.liff?.isInClient()) {
-                window.liff.closeWindow();
-            } else {
-                router.push("/dashboard");
-            }
+            showAlert("Success", t.issues.success, "success", () => {
+                // Close window if in LIFF
+                if (window.liff?.isInClient()) {
+                    window.liff.closeWindow();
+                } else {
+                    router.push("/dashboard");
+                }
+            });
         } catch (error) {
-            alert(t.issues.error);
+            showAlert("Error", t.issues.error, "error");
         } finally {
             setLoading(false);
         }

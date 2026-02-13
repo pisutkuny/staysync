@@ -1,0 +1,138 @@
+
+> staysync@0.1.0 build
+> npx prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 220ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 10.7s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/71) ...
+Dashboard API Error: Error: Dynamic server usage: Route /api/dashboard couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at n (E:\StaySync\.next\server\chunks\_e40685c3._.js:1:51034) {
+  description: "Route /api/dashboard couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+  Generating static pages using 11 workers (17/71) 
+  Generating static pages using 11 workers (35/71) 
+  Generating static pages using 11 workers (53/71) 
+✓ Generating static pages using 11 workers (71/71) in 557.9ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /admin/backup
+├ ƒ /admin/billing/bulk
+├ ƒ /admin/bookings
+├ ƒ /admin/central-meter
+├ ƒ /admin/issues
+├ ƒ /admin/reports
+├ ƒ /admin/users
+├ ƒ /admin/utility-analysis
+├ ƒ /api/admin/bookings
+├ ƒ /api/admin/bookings/[id]
+├ ƒ /api/audit
+├ ƒ /api/auth/2fa/disable
+├ ƒ /api/auth/2fa/enable
+├ ƒ /api/auth/2fa/generate
+├ ƒ /api/auth/2fa/setup
+├ ƒ /api/auth/2fa/validate
+├ ƒ /api/auth/change-password
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/me
+├ ƒ /api/auth/register
+├ ƒ /api/auth/reset-password
+├ ƒ /api/auth/verify-email
+├ ƒ /api/auth/verify-email/resend
+├ ƒ /api/backup/auto-export
+├ ƒ /api/backup/export
+├ ƒ /api/backup/restore
+├ ƒ /api/billing
+├ ƒ /api/billing/bulk
+├ ƒ /api/billing/[id]/pay
+├ ƒ /api/billing/[id]/review-slip
+├ ƒ /api/billing/[id]/status
+├ ƒ /api/billing/[id]/upload-slip
+├ ƒ /api/bookings
+├ ƒ /api/broadcast
+├ ƒ /api/central-meter
+├ ƒ /api/central-meter/[id]
+├ ƒ /api/cron/create-recurring-expenses
+├ ƒ /api/cron/reminders
+├ ƒ /api/dashboard
+├ ƒ /api/documents
+├ ƒ /api/expenses
+├ ƒ /api/expenses/[id]
+├ ƒ /api/issues
+├ ƒ /api/issues/[id]
+├ ƒ /api/login
+├ ƒ /api/logout
+├ ƒ /api/notify/overdue
+├ ƒ /api/recurring-expenses
+├ ƒ /api/recurring-expenses/[id]
+├ ƒ /api/reports/export
+├ ƒ /api/reports/monthly
+├ ƒ /api/residents
+├ ƒ /api/residents/[id]
+├ ƒ /api/residents/[id]/checkout
+├ ƒ /api/residents/[id]/generate-code
+├ ƒ /api/rooms
+├ ƒ /api/rooms/available
+├ ƒ /api/rooms/[id]
+├ ƒ /api/rooms/[id]/billing/latest
+├ ƒ /api/rooms/[id]/checkin
+├ ƒ /api/seed
+├ ƒ /api/settings
+├ ƒ /api/upload
+├ ƒ /api/users
+├ ƒ /api/users/[id]
+├ ƒ /api/users/invite
+├ ƒ /api/webhook/line
+├ ƒ /audit
+├ ƒ /billing
+├ ƒ /billing/bulk
+├ ƒ /billing/[id]/print
+├ ƒ /booking
+├ ƒ /broadcast
+├ ƒ /dashboard
+├ ƒ /expenses
+├ ƒ /expenses/recurring
+├ ƒ /forgot-password
+├ ƒ /issues
+├ ƒ /login
+├ ƒ /_not-found
+├ ƒ /pay/[id]
+├ ƒ /register
+├ ƒ /report
+├ ƒ /reset-password
+├ ƒ /residents/[id]
+├ ƒ /residents/[id]/checkout
+├ ƒ /residents/[id]/edit
+├ ƒ /residents/[id]/upload
+├ ƒ /rooms
+├ ƒ /rooms/add
+├ ƒ /rooms/checkin/[id]
+├ ƒ /rooms/edit/[id]
+├ ƒ /settings
+├ ƒ /users
+└ ƒ /verify-email
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand
+

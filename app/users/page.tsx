@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Users, UserPlus, Shield, Mail, Phone, Calendar, Activity, X, Edit2, Trash2 } from "lucide-react";
+import { useModal } from "@/app/context/ModalContext";
 
 interface User {
     id: number;
@@ -16,6 +17,7 @@ interface User {
 }
 
 export default function UsersPage() {
+    const { showAlert, showConfirm } = useModal();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [showInviteModal, setShowInviteModal] = useState(false);
@@ -65,16 +67,16 @@ export default function UsersPage() {
             const data = await res.json();
 
             if (res.ok) {
-                alert(`User invited! Temporary password: ${data.tempPassword}\n\nPlease save this password and send it to the user.`);
+                showAlert("Success", `User invited! Temporary password: ${data.tempPassword}\n\nPlease save this password and send it to the user.`, "success");
                 setShowInviteModal(false);
                 setInviteForm({ email: "", fullName: "", phone: "", role: "STAFF" });
                 fetchUsers();
             } else {
-                alert(data.error || "Failed to invite user");
+                showAlert("Error", data.error || "Failed to invite user", "error");
             }
         } catch (error) {
             console.error("Invite error:", error);
-            alert("Failed to invite user");
+            showAlert("Error", "Failed to invite user", "error");
         } finally {
             setSubmitting(false);
         }
@@ -96,23 +98,29 @@ export default function UsersPage() {
             const data = await res.json();
 
             if (res.ok) {
-                alert("User updated successfully!");
+                showAlert("Success", "User updated successfully!", "success");
                 setShowEditModal(false);
                 setSelectedUser(null);
                 fetchUsers();
             } else {
-                alert(data.error || "Failed to update user");
+                showAlert("Error", data.error || "Failed to update user", "error");
             }
         } catch (error) {
             console.error("Update error:", error);
-            alert("Failed to update user");
+            showAlert("Error", "Failed to update user", "error");
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (user: User) => {
-        if (!confirm(`Are you sure you want to delete ${user.fullName}?`)) return;
+        const confirmed = await showConfirm(
+            "Delete User",
+            `Are you sure you want to delete ${user.fullName}?`,
+            true
+        );
+
+        if (!confirmed) return;
 
         try {
             const res = await fetch(`/api/users/${user.id}`, {
@@ -120,15 +128,15 @@ export default function UsersPage() {
             });
 
             if (res.ok) {
-                alert("User deleted successfully!");
+                showAlert("Success", "User deleted successfully!", "success");
                 fetchUsers();
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to delete user");
+                showAlert("Error", data.error || "Failed to delete user", "error");
             }
         } catch (error) {
             console.error("Delete error:", error);
-            alert("Failed to delete user");
+            showAlert("Error", "Failed to delete user", "error");
         }
     };
 

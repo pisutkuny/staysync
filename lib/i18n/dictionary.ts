@@ -26,6 +26,7 @@ export const dictionary = {
             confirmDelete: "คุณแน่ใจหรือไม่ที่จะลบรายการนี้?",
             noData: "ไม่พบข้อมูล",
             ok: "ตกลง",
+            confirm: "ยืนยัน",
         },
         sidebar: {
             dashboard: "ภาพรวม",
@@ -707,6 +708,7 @@ export const dictionary = {
             confirmDelete: "Are you sure you want to delete this item?",
             noData: "No data found",
             ok: "OK",
+            confirm: "Confirm",
         },
         sidebar: {
             dashboard: "Dashboard",

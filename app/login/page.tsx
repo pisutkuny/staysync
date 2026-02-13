@@ -5,9 +5,11 @@ import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function LoginPage() {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -82,12 +84,12 @@ export default function LoginPage() {
             });
             const data = await res.json();
             if (data.success) {
-                alert(t.auth.verificationSent);
+                showAlert(t.common.success, t.auth.verificationSent, "success");
             } else {
-                alert(data.error || t.auth.verificationFailed);
+                showAlert(t.common.error, data.error || t.auth.verificationFailed, "error");
             }
         } catch (e) {
-            alert(t.common.error);
+            showAlert(t.common.error, t.common.error, "error");
         }
     };
 

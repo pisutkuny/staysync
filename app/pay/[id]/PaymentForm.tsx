@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Loader2, FileCheck, Banknote } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import generatePayload from "promptpay-qr";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function PaymentForm({ id, config, billDetails }: { id: string, config: any, billDetails?: any }) {
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [submitted, setSubmitted] = useState(false);
@@ -55,7 +57,7 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
             });
         } catch (error: any) {
             console.error("Submit error:", error);
-            alert(`เกิดข้อผิดพลาด: ${error.message || "ไม่สามารถอัปโหลดสลิปได้"}`);
+            showAlert("Error", `เกิดข้อผิดพลาด: ${error.message || "ไม่สามารถอัปโหลดสลิปได้"}`, "error");
         } finally {
             setLoading(false);
         }

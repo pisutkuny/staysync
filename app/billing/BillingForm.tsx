@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Send, Save, CreditCard, Receipt } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 type Room = {
     id: number;
@@ -21,6 +22,7 @@ type Rates = {
 
 export default function BillingForm({ rooms, initialRates, config, totalRoomCount }: { rooms: Room[]; initialRates: Rates; config?: any; totalRoomCount?: number }) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState<number | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
 
@@ -86,10 +88,10 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
             if (!res.ok) throw new Error("Failed");
 
-            alert("Bill created and notification sent!");
+            showAlert("Success", "Bill created and notification sent!", "success");
             setSelectedRoom(null); // Close form
         } catch (error) {
-            alert("Error processing bill.");
+            showAlert("Error", "Error processing bill.", "error");
         } finally {
             setLoading(null);
         }

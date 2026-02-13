@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Loader2, CheckCircle, XCircle, Clock, FileText } from "lucide-react";
 import Link from "next/link";
+import { useModal } from "@/app/context/ModalContext";
 
 interface Booking {
     id: number;
@@ -28,6 +29,7 @@ interface Booking {
 }
 
 export default function AdminBookingsPage() {
+    const { showAlert, showConfirm } = useModal();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState<number | null>(null);
@@ -51,7 +53,8 @@ export default function AdminBookingsPage() {
     };
 
     const handleUpdateStatus = async (id: number, status: string) => {
-        if (!confirm(`Are you sure you want to ${status} this booking?`)) return;
+        const confirmed = await showConfirm("Confirm", `Are you sure you want to ${status} this booking?`, true);
+        if (!confirmed) return;
 
         setProcessingId(id);
         try {
@@ -65,11 +68,11 @@ export default function AdminBookingsPage() {
                 fetchBookings(); // Refresh list
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to update status");
+                showAlert("Error", data.error || "Failed to update status", "error");
             }
         } catch (error) {
             console.error("Error updating booking", error);
-            alert("An error occurred");
+            showAlert("Error", "An error occurred", "error");
         } finally {
             setProcessingId(null);
         }

@@ -6,8 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
+import { useModal } from "@/app/context/ModalContext";
+
 export default function AddRoomPage() {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -35,11 +38,12 @@ export default function AddRoomPage() {
 
             if (!res.ok) throw new Error("Failed");
 
-            alert(t.rooms.addSuccess);
-            router.push("/dashboard"); // Redirect back to dashboard
-            router.refresh(); // Refresh data
+            showAlert(t.common.success, t.rooms.addSuccess, "success", () => {
+                router.push("/dashboard");
+                router.refresh();
+            });
         } catch (error) {
-            alert(t.rooms.addError);
+            showAlert(t.common.error, t.rooms.addError, "error");
         } finally {
             setLoading(false);
         }

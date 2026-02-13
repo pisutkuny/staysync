@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Users, Search, Edit2, Shield, UserX, CheckCircle, AlertTriangle, X, Plus, Trash2, Save } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 interface User {
     id: number;
@@ -18,6 +19,7 @@ interface User {
 
 export default function UserManagementPage() {
     const { t } = useLanguage();
+    const { showAlert, showConfirm } = useModal();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -51,8 +53,9 @@ export default function UserManagementPage() {
             const res = await fetch("/api/users");
             if (!res.ok) {
                 if (res.status === 403) {
-                    alert("คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (สำหรับ Owner เท่านั้น)");
-                    window.location.href = "/admin";
+                    showAlert(t.common.error, "คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (สำหรับ Owner เท่านั้น)", "error", () => {
+                        window.location.href = "/admin";
+                    });
                     return;
                 }
                 throw new Error("Failed to fetch users");
@@ -61,7 +64,7 @@ export default function UserManagementPage() {
             setUsers(data.users);
         } catch (error) {
             console.error(error);
-            alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้งาน");
+            showAlert(t.common.error, "เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้งาน", "error");
         } finally {
             setLoading(false);
         }
@@ -102,9 +105,13 @@ export default function UserManagementPage() {
     }
 
     async function handleDelete(user: User) {
-        if (!confirm(t.users.deleteConfirm.replace("{name}", user.fullName))) {
-            return;
-        }
+        const confirmed = await showConfirm(
+            t.common.delete,
+            t.users.deleteConfirm.replace("{name}", user.fullName),
+            true
+        );
+
+        if (!confirmed) return;
 
         try {
             const res = await fetch(`/api/users/${user.id}`, {
@@ -119,10 +126,10 @@ export default function UserManagementPage() {
             // Update local state (mark as deleted or remove)
             // Option 1: Mark as Deleted
             setUsers(users.map(u => u.id === user.id ? { ...u, status: 'Deleted' } : u));
-            alert(t.users.deleteSuccess);
+            showAlert(t.common.success, t.users.deleteSuccess, "success");
         } catch (error: any) {
             console.error(error);
-            alert(`เกิดข้อผิดพลาด: ${error.message}`);
+            showAlert(t.common.error, `เกิดข้อผิดพลาด: ${error.message}`, "error");
         }
     }
 
@@ -153,17 +160,17 @@ export default function UserManagementPage() {
 
             if (isCreating) {
                 setUsers([result.user, ...users]);
-                alert(t.users.createSuccess);
+                showAlert(t.common.success, t.users.createSuccess, "success");
             } else {
                 setUsers(users.map(u => u.id === editingUser!.id ? { ...u, ...formData } : u));
-                alert(t.users.saveSuccess);
+                showAlert(t.common.success, t.users.saveSuccess, "success");
             }
 
             setEditingUser(null);
             setIsCreating(false);
         } catch (error: any) {
             console.error(error);
-            alert(`เกิดข้อผิดพลาด: ${error.message}`);
+            showAlert(t.common.error, `เกิดข้อผิดพลาด: ${error.message}`, "error");
         } finally {
             setSaving(false);
         }

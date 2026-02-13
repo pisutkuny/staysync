@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function GenerateCodeButton({ residentId, initialCode }: { residentId: number, initialCode: string | null }) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const [code, setCode] = useState(initialCode);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -21,7 +23,7 @@ export default function GenerateCodeButton({ residentId, initialCode }: { reside
                 router.refresh();
             }
         } catch (error) {
-            alert("Error");
+            showAlert(t.common.error, "Error generating code", "error");
         } finally {
             setLoading(false);
         }

@@ -5,6 +5,7 @@ import { Loader2, Save, ArrowLeft, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useModal } from "@/app/context/ModalContext";
 
 interface Room {
     id: number;
@@ -14,6 +15,7 @@ interface Room {
 
 export default function EditResidentPage({ params }: { params: Promise<{ id: string }> }) {
     const { t } = useLanguage();
+    const { showAlert } = useModal();
     const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 });
                 setRooms(roomsData);
             } catch (e) {
-                alert(t.residents.loadError);
+                showAlert(t.common.error, t.residents.loadError, "error");
             } finally {
                 setLoading(false);
             }
@@ -76,7 +78,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             router.push(`/residents/${id}`);
             router.refresh();
         } catch (error) {
-            alert(t.residents.updateError);
+            showAlert(t.common.error, t.residents.updateError, "error");
         } finally {
             setSaving(false);
         }

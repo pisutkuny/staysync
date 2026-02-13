@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { QrCode, Loader2, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import Image from "next/image";
+import { useModal } from "@/app/context/ModalContext";
 
 export default function Setup2FA() {
     const [step, setStep] = useState<"loading" | "idle" | "qr" | "verify" | "done">("loading");
@@ -12,6 +13,7 @@ export default function Setup2FA() {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const { showAlert, showConfirm } = useModal();
 
     // Check initial status
     useEffect(() => {
@@ -94,7 +96,8 @@ export default function Setup2FA() {
     };
 
     const disable2FA = async () => {
-        if (!confirm("Are you sure you want to disable 2FA? Your account will be less secure.")) return;
+        const confirmed = await showConfirm("Confirm", "Are you sure you want to disable 2FA? Your account will be less secure.", true);
+        if (!confirmed) return;
 
         setLoading(true);
         try {
@@ -106,9 +109,9 @@ export default function Setup2FA() {
 
             setIsEnabled(false);
             setStep("idle");
-            alert("2FA has been disabled.");
+            showAlert("Success", "2FA has been disabled.", "success");
         } catch (err: any) {
-            alert(err.message);
+            showAlert("Error", err.message, "error");
         } finally {
             setLoading(false);
         }

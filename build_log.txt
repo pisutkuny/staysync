@@ -1,0 +1,33 @@
+
+> staysync@0.1.0 build
+> npx prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 226ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.2s
+  Running TypeScript ...
+Failed to compile.
+
+./app/rooms/checkin/[id]/CheckInForm.tsx:21:27
+Type error: Cannot find name 'useModal'.
+
+[0m [90m 19 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mCheckInForm[39m({ roomId[33m,[39m roomNumber[33m,[39m roomPrice[33m,[39m isOccupied[33m,[39m defaultContractDuration[33m,[39m defaultDeposit }[33m:[39m [33mCheckInFormProps[39m) {
+ [90m 20 |[39m     [36mconst[39m { t } [33m=[39m useLanguage()[33m;[39m
+[31m[1m>[22m[39m[90m 21 |[39m     [36mconst[39m { showAlert } [33m=[39m useModal()[33m;[39m
+ [90m    |[39m                           [31m[1m^[22m[39m
+ [90m 22 |[39m     [36mconst[39m [loading[33m,[39m setLoading] [33m=[39m useState([36mfalse[39m)[33m;[39m
+ [90m 23 |[39m     [36mconst[39m router [33m=[39m useRouter()[33m;[39m
+ [90m 24 |[39m     [36mconst[39m [formData[33m,[39m setFormData] [33m=[39m useState({[0m
+Next.js build worker exited with code: 1 and signal: null
