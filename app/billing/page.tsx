@@ -28,10 +28,13 @@ export default function BillingPage() {
 
                 // 1. Rooms for billing (Occupied)
                 if (results[0].status === 'fulfilled') {
-                    const allRooms = results[0].value;
-                    if (Array.isArray(allRooms)) {
-                        const occupiedRooms = allRooms.filter((r: any) => r.status === "Occupied");
+                    const data = results[0].value;
+                    if (Array.isArray(data)) {
+                        const occupiedRooms = data.filter((r: any) => r.status === "Occupied");
                         setRooms(occupiedRooms);
+                    } else {
+                        console.error("Invalid rooms data:", data);
+                        setRooms([]);
                     }
                 } else {
                     console.error("Failed to fetch rooms for billing:", results[0].reason);
@@ -39,14 +42,24 @@ export default function BillingPage() {
 
                 // 2. Bills History
                 if (results[1].status === 'fulfilled') {
-                    setBills(results[1].value);
+                    if (Array.isArray(results[1].value)) {
+                        setBills(results[1].value);
+                    } else {
+                        console.error("Invalid bills data:", results[1].value);
+                        setBills([]);
+                    }
                 } else {
                     console.error("Failed to fetch bills:", results[1].reason);
                 }
 
                 // 3. All Rooms (for dashboard/calc)
                 if (results[2].status === 'fulfilled') {
-                    setAllRooms(results[2].value);
+                    if (Array.isArray(results[2].value)) {
+                        setAllRooms(results[2].value);
+                    } else {
+                        console.error("Invalid allRooms data:", results[2].value);
+                        setAllRooms([]);
+                    }
                 } else {
                     console.error("Failed to fetch all rooms:", results[2].reason);
                 }
