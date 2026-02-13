@@ -46,11 +46,17 @@ export async function POST(
             }),
         ]);
 
+        // Fetch System Config for Dorm Name
+        const systemConfig = await prisma.systemConfig.findUnique({
+            where: { organizationId: targetRoom.organizationId }
+        });
+        const dormName = systemConfig?.dormName || "หอพัก";
+
         // Send Line Notification if lineUserId is provided
         if (lineUserId) {
             await sendLineMessage(
                 lineUserId,
-                `ยินดีต้อนรับคุณ ${fullName} เข้าสู่หอพัก StaySync (ห้อง ${room.number}) \nขอบคุณที่ไว้วางใจเราครับ 🙏`
+                `ยินดีต้อนรับคุณ ${fullName} เข้าสู่ ${dormName} (ห้อง ${room.number}) \nขอบคุณที่ไว้วางใจเราครับ 🙏`
             );
         }
 

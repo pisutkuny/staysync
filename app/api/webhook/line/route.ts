@@ -33,6 +33,7 @@ export async function POST(req: Request) {
 
                 // Default fallbacks if config is missing (init)
                 const sysConfig = configObj || {
+                    dormName: "หอพัก",
                     wifiSsid: "StaySync_Residences",
                     wifiPassword: "staysync_wifi",
                     rulesText: "1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน",
@@ -330,11 +331,16 @@ export async function POST(req: Request) {
 
             } else if (event.type === 'follow') {
                 const userId = event.source.userId;
+
+                // Fetch Config for Follow Event
+                const configObj = await prisma.systemConfig.findFirst();
+                const dormName = configObj?.dormName || "หอพัก";
+
                 if (userId) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "สวัสดีครับ ยินดีต้อนรับสู่ หอพัก มีตังค์ 🏡✨\n\nกรุณาพิมพ์ myid ส่งเข้ามาในแชท เพื่อยืนยันสถานะการเข้าพักและเริ่มใช้งานระบบครับ"
+                            text: `สวัสดีครับ ยินดีต้อนรับสู่ ${dormName} 🏡✨\n\nกรุณาพิมพ์ myid ส่งเข้ามาในแชท เพื่อยืนยันสถานะการเข้าพักและเริ่มใช้งานระบบครับ`
                         });
                     }
                     console.log(`New follower: ${userId}`);

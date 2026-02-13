@@ -19,7 +19,7 @@ export async function GET() {
 
         // Fetch System Config for Dorm Name
         const config = await prisma.systemConfig.findFirst();
-        const dormName = config?.dormName || "StaySync";
+        const dormName = config?.dormName || "หอพัก";
 
         // If user is a TENANT, return simplified/empty data to prevent crash
         if (session.role === 'TENANT') {

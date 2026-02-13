@@ -18,10 +18,15 @@ export async function POST(req: Request) {
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const secret = generateSecret();
+        // Fetch System Config
+        const config = await prisma.systemConfig.findUnique({
+            where: { organizationId: user.organizationId }
+        });
+        const issuerName = config?.dormName || "Dormitory Manager";
+
         // @ts-ignore
         const otpauth = generateURI({
-            issuer: "StaySync",
+            issuer: issuerName,
             label: user.email,
             secret
         });

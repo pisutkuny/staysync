@@ -30,7 +30,13 @@ export async function POST(req: NextRequest) {
 
         // Manual OTPAuth URL construction
         const userEmail = user.email;
-        const serviceName = "StaySync";
+
+        // Fetch System Config or Organization for Service Name
+        const config = await prisma.systemConfig.findUnique({
+            where: { organizationId: user.organizationId }
+        });
+        const serviceName = config?.dormName || "Dormitory Manager";
+
         const encodedUser = encodeURIComponent(userEmail);
         const encodedIssuer = encodeURIComponent(serviceName);
         const otpauth = `otpauth://totp/${encodedIssuer}:${encodedUser}?secret=${secret}&issuer=${encodedIssuer}&algorithm=SHA1&digits=6&period=30`;
