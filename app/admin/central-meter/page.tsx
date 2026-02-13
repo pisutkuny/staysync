@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function CentralMeterPage() {
+    const { t } = useLanguage();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [records, setRecords] = useState<any[]>([]);
@@ -114,7 +116,7 @@ export default function CentralMeterPage() {
                 throw new Error(err.error || "Failed to save");
             }
 
-            alert("บันทึกมาตรส่วนกลางสำเร็จ!");
+            alert(t.centralMeter.saveSuccess);
             router.push("/admin/utility-analysis");
             router.refresh();
         } catch (error: any) {
@@ -131,14 +133,14 @@ export default function CentralMeterPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                            📊 บันทึกมาตรส่วนกลาง
+                            📊 {t.centralMeter.title}
                         </h2>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base">บันทึกเลขมาตรน้ำและไฟฟ้าส่วนกลางรายเดือน</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.centralMeter.subtitle}</p>
                     </div>
                     <Link href="/admin/utility-analysis">
                         <button className="bg-white text-blue-700 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 border-2 border-white/30 hover:scale-105">
                             <ArrowLeft size={20} />
-                            กลับไป Utility Analysis
+                            {t.centralMeter.back}
                         </button>
                     </Link>
                 </div>
@@ -149,7 +151,7 @@ export default function CentralMeterPage() {
                 <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-6">
                     {/* Month Selector */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">เดือน</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.month}</label>
                         <input
                             type="month"
                             value={formData.month}
@@ -161,12 +163,12 @@ export default function CentralMeterPage() {
 
                     {/* Water Section */}
                     <div className="border-t border-gray-100 pt-4 space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900">💧 มาตรน้ำส่วนกลาง</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">💧 {t.centralMeter.waterTitle}</h3>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    เลขครั้งก่อน {records.length === 0 && "*"}
+                                    {t.centralMeter.prev} {records.length === 0 && "*"}
                                 </label>
                                 <input
                                     type="number"
@@ -181,7 +183,7 @@ export default function CentralMeterPage() {
                                         }`}
                                 />
                                 {records.length === 0 && (
-                                    <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                                    <p className="text-xs text-amber-600 mt-1">⚠️ {t.centralMeter.firstMonth}</p>
                                 )}
                             </div>
                             <div>
@@ -199,17 +201,17 @@ export default function CentralMeterPage() {
 
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.usage}</label>
                                 <input
                                     type="number"
                                     value={calculated.waterUsage.toFixed(2)}
                                     disabled
                                     className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">หน่วย</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.unit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.rate} *</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -218,10 +220,10 @@ export default function CentralMeterPage() {
                                     required
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost}</label>
                                 <input
                                     type="text"
                                     value={`฿${calculated.waterCost.toLocaleString()}`}
@@ -234,12 +236,12 @@ export default function CentralMeterPage() {
 
                     {/* Electric Section */}
                     <div className="border-t border-gray-100 pt-4 space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900">⚡ มาตรไฟส่วนกลาง</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">⚡ {t.centralMeter.elecTitle}</h3>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    เลขครั้งก่อน {records.length === 0 && "*"}
+                                    {t.centralMeter.prev} {records.length === 0 && "*"}
                                 </label>
                                 <input
                                     type="number"
@@ -254,7 +256,7 @@ export default function CentralMeterPage() {
                                         }`}
                                 />
                                 {records.length === 0 && (
-                                    <p className="text-xs text-amber-600 mt-1">⚠️ เดือนแรก - กรอกเลขมาตรเริ่มต้น</p>
+                                    <p className="text-xs text-amber-600 mt-1">⚠️ {t.centralMeter.firstMonth}</p>
                                 )}
                             </div>
                             <div>
@@ -272,17 +274,17 @@ export default function CentralMeterPage() {
 
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">การใช้งาน</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.usage}</label>
                                 <input
                                     type="number"
                                     value={calculated.electricUsage.toFixed(2)}
                                     disabled
                                     className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">หน่วย</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.unit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">อัตราจริง *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.rate} *</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -291,10 +293,10 @@ export default function CentralMeterPage() {
                                     required
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">฿/หน่วย</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่าใช้จ่ายรวม</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost}</label>
                                 <input
                                     type="text"
                                     value={`฿${calculated.electricCost.toLocaleString()}`}
@@ -307,11 +309,11 @@ export default function CentralMeterPage() {
 
                     {/* Fixed Monthly Costs */}
                     <div className="border-t border-gray-100 pt-4 space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900">💰 ค่าใช้จ่ายคงที่รายเดือน (ถ้ามี)</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">💰 {t.centralMeter.fixedCost}</h3>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">📡 Internet</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">📡 {t.centralMeter.internet}</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -320,10 +322,10 @@ export default function CentralMeterPage() {
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.perMonth}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">🗑️ ค่าขยะ</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">🗑️ {t.centralMeter.trash}</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -332,20 +334,20 @@ export default function CentralMeterPage() {
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">฿/เดือน</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.perMonth}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Note */}
                     <div className="border-t border-gray-100 pt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.note}</label>
                         <textarea
                             value={formData.note}
                             onChange={e => setFormData({ ...formData, note: e.target.value })}
                             rows={3}
                             className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                            placeholder="เช่น: มาตรไฟขัดข้อง, ประมาณการ, etc."
+                            placeholder={t.centralMeter.notePlaceholder}
                         />
                     </div>
 
@@ -357,40 +359,40 @@ export default function CentralMeterPage() {
                             className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                            บันทึกมาตรส่วนกลาง
+                            {t.centralMeter.save}
                         </button>
                     </div>
                 </form>
 
                 {/* Total Summary */}
                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-100">
-                    <h3 className="font-bold text-gray-900 mb-3">💰 สรุปค่าใช้จ่ายเดือนนี้</h3>
+                    <h3 className="font-bold text-gray-900 mb-3">💰 {t.centralMeter.summary}</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600">น้ำ</p>
+                            <p className="text-sm text-gray-600">{t.centralMeter.water}</p>
                             <p className="text-xl font-bold text-indigo-600">฿{calculated.waterCost.toLocaleString()}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">ไฟ</p>
+                            <p className="text-sm text-gray-600">{t.centralMeter.elec}</p>
                             <p className="text-xl font-bold text-purple-600">฿{calculated.electricCost.toLocaleString()}</p>
                         </div>
                         {(formData.internetCost > 0 || formData.trashCost > 0) && (
                             <>
                                 <div>
-                                    <p className="text-sm text-gray-600">Internet</p>
+                                    <p className="text-sm text-gray-600">{t.centralMeter.internet}</p>
                                     <p className="text-xl font-bold text-blue-600">฿{(formData.internetCost || 0).toLocaleString()}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">ขยะ</p>
+                                    <p className="text-sm text-gray-600">{t.centralMeter.trash}</p>
                                     <p className="text-xl font-bold text-green-600">฿{(formData.trashCost || 0).toLocaleString()}</p>
                                 </div>
                             </>
                         )}
                     </div>
                     <div className="mt-3 pt-3 border-t border-indigo-200">
-                        <p className="text-sm text-gray-600">รวมทั้งหมด</p>
+                        <p className="text-sm text-gray-600">{t.centralMeter.total}</p>
                         <p className="text-2xl font-bold text-gray-900">฿{calculated.totalCost.toLocaleString()}</p>
-                        <p className="text-xs text-gray-500 mt-1">(เจ้าของออกค่าส่วนกลาง)</p>
+                        <p className="text-xs text-gray-500 mt-1">{t.centralMeter.ownerPays}</p>
                     </div>
                 </div>
             </div>

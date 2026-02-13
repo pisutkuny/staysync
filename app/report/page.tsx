@@ -4,6 +4,7 @@ import { useState } from "react";
 import Script from "next/script";
 import { Loader2, Send, Image as ImageIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 declare global {
     interface Window {
@@ -12,6 +13,7 @@ declare global {
 }
 
 export default function ReportIssuePage() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -159,7 +161,9 @@ export default function ReportIssuePage() {
 
             if (!res.ok) throw new Error("Failed");
 
-            alert("Issue reported successfully!");
+            if (!res.ok) throw new Error("Failed");
+
+            alert(t.issues.success);
             // Close window if in LIFF
             if (window.liff?.isInClient()) {
                 window.liff.closeWindow();
@@ -167,7 +171,7 @@ export default function ReportIssuePage() {
                 router.push("/dashboard");
             }
         } catch (error) {
-            alert("Error reporting issue.");
+            alert(t.issues.error);
         } finally {
             setLoading(false);
         }
@@ -184,9 +188,9 @@ export default function ReportIssuePage() {
             {/* Enhanced Gradient Header - Card Style */}
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl text-center">
                 <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center justify-center gap-3">
-                    🔧 Report Issue
+                    🔧 {t.issues.reportTitle}
                 </h1>
-                <p className="text-indigo-100 mt-2 text-sm md:text-base">แจ้งซ่อม / รายงานปัญหา</p>
+                <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.issues.reportDesc}</p>
             </div>
 
             <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-1">
@@ -195,15 +199,15 @@ export default function ReportIssuePage() {
                     {/* Room Selection */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">1. Select Room / เลือกห้อง</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.selectRoom}</label>
                             <select
                                 required
                                 value={selectedRoomId}
                                 onChange={(e) => handleRoomChange(e.target.value)}
                                 className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all hover:border-indigo-300"
                             >
-                                <option value="">-- Select Room --</option>
-                                <option value="public">🔔 Public / บุคคลทั่วไป (แจ้งเหตุภายนอก)</option>
+                                <option value="">{t.issues.selectRoomPlaceholder}</option>
+                                <option value="public">{t.issues.publicOption}</option>
                                 <option disabled>──────────────</option>
                                 {uniqueRooms.map((room: any) => (
                                     <option key={room.id} value={room.id}>
@@ -216,7 +220,7 @@ export default function ReportIssuePage() {
                         {/* Resident Selection OR Guest Input */}
                         {!isGuest ? (
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">2. Select Your Name / เลือกชื่อผู้เช่า</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.selectName}</label>
                                 <select
                                     required={!isGuest}
                                     disabled={!selectedRoomId}
@@ -225,7 +229,7 @@ export default function ReportIssuePage() {
                                     className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400 transition-all hover:border-indigo-300"
                                 >
                                     <option value="">
-                                        {selectedRoomId ? "-- Select Name --" : "-- Select Room First --"}
+                                        {selectedRoomId ? t.issues.selectNamePlaceholder : t.issues.selectRoomFirst}
                                     </option>
                                     {filteredResidents.map(r => (
                                         <option key={r.id} value={r.id}>
@@ -237,30 +241,30 @@ export default function ReportIssuePage() {
                         ) : (
                             <div className="space-y-4 bg-indigo-50/50 p-5 rounded-xl border border-indigo-100">
                                 <div>
-                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">Your Name / ชื่อผู้แจ้ง</label>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">{t.issues.yourName}</label>
                                     <input
                                         required
                                         type="text"
                                         value={guestInfo.name}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
-                                        placeholder="Enter your name"
+                                        placeholder={t.issues.enterName}
                                         className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">Contact / เบอร์ติดต่อ</label>
+                                    <label className="block text-sm font-medium text-indigo-900 mb-1.5">{t.issues.contact}</label>
                                     <input
                                         required
                                         type="text"
                                         value={guestInfo.contact}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, contact: e.target.value })}
-                                        placeholder="Phone number or Line ID"
+                                        placeholder={t.issues.enterContact}
                                         className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 {guestInfo.lineUserId && (
                                     <div className="text-xs text-green-600 flex items-center gap-1 font-medium bg-green-50 px-2 py-1 rounded w-fit">
-                                        ✅ Line Connected
+                                        ✅ {t.issues.lineConnected}
                                     </div>
                                 )}
                             </div>
@@ -269,7 +273,7 @@ export default function ReportIssuePage() {
 
                     {/* Category Selection */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Category / หมวดหมู่</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">{t.issues.category}</label>
                         <div className="grid grid-cols-2 gap-3">
                             {["Water", "Electricity", "Internet", "Other"].map((cat) => (
                                 <button
@@ -281,7 +285,11 @@ export default function ReportIssuePage() {
                                         : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
                                         }`}
                                 >
-                                    {cat}
+
+                                    {cat === "Water" && t.issues.catWater}
+                                    {cat === "Electricity" && t.issues.catElectric}
+                                    {cat === "Internet" && t.issues.catInternet}
+                                    {cat === "Other" && t.issues.catOther}
                                 </button>
                             ))}
                         </div>
@@ -289,20 +297,20 @@ export default function ReportIssuePage() {
 
                     {/* Description */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description / รายละเอียด</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.description}</label>
                         <textarea
                             required
                             rows={4}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="Describe the problem..."
+                            placeholder={t.issues.descPlaceholder}
                             className="w-full rounded-xl border border-gray-300 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base shadow-inner transition-all hover:border-indigo-300"
                         />
                     </div>
 
                     {/* Photo Upload */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Photo (Optional) / รูปถ่าย</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.photo}</label>
 
                         {!previewUrl ? (
                             <div className="relative group">
@@ -316,7 +324,7 @@ export default function ReportIssuePage() {
                                     <div className="bg-gray-50 p-3 rounded-full mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                         <ImageIcon size={32} />
                                     </div>
-                                    <span className="text-sm font-medium text-gray-500 group-hover:text-indigo-600">Tap to upload photo</span>
+                                    <span className="text-sm font-medium text-gray-500 group-hover:text-indigo-600">{t.issues.tapToUpload}</span>
                                 </div>
                             </div>
                         ) : (
@@ -341,7 +349,7 @@ export default function ReportIssuePage() {
                         className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-xl hover:shadow-2xl hover:from-indigo-700 hover:to-violet-700 active:scale-98 transition-all flex items-center justify-center gap-3 text-lg"
                     >
                         {loading ? <Loader2 className="animate-spin" /> : <Send size={22} />}
-                        Send Report / ส่งเรื่อง
+                        {t.issues.submit}
                     </button>
                     {liffError && <p className="text-xs text-red-500 text-center bg-red-50 py-1 rounded">{liffError}</p>}
                 </form>

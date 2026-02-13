@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, UserCheck, UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface CheckInFormProps {
     roomId: string;
@@ -13,6 +14,7 @@ interface CheckInFormProps {
 }
 
 export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied }: CheckInFormProps) {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -49,11 +51,11 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
 
             if (!res.ok) throw new Error("Failed");
 
-            alert(isOccupied ? "Resident added successfully!" : "Check-in successful!");
+            alert(isOccupied ? t.residents.addSuccess : t.residents.checkInSuccess);
             router.push("/rooms");
             router.refresh();
         } catch (error) {
-            alert("Error processing request.");
+            alert(t.residents.errorProcessing);
         } finally {
             setLoading(false);
         }
@@ -67,12 +69,12 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                 </Link>
                 <div>
                     <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">
-                        {isOccupied ? "Add Resident" : "Check In Resident"}
+                        {isOccupied ? t.residents.addResident : t.residents.checkInTitle}
                     </h2>
                     <p className="text-gray-500 mt-2">
                         {isOccupied
-                            ? `Add another resident/family member to Room ${roomNumber}.`
-                            : `Assign a new main tenant to Room ${roomNumber}.`
+                            ? `${t.residents.addResidentDesc} ${roomNumber}.`
+                            : `${t.residents.checkInDesc} ${roomNumber}.`
                         }
                     </p>
                 </div>
@@ -81,7 +83,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
             <div className="max-w-md bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.fullName}</label>
                         <input
                             required
                             type="text"
@@ -93,7 +95,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">📞 Phone Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">📞 {t.residents.phone}</label>
                         <input
                             required
                             type="tel"
@@ -106,23 +108,23 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
 
                     {/* Contract Duration */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">📅 Contract Duration</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">📅 {t.residents.contractDuration}</label>
                         <select
                             value={formData.contractDurationMonths}
                             onChange={(e) => setFormData({ ...formData, contractDurationMonths: parseInt(e.target.value) })}
                             className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value={6}>6 Months</option>
-                            <option value={12}>12 Months (Recommended)</option>
-                            <option value={24}>24 Months</option>
-                            <option value={0}>Custom Duration</option>
+                            <option value={6}>{t.residents.months6}</option>
+                            <option value={12}>{t.residents.months12}</option>
+                            <option value={24}>{t.residents.months24}</option>
+                            <option value={0}>{t.residents.customDuration}</option>
                         </select>
                     </div>
 
                     {/* Custom Duration Input */}
                     {formData.contractDurationMonths === 0 && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Custom Months (1-36)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.customMonthsLabel}</label>
                             <input
                                 required
                                 type="number"
@@ -130,7 +132,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                                 max="36"
                                 value={formData.customDuration}
                                 onChange={(e) => setFormData({ ...formData, customDuration: e.target.value })}
-                                placeholder="Enter months"
+                                placeholder={t.residents.enterMonthsPlaceholder}
                                 className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
@@ -138,13 +140,13 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
 
                     {/* Contract End Date Display */}
                     <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                        <p className="text-xs text-gray-600 mb-1">Contract End Date (Auto-calculated)</p>
+                        <p className="text-xs text-gray-600 mb-1">{t.residents.contractEndDateAuto}</p>
                         <p className="text-lg font-bold text-indigo-700">{calculateEndDate()}</p>
                     </div>
 
                     {/* Deposit */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">💰 Deposit (Security Deposit)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">💰 {t.residents.deposit}</label>
                         <input
                             required
                             type="number"
@@ -154,11 +156,11 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                             onChange={(e) => setFormData({ ...formData, deposit: parseFloat(e.target.value) })}
                             className="w-full rounded-lg border-2 border-purple-300 p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg font-bold"
                         />
-                        <p className="text-xs text-gray-500 mt-1">💡 Default: {roomPrice.toLocaleString()} THB (1 month rent)</p>
+                        <p className="text-xs text-gray-500 mt-1">💡 {t.residents.depositDefault.replace('1 Month Rent', `${roomPrice.toLocaleString()} THB`)}</p>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">💬 Line User ID (Optional)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">💬 {t.residents.lineUserIdOptional}</label>
                         <input
                             type="text"
                             value={formData.lineUserId}
@@ -166,7 +168,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                             placeholder="U1234..."
                             className="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
-                        <p className="text-xs text-gray-400 mt-1">Needed for Line notifications.</p>
+                        <p className="text-xs text-gray-400 mt-1">{t.residents.lineUserIdDesc}</p>
                     </div>
 
                     <button
@@ -178,7 +180,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
                             }`}
                     >
                         {loading ? <Loader2 className="animate-spin" /> : (isOccupied ? <UserPlus size={20} /> : <UserCheck size={20} />)}
-                        {isOccupied ? "Add Resident" : "Confirm Check In"}
+                        {isOccupied ? t.residents.addResident : t.residents.confirmCheckIn}
                     </button>
                 </form>
             </div>

@@ -3,9 +3,15 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+
     try {
+        const whereClause = status ? { status } : {};
+
         const issues = await prisma.issue.findMany({
+            where: whereClause,
             include: {
                 resident: {
                     include: { room: true },

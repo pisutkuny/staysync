@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function GenerateCodeButton({ residentId, initialCode }: { residentId: number, initialCode: string | null }) {
+    const { t } = useLanguage();
     const [code, setCode] = useState(initialCode);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -27,7 +29,7 @@ export default function GenerateCodeButton({ residentId, initialCode }: { reside
 
     return (
         <div className="text-right">
-            <p className="text-sm text-gray-500 mb-1">Verification Code</p>
+            <p className="text-sm text-gray-500 mb-1">{t.residents.verificationCode}</p>
             {code ? (
                 <div className="flex items-center gap-3">
                     <span className="text-2xl font-mono font-bold text-indigo-600 tracking-wider">{code}</span>
@@ -41,7 +43,7 @@ export default function GenerateCodeButton({ residentId, initialCode }: { reside
                     disabled={loading}
                     className="text-sm text-indigo-600 font-bold hover:underline"
                 >
-                    {loading ? "Generating..." : "Generate Code"}
+                    {loading ? t.residents.generating : t.residents.generateCode}
                 </button>
             )}
         </div>

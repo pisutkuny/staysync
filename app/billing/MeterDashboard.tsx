@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type RoomData = {
     id: number;
@@ -16,6 +17,7 @@ type RoomData = {
 };
 
 export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
+    const { t } = useLanguage();
     const [filter, setFilter] = useState("");
 
     const filteredRooms = rooms.filter(r =>
@@ -27,14 +29,14 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center gap-4 flex-wrap">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">Meter Status Dashboard</h3>
-                    <p className="text-sm text-gray-500">Monitor latest readings for all rooms.</p>
+                    <h3 className="text-lg font-bold text-gray-900">{t.meterDashboard.title}</h3>
+                    <p className="text-sm text-gray-500">{t.meterDashboard.subtitle}</p>
                 </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
-                        placeholder="Search room or resident..."
+                        placeholder={t.meterDashboard.searchPlaceholder}
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
                         className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64"
@@ -61,21 +63,21 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                                             {room.status}
                                         </span>
                                     </h4>
-                                    <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "No Resident"}</p>
+                                    <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "-"}</p>
                                 </div>
                                 <div className="text-xs text-gray-400 text-right">
-                                    Last Update<br />{lastUpdate}
+                                    {t.meterDashboard.lastUpdate}<br />{lastUpdate}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
                                 <div>
-                                    <p className="text-xs font-bold text-blue-600 mb-1">Last Water</p>
+                                    <p className="text-xs font-bold text-blue-600 mb-1">{t.meterDashboard.lastWater}</p>
                                     <p className="font-mono text-gray-900 font-bold">
                                         {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-yellow-600 mb-1">Last Electric</p>
+                                    <p className="text-xs font-bold text-yellow-600 mb-1">{t.meterDashboard.lastElec}</p>
                                     <p className="font-mono text-gray-900 font-bold">
                                         {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
                                     </p>
@@ -86,7 +88,7 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                 })}
                 {filteredRooms.length === 0 && (
                     <div className="p-8 text-center text-gray-400">
-                        No rooms found matching "{filter}"
+                        {t.meterDashboard.noRooms} "{filter}"
                     </div>
                 )}
             </div>
@@ -96,12 +98,12 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
                         <tr>
-                            <th className="px-6 py-4">Room</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4">Resident</th>
-                            <th className="px-6 py-4 text-right text-blue-600">Last Water</th>
-                            <th className="px-6 py-4 text-right text-yellow-600">Last Electric</th>
-                            <th className="px-6 py-4 text-gray-400">Last Updated</th>
+                            <th className="px-6 py-4">{t.meterDashboard.room}</th>
+                            <th className="px-6 py-4">{t.meterDashboard.status}</th>
+                            <th className="px-6 py-4">{t.meterDashboard.resident}</th>
+                            <th className="px-6 py-4 text-right text-blue-600">{t.meterDashboard.lastWater}</th>
+                            <th className="px-6 py-4 text-right text-yellow-600">{t.meterDashboard.lastElec}</th>
+                            <th className="px-6 py-4 text-gray-400">{t.meterDashboard.lastUpdate}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -138,7 +140,7 @@ export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
                         {filteredRooms.length === 0 && (
                             <tr>
                                 <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
-                                    No rooms found matching "{filter}"
+                                    {t.meterDashboard.noRooms} "{filter}"
                                 </td>
                             </tr>
                         )}

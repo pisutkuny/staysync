@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { Loader2, LogOut, ArrowLeft, AlertTriangle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface ResidentData {
     id: number;
@@ -16,6 +17,7 @@ interface ResidentData {
 }
 
 export default function CheckOutPage({ params }: { params: Promise<{ id: string }> }) {
+    const { t } = useLanguage();
     const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
             setResident(data);
             setDepositReturn(data.deposit); // Default: full return
         } catch (error) {
-            alert("Error loading resident data");
+            alert(t.residents.loadError);
         }
     };
 
@@ -75,11 +77,11 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
 
             if (!res.ok) throw new Error("Checkout failed");
 
-            alert(`✅ Check-out Complete!\\n${early ? "Deposit Forfeited" : `Deposit Returned: ${depositReturn.toLocaleString()} THB`}`);
+            alert(`✅ ${t.residents.checkoutSuccess}\\n${early ? t.residents.depositForfeited : `${t.residents.depositReturned}: ${depositReturn.toLocaleString()} THB`}`);
             router.push("/rooms");
             router.refresh();
         } catch (error) {
-            alert("Error processing check-out.");
+            alert(t.residents.checkoutError);
         } finally {
             setLoading(false);
         }
@@ -99,32 +101,32 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                         <ArrowLeft size={24} className="text-white" />
                     </Link>
                     <div>
-                        <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">Check Out Resident</h1>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">{resident.fullName} • Room {resident.room.number}</p>
+                        <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">{t.residents.checkOut}</h1>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">{resident.fullName} • {t.residents.room} {resident.room.number}</p>
                     </div>
                 </div>
             </div>
 
             {/* Contract Info */}
             <div className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-2xl border-2 border-blue-200 shadow-lg">
-                <h3 className="text-lg font-bold mb-4">📋 Contract Information</h3>
+                <h3 className="text-lg font-bold mb-4">📋 {t.residents.contractInfo}</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <p className="text-sm text-gray-600">Start Date</p>
+                        <p className="text-sm text-gray-600">{t.residents.startDate}</p>
                         <p className="font-bold">{new Date(resident.contractStartDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600">End Date</p>
+                        <p className="text-sm text-gray-600">{t.residents.endDate}</p>
                         <p className="font-bold">{new Date(resident.contractEndDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600">Duration</p>
-                        <p className="font-bold">{resident.contractDurationMonths} months</p>
+                        <p className="text-sm text-gray-600">{t.residents.duration}</p>
+                        <p className="font-bold">{resident.contractDurationMonths} {t.residents.months}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600">Days Until End</p>
+                        <p className="text-sm text-gray-600">{t.residents.daysUntilEnd}</p>
                         <p className={`font-bold text-lg ${daysRemaining > 0 ? "text-blue-600" : "text-red-600"}`}>
-                            {daysRemaining > 0 ? `${daysRemaining} days` : "Expired"}
+                            {daysRemaining > 0 ? `${daysRemaining} ${t.residents.days}` : t.residents.expired}
                         </p>
                     </div>
                 </div>
@@ -134,9 +136,9 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                     <div className="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
                         <AlertTriangle className="text-red-600 mt-0.5" size={20} />
                         <div>
-                            <p className="font-bold text-red-700">⚠️ Early Checkout Detected</p>
+                            <p className="font-bold text-red-700">⚠️ {t.residents.earlyCheckout}</p>
                             <p className="text-sm text-red-600 mt-1">
-                                Checking out {daysRemaining} days before contract end. Deposit will be forfeited per rental agreement.
+                                {t.residents.earlyCheckoutDesc.replace("Checking out before contract end", `${t.residents.checkOutResident} ${daysRemaining} ${t.residents.days}`)}
                             </p>
                         </div>
                     </div>
@@ -147,9 +149,9 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                     <div className="mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-start gap-3">
                         <CheckCircle className="text-green-600 mt-0.5" size={20} />
                         <div>
-                            <p className="font-bold text-green-700">✅ Contract Completed</p>
+                            <p className="font-bold text-green-700">✅ {t.residents.contractCompleted}</p>
                             <p className="text-sm text-green-600 mt-1">
-                                Full deposit will be returned (adjustable for damages/cleaning).
+                                {t.residents.contractCompletedDesc}
                             </p>
                         </div>
                     </div>
@@ -158,19 +160,19 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
 
             {/* Deposit Handling */}
             <form onSubmit={handleSubmit} className="bg-gradient-to-br from-white to-purple-50 p-6 rounded-2xl border-2 border-purple-200 shadow-lg space-y-4">
-                <h3 className="text-lg font-bold">💰 Deposit: {resident.deposit.toLocaleString()} THB</h3>
+                <h3 className="text-lg font-bold">💰 {t.residents.deposit}: {resident.deposit.toLocaleString()} THB</h3>
 
                 {earlyCheckout ? (
                     <>
-                        <p className="text-red-600 font-bold">Status: Will be Forfeited (฿0 returned)</p>
+                        <p className="text-red-600 font-bold">{t.residents.statusForfeit} (฿0)</p>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Reason for Forfeit (for records)
+                                {t.residents.forfeitReason}
                             </label>
                             <textarea
                                 value={depositForfeitReason}
                                 onChange={(e) => setDepositForfeitReason(e.target.value)}
-                                placeholder="Early checkout per rental agreement..."
+                                placeholder={t.residents.forfeitReasonPlaceholder}
                                 className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                 rows={3}
                             />
@@ -178,10 +180,10 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                     </>
                 ) : (
                     <>
-                        <p className="text-green-600 font-bold">Status: Will be Returned</p>
+                        <p className="text-green-600 font-bold">{t.residents.statusReturn}</p>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Amount to Return (Deduct for damages/unpaid bills)
+                                {t.residents.returnAmount}
                             </label>
                             <input
                                 type="number"
@@ -193,7 +195,7 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                                 className="w-full p-3 border-2 border-purple-300 rounded-xl text-lg font-bold focus:ring-2 focus:ring-purple-500"
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                💡 Max: {resident.deposit.toLocaleString()} THB
+                                💡 {t.residents.max}: {resident.deposit.toLocaleString()} THB
                             </p>
                         </div>
                     </>
@@ -206,7 +208,7 @@ export default function CheckOutPage({ params }: { params: Promise<{ id: string 
                         className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold hover:shadow-xl disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 className="animate-spin" /> : <LogOut size={20} />}
-                        {loading ? "Processing..." : "Confirm Check Out"}
+                        {loading ? t.residents.processing : t.residents.confirmCheckOut}
                     </button>
                 </div>
             </form>

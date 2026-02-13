@@ -12,6 +12,7 @@ import {
     Plus,
     Eye,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface AuditLog {
     id: number;
@@ -31,6 +32,7 @@ interface AuditLog {
 }
 
 export default function AuditPage() {
+    const { t } = useLanguage();
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
@@ -117,13 +119,13 @@ export default function AuditPage() {
                         <div>
                             <h1 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                                 <FileText className="text-white" size={32} />
-                                Audit Logs
+                                {t.audit.title}
                             </h1>
-                            <p className="text-indigo-100 mt-2 text-sm md:text-base">Track all changes and user activities</p>
+                            <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.audit.subtitle}</p>
                         </div>
                         <button className="bg-white text-indigo-700 px-4 py-2 rounded-lg font-bold hover:bg-indigo-50 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl border border-white/30 hover:scale-105 text-sm">
                             <Download size={20} />
-                            Export Logs
+                            {t.audit.export}
                         </button>
                     </div>
                 </div>
@@ -137,28 +139,28 @@ export default function AuditPage() {
                             onChange={(e) => setFilters({ ...filters, entity: e.target.value })}
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="">All Entities</option>
-                            <option value="User">User</option>
-                            <option value="Room">Room</option>
-                            <option value="Resident">Resident</option>
-                            <option value="Billing">Billing</option>
-                            <option value="Issue">Issue</option>
-                            <option value="Expense">Expense</option>
+                            <option value="">{t.audit.filter.allEntities}</option>
+                            <option value="User">{t.audit.entities.User}</option>
+                            <option value="Room">{t.audit.entities.Room}</option>
+                            <option value="Resident">{t.audit.entities.Resident}</option>
+                            <option value="Billing">{t.audit.entities.Billing}</option>
+                            <option value="Issue">{t.audit.entities.Issue}</option>
+                            <option value="Expense">{t.audit.entities.Expense}</option>
                         </select>
                         <select
                             value={filters.action}
                             onChange={(e) => setFilters({ ...filters, action: e.target.value })}
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="">All Actions</option>
-                            <option value="CREATE">Create</option>
-                            <option value="UPDATE">Update</option>
-                            <option value="DELETE">Delete</option>
-                            <option value="LOGIN">Login</option>
-                            <option value="LOGOUT">Logout</option>
+                            <option value="">{t.audit.filter.allActions}</option>
+                            <option value="CREATE">{t.audit.actions.CREATE}</option>
+                            <option value="UPDATE">{t.audit.actions.UPDATE}</option>
+                            <option value="DELETE">{t.audit.actions.DELETE}</option>
+                            <option value="LOGIN">{t.audit.actions.LOGIN}</option>
+                            <option value="LOGOUT">{t.audit.actions.LOGOUT}</option>
                         </select>
                         <div className="ml-auto text-sm text-gray-500">
-                            Showing {logs.length} logs
+                            {t.audit.filter.showing.replace("{count}", logs.length.toString())}
                         </div>
                     </div>
                 </div>
@@ -177,10 +179,10 @@ export default function AuditPage() {
                                                     log.action
                                                 )}`}
                                             >
-                                                {log.action}
+                                                {t.audit.actions[log.action as keyof typeof t.audit.actions] || log.action}
                                             </span>
                                             <span className="text-sm font-medium text-gray-700">
-                                                {log.entity}
+                                                {t.audit.entities[log.entity as keyof typeof t.audit.entities] || log.entity}
                                                 {log.entityId && (
                                                     <span className="text-gray-400"> #{log.entityId}</span>
                                                 )}
@@ -208,9 +210,9 @@ export default function AuditPage() {
                     {logs.length === 0 && (
                         <div className="text-center py-12">
                             <FileText className="mx-auto text-gray-300 mb-4" size={48} />
-                            <p className="text-gray-500">No audit logs found</p>
+                            <p className="text-gray-500">{t.audit.noData}</p>
                             <p className="text-sm text-gray-400 mt-1">
-                                Logs will appear here as users make changes
+                                {t.audit.noDataTip}
                             </p>
                         </div>
                     )}

@@ -1,23 +1,31 @@
-import prisma from "@/lib/prisma";
-import { CheckCircle2 } from "lucide-react";
+"use client";
+
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import IssueItem from "./IssueItem";
+import { useState, useEffect, use } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+export default function IssuesPage() {
+    const { t } = useLanguage();
+    const searchParams = useSearchParams();
+    const status = searchParams.get("status");
+    const currentStatus = status || "Pending";
 
-export default async function IssuesPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
-    const { status } = await searchParams;
-    const currentStatus = (status as string) || "Pending";
+    const [issues, setIssues] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const issues = await prisma.issue.findMany({
-        where: { status: currentStatus },
-        include: { resident: { include: { room: true } } },
-        orderBy: { createdAt: "desc" },
-    });
+    useEffect(() => {
+        setLoading(true);
+        fetch(`/api/issues?status=${currentStatus}`)
+            .then(res => res.json())
+            .then(data => {
+                setIssues(data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, [currentStatus]);
 
     return (
         <div className="space-y-8">
@@ -26,14 +34,14 @@ export default async function IssuesPage({
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">
-                            🔧 {currentStatus === "Pending" ? "Pending Issues" : "Maintenance History"}
+                            🔧 {currentStatus === "Pending" ? t.issues.pendingTitle : t.issues.historyTitle}
                         </h2>
                         <p className="text-pink-100 mt-2 text-lg">
-                            {currentStatus === "Pending" ? "Manage active requests." : "View resolved issues."}
+                            {currentStatus === "Pending" ? t.issues.pendingDesc : t.issues.historyDesc}
                         </p>
                     </div>
                     <Link href="/report" className="bg-white text-red-700 px-6 py-3 rounded-xl font-bold hover:bg-red-50 shadow-lg hover:shadow-xl transition-all flex items-center gap-2 whitespace-nowrap border-2 border-white/30 hover:scale-105">
-                        ➕ New Issue
+                        ➕ {t.issues.newIssue}
                     </Link>
                 </div>
             </div>
@@ -47,7 +55,7 @@ export default async function IssuesPage({
                         : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                         }`}
                 >
-                    🔴 Pending
+                    🔴 {t.issues.tabPending}
                 </Link>
                 <Link
                     href="/issues?status=Done"
@@ -56,14 +64,19 @@ export default async function IssuesPage({
                         : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
                         }`}
                 >
-                    ✅ History
+                    ✅ {t.issues.tabHistory}
                 </Link>
             </div>
 
             <div className="space-y-4">
-                {issues.length === 0 ? (
+                {loading ? (
+                    <div className="text-center py-12">
+                        <Loader2 className="animate-spin h-8 w-8 mx-auto text-gray-400" />
+                        <p className="text-gray-500 mt-2">{t.issues.loading}</p>
+                    </div>
+                ) : issues.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                        <p className="text-gray-500">No {currentStatus.toLowerCase()} issues found.</p>
+                        <p className="text-gray-500">{t.issues.noIssues}</p>
                     </div>
                 ) : (
                     issues.map((issue: any) => (

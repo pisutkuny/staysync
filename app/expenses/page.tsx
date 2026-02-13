@@ -7,6 +7,7 @@ import imageCompression from 'browser-image-compression';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Expense = {
     id: number;
@@ -27,6 +28,7 @@ type PaginationInfo = {
 };
 
 export default function ExpensesPage() {
+    const { t } = useLanguage();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -259,7 +261,7 @@ export default function ExpensesPage() {
             if (res.ok) {
                 resetForm();
                 fetchExpenses();
-                alert(editingId ? "Expense updated successfully!" : "Expense added successfully!");
+                alert(editingId ? t.expenses.saveSuccess : t.expenses.saveSuccess);
             }
         } catch (error) {
             alert("Failed to save expense");
@@ -302,7 +304,7 @@ export default function ExpensesPage() {
                 fetchExpenses();
                 setDeleteModalOpen(false);
                 setDeleteTargetId(null);
-                alert("Expense deleted successfully!");
+                alert(t.expenses.deleteSuccess);
             }
         } catch (error) {
             alert("Failed to delete expense");
@@ -381,8 +383,8 @@ export default function ExpensesPage() {
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 Expense Tracking</h2>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Record and monitor operating expenses with receipt uploads.</p>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">💰 {t.expenses.title}</h2>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.expenses.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <button
@@ -393,10 +395,10 @@ export default function ExpensesPage() {
                                 <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
                                 <path d="M21 3v5h-5" />
                             </svg>
-                            Recurring Expenses
+                            {t.expenses.recurring}
                         </button>
                         <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-xl border border-white/30 shadow-lg">
-                            <p className="text-xs font-bold text-white/90 uppercase tracking-wider">Total Expenses</p>
+                            <p className="text-xs font-bold text-white/90 uppercase tracking-wider">{t.expenses.totalExpenses}</p>
                             <p className="text-xl md:text-2xl font-bold text-white drop-shadow-md">฿{totalStats.toLocaleString()}</p>
                         </div>
                     </div>
@@ -411,7 +413,7 @@ export default function ExpensesPage() {
                             <Search className="absolute left-3 top-3 text-indigo-400" size={20} />
                             <input
                                 type="text"
-                                placeholder="🔍 Search title or note..."
+                                placeholder={`🔍 ${t.expenses.search}`}
                                 value={searchQuery}
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value);
@@ -429,12 +431,12 @@ export default function ExpensesPage() {
                         }}
                         className="p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
                     >
-                        <option value="">📁 All Categories</option>
-                        <option value="Maintenance">🔧 Maintenance</option>
-                        <option value="Utilities">⚡ Utilities</option>
-                        <option value="Salary">💼 Salary</option>
-                        <option value="Supplies">📦 Supplies</option>
-                        <option value="Other">📝 Other</option>
+                        <option value="">📁 {t.expenses.allCats}</option>
+                        <option value="Maintenance">🔧 {t.expenses.catMaint}</option>
+                        <option value="Utilities">⚡ {t.expenses.catUtil}</option>
+                        <option value="Salary">💼 {t.expenses.catSalary}</option>
+                        <option value="Supplies">📦 {t.expenses.catSupply}</option>
+                        <option value="Other">📝 {t.expenses.catOther}</option>
                     </select>
                     <div className="flex gap-2">
                         {(searchQuery || categoryFilter || dateFrom || dateTo) && (
@@ -443,7 +445,7 @@ export default function ExpensesPage() {
                                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-2"
                             >
                                 <X size={16} />
-                                Clear
+                                {t.expenses.clear}
                             </button>
                         )}
                         <div className="flex gap-2">
@@ -466,7 +468,7 @@ export default function ExpensesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">
                     <div>
-                        <label className="block text-sm text-gray-600 mb-1">From Date</label>
+                        <label className="block text-sm text-gray-600 mb-1">{t.expenses.fromDate}</label>
                         <input
                             type="date"
                             value={dateFrom}
@@ -478,7 +480,7 @@ export default function ExpensesPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-600 mb-1">To Date</label>
+                        <label className="block text-sm text-gray-600 mb-1">{t.expenses.toDate}</label>
                         <input
                             type="date"
                             value={dateTo}
@@ -498,7 +500,7 @@ export default function ExpensesPage() {
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
                             {editingId ? <Edit className="text-blue-600" size={22} /> : <Plus className="text-indigo-600" size={22} />}
-                            {editingId ? "✏️ Edit Expense" : "➕ Add New Expense"}
+                            {editingId ? `✏️ ${t.expenses.edit}` : `➕ ${t.expenses.add}`}
                         </h3>
                         {editingId && (
                             <button
@@ -512,7 +514,7 @@ export default function ExpensesPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.titleLabel}</label>
                             <div className="relative">
                                 <FileText className="absolute left-3 top-2.5 text-gray-400" size={16} />
                                 <input
@@ -528,7 +530,7 @@ export default function ExpensesPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.amountLabel}</label>
                                 <input
                                     type="number"
                                     required
@@ -540,7 +542,7 @@ export default function ExpensesPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.dateLabel}</label>
                                 <input
                                     type="date"
                                     required
@@ -552,22 +554,22 @@ export default function ExpensesPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.catLabel}</label>
                             <select
                                 value={category}
                                 onChange={e => setCategory(e.target.value)}
                                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                             >
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="Utilities">Utilities</option>
-                                <option value="Salary">Salary</option>
-                                <option value="Supplies">Supplies</option>
-                                <option value="Other">Other</option>
+                                <option value="Maintenance">{t.expenses.catMaint}</option>
+                                <option value="Utilities">{t.expenses.catUtil}</option>
+                                <option value="Salary">{t.expenses.catSalary}</option>
+                                <option value="Supplies">{t.expenses.catSupply}</option>
+                                <option value="Other">{t.expenses.catOther}</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.noteLabel}</label>
                             <textarea
                                 value={note}
                                 onChange={e => setNote(e.target.value)}
@@ -578,7 +580,7 @@ export default function ExpensesPage() {
 
                         {/* Receipt Upload */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Image (Optional)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.receiptLabel}</label>
 
                             {existingReceiptUrl && !receiptPreview && (
                                 <div className="mb-2 relative">
@@ -639,7 +641,7 @@ export default function ExpensesPage() {
                                 disabled={compressing}
                                 className="w-full p-2 border rounded-lg text-sm disabled:opacity-50"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Mobile camera supported • Auto-compressed to ~500KB</p>
+                            <p className="text-xs text-gray-500 mt-1">{t.expenses.mobileCam}</p>
                         </div>
 
                         <button
@@ -650,12 +652,12 @@ export default function ExpensesPage() {
                             {submitting || uploadingReceipt ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
-                                    {uploadingReceipt ? "Uploading..." : editingId ? "Updating..." : "Saving..."}
+                                    {uploadingReceipt ? t.expenses.uploading : editingId ? t.expenses.update : t.expenses.save}
                                 </>
                             ) : (
                                 <>
                                     {editingId ? <Check size={20} /> : <Save size={20} />}
-                                    {editingId ? "Update Record" : "Save Record"}
+                                    {editingId ? t.expenses.update : t.expenses.save}
                                 </>
                             )}
                         </button>
@@ -666,7 +668,7 @@ export default function ExpensesPage() {
                                 onClick={resetForm}
                                 className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-all"
                             >
-                                Cancel
+                                {t.expenses.cancel}
                             </button>
                         )}
                     </form>
@@ -675,7 +677,7 @@ export default function ExpensesPage() {
                 {/* List Section */}
                 <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
+                        <h3 className="text-lg font-bold text-gray-900">{t.expenses.recent}</h3>
                         <select
                             value={limit}
                             onChange={(e) => {
@@ -700,10 +702,10 @@ export default function ExpensesPage() {
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-600 font-medium">
                                         <tr>
-                                            <th className="px-2 py-3 sm:p-4">Date</th>
-                                            <th className="px-2 py-3 sm:p-4">Title</th>
-                                            <th className="px-2 py-3 sm:p-4">Category</th>
-                                            <th className="px-2 py-3 sm:p-4 text-right">Amount</th>
+                                            <th className="px-2 py-3 sm:p-4">{t.expenses.dateLabel}</th>
+                                            <th className="px-2 py-3 sm:p-4">{t.expenses.titleLabel}</th>
+                                            <th className="px-2 py-3 sm:p-4">{t.expenses.catLabel}</th>
+                                            <th className="px-2 py-3 sm:p-4 text-right">{t.expenses.amountLabel}</th>
                                             <th className="px-2 py-3 sm:p-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -711,10 +713,7 @@ export default function ExpensesPage() {
                                         {expenses.length === 0 ? (
                                             <tr>
                                                 <td colSpan={5} className="p-8 text-center text-gray-400">
-                                                    {searchQuery || categoryFilter || dateFrom || dateTo
-                                                        ? "No expenses found matching your filters."
-                                                        : "No expenses recorded yet."
-                                                    }
+                                                    {t.expenses.noExpenses}
                                                 </td>
                                             </tr>
                                         ) : (
@@ -734,7 +733,7 @@ export default function ExpensesPage() {
                                                                 className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
                                                             >
                                                                 <FileText size={12} />
-                                                                View Receipt
+                                                                {t.expenses.viewReceipt}
                                                             </a>
                                                         )}
                                                     </td>

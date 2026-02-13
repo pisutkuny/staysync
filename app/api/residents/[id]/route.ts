@@ -10,7 +10,11 @@ export async function GET(
         const { id } = await params;
         const resident = await prisma.resident.findUnique({
             where: { id: Number(id) },
-            include: { room: true }
+            include: {
+                room: true,
+                documents: true,
+                billings: { orderBy: { createdAt: 'desc' } }
+            }
         });
 
         if (!resident) {

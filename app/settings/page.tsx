@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon, Lock, Eye, EyeOff } from "lucide-react";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import Setup2FA from "../components/Setup2FA";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface SystemConfig {
     dormName: string;
@@ -39,6 +40,7 @@ interface SystemConfig {
 }
 
 export default function SettingsPage() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState("basic");
@@ -139,7 +141,7 @@ export default function SettingsPage() {
                 throw new Error(data.error || "Failed to save settings");
             }
 
-            alert("Settings saved successfully!");
+            alert(t.settings.success);
         } catch (error: any) {
             console.error(error);
             alert(`Error: ${error.message}`);
@@ -151,11 +153,11 @@ export default function SettingsPage() {
     if (loading) return <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-indigo-500" size={40} /></div>;
 
     const allTabs = [
-        { id: "basic", label: "Basic Info", icon: Building2, roles: ["OWNER", "ADMIN"] },
-        { id: "payment", label: "Payment", icon: CreditCard, roles: ["OWNER", "ADMIN"] },
-        { id: "rates", label: "Rates & Fees", icon: Zap, roles: ["OWNER", "ADMIN"] },
-        { id: "chatbot", label: "Chatbot", icon: MessageSquare, roles: ["OWNER", "ADMIN"] },
-        { id: "security", label: "Security", icon: Lock, roles: ["OWNER", "ADMIN", "STAFF", "TENANT", "USER"] }
+        { id: "basic", label: t.settings.tabs.basic, icon: Building2, roles: ["OWNER", "ADMIN"] },
+        { id: "payment", label: t.settings.tabs.payment, icon: CreditCard, roles: ["OWNER", "ADMIN"] },
+        { id: "rates", label: t.settings.tabs.rates, icon: Zap, roles: ["OWNER", "ADMIN"] },
+        { id: "chatbot", label: t.settings.tabs.chatbot, icon: MessageSquare, roles: ["OWNER", "ADMIN"] },
+        { id: "security", label: t.settings.tabs.security, icon: Lock, roles: ["OWNER", "ADMIN", "STAFF", "TENANT", "USER"] }
     ];
 
     const tabs = allTabs.filter(tab => tab.roles.includes(userRole));
@@ -168,9 +170,9 @@ export default function SettingsPage() {
                     <div>
                         <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
                             <SettingsIcon size={24} className="md:w-10 md:h-10" />
-                            System Settings
+                            {t.settings.title}
                         </h2>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Configure your dormitory management system</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.settings.subtitle}</p>
                     </div>
                 </div>
             </div>
@@ -205,11 +207,11 @@ export default function SettingsPage() {
                         {/* Dormitory Details */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
-                                <Building2 size={24} /> Dormitory Information
+                                <Building2 size={24} /> {t.settings.basic.dormInfo}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Dormitory Name *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.name}</label>
                                     <input
                                         name="dormName"
                                         value={config.dormName}
@@ -220,7 +222,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.address}</label>
                                     <input
                                         name="dormAddress"
                                         value={config.dormAddress}
@@ -231,7 +233,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin Phone</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.phone}</label>
                                     <input
                                         name="adminPhone"
                                         value={config.adminPhone}
@@ -241,7 +243,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Phone</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.emergency}</label>
                                     <input
                                         name="emergencyPhone"
                                         value={config.emergencyPhone}
@@ -256,11 +258,11 @@ export default function SettingsPage() {
                         {/* LINE Integration */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700">
-                                <MessageSquare size={24} /> LINE Integration
+                                <MessageSquare size={24} /> {t.settings.basic.lineIntegration}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin LINE User ID</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.lineUserId}</label>
                                     <input
                                         name="adminLineUserId"
                                         value={config.adminLineUserId}
@@ -268,10 +270,10 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="Uxxxxxxxxxxxxxxxxxxxx"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">🔍 หาได้จาก LINE Developer Console - สำหรับรับแจ้งเตือน</p>
+                                    <p className="text-xs text-gray-500 mt-1">🔍 {t.settings.basic.lineUserIdTip}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Admin LINE ID Display</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.lineDisplay}</label>
                                     <input
                                         name="adminLineIdDisplay"
                                         value={config.adminLineIdDisplay}
@@ -279,7 +281,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="@admin_line_id"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">📱 LINE ID ที่ให้ผู้เช่าเพิ่มเพื่อติดต่อ (แสดงใน Chatbot)</p>
+                                    <p className="text-xs text-gray-500 mt-1">📱 {t.settings.basic.lineDisplayTip}</p>
                                 </div>
                             </div>
                         </div>
@@ -292,11 +294,11 @@ export default function SettingsPage() {
                         {/* Bank Account */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700">
-                                <CreditCard size={24} /> Bank Account
+                                <CreditCard size={24} /> {t.settings.payment.bankAccount}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.bankName}</label>
                                     <input
                                         name="bankName"
                                         value={config.bankName}
@@ -306,7 +308,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.accountName}</label>
                                     <input
                                         name="bankAccountName"
                                         value={config.bankAccountName}
@@ -316,7 +318,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.accountNumber}</label>
                                     <input
                                         name="bankAccountNumber"
                                         value={config.bankAccountNumber}
@@ -326,7 +328,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">PromptPay ID</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.promptPay}</label>
                                     <input
                                         name="promptPayId"
                                         value={config.promptPayId}
@@ -334,7 +336,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="Phone or Tax ID"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">💳 เบอร์โทร หรือ เลขประจำตัวผู้เสียภาษี สำหรับรับเงิน</p>
+                                    <p className="text-xs text-gray-500 mt-1">💳 {t.settings.payment.promptPayTip}</p>
                                 </div>
                             </div>
                         </div>
@@ -342,11 +344,11 @@ export default function SettingsPage() {
                         {/* Invoice Settings */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-purple-700">
-                                📄 Invoice Settings
+                                📄 {t.settings.payment.invoiceSettings}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Note</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.invoiceNote}</label>
                                     <textarea
                                         name="invoiceNote"
                                         value={config.invoiceNote}
@@ -357,7 +359,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Logo</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.settings.payment.invoiceLogo}</label>
                                     <div className="space-y-3">
                                         {/* Current Logo Preview */}
                                         {config.invoiceLogo && (
@@ -371,13 +373,13 @@ export default function SettingsPage() {
                                                     }}
                                                 />
                                                 <div className="flex-1">
-                                                    <p className="text-sm text-gray-600">Current logo</p>
+                                                    <p className="text-sm text-gray-600">{t.settings.payment.currentLogo}</p>
                                                     <button
                                                         type="button"
                                                         onClick={() => setConfig(prev => ({ ...prev, invoiceLogo: '' }))}
                                                         className="text-xs text-red-600 hover:text-red-700 mt-1"
                                                     >
-                                                        Remove logo
+                                                        {t.settings.payment.removeLogo}
                                                     </button>
                                                 </div>
                                             </div>
@@ -418,15 +420,15 @@ export default function SettingsPage() {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                                 <span className="text-sm text-gray-600">
-                                                    {config.invoiceLogo ? 'Change logo' : 'Upload logo'}
+                                                    {config.invoiceLogo ? t.settings.payment.changeLogo : t.settings.payment.uploadLogo}
                                                 </span>
                                             </label>
                                         </div>
-                                        <p className="text-xs text-gray-500">Recommended: PNG or JPG, max 2MB</p>
+                                        <p className="text-xs text-gray-500">{t.settings.payment.logoTip}</p>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Color (Hex)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.payment.invoiceColor}</label>
                                     <input
                                         name="invoiceColor"
                                         value={config.invoiceColor}
@@ -434,7 +436,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         placeholder="#4f46e5"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">🎨 สีหลักของใบแจ้งหนี้ (Hex Code)</p>
+                                    <p className="text-xs text-gray-500 mt-1">🎨 {t.settings.payment.colorTip}</p>
                                 </div>
                             </div>
                         </div>
@@ -447,11 +449,11 @@ export default function SettingsPage() {
                         {/* Utility Rates */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-700">
-                                <Zap size={24} /> Utility Rates
+                                <Zap size={24} /> {t.settings.rates.utilityRates}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Water Rate (฿/unit)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.waterRate}</label>
                                     <input
                                         name="waterRate"
                                         type="number"
@@ -461,10 +463,10 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="0.00"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">💧 อัตราที่คิดผู้เช่า ต่อหน่วย</p>
+                                    <p className="text-xs text-gray-500 mt-1">💧 {t.settings.rates.waterTip}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Electric Rate (฿/unit)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.electricRate}</label>
                                     <input
                                         name="electricRate"
                                         type="number"
@@ -474,7 +476,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="0.00"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">⚡ อัตราที่คิดผู้เช่า ต่อหน่วย</p>
+                                    <p className="text-xs text-gray-500 mt-1">⚡ {t.settings.rates.electricTip}</p>
                                 </div>
                             </div>
                         </div>
@@ -482,11 +484,11 @@ export default function SettingsPage() {
                         {/* Fixed Fees */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-amber-700">
-                                💰 Fixed Fees
+                                💰 {t.settings.rates.fixedFees}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Trash Fee (฿)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.trashFee}</label>
                                     <input
                                         name="trashFee"
                                         type="number"
@@ -498,7 +500,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Internet Fee (฿)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.internetFee}</label>
                                     <input
                                         name="internetFee"
                                         type="number"
@@ -510,7 +512,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Other Fees (฿)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.otherFees}</label>
                                     <input
                                         name="otherFees"
                                         type="number"
@@ -527,7 +529,7 @@ export default function SettingsPage() {
                         {/* Common Area Billing */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
-                                🏢 Common Area Billing
+                                🏢 {t.settings.rates.commonArea}
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
@@ -538,41 +540,41 @@ export default function SettingsPage() {
                                         onChange={handleChange}
                                         className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
-                                    <label className="text-sm font-medium text-gray-700">Enable Common Area Charges</label>
+                                    <label className="text-sm font-medium text-gray-700">{t.settings.rates.enableCommon}</label>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">🏢 เปิดใช้งานค่าส่วนกลาง (น้ำ-ไฟส่วนกลาง) ให้ผู้เช่าแชร์ค่าใช้จ่าย</p>
+                                <p className="text-xs text-gray-500 mt-1">🏢 {t.settings.rates.enableCommonTip}</p>
 
                                 {config.enableCommonAreaCharges && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Distribution Method</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.distribution}</label>
                                             <select
                                                 name="commonAreaDistribution"
                                                 value={config.commonAreaDistribution}
                                                 onChange={handleChange}
                                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                             >
-                                                <option value="equal">Equal Split</option>
-                                                <option value="proportional">Proportional to Room Price</option>
+                                                <option value="equal">{t.settings.rates.distEqual}</option>
+                                                <option value="proportional">{t.settings.rates.distProp}</option>
                                             </select>
-                                            <p className="text-xs text-gray-500 mt-1">⚖️ วิธีแบ่งค่าส่วนกลาง: เท่าๆกัน หรือ ตามราคาห้อง</p>
+                                            <p className="text-xs text-gray-500 mt-1">⚖️ {t.settings.rates.distTip}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Fee Cap Type</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.capType}</label>
                                             <select
                                                 name="commonAreaCapType"
                                                 value={config.commonAreaCapType}
                                                 onChange={handleChange}
                                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                             >
-                                                <option value="none">No Cap</option>
-                                                <option value="percentage">Percentage Cap</option>
-                                                <option value="fixed">Fixed Amount</option>
+                                                <option value="none">{t.settings.rates.capNone}</option>
+                                                <option value="percentage">{t.settings.rates.capPercent}</option>
+                                                <option value="fixed">{t.settings.rates.capFixed}</option>
                                             </select>
                                         </div>
                                         {config.commonAreaCapType === "percentage" && (
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Cap Percentage (%)</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.capPercentVal}</label>
                                                 <input
                                                     name="commonAreaCapPercentage"
                                                     type="number"
@@ -586,7 +588,7 @@ export default function SettingsPage() {
                                         )}
                                         {config.commonAreaCapType === "fixed" && (
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Cap Amount (฿)</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.rates.capFixedVal}</label>
                                                 <input
                                                     name="commonAreaCapFixed"
                                                     type="number"
@@ -610,11 +612,11 @@ export default function SettingsPage() {
                         {/* WiFi Info */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-700">
-                                📶 WiFi Information
+                                📶 {t.settings.chatbot.wifiInfo}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">WiFi SSID</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.chatbot.ssid}</label>
                                     <input
                                         name="wifiSsid"
                                         value={config.wifiSsid}
@@ -622,10 +624,10 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="Network name"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">📶 ชื่อ WiFi ที่ให้ผู้เช่าใช้</p>
+                                    <p className="text-xs text-gray-500 mt-1">📶 {t.settings.chatbot.ssidTip}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">WiFi Password</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.chatbot.password}</label>
                                     <input
                                         name="wifiPassword"
                                         value={config.wifiPassword}
@@ -633,7 +635,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="Password"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">🔐 รหัสผ่าน WiFi</p>
+                                    <p className="text-xs text-gray-500 mt-1">🔐 {t.settings.chatbot.passwordTip}</p>
                                 </div>
                             </div>
                         </div>
@@ -641,7 +643,7 @@ export default function SettingsPage() {
                         {/* Rules */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-700">
-                                📜 Dormitory Rules
+                                📜 {t.settings.chatbot.rules}
                             </h3>
                             <textarea
                                 name="rulesText"
@@ -651,13 +653,13 @@ export default function SettingsPage() {
                                 rows={8}
                                 placeholder="1. No pets allowed&#10;2. Quiet hours: 10 PM - 6 AM&#10;3. No smoking inside rooms..."
                             />
-                            <p className="text-xs text-gray-500 mt-2">📜 กฎระเบียบหอพัก แสดงใน Chatbot เมื่อผู้เช่าถาม</p>
+                            <p className="text-xs text-gray-500 mt-2">📜 {t.settings.chatbot.rulesTip}</p>
                         </div>
 
                         {/* Auto Reminders */}
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-purple-700">
-                                🔔 Automation
+                                🔔 {t.settings.chatbot.automation}
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
@@ -668,20 +670,20 @@ export default function SettingsPage() {
                                         onChange={handleChange}
                                         className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                                     />
-                                    <label className="text-sm font-medium text-gray-700">Enable Auto Payment Reminders</label>
+                                    <label className="text-sm font-medium text-gray-700">{t.settings.chatbot.enableReminders}</label>
                                 </div>
-                                <p className="text-sm text-gray-500">🔔 ส่งข้อความเตือนอัตโนมัติให้ผู้เช่าที่ยังไม่ชำระเงิน</p>
+                                <p className="text-sm text-gray-500">🔔 {t.settings.chatbot.remindersTip}</p>
 
                                 {/* Reminder Schedule - Show when enabled */}
                                 {config.enableAutoReminders && (
                                     <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200 space-y-4">
                                         <h4 className="font-semibold text-sm text-purple-900 flex items-center gap-2">
-                                            ⏰ กำหนดเวลาส่งแจ้งเตือน
+                                            ⏰ {t.settings.chatbot.schedule}
                                         </h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    วันที่ส่ง (ของแต่ละเดือน)
+                                                    {t.settings.chatbot.day}
                                                 </label>
                                                 <select
                                                     name="reminderDay"
@@ -695,11 +697,11 @@ export default function SettingsPage() {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <p className="text-xs text-gray-500 mt-1">📅 เลือกวันที่ต้องการส่งเตือน (1-28)</p>
+                                                <p className="text-xs text-gray-500 mt-1">📅 {t.settings.chatbot.dayTip}</p>
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    เวลาที่ส่ง
+                                                    {t.settings.chatbot.time}
                                                 </label>
                                                 <input
                                                     type="time"
@@ -708,14 +710,12 @@ export default function SettingsPage() {
                                                     onChange={handleChange}
                                                     className="w-full p-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">⏰ เวลาที่จะส่งข้อความเตือน</p>
+                                                <p className="text-xs text-gray-500 mt-1">⏰ {t.settings.chatbot.timeTip}</p>
                                             </div>
                                         </div>
                                         <div className="bg-purple-100 p-3 rounded-lg">
                                             <p className="text-sm text-purple-800">
-                                                💡 <strong>ตัวอย่าง:</strong> ถ้าตั้งวันที่ 25 เวลา 09:00 น.
-                                                ระบบจะส่งข้อความเตือนทุกวันที่ 25 เวลา 9 โมงเช้า
-                                                ให้กับผู้เช่าที่ยังไม่ชำระค่าห้องของเดือนนั้น
+                                                💡 <strong>{t.settings.chatbot.example.split(":")[0]}:</strong> {t.settings.chatbot.example.split(":")[1]}
                                             </p>
                                         </div>
                                     </div>
@@ -731,12 +731,12 @@ export default function SettingsPage() {
                         {userRole === "OWNER" && (
                             <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
-                                    <Lock size={24} /> Security Settings
+                                    <Lock size={24} /> {t.settings.security.title}
                                 </h3>
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">Enforce Email Verification</p>
-                                        <p className="text-sm text-gray-500">Require users to verify their email before logging in.</p>
+                                        <p className="font-medium text-gray-900">{t.settings.security.emailVerify}</p>
+                                        <p className="text-sm text-gray-500">{t.settings.security.emailVerifyDesc}</p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
@@ -767,12 +767,12 @@ export default function SettingsPage() {
                             {saving ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
-                                    Saving...
+                                    {t.settings.saving}
                                 </>
                             ) : (
                                 <>
                                     <Save size={20} />
-                                    Save All Settings
+                                    {t.settings.save}
                                 </>
                             )}
                         </button>

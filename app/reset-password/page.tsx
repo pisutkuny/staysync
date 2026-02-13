@@ -4,8 +4,10 @@ import { useState, Suspense } from "react";
 import { Loader2, Lock, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function ResetPasswordForm() {
+    const { t } = useLanguage();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const router = useRouter();
@@ -21,12 +23,12 @@ function ResetPasswordForm() {
         setError("");
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            setError(t.auth.passwordsDoNotMatch);
             return;
         }
 
         if (password.length < 6) {
-            setError("Password must be at least 6 characters");
+            setError(t.auth.passwordTooShort);
             return;
         }
 
@@ -58,8 +60,8 @@ function ResetPasswordForm() {
     if (!token) {
         return (
             <div className="text-center text-red-500">
-                <p>Invalid or missing reset token.</p>
-                <Link href="/forgot-password" className="text-indigo-600 hover:underline mt-2 inline-block">Request new link</Link>
+                <p>{t.auth.invalidToken}</p>
+                <Link href="/forgot-password" className="text-indigo-600 hover:underline mt-2 inline-block">{t.auth.requestNewLink}</Link>
             </div>
         );
     }
@@ -70,11 +72,11 @@ function ResetPasswordForm() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600">
                     <CheckCircle size={32} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Password Reset!</h2>
-                <p className="text-gray-500">Your password has been successfully updated.</p>
-                <p className="text-sm text-gray-400">Redirecting to login...</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t.auth.passwordResetSuccess}</h2>
+                <p className="text-gray-500">{t.auth.passwordResetSuccessDesc}</p>
+                <p className="text-sm text-gray-400">{t.auth.redirectingLogin}</p>
                 <Link href="/login" className="text-indigo-600 font-medium hover:underline block mt-4">
-                    Go to Login
+                    {t.auth.goToLogin}
                 </Link>
             </div>
         );
@@ -83,8 +85,8 @@ function ResetPasswordForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2 text-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Reset Password</h1>
-                <p className="text-gray-500">Enter your new password below.</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t.auth.resetPasswordTitle}</h1>
+                <p className="text-gray-500">{t.auth.resetPasswordSubtitle}</p>
             </div>
 
             {error && (
@@ -94,26 +96,26 @@ function ResetPasswordForm() {
             )}
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.passwordLabel}</label>
                 <input
                     required
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Minimum 6 characters"
+                    placeholder={t.auth.passwordTooShort}
                 />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.confirmPasswordLabel}</label>
                 <input
                     required
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Confirm new password"
+                    placeholder={t.auth.confirmPasswordLabel}
                 />
             </div>
 
@@ -122,7 +124,7 @@ function ResetPasswordForm() {
                 disabled={loading}
                 className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
             >
-                {loading ? <Loader2 className="animate-spin" /> : "Reset Password"}
+                {loading ? <Loader2 className="animate-spin" /> : t.auth.resetPasswordButton}
             </button>
         </form>
     );

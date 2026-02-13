@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Billing = {
     id: number;
@@ -20,6 +21,7 @@ type Billing = {
 };
 
 export default function BillingHistory({ billings }: { billings: Billing[] }) {
+    const { t } = useLanguage();
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
     const toggle = (id: number) => {
@@ -27,7 +29,7 @@ export default function BillingHistory({ billings }: { billings: Billing[] }) {
     };
 
     if (billings.length === 0) {
-        return <p className="text-sm text-gray-400">No billing history.</p>;
+        return <p className="text-sm text-gray-400">{t.residents.noBillingHistory}</p>;
     }
 
     return (
@@ -52,24 +54,24 @@ export default function BillingHistory({ billings }: { billings: Billing[] }) {
                     {expandedId === bill.id && (
                         <div className="bg-gray-50 p-3 rounded-lg text-xs space-y-1 mt-1 text-gray-600">
                             <div className="flex justify-between">
-                                <span>Water ({bill.waterMeterCurrent - bill.waterMeterLast} units)</span>
+                                <span>{t.residents.water} ({bill.waterMeterCurrent - bill.waterMeterLast} {t.dashboard.unit})</span>
                                 <span>{((bill.waterMeterCurrent - bill.waterMeterLast) * bill.waterRate).toLocaleString()} ฿</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Electric ({bill.electricMeterCurrent - bill.electricMeterLast} units)</span>
+                                <span>{t.residents.electric} ({bill.electricMeterCurrent - bill.electricMeterLast} {t.dashboard.unit})</span>
                                 <span>{((bill.electricMeterCurrent - bill.electricMeterLast) * bill.electricRate).toLocaleString()} ฿</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Internet</span>
+                                <span>{t.residents.internet}</span>
                                 <span>{bill.internetFee.toLocaleString()} ฿</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Trash</span>
+                                <span>{t.residents.trash}</span>
                                 <span>{bill.trashFee.toLocaleString()} ฿</span>
                             </div>
                             {bill.otherFees > 0 && (
                                 <div className="flex justify-between text-gray-500">
-                                    <span>Other</span>
+                                    <span>{t.residents.other}</span>
                                     <span>{bill.otherFees.toLocaleString()} ฿</span>
                                 </div>
                             )}

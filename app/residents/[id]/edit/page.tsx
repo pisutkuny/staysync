@@ -4,6 +4,7 @@ import { useState, use, useEffect } from "react";
 import { Loader2, Save, ArrowLeft, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface Room {
     id: number;
@@ -12,6 +13,7 @@ interface Room {
 }
 
 export default function EditResidentPage({ params }: { params: Promise<{ id: string }> }) {
+    const { t } = useLanguage();
     const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 });
                 setRooms(roomsData);
             } catch (e) {
-                alert("Failed to load data");
+                alert(t.residents.loadError);
             } finally {
                 setLoading(false);
             }
@@ -74,7 +76,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             router.push(`/residents/${id}`);
             router.refresh();
         } catch (error) {
-            alert("Error updating resident");
+            alert(t.residents.updateError);
         } finally {
             setSaving(false);
         }
@@ -92,36 +94,36 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 <Link href={`/residents/${id}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <ArrowLeft size={24} className="text-gray-600" />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">Edit Resident Profile</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{t.residents.editProfile}</h1>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
 
                 {/* Room Selection */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Room (Transfer)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.roomTransfer}</label>
                     <select
                         value={formData.roomId}
                         onChange={e => setFormData({ ...formData, roomId: e.target.value })}
                         className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     >
-                        <option value="">-- No Room --</option>
+                        <option value="">{t.residents.noRoom}</option>
                         {rooms.map(room => (
                             <option key={room.id} value={room.id}>
-                                Room {room.number} ({room.status})
+                                {t.residents.room} {room.number} ({room.status})
                             </option>
                         ))}
                     </select>
                     {isRoomOccupied && (
                         <div className="flex items-start gap-2 mt-2 text-amber-600 text-xs bg-amber-50 p-2 rounded-lg">
                             <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                            <p>Warning: This room is marked as "Occupied". You can still move here (e.g. sharing room), but please verify first.</p>
+                            <p>{t.residents.roomOccupiedWarning}</p>
                         </div>
                     )}
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.fullName}</label>
                     <input
                         type="text"
                         value={formData.fullName}
@@ -131,7 +133,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.phone}</label>
                     <input
                         type="text"
                         value={formData.phone}
@@ -148,7 +150,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                         placeholder="U1234..."
                         className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
-                    <p className="text-xs text-gray-500 mt-1">If available, paste standard Line User ID (Uxxxxxxxx...). Leave empty to disconnect.</p>
+                    <p className="text-xs text-gray-500 mt-1">{t.residents.lineUserIdDesc}</p>
                 </div>
 
                 <div className="pt-4 border-t border-gray-100">
@@ -158,7 +160,7 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                         className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                     >
                         {saving ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                        Save Changes
+                        {t.residents.saveChanges}
                     </button>
                 </div>
             </form>

@@ -1,17 +1,38 @@
 
-import prisma from "@/lib/prisma";
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { UserPlus, UserMinus } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 import DeleteRoomButton from "./DeleteRoomButton";
 import RoomCommonAreaToggle from "./RoomCommonAreaToggle";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export const dynamic = 'force-dynamic';
+export default function RoomsPage() {
+    const { t } = useLanguage();
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-export default async function RoomsPage() {
-    const rooms = await prisma.room.findMany({
-        orderBy: { number: "asc" },
-        include: { residents: true }
-    });
+    useEffect(() => {
+        fetch("/api/rooms")
+            .then(res => res.json())
+            .then(data => {
+                setRooms(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load rooms", err);
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <Loader2 className="animate-spin text-indigo-600" size={32} />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -19,12 +40,12 @@ export default async function RoomsPage() {
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 All Rooms</h2>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base">Manage rooms and residents.</p>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 {t.rooms.allRooms}</h2>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.rooms.manageRoomsDesc}</p>
                     </div>
                     <Link href="/rooms/add">
                         <button className="bg-white text-green-700 px-4 py-2.5 rounded-lg font-bold hover:bg-green-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm">
-                            ➕ Add New Room
+                            ➕ {t.rooms.addNewRoom}
                         </button>
                     </Link>
                 </div>
@@ -49,7 +70,7 @@ export default async function RoomsPage() {
                                 </Link>
                                 <span className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-full shadow-md ${room.status === "Occupied" ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white" : "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
                                     }`}>
-                                    {room.status}
+                                    {t.status[room.status as keyof typeof t.status] || room.status}
                                 </span>
                             </div>
                         </div>
@@ -57,21 +78,21 @@ export default async function RoomsPage() {
                         <div className="mt-4">
                             {room.status === "Occupied" ? (
                                 <div>
-                                    <p className="text-sm text-gray-600 font-medium mb-2">Residents ({room.residents.filter((r: any) => r.status === 'Active').length}):</p>
+                                    <p className="text-sm text-gray-600 font-medium mb-2">{t.rooms.residents} ({room.residents?.length || 0}):</p>
                                     <div className="space-y-1">
-                                        {room.residents.filter((r: any) => r.status === 'Active').length > 0 ? (
-                                            room.residents.filter((r: any) => r.status === 'Active').map((resident: any) => (
+                                        {room.residents && room.residents.length > 0 ? (
+                                            room.residents.map((resident: any) => (
                                                 <Link key={resident.id} href={`/residents/${resident.id}`} className="block text-emerald-600 font-bold hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded-lg transition text-sm">
                                                     👤 {resident.fullName}
                                                 </Link>
                                             ))
                                         ) : (
-                                            <p className="font-medium text-gray-900">Unknown</p>
+                                            <p className="font-medium text-gray-900">{t.rooms.unknown}</p>
                                         )}
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-400 italic">Empty room</p>
+                                <p className="text-sm text-gray-400 italic">{t.rooms.emptyRoom}</p>
                             )}
                         </div>
 
@@ -81,7 +102,7 @@ export default async function RoomsPage() {
                                     <Link href={`/rooms/checkin/${room.id}`} className="w-full">
                                         <button className="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm">
                                             <UserPlus size={18} />
-                                            Check In
+                                            {t.rooms.checkIn}
                                         </button>
                                     </Link>
                                     <DeleteRoomButton roomId={room.id} />
@@ -90,7 +111,7 @@ export default async function RoomsPage() {
                                 <Link href={`/rooms/checkin/${room.id}`} className="w-full">
                                     <button className="w-full py-2 bg-gradient-to-r from-emerald-400 to-lime-500 text-white rounded-lg hover:from-emerald-500 hover:to-lime-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm">
                                         <UserPlus size={18} />
-                                        Add Resident
+                                        {t.rooms.addResident}
                                     </button>
                                 </Link>
                             )}

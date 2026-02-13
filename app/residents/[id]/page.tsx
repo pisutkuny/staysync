@@ -1,23 +1,45 @@
-import prisma from "@/lib/prisma";
+"use client";
+
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, FileText, Upload, Trash2, Download } from "lucide-react";
+import { ArrowLeft, FileText, Upload, Trash2, Download, Loader2 } from "lucide-react";
 import GenerateCodeButton from "./GenerateCodeButton";
 import BillingHistory from "./BillingHistory";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export default async function ResidentProfilePage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const residentId = Number(id);
-    const resident = await prisma.resident.findUnique({
-        where: { id: residentId },
-        include: {
-            room: true,
-            documents: true,
-            billings: { orderBy: { createdAt: 'desc' } }
-        }
-    });
+export default function ResidentProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { t } = useLanguage();
+    const { id } = use(params);
+    const [resident, setResident] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch(`/api/residents/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    setResident(null);
+                } else {
+                    setResident(data);
+                }
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load resident", err);
+                setLoading(false);
+            });
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <Loader2 className="animate-spin text-indigo-600" size={32} />
+            </div>
+        );
+    }
 
     if (!resident) {
-        return <div className="p-8">Resident not found</div>;
+        return <div className="p-8 text-center text-gray-500">{t.residents.notFound}</div>;
     }
 
     return (
@@ -38,7 +60,7 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                                 </Link>
                             </h1>
                         </div>
-                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">🏠 Room {resident.room?.number || 'N/A'} • 📞 {resident.phone}</p>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium">🏠 {t.residents.room} {resident.room?.number || 'N/A'} • 📞 {resident.phone}</p>
                     </div>
                 </div>
             </div>
@@ -52,24 +74,24 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                                 <FileText className="text-indigo-600" size={20} />
-                                Documents
+                                {t.residents.documents}
                             </h2>
                             <Link
                                 href={`/residents/${resident.id}/upload`}
                                 className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-bold hover:bg-indigo-100 transition-colors flex items-center gap-2"
                             >
                                 <Upload size={16} />
-                                Upload New
+                                {t.residents.uploadNew}
                             </Link>
                         </div>
 
-                        {resident.documents.length === 0 ? (
+                        {resident.documents && resident.documents.length === 0 ? (
                             <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                                <p className="text-gray-500 text-sm">No documents uploaded (Contracts, ID Cards, etc.)</p>
+                                <p className="text-gray-500 text-sm">{t.residents.noDocuments}</p>
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                {resident.documents.map((doc) => (
+                                {resident.documents.map((doc: any) => (
                                     <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-all">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200 shadow-sm text-red-500">
@@ -93,19 +115,19 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
 
                     {/* Verification Code Section */}
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Line Connection</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.lineConnection}</h2>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-gray-500 mb-1">Status</p>
+                                <p className="text-sm text-gray-500 mb-1">{t.residents.statusLabel}</p>
                                 {resident.lineUserId ? (
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
                                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                        Connected
+                                        {t.residents.connected}
                                     </span>
                                 ) : (
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
                                         <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                        Not Connected
+                                        {t.residents.notConnected}
                                     </span>
                                 )}
                             </div>
@@ -116,13 +138,13 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
 
                     {/* Management Actions */}
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Management</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.management}</h2>
                         <Link
                             href={`/residents/${resident.id}/checkout`}
                             className="w-full py-2.5 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                             <Trash2 size={18} />
-                            Check Out Resident
+                            {t.residents.checkOutResident}
                         </Link>
                     </div>
 
@@ -131,7 +153,7 @@ export default async function ResidentProfilePage({ params }: { params: Promise<
                 {/* Right Column: Billing History Summary */}
                 <div className="space-y-6">
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Billing History</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.billingHistory}</h2>
                         <BillingHistory billings={resident.billings} />
                     </div>
                 </div>

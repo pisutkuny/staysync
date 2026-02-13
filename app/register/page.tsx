@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Loader2, UserPlus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function RegisterPage() {
+    const { t } = useLanguage();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -20,7 +22,7 @@ export default function RegisterPage() {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("รหัสผ่านไม่ตรงกัน");
+            alert(t.auth.passwordsDoNotMatch);
             return;
         }
 
@@ -41,13 +43,13 @@ export default function RegisterPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || "การลงทะเบียนล้มเหลว");
+                throw new Error(data.error || "Registration failed");
             }
 
             if (data.emailSent) {
-                alert("ลงทะเบียนสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันตัวตน ก่อนเข้าสู่ระบบ");
+                alert(t.auth.verificationSent);
             } else {
-                alert("ลงทะเบียนสำเร็จ! แต่ระบบไม่สามารถส่งอีเมลยืนยันได้ในขณะนี้\nกรุณาเข้าสู่ระบบ แล้วกดปุ่ม 'ส่งอีเมลยืนยันอีกครั้ง' (Resend Verification Email)");
+                alert(t.auth.verificationFailed);
             }
             router.push("/login");
         } catch (error: any) {
@@ -64,25 +66,25 @@ export default function RegisterPage() {
                     <div className="bg-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mx-auto text-white shadow-lg mb-4">
                         <UserPlus size={24} />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">สมัครสมาชิก</h1>
-                    <p className="text-gray-500">สร้างบัญชีใหม่เพื่อเข้าใช้งาน StaySync</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t.auth.registerTitle}</h1>
+                    <p className="text-gray-500">{t.auth.registerSubtitle}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">ชื่อ-นามสกุล</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.fullNameLabel}</label>
                         <input
                             required
                             type="text"
                             value={formData.fullName}
                             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                            placeholder="สมชาย ใจดี"
+                            placeholder="Somchai Jaidee"
                             className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์ (ถ้ามี)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.phoneLabel}</label>
                         <input
                             type="tel"
                             value={formData.phone}
@@ -93,7 +95,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.emailLabel}</label>
                         <input
                             required
                             type="email"
@@ -105,25 +107,25 @@ export default function RegisterPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.passwordLabel}</label>
                         <input
                             required
                             type="password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            placeholder="อย่างน้อย 6 ตัวอักษร"
+                            placeholder={t.auth.passwordTooShort}
                             className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">ยืนยันรหัสผ่าน</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.confirmPasswordLabel}</label>
                         <input
                             required
                             type="password"
                             value={formData.confirmPassword}
                             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                            placeholder="กรอกรหัสผ่านอีกครั้ง"
+                            placeholder={t.auth.confirmPasswordLabel}
                             className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
@@ -133,15 +135,15 @@ export default function RegisterPage() {
                         disabled={loading}
                         className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 mt-6"
                     >
-                        {loading ? <Loader2 className="animate-spin" /> : "ลงทะเบียน"}
+                        {loading ? <Loader2 className="animate-spin" /> : t.auth.registerButton}
                     </button>
                 </form>
 
                 <div className="text-center pt-4 border-t border-gray-100">
                     <p className="text-sm text-gray-500">
-                        มีบัญชีอยู่แล้ว?{" "}
+                        {t.auth.hasAccount}{" "}
                         <Link href="/login" className="text-indigo-600 font-semibold hover:underline">
-                            เข้าสู่ระบบ
+                            {t.auth.loginLink}
                         </Link>
                     </p>
                 </div>

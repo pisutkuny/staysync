@@ -4,8 +4,10 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2, Plus, X, Image as ImageIcon } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function EditRoomPage({ params }: { params: Promise<{ id: string }> }) {
+    const { t } = useLanguage();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -39,7 +41,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         const fetchRoom = async () => {
             try {
                 const res = await fetch(`/api/rooms/${roomId}`);
-                if (!res.ok) throw new Error("Room not found");
+                if (!res.ok) throw new Error(t.rooms.loadError);
                 const data = await res.json();
 
                 setFormData({
@@ -54,7 +56,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                 });
             } catch (error) {
                 console.error(error);
-                alert("Failed to load room data");
+                alert(t.rooms.loadError);
                 router.push("/rooms");
             } finally {
                 setLoading(false);
@@ -137,11 +139,11 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
 
             if (!res.ok) throw new Error("Failed to update");
 
-            alert("Room updated successfully!");
+            alert(t.rooms.updateSuccess);
             router.push("/rooms");
             router.refresh();
         } catch (error) {
-            alert("Error updating room");
+            alert(t.rooms.updateError);
         } finally {
             setSaving(false);
         }
@@ -162,18 +164,18 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     <ArrowLeft size={20} className="text-gray-500" />
                 </Link>
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-gray-900">Edit Room {formData.number}</h2>
-                    <p className="text-gray-500">Update room details, features, and photos.</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t.rooms.editRoom} {formData.number}</h2>
+                    <p className="text-gray-500">{t.rooms.editRoomDesc}</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Basic Information</h3>
+                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2">{t.rooms.basicInfo}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.roomNumber}</label>
                             <input
                                 required
                                 type="text"
@@ -183,7 +185,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (THB)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.priceThb}</label>
                             <input
                                 required
                                 type="number"
@@ -193,19 +195,19 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.statusLabel}</label>
                             <select
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
                                 className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
                             >
-                                <option value="Available">Available</option>
-                                <option value="Occupied">Occupied</option>
-                                <option value="Maintenance">Maintenance</option>
+                                <option value="Available">{t.status.Available}</option>
+                                <option value="Occupied">{t.status.Occupied}</option>
+                                <option value="Maintenance">{t.status.Maintenance}</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Common Area Charge</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.commonAreaCharge}</label>
                             <div className="flex items-center gap-2 mt-2">
                                 <input
                                     type="checkbox"
@@ -213,7 +215,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                                     onChange={e => setFormData({ ...formData, chargeCommonArea: e.target.checked })}
                                     className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
                                 />
-                                <span className="text-gray-600 text-sm">Enable Common Area Fee</span>
+                                <span className="text-gray-600 text-sm">{t.rooms.enableCommonAreaFee}</span>
                             </div>
                         </div>
                     </div>
@@ -221,10 +223,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
 
                 {/* Details & Features */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Details & Features</h3>
+                    <h3 className="text-lg font-bold text-gray-800 border-b pb-2">{t.rooms.detailsFeatures}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Floor</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.floor}</label>
                             <input
                                 type="number"
                                 value={formData.floor}
@@ -234,7 +236,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Size (sqm)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.rooms.sizeSqm}</label>
                             <input
                                 type="number"
                                 step="0.1"
@@ -247,13 +249,13 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.rooms.features}</label>
                         <div className="flex gap-2 mb-2">
                             <input
                                 type="text"
                                 value={newFeature}
                                 onChange={e => setNewFeature(e.target.value)}
-                                placeholder="Add feature (e.g. Air Con, WiFi)"
+                                placeholder={t.rooms.addFeaturePlaceholder}
                                 className="flex-1 rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
                                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddFeature())}
                             />
@@ -282,17 +284,17 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                     <h3 className="text-lg font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
                         <ImageIcon size={20} className="text-indigo-600" />
-                        Room Photos
+                        {t.rooms.roomPhotos}
                     </h3>
 
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-gray-700">Add Image from Google Drive</label>
+                        <label className="block text-sm font-medium text-gray-700">{t.rooms.addImageDrive}</label>
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={newImageLink}
                                 onChange={e => setNewImageLink(e.target.value)}
-                                placeholder="Paste Google Drive Link here..."
+                                placeholder={t.rooms.pasteDriveLink}
                                 className="flex-1 rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                             <button
@@ -300,10 +302,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                                 onClick={handleAddImage}
                                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 font-medium"
                             >
-                                Add Photo
+                                {t.rooms.addPhoto}
                             </button>
                         </div>
-                        <p className="text-xs text-gray-500">Supports standard Google Drive sharing links. System will automatically convert them to viewable images.</p>
+                        <p className="text-xs text-gray-500">{t.rooms.driveLinkDesc}</p>
                     </div>
 
                     {/* Image Grid */}
@@ -326,7 +328,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                         ))}
                         {formData.images.length === 0 && (
                             <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg">
-                                No photos added yet
+                                {t.rooms.noPhotos}
                             </div>
                         )}
                     </div>
@@ -338,7 +340,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                         onClick={() => router.back()}
                         className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors"
                     >
-                        Cancel
+                        {t.rooms.cancel}
                     </button>
                     <button
                         type="submit"
@@ -346,7 +348,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                         className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg flex items-center justify-center gap-2"
                     >
                         {saving ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                        Save Changes
+                        {t.rooms.saveChanges}
                     </button>
                 </div>
             </form>

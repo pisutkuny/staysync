@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Save, Copy, Loader2, FileText, Check } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type RoomData = {
     id: number;
@@ -21,6 +22,7 @@ type Rates = {
 };
 
 export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomData[]; initialRates: Rates }) {
+    const { t } = useLanguage();
     const [readings, setReadings] = useState<Record<number, { wCurr: string; eCurr: string }>>({});
     const [rates, setRates] = useState<Rates>(initialRates);
     const [loading, setLoading] = useState(false);
@@ -51,7 +53,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
     };
 
     const handleSubmit = async () => {
-        if (!confirm("Confirm create bills for recorded rooms?")) return;
+        if (!confirm(t.bulkBilling.confirmCreate)) return;
         setLoading(true);
 
         const billsToCreate = rooms
@@ -74,12 +76,12 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 })
             });
             if (res.ok) {
-                alert("Bills created successfully!");
+                alert(t.bulkBilling.success);
                 setSubmitted(billsToCreate.map(b => b.roomId));
             }
         } catch (e) {
             console.error(e);
-            alert("Failed to create bills");
+            alert(t.bulkBilling.error);
         } finally {
             setLoading(false);
         }
@@ -89,8 +91,8 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
         <div className="space-y-6 pb-10">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-lg md:text-2xl font-bold text-gray-900">End of Month Recording</h2>
-                    <p className="text-gray-500">Global rates will be applied to all bills created here.</p>
+                    <h2 className="text-lg md:text-2xl font-bold text-gray-900">{t.bulkBilling.title}</h2>
+                    <p className="text-gray-500">{t.bulkBilling.subtitle}</p>
                 </div>
                 <button
                     onClick={handleSubmit}
@@ -98,16 +100,17 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                     className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-sm"
                 >
                     {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                    Save & Send Bills
+                    {t.bulkBilling.saveAndSend}
                 </button>
             </div>
 
             {/* Rate Settings */}
             {/* Rate Settings */}
+            {/* Rate Settings */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">💧 Water Rate</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase">💧 {t.bulkBilling.waterRate}</span>
                         <input
                             type="number"
                             value={rates.water}
@@ -116,7 +119,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">⚡ Electric Rate</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase">⚡ {t.bulkBilling.elecRate}</span>
                         <input
                             type="number"
                             value={rates.electric}
@@ -125,7 +128,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">🗑️ Trash</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase">🗑️ {t.bulkBilling.trash}</span>
                         <input
                             type="number"
                             value={rates.trash}
@@ -134,7 +137,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">🌐 Internet</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase">🌐 {t.bulkBilling.internet}</span>
                         <input
                             type="number"
                             value={rates.internet}
@@ -143,7 +146,7 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">➕ Other</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase">➕ {t.bulkBilling.other}</span>
                         <input
                             type="number"
                             value={rates.other}
@@ -166,16 +169,16 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                         <div key={room.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-4">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h4 className="font-bold text-gray-900 text-lg">Room {room.number}</h4>
+                                    <h4 className="font-bold text-gray-900 text-lg">{t.billing.room} {room.number}</h4>
                                     <p className="text-gray-500 text-sm">{room.residentName}</p>
                                 </div>
                                 {isDone ? (
                                     <span className="flex items-center gap-1 text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-lg border border-green-100">
-                                        <Check size={14} /> Sent
+                                        <Check size={14} /> {t.bulkBilling.sent}
                                     </span>
                                 ) : (
                                     <div className="text-right">
-                                        <span className="text-xs text-gray-400">Total</span>
+                                        <span className="text-xs text-gray-400">{t.bulkBilling.previewTotal}</span>
                                         <p className="font-bold text-gray-900">{total > room.roomPrice ? `฿${total.toLocaleString()}` : '-'}</p>
                                     </div>
                                 )}
@@ -217,14 +220,14 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-100 text-gray-700 font-bold">
                         <tr>
-                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Room</th>
-                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Resident</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-50 text-blue-800 whitespace-nowrap">Water (Old)</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-100 text-blue-800 border-l border-blue-200 whitespace-nowrap">Water (New)</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-50 text-yellow-800 whitespace-nowrap">Elec (Old)</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-100 text-yellow-800 border-l border-yellow-200 whitespace-nowrap">Elec (New)</th>
-                            <th className="px-3 py-3 sm:p-4 text-right whitespace-nowrap">Preview Total</th>
-                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">Status</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.room}</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.resident}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-50 text-blue-800 whitespace-nowrap">{t.billing.waterPrev}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-100 text-blue-800 border-l border-blue-200 whitespace-nowrap">{t.bulkBilling.waterNew}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-50 text-yellow-800 whitespace-nowrap">{t.billing.elecPrev}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-100 text-yellow-800 border-l border-yellow-200 whitespace-nowrap">{t.bulkBilling.elecNew}</th>
+                            <th className="px-3 py-3 sm:p-4 text-right whitespace-nowrap">{t.bulkBilling.previewTotal}</th>
+                            <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.status}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -273,10 +276,10 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
                                     <td className="px-3 py-3 sm:p-4 whitespace-nowrap">
                                         {isDone ? (
                                             <span className="flex items-center gap-1 text-green-600 font-bold text-xs">
-                                                <Check size={14} /> Sent
+                                                <Check size={14} /> {t.bulkBilling.sent}
                                             </span>
                                         ) : (
-                                            <span className="text-gray-400 text-xs font-medium">Pending</span>
+                                            <span className="text-gray-400 text-xs font-medium">{t.bulkBilling.pending}</span>
                                         )}
                                     </td>
                                 </tr>

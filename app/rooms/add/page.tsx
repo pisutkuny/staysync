@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function AddRoomPage() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -29,11 +31,11 @@ export default function AddRoomPage() {
 
             if (!res.ok) throw new Error("Failed");
 
-            alert("Room added successfully!");
+            alert(t.rooms.addSuccess);
             router.push("/dashboard"); // Redirect back to dashboard
             router.refresh(); // Refresh data
         } catch (error) {
-            alert("Error adding room.");
+            alert(t.rooms.addError);
         } finally {
             setLoading(false);
         }
@@ -46,15 +48,15 @@ export default function AddRoomPage() {
                     <ArrowLeft size={20} className="text-gray-500" />
                 </Link>
                 <div>
-                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">Add New Room</h2>
-                    <p className="text-gray-500 mt-2">Create a new room in the dormitory.</p>
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-gray-900">{t.rooms.addNewRoom}</h2>
+                    <p className="text-gray-500 mt-2">{t.rooms.createRoomDesc}</p>
                 </div>
             </div>
 
             <div className="max-w-md bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Room Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.rooms.roomNumber}</label>
                         <input
                             required
                             type="text"
@@ -66,7 +68,7 @@ export default function AddRoomPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Price (THB/Month)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.rooms.priceThbMonth}</label>
                         <input
                             required
                             type="number"
@@ -83,7 +85,7 @@ export default function AddRoomPage() {
                         className="w-full mt-4 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                        Save Room
+                        {t.rooms.saveRoom}
                     </button>
                 </form>
             </div>

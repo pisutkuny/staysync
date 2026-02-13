@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function LoginPage() {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -39,27 +41,26 @@ export default function LoginPage() {
             }
 
             if (!res.ok) {
-                const errorMessage = data.error || "Invalid credentials";
+                const errorMessage = data.error || t.auth.invalidCredentials;
                 if (errorMessage === 'Please verify your email address') {
                     setError(
                         <div className="flex flex-col gap-2">
-                            <span>{errorMessage}</span>
+                            <span>{t.auth.pleaseVerifyEmail}</span>
                             <button
                                 type="button"
                                 onClick={() => handleResendVerification(formData.email)}
                                 className="text-sm font-medium text-indigo-600 hover:text-indigo-500 underline"
                             >
-                                Resend Verification Email
+                                {t.auth.resendVerification}
                             </button>
                         </div>
                     );
                 } else {
                     setError(errorMessage);
                 }
-                throw new Error(errorMessage); // Throw to reach catch block (optional, or just return)
+                throw new Error(errorMessage);
             }
 
-            // Force hard redirect to ensure middleware/session are picked up
             window.location.href = "/dashboard";
         } catch (error: any) {
             if (typeof error === 'string' || React.isValidElement(error)) {
@@ -81,12 +82,12 @@ export default function LoginPage() {
             });
             const data = await res.json();
             if (data.success) {
-                alert("Verification email sent! Please check your inbox.");
+                alert(t.auth.verificationSent);
             } else {
-                alert(data.error || "Failed to send email");
+                alert(data.error || t.auth.verificationFailed);
             }
         } catch (e) {
-            alert("Failed to send request");
+            alert(t.common.error);
         }
     };
 
@@ -97,8 +98,8 @@ export default function LoginPage() {
                     <div className="bg-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mx-auto text-white shadow-lg mb-4">
                         <Lock size={24} />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">StaySync Login</h1>
-                    <p className="text-gray-500">Sign in to manage dormitory</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t.auth.loginTitle}</h1>
+                    <p className="text-gray-500">{t.auth.loginSubtitle}</p>
                 </div>
 
                 {error && (
@@ -111,7 +112,7 @@ export default function LoginPage() {
                     {!show2FA ? (
                         <>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.emailLabel}</label>
                                 <input
                                     required
                                     type="email"
@@ -124,9 +125,9 @@ export default function LoginPage() {
 
                             <div>
                                 <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-sm font-medium text-gray-700">Password</label>
+                                    <label className="block text-sm font-medium text-gray-700">{t.auth.passwordLabel}</label>
                                     <Link href="/forgot-password" className="text-xs text-indigo-600 hover:underline">
-                                        Forgot Password?
+                                        {t.auth.forgotPasswordTitle}
                                     </Link>
                                 </div>
                                 <input
@@ -134,7 +135,7 @@ export default function LoginPage() {
                                     type="password"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    placeholder="Enter password"
+                                    placeholder={t.common.loading ? "Enter password" : ""}
                                     className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
@@ -142,10 +143,10 @@ export default function LoginPage() {
                     ) : (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                             <div className="bg-indigo-50 p-4 rounded-lg mb-4 text-center">
-                                <p className="text-indigo-800 font-medium">Two-Factor Authentication Required</p>
-                                <p className="text-indigo-600 text-sm">Please enter the code from your app.</p>
+                                <p className="text-indigo-800 font-medium">{t.auth.twoFactorRequired}</p>
+                                <p className="text-indigo-600 text-sm">{t.auth.enterTwoFactorCode}</p>
                             </div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">2FA Code</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.auth.twoFactorCode}</label>
                             <input
                                 required
                                 type="text"
@@ -163,7 +164,7 @@ export default function LoginPage() {
                         disabled={loading}
                         className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                     >
-                        {loading ? <Loader2 className="animate-spin" /> : (show2FA ? "Verify & Login" : "Sign In")}
+                        {loading ? <Loader2 className="animate-spin" /> : (show2FA ? t.auth.verifyAndLogin : t.auth.signInButton)}
                     </button>
 
                     {show2FA && (
@@ -172,16 +173,16 @@ export default function LoginPage() {
                             onClick={() => setShow2FA(false)}
                             className="w-full text-sm text-gray-500 hover:text-gray-700"
                         >
-                            Back to Login
+                            {t.auth.backToLogin}
                         </button>
                     )}
                 </form>
 
                 <div className="text-center pt-4 border-t border-gray-100">
                     <p className="text-sm text-gray-500">
-                        ยังไม่มีบัญชี?{" "}
+                        {t.auth.noAccount}{" "}
                         <Link href="/register" className="text-indigo-600 font-semibold hover:underline">
-                            สมัครสมาชิก
+                            {t.auth.registerLink}
                         </Link>
                     </p>
                 </div>

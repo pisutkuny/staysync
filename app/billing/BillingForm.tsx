@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Send, Save, CreditCard, Receipt } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Room = {
     id: number;
@@ -19,6 +20,7 @@ type Rates = {
 };
 
 export default function BillingForm({ rooms, initialRates, config, totalRoomCount }: { rooms: Room[]; initialRates: Rates; config?: any; totalRoomCount?: number }) {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState<number | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<number | null>(null);
 
@@ -100,7 +102,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                     <div className="p-6 cursor-pointer" onClick={() => handleSelectRoom(room.id)}>
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Room {room.number}</h3>
+                                <h3 className="text-xl font-bold text-gray-900">{t.billing.room} {room.number}</h3>
                                 <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "No Resident"}</p>
                             </div>
                             <div className="text-right">
@@ -116,7 +118,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                         <form onSubmit={(e) => handleSubmit(e, room.id)} className="p-6 pt-0 border-t border-gray-100">
                             <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Water Previous</label>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">{t.billing.waterPrev}</label>
                                     <input
                                         type="number"
                                         className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
@@ -125,7 +127,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-blue-500 uppercase mb-1">Water Current</label>
+                                    <label className="block text-xs font-bold text-blue-500 uppercase mb-1">{t.billing.waterCurr}</label>
                                     <input
                                         type="number"
                                         required
@@ -139,7 +141,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                             <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Elec Previous</label>
+                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">{t.billing.elecPrev}</label>
                                     <input
                                         type="number"
                                         className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
@@ -148,7 +150,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">Elec Current</label>
+                                    <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">{t.billing.elecCurr}</label>
                                     <input
                                         type="number"
                                         required
@@ -161,7 +163,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                             <div className="grid grid-cols-3 gap-2 mt-4">
                                 <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Trash</label>
+                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.trash}</label>
                                     <input
                                         type="number"
                                         className="w-full border border-gray-200 rounded-lg p-2 text-sm"
@@ -170,7 +172,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Internet</label>
+                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.internet}</label>
                                     <input
                                         type="number"
                                         className="w-full border border-gray-200 rounded-lg p-2 text-sm"
@@ -179,7 +181,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Other</label>
+                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.other}</label>
                                     <input
                                         type="number"
                                         className="w-full border border-gray-200 rounded-lg p-2 text-sm"
@@ -191,17 +193,17 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                             {/* Common Area Fee Input */}
                             <div className="mt-2">
-                                <label className="block text-xs text-purple-600 mb-1 font-medium">Common Area (ค่าส่วนกลาง)</label>
+                                <label className="block text-xs text-purple-600 mb-1 font-medium">{t.billing.commonFee}</label>
                                 <input
                                     type="number"
                                     className="w-full border border-purple-200 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all font-medium text-purple-700"
                                     value={formData.commonFee}
                                     onChange={(e) => setFormData({ ...formData, commonFee: e.target.value })}
-                                    placeholder={config?.enableCommonAreaCharges ? "Auto-calculated" : "Manual input"}
+                                    placeholder={config?.enableCommonAreaCharges ? t.billing.autoCalc : t.billing.manual}
                                 />
                                 {config?.enableCommonAreaCharges && config?.commonAreaCapType === 'fixed' && (
                                     <p className="text-[10px] text-purple-400 mt-1">
-                                        Fixed Cap: ฿{config.commonAreaCapFixed} / {totalRoomCount} rooms
+                                        {t.billing.fixedCap.replace("{amount}", String(config.commonAreaCapFixed)).replace("{rooms}", String(totalRoomCount || 0))}
                                     </p>
                                 )}
                             </div>
@@ -212,7 +214,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                 className="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {loading === room.id ? <Loader2 className="animate-spin" size={18} /> : <Receipt size={18} />}
-                                Calculate & Send Bill
+                                {t.billing.calcAndSend}
                             </button>
                         </form>
                     )}

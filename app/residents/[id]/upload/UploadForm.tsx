@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, Upload, File, ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface UploadFormProps {
     residentId: number;
@@ -12,6 +13,7 @@ interface UploadFormProps {
 }
 
 export default function UploadForm({ residentId, roomFolder, profileFolder }: UploadFormProps) {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [docType, setDocType] = useState("Contract");
@@ -36,7 +38,7 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
                 const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
 
                 if (!scriptUrl) {
-                    reject(new Error("Missing Script URL config"));
+                    reject(new Error(t.residents.missingConfig));
                     return;
                 }
 
@@ -138,13 +140,13 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
 
             if (!res.ok) throw new Error("Failed to save record to database");
 
-            alert("Document saved successfully!");
+            alert(t.residents.saveSuccess);
             router.push(`/residents/${residentId}`);
             router.refresh();
 
         } catch (error: any) {
             console.error("Upload Logic Error:", error);
-            alert("Error: " + error.message);
+            alert(`${t.residents.uploadError}: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -155,16 +157,16 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
 
             {/* Type Selection */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Document Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.docType}</label>
                 <select
                     value={docType}
                     onChange={(e) => setDocType(e.target.value)}
                     className="w-full rounded-lg border border-gray-300 p-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                    <option value="Contract">Contract (สัญญาเช่า)</option>
-                    <option value="ID Card">ID Card (สำเนาบัตรประชาชน)</option>
-                    <option value="House Registration">House Registration (ทะเบียนบ้าน)</option>
-                    <option value="Other">Other (อื่นๆ)</option>
+                    <option value="Contract">{t.residents.docContract}</option>
+                    <option value="ID Card">{t.residents.docIDCard}</option>
+                    <option value="House Registration">{t.residents.docHouseReg}</option>
+                    <option value="Other">{t.residents.docOther}</option>
                 </select>
             </div>
 
@@ -175,21 +177,21 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
                     onClick={() => setUploadMode('file')}
                     className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${uploadMode === 'file' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    Upload File
+                    {t.residents.modeFile}
                 </button>
                 <button
                     type="button"
                     onClick={() => setUploadMode('link')}
                     className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${uploadMode === 'link' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    External Link
+                    {t.residents.modeLink}
                 </button>
             </div>
 
             {/* Inputs based on Mode */}
             {uploadMode === 'file' ? (
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">File (PDF or Image)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.fileLabel}</label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 transition-colors relative cursor-pointer">
                         <input
                             type="file"
@@ -205,24 +207,24 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
                         ) : (
                             <>
                                 <Upload size={32} className="mb-2" />
-                                <span className="text-sm">Click to choose file</span>
+                                <span className="text-sm">{t.residents.clickToChoose}</span>
                             </>
                         )}
                     </div>
-                    <p className="text-xs text-gray-400 mt-2 text-center">Stores in database (Max 5MB)</p>
+                    <p className="text-xs text-gray-400 mt-2 text-center">{t.residents.storageNotice}</p>
                 </div>
             ) : (
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Google Drive / External Link</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.linkUrl}</label>
                     <input
                         type="url"
                         required={uploadMode === 'link'}
                         value={externalLink}
                         onChange={(e) => setExternalLink(e.target.value)}
-                        placeholder="https://drive.google.com/file/d/..."
+                        placeholder={t.residents.linkPlaceholder}
                         className="w-full rounded-lg border border-gray-300 p-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    <p className="text-xs text-gray-500 mt-2">Paste the shareable link of your document here.</p>
+                    <p className="text-xs text-gray-500 mt-2">{t.residents.linkDesc}</p>
                 </div>
             )}
 
@@ -231,7 +233,7 @@ export default function UploadForm({ residentId, roomFolder, profileFolder }: Up
                 disabled={loading || (uploadMode === 'file' && !selectedFile) || (uploadMode === 'link' && !externalLink)}
                 className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
-                {loading ? <Loader2 className="animate-spin" /> : (uploadMode === 'file' ? "Upload & Save" : "Save Link")}
+                {loading ? <Loader2 className="animate-spin" /> : (uploadMode === 'file' ? t.residents.uploadAndSave : t.residents.saveLink)}
             </button>
         </form>
     );

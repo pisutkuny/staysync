@@ -1,23 +1,30 @@
-import prisma from "@/lib/prisma";
-import { ArrowLeft } from "lucide-react";
+"use client";
+
+import { useState, useEffect, use } from "react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import UploadForm from "./UploadForm";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export default async function UploadDocumentPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const residentId = Number(id);
+export default function UploadDocumentPage({ params }: { params: Promise<{ id: string }> }) {
+    const { t } = useLanguage();
+    const { id } = use(params);
+    const [resident, setResident] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Fetch Resident & Room Info for Folder Naming
-    const resident = await prisma.resident.findUnique({
-        where: { id: residentId },
-        include: { room: true }
-    });
+    useEffect(() => {
+        fetch(`/api/residents/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setResident(data.error ? null : data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, [id]);
 
-    if (!resident) {
-        return <div>Resident not found</div>;
-    }
+    if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (!resident) return <div className="p-8">{t.residents.notFound}</div>;
 
-    // Determine Folder Structure: "Room X" -> "[Name]"
     const roomNumber = resident.room ? resident.room.number : "Unknown Room";
     const roomFolder = `Room ${roomNumber}`;
     const profileFolder = resident.fullName;
@@ -25,15 +32,14 @@ export default async function UploadDocumentPage({ params }: { params: Promise<{
     return (
         <div className="max-w-md mx-auto space-y-6">
             <div className="flex items-center gap-4 mb-8">
-                <Link href={`/residents/${residentId}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <Link href={`/residents/${id}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <ArrowLeft size={24} className="text-gray-600" />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">Upload Document</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{t.residents.uploadDocument}</h1>
             </div>
 
-            {/* Render Client Form with Server Data */}
             <UploadForm
-                residentId={residentId}
+                residentId={resident.id}
                 roomFolder={roomFolder}
                 profileFolder={profileFolder}
             />

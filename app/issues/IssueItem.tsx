@@ -3,13 +3,15 @@
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function IssueItem({ issue }: { issue: any }) {
+    const { t } = useLanguage();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     const handleMarkDone = async () => {
-        if (!confirm("Confirm marking this issue as resolved?")) return;
+        if (!confirm(t.issues.confirmMarkDone)) return;
         setLoading(true);
 
         try {
@@ -49,7 +51,7 @@ export default function IssueItem({ issue }: { issue: any }) {
                     </div>
                 )}
                 <p className="text-sm text-gray-600">
-                    Reported by <span className="font-medium text-indigo-600">{issue.resident?.fullName}</span> (Room {issue.resident?.room?.number || "N/A"})
+                    {t.issues.reportedBy} <span className="font-medium text-indigo-600">{issue.resident?.fullName}</span> ({t.issues.room} {issue.resident?.room?.number || "N/A"})
                 </p>
             </div>
 
@@ -57,7 +59,7 @@ export default function IssueItem({ issue }: { issue: any }) {
                 {issue.status === "Done" ? (
                     <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold border border-green-200">
                         <CheckCircle2 size={18} />
-                        Resolved
+                        {t.issues.resolved}
                     </span>
                 ) : (
                     <button
@@ -66,7 +68,7 @@ export default function IssueItem({ issue }: { issue: any }) {
                         className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50"
                     >
                         {loading ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
-                        Mark Done
+                        {t.issues.markDone}
                     </button>
                 )}
             </div>
