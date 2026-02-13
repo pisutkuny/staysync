@@ -157,7 +157,8 @@ export default function CentralMeterPage() {
                             value={formData.month}
                             onChange={e => setFormData({ ...formData, month: e.target.value })}
                             required
-                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none"
+                            style={{ colorScheme: 'light' }}
                         />
                     </div>
 
@@ -165,7 +166,7 @@ export default function CentralMeterPage() {
                     <div className="border-t border-gray-100 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">💧 {t.centralMeter.waterTitle}</h3>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     {t.centralMeter.prev} {records.length === 0 && "*"}
@@ -199,7 +200,7 @@ export default function CentralMeterPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.usage}</label>
                                 <input
@@ -250,7 +251,7 @@ export default function CentralMeterPage() {
                     <div className="border-t border-gray-100 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">⚡ {t.centralMeter.elecTitle}</h3>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     {t.centralMeter.prev} {records.length === 0 && "*"}
@@ -284,7 +285,7 @@ export default function CentralMeterPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.usage}</label>
                                 <input
@@ -323,7 +324,7 @@ export default function CentralMeterPage() {
                     <div className="border-t border-gray-100 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">💰 {t.centralMeter.fixedCost}</h3>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">📡 {t.centralMeter.internet}</label>
                                 <input
