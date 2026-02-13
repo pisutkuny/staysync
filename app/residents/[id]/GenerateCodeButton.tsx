@@ -20,6 +20,7 @@ export default function GenerateCodeButton({ residentId, initialCode }: { reside
             const data = await res.json();
             if (data.success) {
                 setCode(data.code);
+                showAlert(t.common.success, "Verification code generated!", "success");
                 router.refresh();
             }
         } catch (error) {

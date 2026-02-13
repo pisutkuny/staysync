@@ -78,8 +78,10 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
             });
             if (!res.ok) throw new Error("Failed");
 
-            router.push(`/residents/${id}`);
-            router.refresh();
+            showAlert(t.common.success, t.residents.updateSuccess || "Resident updated successfully!", "success", () => {
+                router.push(`/residents/${id}`);
+                router.refresh();
+            });
         } catch (error) {
             showAlert(t.common.error, t.residents.updateError, "error");
         } finally {
