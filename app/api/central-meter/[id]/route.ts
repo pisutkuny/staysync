@@ -33,6 +33,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         const {
             waterMeterCurrent,
             waterRateFromUtility,
+            waterMeterMaintenanceFee,
             electricMeterCurrent,
             electricRateFromUtility,
             note
@@ -49,7 +50,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
         // Recalculate usage and costs
         const waterUsage = waterMeterCurrent - currentRecord.waterMeterLast;
-        const waterTotalCost = waterUsage * waterRateFromUtility;
+        const waterMaintenanceFee = waterMeterMaintenanceFee !== undefined ? Number(waterMeterMaintenanceFee) : (currentRecord.waterMeterMaintenanceFee || 0);
+        const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
         const electricUsage = electricMeterCurrent - currentRecord.electricMeterLast;
         const electricTotalCost = electricUsage * electricRateFromUtility;
@@ -61,6 +63,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                 waterUsage,
                 waterRateFromUtility,
                 waterTotalCost,
+                waterMeterMaintenanceFee: waterMaintenanceFee,
                 electricMeterCurrent,
                 electricUsage,
                 electricRateFromUtility,

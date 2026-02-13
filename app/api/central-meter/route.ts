@@ -54,7 +54,8 @@ export async function POST(request: Request) {
 
         // Calculate usage and costs
         const waterUsage = waterMeterCurrent - waterLast;
-        const waterTotalCost = waterUsage * waterRateFromUtility;
+        const waterMaintenanceFee = Number(body.waterMeterMaintenanceFee) || 0;
+        const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
         const electricUsage = electricMeterCurrent - electricLast;
         const electricTotalCost = electricUsage * electricRateFromUtility;
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
                 waterUsage,
                 waterRateFromUtility,
                 waterTotalCost,
+                waterMeterMaintenanceFee: waterMaintenanceFee,
                 electricMeterLast: electricLast,
                 electricMeterCurrent,
                 electricUsage,

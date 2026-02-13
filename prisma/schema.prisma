@@ -396,6 +396,7 @@ model CentralMeter {
   waterUsage           Float // Auto-calculated
   waterRateFromUtility Float // Actual cost from utility bill (per unit)
   waterTotalCost       Float // Auto-calculated
+  waterMeterMaintenanceFee Float? @default(0) // New field: Fixed monthly maintenance fee
 
   // Electric
   electricMeterLast       Float

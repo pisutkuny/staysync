@@ -20,6 +20,7 @@ export default function CentralMeterPage() {
         waterMeterLast: 0,
         waterMeterCurrent: 0,
         waterRateFromUtility: 5,
+        waterMeterMaintenanceFee: 0,
         electricMeterLast: 0,
         electricMeterCurrent: 0,
         electricRateFromUtility: 5,
@@ -73,7 +74,7 @@ export default function CentralMeterPage() {
     // Auto-calculate usage and costs
     useEffect(() => {
         const waterUsage = Math.max(0, formData.waterMeterCurrent - formData.waterMeterLast);
-        const waterCost = waterUsage * formData.waterRateFromUtility;
+        const waterCost = (waterUsage * formData.waterRateFromUtility) + (formData.waterMeterMaintenanceFee || 0);
 
         const electricUsage = Math.max(0, formData.electricMeterCurrent - formData.electricMeterLast);
         const electricCost = electricUsage * formData.electricRateFromUtility;
@@ -91,6 +92,7 @@ export default function CentralMeterPage() {
         formData.waterMeterCurrent,
         formData.waterMeterLast,
         formData.waterRateFromUtility,
+        formData.waterMeterMaintenanceFee,
         formData.electricMeterCurrent,
         formData.electricMeterLast,
         formData.electricRateFromUtility,
@@ -197,7 +199,7 @@ export default function CentralMeterPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.usage}</label>
                                 <input
@@ -219,6 +221,18 @@ export default function CentralMeterPage() {
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่ารักษามาตร (฿)</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.waterMeterMaintenanceFee}
+                                    onChange={e => setFormData({ ...formData, waterMeterMaintenanceFee: parseFloat(e.target.value) || 0 })}
+                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="0"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">คงที่ต่อเดือน</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost}</label>
