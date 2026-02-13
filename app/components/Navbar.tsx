@@ -32,7 +32,7 @@ export default function Navbar({ userRole }: { userRole?: string }) {
                         <Menu size={24} />
                     </button>
 
-                    <Link href="/">
+                    <Link href={userRole ? "/dashboard" : "/"}>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent cursor-pointer">
                             StaySync
                         </h1>
