@@ -120,12 +120,12 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                         <form onSubmit={(e) => handleSubmit(e, room.id)} className="p-6 pt-0 border-t border-gray-100">
                             <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">{t.billing.waterPrev}</label>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.waterPrev} (Edit)</label>
                                     <input
                                         type="number"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
+                                        className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
                                         value={formData.waterLast}
-                                        disabled
+                                        onChange={(e) => setFormData({ ...formData, waterLast: e.target.value })}
                                     />
                                 </div>
                                 <div>
@@ -143,12 +143,12 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                             <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1">{t.billing.elecPrev}</label>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.elecPrev} (Edit)</label>
                                     <input
                                         type="number"
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm text-gray-500"
+                                        className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
                                         value={formData.electricLast}
-                                        disabled
+                                        onChange={(e) => setFormData({ ...formData, electricLast: e.target.value })}
                                     />
                                 </div>
                                 <div>
