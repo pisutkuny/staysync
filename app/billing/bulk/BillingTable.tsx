@@ -92,19 +92,22 @@ export default function BulkBillingPage({ rooms, initialRates }: { rooms: RoomDa
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-lg md:text-2xl font-bold text-gray-900">{t.bulkBilling.title}</h2>
-                    <p className="text-gray-500">{t.bulkBilling.subtitle}</p>
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">📝 {t.bulkBilling.title}</h2>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.bulkBilling.subtitle}</p>
+                    </div>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 disabled:opacity-50 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                    >
+                        {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
+                        {t.bulkBilling.saveAndSend}
+                    </button>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-sm"
-                >
-                    {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                    {t.bulkBilling.saveAndSend}
-                </button>
             </div>
 
             {/* Rate Settings */}
