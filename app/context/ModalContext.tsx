@@ -1,14 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useCallback, ReactNode } from "react";
-import Swal, { SweetAlertIcon } from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
-
-const MySwal = withReactContent(Swal);
-
-// Define AlertType to match previous usage or mapping
-export type AlertType = SweetAlertIcon;
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import AlertModal, { AlertType } from "@/app/components/AlertModal";
 
 interface ModalContextType {
     showAlert: (title: string, message: string, type?: AlertType, onAction?: () => void) => void;
@@ -18,38 +11,62 @@ interface ModalContextType {
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export function ModalProvider({ children }: { children: ReactNode }) {
-    const { t } = useLanguage();
+    const [alertState, setAlertState] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "success" as AlertType,
+        onAction: undefined as (() => void) | undefined
+    });
 
     const showAlert = useCallback((title: string, message: string, type: AlertType = "success", onAction?: () => void) => {
-        MySwal.fire({
-            title: title,
-            text: message,
-            icon: type,
-            confirmButtonText: t.common?.ok || "OK",
-            confirmButtonColor: type === 'error' ? '#EF4444' : '#4F46E5', // Red or Indigo
-        }).then(() => {
-            if (onAction) onAction();
+        setAlertState({
+            isOpen: true,
+            title,
+            message,
+            type,
+            onAction
         });
-    }, [t]);
+    }, []);
 
-    const showConfirm = useCallback((title: string, message: string, isDestructive: boolean = false) => {
-        return MySwal.fire({
+    const closeAlert = useCallback(() => {
+        setAlertState(prev => ({ ...prev, isOpen: false }));
+        if (alertState.onAction) {
+            // Execute action after closing if defined (optional, depending on UX preference)
+            // For now, we rely on the button click inside modal to trigger action
+        }
+    }, [alertState.onAction]);
+
+    // Keep SweetAlert for confirm dialogs for now, or implement a separate ConfirmModal later
+    const showConfirm = useCallback(async (title: string, message: string, isDestructive: boolean = false) => {
+        const Swal = (await import("sweetalert2")).default;
+        return Swal.fire({
             title: title,
             text: message,
             icon: isDestructive ? 'warning' : 'question',
             showCancelButton: true,
-            confirmButtonText: t.common?.confirm || "Confirm",
-            cancelButtonText: t.common?.cancel || "Cancel",
+            confirmButtonText: "Confirm",
+            cancelButtonText: "Cancel",
             confirmButtonColor: isDestructive ? '#EF4444' : '#4F46E5',
-            cancelButtonColor: '#9CA3AF',
         }).then((result) => {
             return result.isConfirmed;
         });
-    }, [t]);
+    }, []);
 
     return (
         <ModalContext.Provider value={{ showAlert, showConfirm }}>
             {children}
+            <AlertModal
+                isOpen={alertState.isOpen}
+                onClose={closeAlert}
+                title={alertState.title}
+                message={alertState.message}
+                type={alertState.type}
+                onAction={() => {
+                    closeAlert();
+                    if (alertState.onAction) alertState.onAction();
+                }}
+            />
         </ModalContext.Provider>
     );
 }
