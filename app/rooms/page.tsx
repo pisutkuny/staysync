@@ -77,26 +77,35 @@ export default function RoomsPage() {
 
                         <div className="mt-4 space-y-3">
                             {/* Contract & Meter Info */}
-                            <div className="bg-white/50 rounded-lg p-2 text-xs space-y-1.5">
-                                <div className="grid grid-cols-2 gap-2">
+                            {/* Contract & Meter Info */}
+                            <div className="bg-white/50 rounded-lg p-2 space-y-1">
+                                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                                     <div>
-                                        <p className="text-[10px] text-gray-500 font-semibold uppercase">{t.rooms.initialWater}</p>
-                                        <p className="font-mono font-bold text-gray-700">{room.waterMeterInitial}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase leading-none mb-0.5">{t.rooms.initialWater}</p>
+                                        <p className="font-mono font-bold text-sm text-gray-800 leading-none">{room.waterMeterInitial}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-gray-500 font-semibold uppercase">{t.rooms.initialElectric}</p>
-                                        <p className="font-mono font-bold text-gray-700">{room.electricMeterInitial}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase leading-none mb-0.5">{t.rooms.initialElectric}</p>
+                                        <p className="font-mono font-bold text-sm text-gray-800 leading-none">{room.electricMeterInitial}</p>
                                     </div>
                                 </div>
                                 {room.status === "Occupied" && room.residents && room.residents[0] && (
-                                    <div className="pt-1.5 border-t border-gray-200/50">
-                                        <p className="text-[10px] text-gray-500 font-semibold uppercase mb-0.5">{t.rooms.contract}</p>
-                                        <div className="flex justify-between items-center text-[11px] text-gray-700 font-medium">
-                                            <span title="Start Date">📅 {new Date(room.residents[0].contractStartDate).toLocaleDateString('th-TH')}</span>
-                                            <span className="text-gray-400">→</span>
-                                            <span title="End Date">🏁 {room.residents[0].contractEndDate ? new Date(room.residents[0].contractEndDate).toLocaleDateString('th-TH') : "N/A"}</span>
+                                    <div className="pt-2 border-t border-gray-200/60 mt-1">
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-[10px] text-gray-400 font-bold uppercase leading-none mb-1">{t.rooms.contract}</p>
+                                                <div className="text-xs text-gray-700 font-semibold leading-tight flex items-center gap-1.5">
+                                                    <span>{new Date(room.residents[0].contractStartDate).toLocaleDateString('th-TH', { day: 'numeric', month: 'numeric', year: '2-digit' })}</span>
+                                                    <span className="text-gray-300">➜</span>
+                                                    <span>{room.residents[0].contractEndDate ? new Date(room.residents[0].contractEndDate).toLocaleDateString('th-TH', { day: 'numeric', month: 'numeric', year: '2-digit' }) : "N/A"}</span>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-200">
+                                                    {room.residents[0].contractDurationMonths} {t.residents.months}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <p className="text-[10px] text-green-600 font-medium mt-0.5">⏳ {room.residents[0].contractDurationMonths} {t.residents.months}</p>
                                     </div>
                                 )}
                             </div>
