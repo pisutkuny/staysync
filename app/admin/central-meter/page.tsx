@@ -29,10 +29,8 @@ export default function CentralMeterPage() {
     });
 
     const [calculated, setCalculated] = useState({
-        waterLast: 0,
         waterUsage: 0,
         waterCost: 0,
-        electricLast: 0,
         electricUsage: 0,
         electricCost: 0,
         totalCost: 0
@@ -53,7 +51,7 @@ export default function CentralMeterPage() {
         }
     };
 
-    // Auto-calculate when month changes
+    // Auto-fill previous readings when month changes
     useEffect(() => {
         const selectedMonth = new Date(formData.month + "-01");
         const lastRecord = records.find((r) => {
@@ -68,37 +66,37 @@ export default function CentralMeterPage() {
                 waterMeterLast: lastRecord.waterMeterCurrent,
                 electricMeterLast: lastRecord.electricMeterCurrent
             }));
-            setCalculated(prev => ({
-                ...prev,
-                waterLast: lastRecord.waterMeterCurrent,
-                electricLast: lastRecord.electricMeterCurrent
-            }));
-        } else {
-            // No previous record - keep current formData values
-            setCalculated(prev => ({
-                ...prev,
-                waterLast: formData.waterMeterLast,
-                electricLast: formData.electricMeterLast
-            }));
         }
+        // If no previous record, we don't overwrite user's manual input
     }, [formData.month, records]);
 
     // Auto-calculate usage and costs
     useEffect(() => {
-        const waterUsage = Math.max(0, formData.waterMeterCurrent - calculated.waterLast);
+        const waterUsage = Math.max(0, formData.waterMeterCurrent - formData.waterMeterLast);
         const waterCost = waterUsage * formData.waterRateFromUtility;
 
-        const electricUsage = Math.max(0, formData.electricMeterCurrent - calculated.electricLast);
+        const electricUsage = Math.max(0, formData.electricMeterCurrent - formData.electricMeterLast);
         const electricCost = electricUsage * formData.electricRateFromUtility;
 
-        setCalculated(prev => ({
-            ...prev,
+        const totalCost = waterCost + electricCost + (formData.internetCost || 0) + (formData.trashCost || 0);
+
+        setCalculated({
             waterUsage,
             waterCost,
             electricUsage,
-            electricCost
-        }));
-    }, [formData.waterMeterCurrent, formData.waterRateFromUtility, formData.electricMeterCurrent, formData.electricRateFromUtility, calculated.waterLast, calculated.electricLast]);
+            electricCost,
+            totalCost
+        });
+    }, [
+        formData.waterMeterCurrent,
+        formData.waterMeterLast,
+        formData.waterRateFromUtility,
+        formData.electricMeterCurrent,
+        formData.electricMeterLast,
+        formData.electricRateFromUtility,
+        formData.internetCost,
+        formData.trashCost
+    ]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
