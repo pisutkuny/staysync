@@ -46,7 +46,10 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied 
             const res = await fetch(`/api/rooms/${roomId}/checkin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    contractStartDate: new Date().toISOString()
+                }),
             });
 
             if (!res.ok) throw new Error("Failed");
