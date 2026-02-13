@@ -61,15 +61,20 @@ export async function POST(request: Request) {
     }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const status = searchParams.get('status');
+
+        const whereClause: any = {};
+        if (status) {
+            whereClause.status = status;
+        }
+
         const rooms = await prisma.room.findMany({
+            where: whereClause,
             orderBy: { number: 'asc' },
             include: {
-                // billings: {
-                //     orderBy: { createdAt: 'desc' },
-                //     take: 1
-                // },
                 residents: {
                     where: { status: 'Active' }
                 }
