@@ -283,6 +283,7 @@ export const dictionary = {
             depositForfeited: "ยึดเงินประกัน",
             depositReturned: "คืนเงินประกัน",
             checkoutError: "เกิดข้อผิดพลาดในการย้ายออก",
+            isChild: "ผู้พักอาศัยอายุต่ำกว่า 18 ปี",
         },
         issues: {
             title: "แจ้งซ่อม / รายงานปัญหา",
@@ -967,6 +968,7 @@ export const dictionary = {
             depositForfeited: "Deposit Forfeited",
             depositReturned: "Deposit Returned",
             checkoutError: "Error processing check-out",
+            isChild: "Resident under 18",
         },
         issues: {
             title: "Report Issue",

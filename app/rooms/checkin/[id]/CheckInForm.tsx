@@ -126,7 +126,7 @@ export default function CheckInForm({ roomId, roomNumber, roomPrice, isOccupied,
                             className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
                         />
                         <label htmlFor="isChild" className="text-sm font-medium text-gray-700 select-none cursor-pointer">
-                            👶 {t.common?.residentsUnder18 || "Resident is under 18 (Child)"}
+                            👶 {t.residents?.isChild || "Resident is under 18 (Child)"}
                         </label>
                     </div>
 
