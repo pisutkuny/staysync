@@ -96,19 +96,35 @@ export default function BulkMeterPage() {
         }
     }
 
-    function updateMeter(roomId: number, field: 'waterCurrent' | 'electricCurrent', value: string) {
+    function updateMeter(roomId: number, field: 'waterCurrent' | 'electricCurrent' | 'lastWater' | 'lastElectric', value: string) {
         if (!config) return;
 
-        const numValue = value === '' ? null : parseFloat(value);
+        const numValue = value === '' ? 0 : parseFloat(value); // Default to 0 if empty for Last, null for Current?
+        // Actually for lastWater/lastElectric, 0 is a valid number, empty string might mean 0 or keep as is.
+        // Let's use 0 for safety if empty for Last values.
+        // For Current values, null is used to verify completeness.
 
         setEntries(prev => prev.map(entry => {
             if (entry.roomId !== roomId) return entry;
 
-            const updated = { ...entry, [field]: numValue };
+            const updated = { ...entry };
 
-            // Recalculate
-            updated.waterUsage = updated.waterCurrent !== null ? Math.max(0, updated.waterCurrent - entry.lastWater) : 0;
-            updated.electricUsage = updated.electricCurrent !== null ? Math.max(0, updated.electricCurrent - entry.lastElectric) : 0;
+            if (field === 'waterCurrent' || field === 'electricCurrent') {
+                updated[field] = value === '' ? null : parseFloat(value);
+            } else {
+                // For lastWater / lastElectric
+                updated[field] = parseFloat(value) || 0;
+            }
+
+            // Recalculate - use updated values
+            const wCurrent = updated.waterCurrent;
+            const wLast = updated.lastWater;
+            updated.waterUsage = wCurrent !== null ? Math.max(0, wCurrent - wLast) : 0;
+
+            const eCurrent = updated.electricCurrent;
+            const eLast = updated.lastElectric;
+            updated.electricUsage = eCurrent !== null ? Math.max(0, eCurrent - eLast) : 0;
+
             updated.waterCost = updated.waterUsage * config.waterRate;
             updated.electricCost = updated.electricUsage * config.electricRate;
             updated.totalCost = updated.rentCost + updated.waterCost + updated.electricCost + updated.trashCost + updated.internetCost + updated.otherCost;
@@ -134,7 +150,9 @@ export default function BulkMeterPage() {
                 entries: completedEntries.map(e => ({
                     roomId: e.roomId,
                     waterCurrent: e.waterCurrent!,
-                    electricCurrent: e.electricCurrent!
+                    electricCurrent: e.electricCurrent!,
+                    lastWater: e.lastWater,
+                    lastElectric: e.lastElectric
                 }))
             };
 
@@ -251,7 +269,14 @@ export default function BulkMeterPage() {
                                     <td className="p-3 font-bold text-indigo-700 dark:text-indigo-400">{entry.roomNumber}</td>
 
                                     {/* Water */}
-                                    <td className="p-3 text-right text-gray-500 dark:text-gray-400">{entry.lastWater}</td>
+                                    <td className="p-3 text-right">
+                                        <input
+                                            type="number"
+                                            value={entry.lastWater}
+                                            onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
+                                            className="w-20 text-right border-b border-gray-300 focus:border-blue-500 outline-none bg-transparent"
+                                        />
+                                    </td>
                                     <td className="p-3">
                                         <input
                                             type="number"
@@ -264,7 +289,14 @@ export default function BulkMeterPage() {
                                     <td className="p-3 text-right font-semibold text-blue-700 dark:text-blue-400">{entry.waterUsage}</td>
 
                                     {/* Electric */}
-                                    <td className="p-3 text-right text-gray-500 dark:text-gray-400">{entry.lastElectric}</td>
+                                    <td className="p-3 text-right">
+                                        <input
+                                            type="number"
+                                            value={entry.lastElectric}
+                                            onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
+                                            className="w-20 text-right border-b border-gray-300 focus:border-orange-500 outline-none bg-transparent"
+                                        />
+                                    </td>
                                     <td className="p-3">
                                         <input
                                             type="number"
@@ -311,7 +343,12 @@ export default function BulkMeterPage() {
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
                                         <div className="text-gray-500 mb-1">เก่า</div>
-                                        <div className="font-semibold">{entry.lastWater}</div>
+                                        <input
+                                            type="number"
+                                            value={entry.lastWater}
+                                            onChange={(e) => updateMeter(entry.roomId, 'lastWater', e.target.value)}
+                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                        />
                                     </div>
                                     <div>
                                         <div className="text-gray-500 mb-1">ปัจจุบัน</div>
@@ -336,7 +373,12 @@ export default function BulkMeterPage() {
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
                                         <div className="text-gray-500 mb-1">เก่า</div>
-                                        <div className="font-semibold">{entry.lastElectric}</div>
+                                        <input
+                                            type="number"
+                                            value={entry.lastElectric}
+                                            onChange={(e) => updateMeter(entry.roomId, 'lastElectric', e.target.value)}
+                                            className="w-full border rounded px-2 py-1 text-center text-sm"
+                                        />
                                     </div>
                                     <div>
                                         <div className="text-gray-500 mb-1">ปัจจุบัน</div>

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
         // Process each entry
         for (const entry of entries) {
-            const { roomId, waterCurrent, electricCurrent } = entry;
+            const { roomId, waterCurrent, electricCurrent, lastWater: manualLastWater, lastElectric: manualLastElectric } = entry;
 
             // Skip if incomplete
             if (waterCurrent === null || electricCurrent === null) {
@@ -89,10 +89,12 @@ export async function POST(req: Request) {
                     });
                 }
 
-                // Get last meter readings (use initial meters if this is the first bill)
+                // Get last meter readings
+                // Priority: 1. Manual Input (from Payload) 2. Last Billing 3. Room Initial
                 const lastBilling = room.billings[0];
-                const waterLast = lastBilling?.waterMeterCurrent ?? room.waterMeterInitial;
-                const electricLast = lastBilling?.electricMeterCurrent ?? room.electricMeterInitial;
+
+                const waterLast = manualLastWater ?? (lastBilling?.waterMeterCurrent ?? room.waterMeterInitial);
+                const electricLast = manualLastElectric ?? (lastBilling?.electricMeterCurrent ?? room.electricMeterInitial);
 
                 // Calculate usage
                 const waterUsage = waterCurrent - waterLast;
