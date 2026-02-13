@@ -109,8 +109,19 @@ export async function PUT(
             }
 
             if (Object.keys(updateData).length > 0) {
+                // Calculate End Date
+                const resident = existingRoom.residents[0];
+                const startDate = updateData.contractStartDate || resident.contractStartDate;
+                const duration = updateData.contractDurationMonths || resident.contractDurationMonths;
+
+                if (startDate && duration) {
+                    const endDate = new Date(startDate);
+                    endDate.setMonth(endDate.getMonth() + duration);
+                    updateData.contractEndDate = endDate;
+                }
+
                 await prisma.resident.update({
-                    where: { id: existingRoom.residents[0].id },
+                    where: { id: resident.id },
                     data: updateData
                 });
             }

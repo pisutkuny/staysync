@@ -107,6 +107,20 @@ export async function PATCH(
                     contractDurationMonths: body.contractDurationMonths ? Number(body.contractDurationMonths) : undefined,
                 }
             });
+
+            // Recalculate End Date if start date or duration changed
+            const updatedContractStartDate = body.contractStartDate ? new Date(body.contractStartDate) : currentResident.contractStartDate;
+            const updatedDuration = body.contractDurationMonths ? Number(body.contractDurationMonths) : currentResident.contractDurationMonths;
+
+            if (updatedContractStartDate && updatedDuration) {
+                const endDate = new Date(updatedContractStartDate);
+                endDate.setMonth(endDate.getMonth() + updatedDuration);
+
+                await prisma.resident.update({
+                    where: { id: residentId },
+                    data: { contractEndDate: endDate }
+                });
+            }
         }
 
         // Get updated resident for audit
