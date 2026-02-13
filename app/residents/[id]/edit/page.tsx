@@ -28,7 +28,9 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
         phone: "",
         lineUserId: "",
         roomId: "",
-        isChild: false
+        isChild: false,
+        contractStartDate: "",
+        contractDurationMonths: 12
     });
 
     // Fetch initial data & Rooms
@@ -51,7 +53,9 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                     phone: resident.phone || "",
                     lineUserId: resident.lineUserId || "",
                     roomId: resident.roomId?.toString() || "",
-                    isChild: resident.isChild || false
+                    isChild: resident.isChild || false,
+                    contractStartDate: resident.contractStartDate ? resident.contractStartDate.split('T')[0] : "",
+                    contractDurationMonths: resident.contractDurationMonths || 12
                 });
                 setRooms(roomsData);
             } catch (e) {
@@ -73,7 +77,9 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                 body: JSON.stringify({
                     ...formData,
                     roomId: formData.roomId ? Number(formData.roomId) : null,
-                    isChild: formData.isChild
+                    isChild: formData.isChild,
+                    contractStartDate: formData.contractStartDate,
+                    contractDurationMonths: formData.contractDurationMonths
                 }),
             });
             if (!res.ok) throw new Error("Failed");
@@ -171,6 +177,30 @@ export default function EditResidentPage({ params }: { params: Promise<{ id: str
                         className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                     <p className="text-xs text-gray-500 mt-1">{t.residents.lineUserIdDesc}</p>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100 space-y-4">
+                    <h3 className="text-sm font-bold text-gray-900 border-b pb-1">📝 {t.residents.contractInfo}</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.startDate}</label>
+                            <input
+                                type="date"
+                                value={formData.contractStartDate}
+                                onChange={e => setFormData({ ...formData, contractStartDate: e.target.value })}
+                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t.residents.duration} ({t.residents.months})</label>
+                            <input
+                                type="number"
+                                value={formData.contractDurationMonths}
+                                onChange={e => setFormData({ ...formData, contractDurationMonths: parseInt(e.target.value) || 0 })}
+                                className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="pt-4 border-t border-gray-100">

@@ -29,7 +29,8 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         defaultDeposit: 0,
         waterMeterInitial: 0,
         electricMeterInitial: 0,
-        checkInDate: ""
+        checkInDate: "",
+        updateActiveResident: false
     });
 
     const [newImageLink, setNewImageLink] = useState("");
@@ -65,7 +66,8 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     defaultDeposit: data.defaultDeposit || 0,
                     waterMeterInitial: data.waterMeterInitial || 0,
                     electricMeterInitial: data.electricMeterInitial || 0,
-                    checkInDate: data.residents && data.residents.length > 0 ? data.residents[0].checkInDate.split('T')[0] : ""
+                    checkInDate: data.residents && data.residents.length > 0 ? data.residents[0].checkInDate.split('T')[0] : "",
+                    updateActiveResident: false
                 });
             } catch (error) {
                 console.error(error);
@@ -150,7 +152,8 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                     defaultDeposit: formData.defaultDeposit,
                     waterMeterInitial: formData.waterMeterInitial,
                     electricMeterInitial: formData.electricMeterInitial,
-                    checkInDate: formData.checkInDate
+                    checkInDate: formData.checkInDate,
+                    updateActiveResident: formData.updateActiveResident
                 })
             });
 
@@ -245,6 +248,20 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
                                 onChange={e => setFormData({ ...formData, defaultContractDuration: parseInt(e.target.value) || 0 })}
                                 className="w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"
                             />
+                            {formData.status === 'Occupied' && (
+                                <div className="flex items-center gap-2 mt-2 bg-blue-50 p-2 rounded-lg border border-blue-100">
+                                    <input
+                                        type="checkbox"
+                                        id="updateActiveResident"
+                                        checked={formData.updateActiveResident || false}
+                                        onChange={e => setFormData({ ...formData, updateActiveResident: e.target.checked })}
+                                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <label htmlFor="updateActiveResident" className="text-xs text-blue-700 font-medium cursor-pointer select-none">
+                                        Update active resident's contract too?
+                                    </label>
+                                </div>
+                            )}
                         </div>
 
                         <div>

@@ -86,7 +86,10 @@ export async function PATCH(
                         fullName,
                         phone,
                         lineUserId: lineUserId || null,
-                        isChild: isChild !== undefined ? isChild : currentResident.isChild
+                        isChild: isChild !== undefined ? isChild : currentResident.isChild,
+                        // Allow updating contract details
+                        contractStartDate: body.contractStartDate ? new Date(body.contractStartDate) : undefined,
+                        contractDurationMonths: body.contractDurationMonths ? Number(body.contractDurationMonths) : undefined,
                     }
                 });
             });
@@ -98,7 +101,10 @@ export async function PATCH(
                     fullName,
                     phone,
                     lineUserId: lineUserId || null,
-                    isChild: isChild !== undefined ? isChild : currentResident.isChild
+                    isChild: isChild !== undefined ? isChild : currentResident.isChild,
+                    // Allow updating contract details
+                    contractStartDate: body.contractStartDate ? new Date(body.contractStartDate) : undefined,
+                    contractDurationMonths: body.contractDurationMonths ? Number(body.contractDurationMonths) : undefined,
                 }
             });
         }

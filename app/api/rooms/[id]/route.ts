@@ -96,14 +96,24 @@ export async function PUT(
         });
 
         // Update Resident Check-in Date if provided and room has active resident
-        if (checkInDate && existingRoom.residents.length > 0) {
-            await prisma.resident.update({
-                where: { id: existingRoom.residents[0].id },
-                data: {
-                    checkInDate: new Date(checkInDate + 'T12:00:00Z'), // Set to noon UTC to avoid timezone shifts
-                    contractStartDate: new Date(checkInDate + 'T12:00:00Z') // Sync contract start date
-                }
-            });
+        if ((checkInDate || body.updateActiveResident) && existingRoom.residents.length > 0) {
+            const updateData: any = {};
+
+            if (checkInDate) {
+                updateData.checkInDate = new Date(checkInDate + 'T12:00:00Z');
+                updateData.contractStartDate = new Date(checkInDate + 'T12:00:00Z');
+            }
+
+            if (body.updateActiveResident && defaultContractDuration) {
+                updateData.contractDurationMonths = parseInt(defaultContractDuration);
+            }
+
+            if (Object.keys(updateData).length > 0) {
+                await prisma.resident.update({
+                    where: { id: existingRoom.residents[0].id },
+                    data: updateData
+                });
+            }
         }
 
         // Log audit
