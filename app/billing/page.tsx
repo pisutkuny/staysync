@@ -23,7 +23,7 @@ export default function BillingPage() {
                     fetch("/api/rooms?status=Occupied").then(res => res.json()),
                     fetch("/api/billing").then(res => res.json()),
                     fetch("/api/rooms").then(res => res.json()),
-                    fetch("/api/settings/config").then(res => res.json())
+                    fetch("/api/settings").then(res => res.json())
                 ]);
 
                 setRooms(roomsRes);
