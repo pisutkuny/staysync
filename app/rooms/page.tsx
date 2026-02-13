@@ -80,20 +80,20 @@ export default function RoomsPage() {
                             {/* Contract & Meter Info */}
                             {/* Contract & Meter Info */}
                             {room.status === "Occupied" && (
-                                <div className="bg-white/60 rounded-xl p-3 shadow-sm border border-green-100 space-y-3">
+                                <div className="bg-white/70 rounded-xl p-2.5 shadow-sm border border-green-200 space-y-3">
                                     {/* Meter Readings */}
                                     <div>
                                         <p className="text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-1">
                                             📊 {t.rooms.initialReadings}
                                         </p>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 flex flex-col justify-between">
-                                                <p className="text-xs text-blue-600 font-bold uppercase mb-0.5">{t.rooms.initialWater}</p>
-                                                <p className="font-mono font-bold text-base text-gray-800">{room.waterMeterInitial}</p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="bg-blue-50 p-2 rounded-lg border border-blue-200 flex flex-col justify-between">
+                                                <p className="text-xs text-blue-700 font-bold uppercase mb-0.5">{t.rooms.initialWater}</p>
+                                                <p className="font-mono font-bold text-base text-gray-900">{room.waterMeterInitial}</p>
                                             </div>
-                                            <div className="bg-amber-50/50 p-2.5 rounded-lg border border-amber-100 flex flex-col justify-between">
-                                                <p className="text-xs text-amber-600 font-bold uppercase mb-0.5">{t.rooms.initialElectric}</p>
-                                                <p className="font-mono font-bold text-base text-gray-800">{room.electricMeterInitial}</p>
+                                            <div className="bg-amber-50 p-2 rounded-lg border border-amber-200 flex flex-col justify-between">
+                                                <p className="text-xs text-amber-700 font-bold uppercase mb-0.5">{t.rooms.initialElectric}</p>
+                                                <p className="font-mono font-bold text-base text-gray-900">{room.electricMeterInitial}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -105,13 +105,13 @@ export default function RoomsPage() {
                                                 📝 {t.rooms.contract}
                                             </p>
                                             <div className="flex flex-col gap-1">
-                                                <div className="flex flex-wrap items-center gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
-                                                    <span className="text-base font-medium text-gray-700 whitespace-nowrap">
+                                                <div className="flex flex-wrap items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-300">
+                                                    <span className="text-base font-bold text-gray-800 whitespace-nowrap">
                                                         {new Date(room.residents[0].contractStartDate).toLocaleDateString('th-TH', { day: 'numeric', month: '2-digit', year: '2-digit' })}
                                                         <span className="mx-2 text-gray-400">➜</span>
                                                         {room.residents[0].contractEndDate ? new Date(room.residents[0].contractEndDate).toLocaleDateString('th-TH', { day: 'numeric', month: '2-digit', year: '2-digit' }) : "N/A"}
                                                     </span>
-                                                    <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-sm whitespace-nowrap">
+                                                    <span className="bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap">
                                                         {room.residents[0].contractDurationMonths} {t.residents.months}
                                                     </span>
                                                 </div>
