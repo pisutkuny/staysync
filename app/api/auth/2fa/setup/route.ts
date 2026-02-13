@@ -24,6 +24,7 @@ export async function POST(req: Request) {
         });
         const issuerName = config?.dormName || "Dormitory Manager";
 
+        const secret = generateSecret();
         // @ts-ignore
         const otpauth = generateURI({
             issuer: issuerName,
