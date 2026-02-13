@@ -13,6 +13,14 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
 
     const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
 
+    // Date Formatters
+    const billDate = new Date(billing.createdAt);
+    const rentMonth = billDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+
+    const prevDate = new Date(billDate);
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const utilityMonth = prevDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
         : "";
@@ -53,27 +61,33 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
                     </thead>
                     <tbody className="text-gray-800">
                         <tr>
-                            <td className="py-1 text-left">ค่าเช่าห้อง</td>
+                            <td className="py-1 text-left">
+                                ค่าเช่าห้อง <span className="text-[9px] text-gray-500">({rentMonth})</span>
+                            </td>
                             <td className="py-1 text-center">-</td>
                             <td className="py-1 font-bold">{rentAmount.toLocaleString()}</td>
                         </tr>
                         <tr>
                             <td className="py-1 text-left">
-                                ค่าน้ำ <span className="text-[9px] text-gray-400">({billing.waterMeterLast}→{billing.waterMeterCurrent})</span>
+                                <div>ค่าน้ำ <span className="text-[9px] text-gray-500">({utilityMonth})</span></div>
+                                <div className="text-[9px] text-gray-400">({billing.waterMeterLast}→{billing.waterMeterCurrent})</div>
                             </td>
                             <td className="py-1 text-center">{(billing.waterMeterCurrent - billing.waterMeterLast)}</td>
                             <td className="py-1 font-bold">{waterAmount.toLocaleString()}</td>
                         </tr>
                         <tr>
                             <td className="py-1 text-left">
-                                ค่าไฟ <span className="text-[9px] text-gray-400">({billing.electricMeterLast}→{billing.electricMeterCurrent})</span>
+                                <div>ค่าไฟ <span className="text-[9px] text-gray-500">({utilityMonth})</span></div>
+                                <div className="text-[9px] text-gray-400">({billing.electricMeterLast}→{billing.electricMeterCurrent})</div>
                             </td>
                             <td className="py-1 text-center">{(billing.electricMeterCurrent - billing.electricMeterLast)}</td>
                             <td className="py-1 font-bold">{electricAmount.toLocaleString()}</td>
                         </tr>
                         {billing.trashFee > 0 && (
                             <tr>
-                                <td className="py-1 text-left">ค่าขยะ</td>
+                                <td className="py-1 text-left">
+                                    ค่าขยะ <span className="text-[9px] text-gray-500">({utilityMonth})</span>
+                                </td>
                                 <td className="py-1 text-center">-</td>
                                 <td className="py-1 font-bold">{billing.trashFee.toLocaleString()}</td>
                             </tr>

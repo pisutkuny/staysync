@@ -76,7 +76,7 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                         <tbody className="text-xs font-medium text-gray-700">
                             <tr>
                                 <td className="py-3">
-                                    ค่าเช่าห้อง ({billing.room.number})
+                                    ค่าเช่าห้อง {billing.room.number}
                                     <span className="ml-1 text-[10px] text-gray-500">({rentMonth})</span>
                                 </td>
                                 <td className="py-3 text-right">{rentAmount.toLocaleString()}</td>
