@@ -173,12 +173,13 @@ export default function ReportsPage() {
                             const expensePercent = Math.min(((data.expenses?.total || 0) / maxVal) * 100, 100);
 
                             return (
+                            return (
                                 <div className="space-y-8 print:space-y-2">
                                     {/* Income Power Bar */}
                                     <div className="relative">
                                         <div className="flex justify-between text-sm md:text-base font-bold mb-2">
                                             <span className="flex items-center gap-2 text-emerald-700">
-                                                <div className="w-3 h-3 rounded-full bg-emerald-500 print:hidden"></div>
+                                                <div className="w-3 h-3 rounded-full bg-emerald-500 print:bg-emerald-500 print-force-color"></div>
                                                 รายรับ (Income)
                                             </span>
                                             <span className="text-emerald-700">฿{data.income?.total?.toLocaleString()}</span>
@@ -189,7 +190,7 @@ export default function ReportsPage() {
 
                                             <div
                                                 style={{ width: `${incomePercent}%` }}
-                                                className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 rounded-full shadow-lg print:bg-green-600 print:shadow-none transition-all duration-1000 ease-out flex items-center relative"
+                                                className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 rounded-full shadow-lg print:bg-green-600 print-force-bg-green transition-all duration-1000 ease-out flex items-center relative"
                                             >
                                                 {/* Glossy Effect */}
                                                 <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
@@ -207,7 +208,7 @@ export default function ReportsPage() {
                                     <div className="relative">
                                         <div className="flex justify-between text-sm md:text-base font-bold mb-2">
                                             <span className="flex items-center gap-2 text-rose-700">
-                                                <div className="w-3 h-3 rounded-full bg-rose-500 print:hidden"></div>
+                                                <div className="w-3 h-3 rounded-full bg-rose-500 print:bg-rose-500 print-force-color"></div>
                                                 รายจ่าย (Expenses)
                                             </span>
                                             <span className="text-rose-700">฿{data.expenses?.total?.toLocaleString()}</span>
@@ -217,7 +218,7 @@ export default function ReportsPage() {
 
                                             <div
                                                 style={{ width: `${expensePercent}%` }}
-                                                className="h-full bg-gradient-to-r from-rose-400 via-red-500 to-pink-600 rounded-full shadow-lg print:bg-red-600 print:shadow-none transition-all duration-1000 ease-out flex items-center relative"
+                                                className="h-full bg-gradient-to-r from-rose-400 via-red-500 to-pink-600 rounded-full shadow-lg print:bg-red-600 print-force-bg-red transition-all duration-1000 ease-out flex items-center relative"
                                             >
                                                 <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
 
@@ -229,6 +230,7 @@ export default function ReportsPage() {
                                         <p className="text-xs text-gray-400 mt-1 text-right print:hidden"> Utilities + Common fees </p>
                                     </div>
                                 </div>
+                            );
                             );
                         })()}
                     </div>
@@ -394,6 +396,22 @@ export default function ReportsPage() {
                     h4 { font-size: 17px !important; margin-bottom: 6px !important; }
                     p { margin-bottom: 4px !important; }
                     td, th { padding-top: 4px !important; padding-bottom: 4px !important; }
+
+                    /* Force Colors for Bars */
+                    .print-force-bg-green {
+                        background-color: #10b981 !important; /* emerald-500 */
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .print-force-bg-red {
+                        background-color: #ef4444 !important; /* red-500 */
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .print-force-color {
+                         -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
                 }
             `}</style>
         </div >
