@@ -224,35 +224,35 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Detailed Breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 print:gap-4 print:mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 print:grid-cols-2 print:gap-4 print:mb-4">
                         <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
                             <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายรับ (Income Breakdown)</h4>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs md:text-sm print:text-xs">
                                     <tbody>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าเช่าห้อง</td>
-                                            <td className="py-2 text-right font-medium whitespace-nowrap">฿{data.income?.rent?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าเช่าห้อง</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">฿{data.income?.rent?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าน้ำ</td>
-                                            <td className="py-2 text-right font-medium whitespace-nowrap">฿{data.income?.water?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าน้ำ</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">฿{data.income?.water?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าไฟ</td>
-                                            <td className="py-2 text-right font-medium whitespace-nowrap">฿{data.income?.electric?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าไฟ</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">฿{data.income?.electric?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าส่วนกลาง</td>
-                                            <td className="py-2 text-right font-medium whitespace-nowrap">฿{data.income?.common?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าส่วนกลาง</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">฿{data.income?.common?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าขยะ/อื่นๆ</td>
-                                            <td className="py-2 text-right font-medium whitespace-nowrap">฿{(data.income?.trash + data.income?.other + data.income?.internet).toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/อื่นๆ</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">฿{(data.income?.trash + data.income?.other + data.income?.internet).toLocaleString()}</td>
                                         </tr>
                                         <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
-                                            <td className="py-2 pl-2">รวมรายรับ</td>
-                                            <td className="py-2 pr-2 text-right whitespace-nowrap">฿{data.income?.total?.toLocaleString()}</td>
+                                            <td className="py-2 pl-2 print:py-1">รวมรายรับ</td>
+                                            <td className="py-2 pr-2 text-right whitespace-nowrap print:py-1">฿{data.income?.total?.toLocaleString()}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -265,20 +265,20 @@ export default function ReportsPage() {
                                 <table className="w-full text-xs md:text-sm print:text-xs">
                                     <tbody>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">บิลค่าน้ำ (ประปา)</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap">-฿{data.expenses?.waterBill?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าน้ำ (ประปา)</td>
+                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.waterBill?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">บิลค่าไฟ (การไฟฟ้า)</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap">-฿{data.expenses?.electricBill?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าไฟ (การไฟฟ้า)</td>
+                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.electricBill?.toLocaleString()}</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2">ค่าขยะ/เน็ต</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/เน็ต</td>
+                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
                                         </tr>
                                         <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
-                                            <td className="py-2 pl-2">รวมรายจ่าย</td>
-                                            <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap">-฿{data.expenses?.total?.toLocaleString()}</td>
+                                            <td className="py-2 pl-2 print:py-1">รวมรายจ่าย</td>
+                                            <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap print:py-1">-฿{data.expenses?.total?.toLocaleString()}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -290,16 +290,16 @@ export default function ReportsPage() {
                                     <table className="w-full text-xs md:text-sm print:text-xs">
                                         <tbody>
                                             <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2">น้ำรวม</td>
-                                                <td className="py-2 text-right font-medium whitespace-nowrap">{data.usage?.waterUnits?.toLocaleString()} หน่วย</td>
+                                                <td className="py-2 text-gray-600 pr-2 print:py-1">น้ำรวม</td>
+                                                <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.waterUnits?.toLocaleString()} หน่วย</td>
                                             </tr>
                                             <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2">ไฟรวม</td>
-                                                <td className="py-2 text-right font-medium whitespace-nowrap">{data.usage?.electricUnits?.toLocaleString()} หน่วย</td>
+                                                <td className="py-2 text-gray-600 pr-2 print:py-1">ไฟรวม</td>
+                                                <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.electricUnits?.toLocaleString()} หน่วย</td>
                                             </tr>
                                             <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2">สถานะบิล</td>
-                                                <td className="py-2 text-right whitespace-nowrap">
+                                                <td className="py-2 text-gray-600 pr-2 print:py-1">สถานะบิล</td>
+                                                <td className="py-2 text-right whitespace-nowrap print:py-1">
                                                     <span className="text-green-600 font-bold">{data.stats?.paidBills} จ่าย</span> /
                                                     <span className="text-red-500 font-bold ml-1">{data.stats?.unpaidBills} ค้าง</span>
                                                 </td>
@@ -321,10 +321,16 @@ export default function ReportsPage() {
             <style jsx global>{`
                 @media print {
                     @page { size: A4; margin: 10mm; }
-                    body { -webkit-print-color-adjust: exact; background-color: white !important; }
+                    body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 12px; }
                     nav, header, aside, .print\\:hidden { display: none !important; }
                     #printable-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
                     .recharts-wrapper { break-inside: avoid; }
+                    
+                    /* Compact Headings */
+                    h1 { font-size: 18px !important; margin-bottom: 4px !important; }
+                    h2 { font-size: 16px !important; margin-bottom: 4px !important; }
+                    h3 { font-size: 14px !important; }
+                    h4 { font-size: 14px !important; margin-bottom: 8px !important; }
                 }
             `}</style>
         </div>
