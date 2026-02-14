@@ -393,6 +393,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                                     </div>
                                     <input
                                         type="number"
+                                        min={room.lastWater}
                                         className="w-full p-2 border border-blue-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50/50"
                                         value={wCurr}
                                         onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
@@ -405,6 +406,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                                     </div>
                                     <input
                                         type="number"
+                                        min={room.lastElectric}
                                         className="w-full p-2 border border-yellow-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-yellow-50/50"
                                         value={eCurr}
                                         onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
@@ -451,6 +453,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                                     <td className="px-2 py-3 sm:p-4 text-center border-l border-blue-100 bg-blue-50/50 whitespace-nowrap">
                                         <input
                                             type="number"
+                                            min={room.lastWater}
                                             className="w-16 sm:w-20 p-1 border border-blue-300 rounded text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none"
                                             value={wCurr}
                                             onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
@@ -465,6 +468,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                                     <td className="px-2 py-3 sm:p-4 text-center border-l border-yellow-100 bg-yellow-50/50 whitespace-nowrap">
                                         <input
                                             type="number"
+                                            min={room.lastElectric}
                                             className="w-16 sm:w-20 p-1 border border-yellow-300 rounded text-center font-bold focus:ring-2 focus:ring-yellow-500 outline-none"
                                             value={eCurr}
                                             onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
