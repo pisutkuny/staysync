@@ -106,7 +106,7 @@ export default function ReportsPage() {
                 <div id="printable-area" className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-gray-900 print:shadow-none print:border-none print:p-0 print:absolute print:top-0 print:left-0 print:w-full print:m-0 print:text-sm">
 
                     {/* Report Header - Print Only Formal Header */}
-                    <div className="hidden print:block text-center mb-8 border-b-2 border-black pb-4">
+                    <div className="hidden print:block text-center mb-8">
                         <div className="flex items-center justify-center gap-2 mb-2">
                             {/* Optional: Add Logo here if available */}
                             <h1 className="text-2xl font-bold text-black uppercase tracking-wide">{dormName}</h1>
