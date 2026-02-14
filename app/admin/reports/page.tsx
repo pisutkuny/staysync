@@ -130,7 +130,7 @@ export default function ReportsPage() {
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 print:mb-2 print-grid-3">
-                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:print-no-border print:p-0">
+                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-green-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingUp size={14} className="md:hidden" />
                                 <TrendingUp size={16} className="hidden md:block" />
@@ -139,7 +139,7 @@ export default function ReportsPage() {
                             <p className="text-2xl md:text-3xl font-bold text-green-700 mt-2 print:text-xl">฿{data.income?.total?.toLocaleString()}</p>
                             <p className="text-xs text-green-600 mt-1">จากบิลที่ชำระแล้ว ({data.stats?.paidBills} บิล)</p>
                         </div>
-                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:print-no-border print:p-0">
+                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-red-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingDown size={14} className="md:hidden" />
                                 <TrendingDown size={16} className="hidden md:block" />
@@ -148,7 +148,7 @@ export default function ReportsPage() {
                             <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
                             <p className="text-xs text-red-600 mt-1 truncate">ค่าน้ำ/ไฟ ส่วนกลาง</p>
                         </div>
-                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:print-no-border print:p-0">
+                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-blue-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <DollarSign size={14} className="md:hidden" />
                                 <DollarSign size={16} className="hidden md:block" />
