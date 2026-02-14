@@ -331,31 +331,36 @@ export default function ReportsPage() {
             <style jsx global>{`
                 @media print {
                     @page { size: A4; margin: 10mm; }
-                    body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 14px; }
                     
-                    /* Hide everything by default */
-                    body > * { display: none !important; }
+                    /* Use visibility to hide everything but keep the target element visible */
+                    body * {
+                        visibility: hidden;
+                    }
                     
-                    /* Re-show only the report */
-                    /* Note: This assumes the report is within the body. If it's deep nested, this might be tricky. 
-                       Better to use the existing absolute positioning technique but ensuring overrides. */
-                    
-                    nav, header, aside, .print\\:hidden, div[class*="navbar"], div[class*="sidebar"] { display: none !important; }
-                    
-                    /* Target the printable area specifically */
-                    #printable-area { 
-                        display: block !important;
+                    /* Reset visibility for the printable area */
+                    #printable-area, #printable-area * {
+                        visibility: visible;
+                    }
+
+                    /* Position the printable area to fill the page, ignoring hidden parents' spacing */
+                    #printable-area {
                         position: absolute !important;
-                        top: 0 !important;
                         left: 0 !important;
+                        top: 0 !important;
                         width: 100% !important;
-                        height: 100% !important;
                         margin: 0 !important;
                         padding: 0 !important;
+                        background-color: white !important;
                         border: none !important;
                         box-shadow: none !important;
+                    }
+
+                    /* 
+                       Specific overrides to ensure no background colors leak from parents 
+                       if they are somehow still rendering background 
+                    */
+                    body {
                         background-color: white !important;
-                        z-index: 9999 !important;
                     }
 
                     .recharts-wrapper { break-inside: avoid; }
@@ -365,21 +370,23 @@ export default function ReportsPage() {
                         display: grid !important;
                         grid-template-columns: repeat(3, 1fr) !important;
                         gap: 12px !important;
+                        visibility: visible !important;
                     }
                     .print-grid-2 {
                         display: grid !important;
                         grid-template-columns: repeat(2, 1fr) !important;
                         gap: 16px !important;
+                        visibility: visible !important;
                     }
                     
-                    /* Hide borders on summary cards for cleaner look if requested */
+                    /* Hide borders on summary cards */
                     .print-no-border {
                         border: none !important;
                         background: none !important;
                         box-shadow: none !important;
                     }
                     
-                    /* Compact Headings but larger than before */
+                    /* Typography Adjustments */
                     h1 { font-size: 20px !important; margin-bottom: 8px !important; }
                     h2 { font-size: 16px !important; margin-bottom: 6px !important; }
                     h3 { font-size: 15px !important; }
