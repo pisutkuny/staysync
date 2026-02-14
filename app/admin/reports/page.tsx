@@ -116,6 +116,7 @@ export default function ReportsPage() {
                             <span>Month: {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}</span>
                             <span>Printed on: {new Date().toLocaleString('th-TH')}</span>
                         </div>
+                        <hr className="mt-4 border-gray-300" />
                     </div>
 
                     {/* Report Header - Web Only (Hidden in Print) */}
