@@ -361,6 +361,7 @@ export default function ReportsPage() {
                     */
                     body {
                         background-color: white !important;
+                        font-size: 16px !important;
                     }
 
                     .recharts-wrapper { break-inside: avoid; }
@@ -386,11 +387,11 @@ export default function ReportsPage() {
                         box-shadow: none !important;
                     }
                     
-                    /* Typography Adjustments */
-                    h1 { font-size: 20px !important; margin-bottom: 8px !important; }
-                    h2 { font-size: 16px !important; margin-bottom: 6px !important; }
-                    h3 { font-size: 15px !important; }
-                    h4 { font-size: 15px !important; margin-bottom: 6px !important; }
+                    /* Typography Adjustments - Increased size by +2px as requested */
+                    h1 { font-size: 22px !important; margin-bottom: 8px !important; }
+                    h2 { font-size: 18px !important; margin-bottom: 6px !important; }
+                    h3 { font-size: 17px !important; }
+                    h4 { font-size: 17px !important; margin-bottom: 6px !important; }
                     p { margin-bottom: 4px !important; }
                     td, th { padding-top: 4px !important; padding-bottom: 4px !important; }
                 }
