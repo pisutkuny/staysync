@@ -54,7 +54,7 @@ export const NAV_ITEMS: NavItem[] = [
             },
             {
                 label: "Bulk Meter Entry",
-                href: "/admin/billing/bulk",
+                href: "/billing/bulk",
                 roles: ["OWNER"]
             },
             {
