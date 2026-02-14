@@ -169,70 +169,74 @@ export default function ReportsPage() {
                         </h4>
 
                         {(() => {
-                            const maxVal = Math.max(data.income?.total || 0, data.expenses?.total || 0, 1);
-                            const incomePercent = Math.min(((data.income?.total || 0) / maxVal) * 100, 100);
-                            const expensePercent = Math.min(((data.expenses?.total || 0) / maxVal) * 100, 100);
+                            const totalVolume = (data.income?.total || 0) + (data.expenses?.total || 0);
+                            // Avoid division by zero
+                            const safeTotal = totalVolume === 0 ? 1 : totalVolume;
+                            const incomePercent = ((data.income?.total || 0) / safeTotal) * 100;
+                            const expensePercent = ((data.expenses?.total || 0) / safeTotal) * 100;
 
                             return (
-
-                                <div className="space-y-8 print:space-y-2">
-                                    {/* Income Power Bar */}
-                                    <div className="relative">
-                                        <div className="flex justify-between text-sm md:text-base font-bold mb-2">
+                                <div className="space-y-4 print:space-y-4 pt-4 pb-2">
+                                    {/* Labels Row */}
+                                    <div className="flex justify-between items-end text-sm md:text-base font-bold mb-2">
+                                        {/* Income Label (Left) */}
+                                        <div className="flex flex-col items-start">
                                             <span className="flex items-center gap-2 text-emerald-700">
                                                 <div className="w-3 h-3 rounded-full bg-emerald-500 print:bg-emerald-500 print-force-color"></div>
                                                 รายรับ (Income)
                                             </span>
-                                            <span className="text-emerald-700">฿{data.income?.total?.toLocaleString()}</span>
+                                            <span className="text-xl text-emerald-700 mt-1">฿{data.income?.total?.toLocaleString()}</span>
                                         </div>
-                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-4 relative">
-                                            {/* Pattern Overlay for Texture */}
-                                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
 
-                                            <div
-                                                style={{ width: `${incomePercent}%` }}
-                                                className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 rounded-full shadow-lg print:bg-green-600 print-force-bg-green transition-all duration-1000 ease-out flex items-center relative"
-                                            >
-                                                {/* Glossy Effect */}
-                                                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
-
-                                                {/* Percentage Label inside bar if wide enough */}
-                                                {incomePercent > 15 && (
-                                                    <span className="absolute right-3 text-white text-xs font-bold drop-shadow-md print:hidden">{incomePercent.toFixed(0)}%</span>
-                                                )}
-                                            </div>
+                                        {/* Expense Label (Right) */}
+                                        <div className="flex flex-col items-end">
+                                            <span className="flex items-center gap-2 text-rose-700">
+                                                รายจ่าย (Expenses)
+                                                <div className="w-3 h-3 rounded-full bg-rose-500 print:bg-rose-500 print-force-color"></div>
+                                            </span>
+                                            <span className="text-xl text-rose-700 mt-1">฿{data.expenses?.total?.toLocaleString()}</span>
                                         </div>
-                                        <p className="text-xs text-gray-400 mt-1 text-right print:hidden"> Based on paid bills </p>
                                     </div>
 
-                                    {/* Expense Power Bar */}
-                                    <div className="relative">
-                                        <div className="flex justify-between text-sm md:text-base font-bold mb-2">
-                                            <span className="flex items-center gap-2 text-rose-700">
-                                                <div className="w-3 h-3 rounded-full bg-rose-500 print:bg-rose-500 print-force-color"></div>
-                                                รายจ่าย (Expenses)
-                                            </span>
-                                            <span className="text-rose-700">฿{data.expenses?.total?.toLocaleString()}</span>
-                                        </div>
-                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-4 relative">
-                                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
+                                    {/* Single Split Bar Container */}
+                                    <div className="h-10 md:h-12 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-8 relative flex">
+                                        {/* Pattern Overlay for Texture (Background) */}
+                                        <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
 
-                                            <div
-                                                style={{ width: `${expensePercent}%` }}
-                                                className="h-full bg-gradient-to-r from-rose-400 via-red-500 to-pink-600 rounded-full shadow-lg print:bg-red-600 print-force-bg-red transition-all duration-1000 ease-out flex items-center relative"
-                                            >
-                                                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full pointer-events-none print:hidden"></div>
-
-                                                {expensePercent > 15 && (
-                                                    <span className="absolute right-3 text-white text-xs font-bold drop-shadow-md print:hidden">{expensePercent.toFixed(0)}%</span>
-                                                )}
-                                            </div>
+                                        {/* Income Segment (Left to Right) */}
+                                        <div
+                                            style={{ width: `${incomePercent}%` }}
+                                            className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 shadow-lg print:bg-green-600 print-force-bg-green transition-all duration-1000 ease-out flex items-center justify-start pl-4 relative"
+                                        >
+                                            {/* Glossy Effect */}
+                                            <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 pointer-events-none print:hidden"></div>
+                                            {incomePercent > 10 && (
+                                                <span className="text-white text-xs md:text-sm font-bold drop-shadow-md z-10 print:text-white print-force-color">{incomePercent.toFixed(0)}%</span>
+                                            )}
                                         </div>
-                                        <p className="text-xs text-gray-400 mt-1 text-right print:hidden"> Utilities + Common fees </p>
+
+                                        {/* Expense Segment (Right to Left visual - actually just taking remaining space) */}
+                                        <div
+                                            style={{ width: `${expensePercent}%` }}
+                                            className="h-full bg-gradient-to-l from-rose-400 via-red-500 to-pink-600 shadow-lg print:bg-red-600 print-force-bg-red transition-all duration-1000 ease-out flex items-center justify-end pr-4 relative"
+                                        >
+                                            {/* Glossy Effect */}
+                                            <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 pointer-events-none print:hidden"></div>
+                                            {expensePercent > 10 && (
+                                                <span className="text-white text-xs md:text-sm font-bold drop-shadow-md z-10 print:text-white print-force-color">{expensePercent.toFixed(0)}%</span>
+                                            )}
+                                        </div>
+
+                                        {/* Center dividing line (optional, for visual clarity when they meet) */}
+                                        <div className="absolute left-[calc(var(--income-pct))] top-0 bottom-0 w-0.5 bg-white opacity-50 z-20 print:hidden" style={{ left: `${incomePercent}%` }}></div>
+                                    </div>
+
+                                    <div className="flex justify-between text-xs text-gray-400 mt-1 print:hidden">
+                                        <span>Based on paid bills</span>
+                                        <span>Utilities + Common fees</span>
                                     </div>
                                 </div>
                             );
-
                         })()}
                     </div>
 
