@@ -118,8 +118,8 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 print:mb-4 print:gap-4">
-                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:border print:border-green-200 print:bg-white">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 print:mb-2 print-grid-3">
+                        <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:border print:border-green-200 print:bg-white print:p-2">
                             <h3 className="text-green-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingUp size={14} className="md:hidden" />
                                 <TrendingUp size={16} className="hidden md:block" />
@@ -128,7 +128,7 @@ export default function ReportsPage() {
                             <p className="text-2xl md:text-3xl font-bold text-green-700 mt-2 print:text-xl">฿{data.income?.total?.toLocaleString()}</p>
                             <p className="text-xs text-green-600 mt-1">จากบิลที่ชำระแล้ว ({data.stats?.paidBills} บิล)</p>
                         </div>
-                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:border print:border-red-200 print:bg-white">
+                        <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:border print:border-red-200 print:bg-white print:p-2">
                             <h3 className="text-red-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingDown size={14} className="md:hidden" />
                                 <TrendingDown size={16} className="hidden md:block" />
@@ -137,7 +137,7 @@ export default function ReportsPage() {
                             <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
                             <p className="text-xs text-red-600 mt-1 truncate">ค่าน้ำ/ไฟ ส่วนกลาง</p>
                         </div>
-                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:border print:border-blue-200 print:bg-white">
+                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:border print:border-blue-200 print:bg-white print:p-2">
                             <h3 className="text-blue-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <DollarSign size={14} className="md:hidden" />
                                 <DollarSign size={16} className="hidden md:block" />
@@ -151,7 +151,7 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Power Bar Chart Section */}
-                    <div className="mb-8 p-6 border rounded-3xl bg-white shadow-sm print:shadow-none print:border-gray-300 print:break-inside-avoid print:p-4">
+                    <div className="mb-8 p-6 border rounded-3xl bg-white shadow-sm print:shadow-none print:border-gray-300 print:break-inside-avoid print:p-2 print:mb-4">
                         <h4 className="font-bold text-lg mb-6 text-center print:text-base print:mb-4 flex items-center justify-center gap-2">
                             <TrendingUp className="text-indigo-600 print:hidden" size={20} />
                             เปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)
@@ -163,7 +163,7 @@ export default function ReportsPage() {
                             const expensePercent = Math.min(((data.expenses?.total || 0) / maxVal) * 100, 100);
 
                             return (
-                                <div className="space-y-8 print:space-y-4">
+                                <div className="space-y-8 print:space-y-2">
                                     {/* Income Power Bar */}
                                     <div className="relative">
                                         <div className="flex justify-between text-sm md:text-base font-bold mb-2">
@@ -173,7 +173,7 @@ export default function ReportsPage() {
                                             </span>
                                             <span className="text-emerald-700">฿{data.income?.total?.toLocaleString()}</span>
                                         </div>
-                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-6 relative">
+                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-4 relative">
                                             {/* Pattern Overlay for Texture */}
                                             <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
 
@@ -202,7 +202,7 @@ export default function ReportsPage() {
                                             </span>
                                             <span className="text-rose-700">฿{data.expenses?.total?.toLocaleString()}</span>
                                         </div>
-                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-6 relative">
+                                        <div className="h-8 md:h-10 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200 print:border-gray-300 print:bg-white print:h-4 relative">
                                             <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] pointer-events-none print:hidden"></div>
 
                                             <div
@@ -224,7 +224,7 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Detailed Breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 print:grid-cols-2 print:gap-4 print:mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 print:mb-2 print-grid-2">
                         <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
                             <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายรับ (Income Breakdown)</h4>
                             <div className="overflow-x-auto">
@@ -321,16 +321,30 @@ export default function ReportsPage() {
             <style jsx global>{`
                 @media print {
                     @page { size: A4; margin: 10mm; }
-                    body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 12px; }
+                    body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 11px; }
                     nav, header, aside, .print\\:hidden { display: none !important; }
                     #printable-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
                     .recharts-wrapper { break-inside: avoid; }
                     
+                    /* Force Grid for Print - Tailwind sometimes fails in print emulation */
+                    .print-grid-3 {
+                        display: grid !important;
+                        grid-template-columns: repeat(3, 1fr) !important;
+                        gap: 12px !important;
+                    }
+                    .print-grid-2 {
+                        display: grid !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 16px !important;
+                    }
+                    
                     /* Compact Headings */
-                    h1 { font-size: 18px !important; margin-bottom: 4px !important; }
-                    h2 { font-size: 16px !important; margin-bottom: 4px !important; }
-                    h3 { font-size: 14px !important; }
-                    h4 { font-size: 14px !important; margin-bottom: 8px !important; }
+                    h1 { font-size: 16px !important; margin-bottom: 4px !important; }
+                    h2 { font-size: 14px !important; margin-bottom: 4px !important; }
+                    h3 { font-size: 12px !important; }
+                    h4 { font-size: 12px !important; margin-bottom: 4px !important; }
+                    p { margin-bottom: 2px !important; }
+                    td, th { padding-top: 2px !important; padding-bottom: 2px !important; }
                 }
             `}</style>
         </div>
