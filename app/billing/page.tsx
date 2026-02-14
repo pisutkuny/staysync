@@ -117,8 +117,8 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            {/* Meter Dashboard Table */}
-            <MeterDashboard rooms={allRooms} />
+            {/* Dashboard Stats */}
+            <MeterDashboard rooms={rooms} bills={bills} />
 
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <div className="mb-6">

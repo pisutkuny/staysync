@@ -664,6 +664,18 @@ export const dictionary = {
             noData: "ไม่พบประวัติการใช้งาน",
             noDataTip: "ประวัติการใช้งานจะแสดงที่นี่เมื่อมีการเปลี่ยนแปลง"
         },
+        meterDashboard: {
+            title: "สถานะการบิล (รายเดือน)",
+            subtitle: "ภาพรวมการเก็บเงินและจดมิเตอร์ประจำเดือน",
+            searchPlaceholder: "ค้นหาเลขห้อง...",
+            room: "ห้อง",
+            status: "สถานะ",
+            resident: "ผู้เช่า",
+            lastWater: "น้ำล่าสุด",
+            lastElec: "ไฟล่าสุด",
+            lastUpdate: "อัปเดตล่าสุด",
+            noRooms: "ไม่พบห้องที่ค้นหา",
+        },
         broadcast: {
             title: "ประกาศข่าวสาร",
             subtitle: "ส่งประกาศแจ้งเตือนไปยังผู้เช่าผ่าน LINE",
@@ -1323,6 +1335,18 @@ export const dictionary = {
                 emailVerify: "Enforce Email Verification",
                 emailVerifyDesc: "Require users to verify their email before logging in."
             }
+        },
+        meterDashboard: {
+            title: "Billing Status (Monthly)",
+            subtitle: "Overview of monthly billing and meter readings",
+            searchPlaceholder: "Search room number...",
+            room: "Room",
+            status: "Status",
+            resident: "Resident",
+            lastWater: "Last Water",
+            lastElec: "Last Elec",
+            lastUpdate: "Last Update",
+            noRooms: "No rooms found",
         },
         audit: {
             title: "Audit Logs",

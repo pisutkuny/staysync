@@ -1,146 +1,214 @@
 "use client";
 
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { format } from "date-fns";
+import { th, enUS } from "date-fns/locale";
+import Link from "next/link";
 
 type RoomData = {
     id: number;
     number: string;
     status: string;
     residents: { fullName: string }[];
-    billings: {
-        waterMeterCurrent: number;
-        electricMeterCurrent: number;
-        createdAt: Date | string;
-    }[];
 };
 
-export default function MeterDashboard({ rooms }: { rooms: RoomData[] }) {
-    const { t } = useLanguage();
+type BillData = {
+    id: number;
+    roomId: number;
+    totalAmount: number;
+    createdAt: string | Date;
+    status: string;
+};
+
+export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bills: BillData[] }) {
+    const { t, language } = useLanguage();
     const [filter, setFilter] = useState("");
 
-    const filteredRooms = rooms.filter(r =>
-        r.number.includes(filter) ||
-        r.residents[0]?.fullName.toLowerCase().includes(filter.toLowerCase())
-    );
+    // Default to current month YYYY-MM
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const now = new Date();
+        return now.toISOString().slice(0, 7);
+    });
+
+    const [statusFilter, setStatusFilter] = useState<'all' | 'billed' | 'pending'>('pending');
+
+    // Calculate Status
+    const roomStatus = useMemo(() => {
+        return rooms.map(room => {
+            // Find bill for this room in selected month
+            // Ensure bills is an array before finding
+            const safeBills = Array.isArray(bills) ? bills : [];
+            const bill = safeBills.find(b => {
+                const billDate = new Date(b.createdAt);
+                const billMonth = billDate.toISOString().slice(0, 7);
+                return b.roomId === room.id && billMonth === selectedMonth;
+            });
+
+            return {
+                ...room,
+                bill,
+                isBilled: !!bill
+            };
+        });
+    }, [rooms, bills, selectedMonth]);
+
+    // Calculate Stats
+    const stats = useMemo(() => {
+        const total = roomStatus.length;
+        const billed = roomStatus.filter(r => r.isBilled).length;
+        const pending = total - billed;
+        return { total, billed, pending };
+    }, [roomStatus]);
+
+    // Filtered List
+    const filteredRooms = roomStatus.filter(r => {
+        const matchesSearch = r.number.includes(filter) ||
+            r.residents[0]?.fullName?.toLowerCase().includes(filter.toLowerCase());
+
+        if (!matchesSearch) return false;
+
+        if (statusFilter === 'billed') return r.isBilled;
+        if (statusFilter === 'pending') return !r.isBilled;
+        return true;
+    });
 
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center gap-4 flex-wrap">
-                <div>
-                    <h3 className="text-lg font-bold text-gray-900">{t.meterDashboard.title}</h3>
-                    <p className="text-sm text-gray-500">{t.meterDashboard.subtitle}</p>
+            {/* Header & Controls */}
+            <div className="p-6 border-b border-gray-100 space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            📊 {t.meterDashboard?.title || "Billing Status"}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            {t.meterDashboard?.subtitle || "Overview of monthly billing progress"}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+                        <Calendar size={16} className="text-gray-500 ml-2" />
+                        <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer"
+                        />
+                    </div>
                 </div>
+
+                {/* Status Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`p-4 rounded-xl border transition-all text-left group ${statusFilter === 'all' ? 'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:border-indigo-200 bg-white'
+                            }`}
+                    >
+                        <div className="text-sm text-gray-500 font-medium mb-1">Total Rooms</div>
+                        <div className="text-3xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            {stats.total}
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => setStatusFilter('billed')}
+                        className={`p-4 rounded-xl border transition-all text-left group ${statusFilter === 'billed' ? 'ring-2 ring-green-500 border-green-500 bg-green-50' : 'border-gray-100 hover:border-green-200 bg-white'
+                            }`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <div className="text-sm text-green-600 font-medium mb-1">Billed</div>
+                            <CheckCircle2 size={18} className="text-green-500" />
+                        </div>
+                        <div className="text-3xl font-bold text-green-700">
+                            {stats.billed}
+                            <span className="text-sm font-normal text-green-600 ml-2">
+                                ({stats.total > 0 ? Math.round((stats.billed / stats.total) * 100) : 0}%)
+                            </span>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => setStatusFilter('pending')}
+                        className={`p-4 rounded-xl border transition-all text-left group ${statusFilter === 'pending' ? 'ring-2 ring-red-500 border-red-500 bg-red-50' : 'border-gray-100 hover:border-red-200 bg-white'
+                            }`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <div className="text-sm text-red-600 font-medium mb-1">Pending</div>
+                            <AlertCircle size={18} className="text-red-500" />
+                        </div>
+                        <div className="text-3xl font-bold text-red-700">
+                            {stats.pending}
+                            <span className="text-sm font-normal text-red-600 ml-2">
+                                ({stats.total > 0 ? Math.round((stats.pending / stats.total) * 100) : 0}%)
+                            </span>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Filter & Search */}
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
-                        placeholder={t.meterDashboard.searchPlaceholder}
+                        placeholder={t.meterDashboard?.searchPlaceholder || "Search room..."}
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50/50"
                     />
                 </div>
             </div>
 
-            {/* Mobile View: Cards */}
-            <div className="md:hidden divide-y divide-gray-100">
-                {filteredRooms.map((room) => {
-                    const lastBill = room.billings?.[0];
-                    const lastUpdate = lastBill ? new Date(lastBill.createdAt).toLocaleDateString() : "-";
-
-                    return (
-                        <div key={room.id} className="p-4 space-y-3">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                        Room {room.number}
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${room.status === 'Occupied' ? 'bg-green-100 text-green-700' :
-                                            room.status === 'Maintenance' ? 'bg-red-100 text-red-700' :
-                                                'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {room.status}
-                                        </span>
-                                    </h4>
-                                    <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "-"}</p>
-                                </div>
-                                <div className="text-xs text-gray-400 text-right">
-                                    {t.meterDashboard.lastUpdate}<br />{lastUpdate}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                <div>
-                                    <p className="text-xs font-bold text-blue-600 mb-1">{t.meterDashboard.lastWater}</p>
-                                    <p className="font-mono text-gray-900 font-bold">
-                                        {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-yellow-600 mb-1">{t.meterDashboard.lastElec}</p>
-                                    <p className="font-mono text-gray-900 font-bold">
-                                        {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-                {filteredRooms.length === 0 && (
-                    <div className="p-8 text-center text-gray-400">
-                        {t.meterDashboard.noRooms} "{filter}"
-                    </div>
-                )}
-            </div>
-
-            {/* Desktop View: Table */}
-            <div className="hidden md:block overflow-x-auto">
+            {/* List */}
+            <div className="max-h-[400px] overflow-y-auto">
                 <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
+                    <thead className="bg-gray-50 text-gray-600 font-medium sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th className="px-6 py-4">{t.meterDashboard.room}</th>
-                            <th className="px-6 py-4">{t.meterDashboard.status}</th>
-                            <th className="px-6 py-4">{t.meterDashboard.resident}</th>
-                            <th className="px-6 py-4 text-right text-blue-600">{t.meterDashboard.lastWater}</th>
-                            <th className="px-6 py-4 text-right text-yellow-600">{t.meterDashboard.lastElec}</th>
-                            <th className="px-6 py-4 text-gray-400">{t.meterDashboard.lastUpdate}</th>
+                            <th className="p-4 w-24">Room</th>
+                            <th className="p-4">Resident</th>
+                            <th className="p-4 text-center">Status</th>
+                            <th className="p-4 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {filteredRooms.map((room) => {
-                            const lastBill = room.billings?.[0];
-                            const lastUpdate = lastBill ? new Date(lastBill.createdAt).toLocaleDateString() : "-";
-
-                            return (
-                                <tr key={room.id} className="hover:bg-gray-50/50 transition-colors">
-                                    <td className="px-6 py-3 font-bold text-gray-900">{room.number}</td>
-                                    <td className="px-6 py-3">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${room.status === 'Occupied' ? 'bg-green-100 text-green-700' :
-                                            room.status === 'Maintenance' ? 'bg-red-100 text-red-700' :
-                                                'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {room.status}
+                        {filteredRooms.map((room) => (
+                            <tr key={room.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="p-4 font-bold text-gray-900">{room.number}</td>
+                                <td className="p-4 text-gray-600">
+                                    {room.residents[0]?.fullName || <span className="text-gray-300 italic">Vacant</span>}
+                                </td>
+                                <td className="p-4 text-center">
+                                    {room.isBilled ? (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            <CheckCircle2 size={12} /> Billed
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-3 text-gray-600">
-                                        {room.residents[0]?.fullName || "-"}
-                                    </td>
-                                    <td className="px-6 py-3 text-right font-medium text-gray-900">
-                                        {lastBill?.waterMeterCurrent != null ? lastBill.waterMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
-                                    </td>
-                                    <td className="px-6 py-3 text-right font-medium text-gray-900">
-                                        {lastBill?.electricMeterCurrent != null ? lastBill.electricMeterCurrent.toLocaleString() : <span className="text-gray-300">-</span>}
-                                    </td>
-                                    <td className="px-6 py-3 text-xs text-gray-400">
-                                        {lastUpdate}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200 animate-pulse">
+                                            <AlertCircle size={12} /> Pending
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="p-4 text-right">
+                                    {room.isBilled ? (
+                                        <div className="text-xs font-bold text-gray-900">
+                                            ฿{room.bill?.totalAmount.toLocaleString()}
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            href={`/billing/bulk?month=${selectedMonth}`}
+                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm hover:shadow"
+                                        >
+                                            Create Bill <ArrowRight size={12} />
+                                        </Link>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
                         {filteredRooms.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
-                                    {t.meterDashboard.noRooms} "{filter}"
+                                <td colSpan={4} className="p-8 text-center text-gray-400 italic">
+                                    No rooms found matching "{filter}"
                                 </td>
                             </tr>
                         )}
