@@ -3,14 +3,19 @@
 import { useState, useEffect } from "react";
 import { Loader2, Printer, FileText, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { format } from "date-fns";
-import { th } from "date-fns/locale";
+import { th, enUS } from "date-fns/locale";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function ReportsPage() {
+    const { language, t } = useLanguage();
     const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [dormName, setDormName] = useState("StaySync Dormitory");
+
+    // Derived locale for date formatting
+    const dateLocale = language === 'TH' ? th : enUS;
 
     useEffect(() => {
         fetch("/api/settings")
@@ -48,8 +53,8 @@ export default function ReportsPage() {
 
     // Prepare chart data for single month
     const chartData = data ? [
-        { name: 'รายรับ (Income)', amount: data.income?.total || 0, color: '#10b981' },
-        { name: 'รายจ่าย (Expense)', amount: data.expenses?.total || 0, color: '#ef4444' }
+        { name: language === 'TH' ? 'รายรับ (Income)' : 'Income', amount: data.income?.total || 0, color: '#10b981' },
+        { name: language === 'TH' ? 'รายจ่าย (Expense)' : 'Expense', amount: data.expenses?.total || 0, color: '#ef4444' }
     ] : [];
 
     return (
@@ -66,10 +71,10 @@ export default function ReportsPage() {
                             <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm shadow-inner">
                                 <FileText className="text-white" size={24} />
                             </div>
-                            Monthly Financial Report
+                            {language === 'TH' ? 'รายงานรายรับ-รายจ่ายประจำเดือน' : 'Monthly Financial Report'}
                         </h1>
                         <p className="text-indigo-100 mt-2 text-sm md:text-base font-medium opacity-90 pl-1">
-                            รายงานสรุปรายรับ-รายจ่ายประจำเดือน
+                            {language === 'TH' ? 'สรุปข้อมูลการเงินของหอพัก' : 'Dormitory Financial Summary'}
                         </p>
                     </div>
 
@@ -78,7 +83,7 @@ export default function ReportsPage() {
                             type="month"
                             value={month}
                             onChange={(e) => setMonth(e.target.value)}
-                            className="border border-indigo-200/50 bg-white/95 text-indigo-900 rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto focus:ring-4 focus:ring-indigo-500/30 outline-none font-semibold shadow-sm"
+                            className="border border-indigo-200/50 bg-white/95 text-indigo-900 rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto focus:ring-4 focus:ring-indigo-500/30 outline-none font-semibold shadow-sm dark:[color-scheme:dark]"
                         />
                         <div className="flex gap-2">
                             <button
@@ -86,13 +91,13 @@ export default function ReportsPage() {
                                 className="bg-white text-indigo-700 px-5 py-2.5 rounded-xl hover:bg-indigo-50 font-bold shadow-sm hover:shadow-md transition-all text-sm flex-1 sm:flex-none flex items-center gap-2 justify-center"
                             >
                                 <Loader2 size={16} className={loading ? "animate-spin" : "hidden"} />
-                                Refresh
+                                {language === 'TH' ? 'รีเฟรช' : 'Refresh'}
                             </button>
                             <button
                                 onClick={handlePrint}
                                 className="bg-indigo-900/40 text-white border border-white/30 px-5 py-2.5 rounded-xl hover:bg-indigo-900/60 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-sm flex-1 sm:flex-none transition-all font-semibold"
                             >
-                                <Printer size={18} /> Print
+                                <Printer size={18} /> {language === 'TH' ? 'พิมพ์' : 'Print'}
                             </button>
                         </div>
                     </div>
@@ -111,21 +116,25 @@ export default function ReportsPage() {
                             {/* Optional: Add Logo here if available */}
                             <h1 className="text-2xl font-bold text-black uppercase tracking-wide">{dormName}</h1>
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-800">Monthly Financial Report (รายงานสรุปรายรับ-รายจ่าย)</h2>
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            {language === 'TH' ? 'รายงานสรุปรายรับ-รายจ่ายประจำเดือน' : 'Monthly Financial Report'}
+                        </h2>
                         <div className="mt-4 flex justify-between text-sm text-gray-600">
-                            <span>Month: {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}</span>
-                            <span>Printed on: {new Date().toLocaleString('th-TH')}</span>
+                            <span>{language === 'TH' ? 'เดือน:' : 'Month:'} {format(new Date(month + "-01"), "MMMM yyyy", { locale: dateLocale })}</span>
+                            <span>{language === 'TH' ? 'พิมพ์เมื่อ:' : 'Printed on:'} {new Date().toLocaleString(language === 'TH' ? 'th-TH' : 'en-US')}</span>
                         </div>
                         <hr className="mt-4 border-gray-300" />
                     </div>
 
                     {/* Report Header - Web Only (Hidden in Print) */}
                     <div className="text-center mb-8 border-b-2 border-gray-800 pb-4 print:hidden">
-                        <h2 className="text-xl md:text-3xl font-bold uppercase tracking-wide">รายงานสรุปประจำเดือน</h2>
+                        <h2 className="text-xl md:text-3xl font-bold uppercase tracking-wide">
+                            {language === 'TH' ? 'รายงานสรุปประจำเดือน' : 'Monthly Financial Report'}
+                        </h2>
                         <p className="text-lg text-gray-600 mt-2">
-                            {format(new Date(month + "-01"), "MMMM yyyy", { locale: th })}
+                            {format(new Date(month + "-01"), "MMMM yyyy", { locale: dateLocale })}
                         </p>
-                        <p className="text-sm text-gray-400 mt-1">Generated: {new Date().toLocaleString('th-TH')}</p>
+                        <p className="text-sm text-gray-400 mt-1">Generated: {new Date().toLocaleString(language === 'TH' ? 'th-TH' : 'en-US')}</p>
                     </div>
 
                     {/* Summary Cards */}
@@ -134,30 +143,36 @@ export default function ReportsPage() {
                             <h3 className="text-green-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingUp size={14} className="md:hidden" />
                                 <TrendingUp size={16} className="hidden md:block" />
-                                <span className="truncate">รายรับรวม (Total Income)</span>
+                                <span className="truncate">{language === 'TH' ? 'รายรับรวม (Total Income)' : 'Total Income'}</span>
                             </h3>
                             <p className="text-2xl md:text-3xl font-bold text-green-700 mt-2 print:text-xl">฿{data.income?.total?.toLocaleString()}</p>
-                            <p className="text-xs text-green-600 mt-1">จากบิลที่ชำระแล้ว ({data.stats?.paidBills} บิล)</p>
+                            <p className="text-xs text-green-600 mt-1">
+                                {language === 'TH' ? `จากบิลที่ชำระแล้ว (${data.stats?.paidBills} บิล)` : `From paid bills (${data.stats?.paidBills} bills)`}
+                            </p>
                         </div>
                         <div className="bg-red-50 p-3 md:p-4 rounded-xl border border-red-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-red-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingDown size={14} className="md:hidden" />
                                 <TrendingDown size={16} className="hidden md:block" />
-                                <span className="truncate">รายจ่าย (Expenses)</span>
+                                <span className="truncate">{language === 'TH' ? 'รายจ่าย (Expenses)' : 'Expenses'}</span>
                             </h3>
                             <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
-                            <p className="text-xs text-red-600 mt-1 truncate">ค่าน้ำ/ไฟ ส่วนกลาง</p>
+                            <p className="text-xs text-red-600 mt-1 truncate">
+                                {language === 'TH' ? 'ค่าน้ำ/ไฟ ส่วนกลาง' : 'Utilities + Common fees'}
+                            </p>
                         </div>
                         <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-blue-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <DollarSign size={14} className="md:hidden" />
                                 <DollarSign size={16} className="hidden md:block" />
-                                <span className="truncate">กำไรสุทธิ (Net Profit)</span>
+                                <span className="truncate">{language === 'TH' ? 'กำไรสุทธิ (Net Profit)' : 'Net Profit'}</span>
                             </h3>
                             <p className="text-2xl md:text-3xl font-bold text-blue-700 mt-2 print:text-xl">
                                 ฿{(data.income?.total - data.expenses?.total).toLocaleString()}
                             </p>
-                            <p className="text-xs text-blue-600 mt-1">รายรับ - รายจ่าย</p>
+                            <p className="text-xs text-blue-600 mt-1">
+                                {language === 'TH' ? 'รายรับ - รายจ่าย' : 'Income - Expenses'}
+                            </p>
                         </div>
                     </div>
 
@@ -165,7 +180,7 @@ export default function ReportsPage() {
                     <div className="mb-8 p-6 border rounded-3xl bg-white shadow-sm print:shadow-none print:border-gray-300 print:break-inside-avoid print:p-2 print:mb-4">
                         <h4 className="font-bold text-lg mb-6 text-center print:text-base print:mb-4 flex items-center justify-center gap-2">
                             <TrendingUp className="text-indigo-600 print:hidden" size={20} />
-                            เปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)
+                            {language === 'TH' ? 'เปรียบเทียบ รายรับ-รายจ่าย (Financial Overview)' : 'Financial Overview (Income vs Expenses)'}
                         </h4>
 
                         {(() => {
@@ -183,7 +198,7 @@ export default function ReportsPage() {
                                         <div className="flex flex-col items-start">
                                             <span className="flex items-center gap-2 text-emerald-700">
                                                 <div className="w-3 h-3 rounded-full bg-emerald-500 print:bg-emerald-500 print-force-color"></div>
-                                                รายรับ (Income)
+                                                {language === 'TH' ? 'รายรับ (Income)' : 'Income'}
                                             </span>
                                             <span className="text-xl text-emerald-700 mt-1">฿{data.income?.total?.toLocaleString()}</span>
                                         </div>
@@ -191,7 +206,7 @@ export default function ReportsPage() {
                                         {/* Expense Label (Right) */}
                                         <div className="flex flex-col items-end">
                                             <span className="flex items-center gap-2 text-rose-700">
-                                                รายจ่าย (Expenses)
+                                                {language === 'TH' ? 'รายจ่าย (Expenses)' : 'Expenses'}
                                                 <div className="w-3 h-3 rounded-full bg-rose-500 print:bg-rose-500 print-force-color"></div>
                                             </span>
                                             <span className="text-xl text-rose-700 mt-1">฿{data.expenses?.total?.toLocaleString()}</span>
