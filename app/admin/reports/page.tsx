@@ -83,7 +83,7 @@ export default function ReportsPage() {
                             type="month"
                             value={month}
                             onChange={(e) => setMonth(e.target.value)}
-                            className="border border-indigo-200/50 bg-white/95 text-indigo-900 rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto focus:ring-4 focus:ring-indigo-500/30 outline-none font-semibold shadow-sm dark:[color-scheme:dark]"
+                            className="border border-indigo-200/50 bg-white/95 text-indigo-900 rounded-xl px-4 py-2.5 text-sm w-full sm:w-auto focus:ring-4 focus:ring-indigo-500/30 outline-none font-semibold shadow-sm [color-scheme:light]"
                         />
                         <div className="flex gap-2">
                             <button
