@@ -332,8 +332,32 @@ export default function ReportsPage() {
                 @media print {
                     @page { size: A4; margin: 10mm; }
                     body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 14px; }
-                    nav, header, aside, .print\\:hidden { display: none !important; }
-                    #printable-area { width: 100% !important; margin: 0 !important; margin-top: 20px !important; padding: 0 !important; }
+                    
+                    /* Hide everything by default */
+                    body > * { display: none !important; }
+                    
+                    /* Re-show only the report */
+                    /* Note: This assumes the report is within the body. If it's deep nested, this might be tricky. 
+                       Better to use the existing absolute positioning technique but ensuring overrides. */
+                    
+                    nav, header, aside, .print\\:hidden, div[class*="navbar"], div[class*="sidebar"] { display: none !important; }
+                    
+                    /* Target the printable area specifically */
+                    #printable-area { 
+                        display: block !important;
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        background-color: white !important;
+                        z-index: 9999 !important;
+                    }
+
                     .recharts-wrapper { break-inside: avoid; }
                     
                     /* Force Grid for Print */
@@ -352,6 +376,7 @@ export default function ReportsPage() {
                     .print-no-border {
                         border: none !important;
                         background: none !important;
+                        box-shadow: none !important;
                     }
                     
                     /* Compact Headings but larger than before */
