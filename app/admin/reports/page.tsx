@@ -173,7 +173,7 @@ export default function ReportsPage() {
                             const expensePercent = Math.min(((data.expenses?.total || 0) / maxVal) * 100, 100);
 
                             return (
-                            return (
+
                                 <div className="space-y-8 print:space-y-2">
                                     {/* Income Power Bar */}
                                     <div className="relative">
