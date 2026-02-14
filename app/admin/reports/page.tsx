@@ -328,38 +328,39 @@ export default function ReportsPage() {
                 </div>
             ) : null}
 
-            @media print {
-                @page {size: A4; margin: 10mm; }
-            body {-webkit - print - color - adjust: exact; background-color: white !important; font-size: 14px; }
-            nav, header, aside, .print\\:hidden {display: none !important; }
-            #printable-area {width: 100% !important; margin: 0 !important; margin-top: 20px !important; padding: 0 !important; }
-            .recharts-wrapper { break-inside: avoid; }
-
-            /* Force Grid for Print */
-            .print-grid-3 {
-                display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 12px !important;
+            <style jsx global>{`
+                @media print {
+                    @page { size: A4; margin: 10mm; }
+                    body { -webkit-print-color-adjust: exact; background-color: white !important; font-size: 14px; }
+                    nav, header, aside, .print\\:hidden { display: none !important; }
+                    #printable-area { width: 100% !important; margin: 0 !important; margin-top: 20px !important; padding: 0 !important; }
+                    .recharts-wrapper { break-inside: avoid; }
+                    
+                    /* Force Grid for Print */
+                    .print-grid-3 {
+                        display: grid !important;
+                        grid-template-columns: repeat(3, 1fr) !important;
+                        gap: 12px !important;
                     }
-            .print-grid-2 {
-                display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 16px !important;
+                    .print-grid-2 {
+                        display: grid !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 16px !important;
                     }
-
-            /* Hide borders on summary cards for cleaner look if requested */
-            .print-no-border {
-                border: none !important;
-            background: none !important;
+                    
+                    /* Hide borders on summary cards for cleaner look if requested */
+                    .print-no-border {
+                        border: none !important;
+                        background: none !important;
                     }
-
-            /* Compact Headings but larger than before */
-            h1 {font - size: 20px !important; margin-bottom: 8px !important; }
-            h2 {font - size: 16px !important; margin-bottom: 6px !important; }
-            h3 {font - size: 15px !important; }
-            h4 {font - size: 15px !important; margin-bottom: 6px !important; }
-            p {margin - bottom: 4px !important; }
-            td, th {padding - top: 4px !important; padding-bottom: 4px !important; }
+                    
+                    /* Compact Headings but larger than before */
+                    h1 { font-size: 20px !important; margin-bottom: 8px !important; }
+                    h2 { font-size: 16px !important; margin-bottom: 6px !important; }
+                    h3 { font-size: 15px !important; }
+                    h4 { font-size: 15px !important; margin-bottom: 6px !important; }
+                    p { margin-bottom: 4px !important; }
+                    td, th { padding-top: 4px !important; padding-bottom: 4px !important; }
                 }
             `}</style>
         </div >
