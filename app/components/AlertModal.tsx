@@ -22,8 +22,12 @@ export default function AlertModal({
     message,
     type = "success",
     actionLabel = "OK",
-    onAction
-}: AlertModalProps) {
+    onAction,
+    showCancel = false,
+    cancelLabel = "Cancel",
+    onCancel,
+    children
+}: AlertModalProps & { showCancel?: boolean; cancelLabel?: string; onCancel?: () => void; children?: React.ReactNode }) {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
@@ -40,6 +44,14 @@ export default function AlertModal({
     const handleAction = () => {
         if (onAction) {
             onAction();
+        } else {
+            onClose();
+        }
+    };
+
+    const handleCancel = () => {
+        if (onCancel) {
+            onCancel();
         } else {
             onClose();
         }
@@ -96,7 +108,7 @@ export default function AlertModal({
             {/* Backdrop */}
             <div
                 className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}
-                onClick={onClose}
+                onClick={onClose} // Allow clicking backdrop to close/cancel
             />
 
             {/* Modal Content */}
@@ -107,16 +119,35 @@ export default function AlertModal({
                     </div>
 
                     <h3 className="text-2xl font-bold text-gray-800 mb-2 font-display tracking-tight">{title}</h3>
-                    <p className="text-gray-500 mb-8 text-[15px] leading-relaxed font-medium">
-                        {message}
-                    </p>
 
-                    <button
-                        onClick={handleAction}
-                        className={`w-full py-3.5 rounded-xl font-bold shadow-lg transition-all transform active:scale-95 ${getButtonColor()}`}
-                    >
-                        {actionLabel}
-                    </button>
+                    {message && (
+                        <p className="text-gray-500 mb-6 text-[15px] leading-relaxed font-medium">
+                            {message}
+                        </p>
+                    )}
+
+                    {children && (
+                        <div className="w-full mb-6 text-left">
+                            {children}
+                        </div>
+                    )}
+
+                    <div className="flex gap-3 w-full">
+                        {showCancel && (
+                            <button
+                                onClick={handleCancel}
+                                className="flex-1 py-3.5 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all active:scale-95"
+                            >
+                                {cancelLabel}
+                            </button>
+                        )}
+                        <button
+                            onClick={handleAction}
+                            className={`flex-1 py-3.5 rounded-xl font-bold shadow-lg transition-all transform active:scale-95 ${getButtonColor()}`}
+                        >
+                            {actionLabel}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -50,6 +50,11 @@ export default function BulkMeterPage() {
         message: string;
         type: 'success' | 'error' | 'warning' | 'info';
         onAction?: () => void;
+        showCancel?: boolean;
+        cancelLabel?: string;
+        onCancel?: () => void;
+        content?: React.ReactNode;
+        actionLabel?: string;
     }>({
         isOpen: false,
         title: "",
@@ -150,21 +155,68 @@ export default function BulkMeterPage() {
         }));
     }
 
-    const completedEntries = entries.filter(e => e.waterCurrent !== null && e.electricCurrent !== null);
+    const completedEntries = entries.filter(e => e.waterCurrent !== null && e.electricCurrent !== null && e.waterCurrent >= e.lastWater && e.electricCurrent >= e.lastElectric);
     const grandTotal = completedEntries.reduce((sum, e) => sum + e.totalCost, 0);
 
-    async function handleSubmit() {
+    function handlePreview() {
         if (completedEntries.length === 0) {
             setAlertState({
                 isOpen: true,
                 title: "แจ้งเตือน",
-                message: "กรุณากรอกมาตรอย่างน้อย 1 ห้อง",
+                message: "กรุณากรอกมาตรให้ครบถ้วนและถูกต้อง (ค่าใหม่อย่างน้อยต้องเท่ากับค่าเก่า)",
                 type: "warning"
             });
             return;
         }
 
+        const content = (
+            <div className="bg-gray-50 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4 text-sm text-yellow-800">
+                    ⚠️ ระบบจะสร้างบิล <strong>{completedEntries.length}</strong> ห้อง ยอดรวม <strong>฿{grandTotal.toLocaleString()}</strong>
+                </div>
+                <div className="space-y-2">
+                    {completedEntries.map(entry => (
+                        <div key={entry.roomId} className="flex justify-between items-center text-sm border-b border-gray-200 pb-2">
+                            <div>
+                                <span className="font-bold text-gray-700">{entry.roomNumber}</span>
+                                <span className="text-xs text-gray-500 ml-2">
+                                    (น้ำ {entry.waterUsage} | ไฟ {entry.electricUsage})
+                                </span>
+                            </div>
+                            <div className="font-bold text-green-700">฿{entry.totalCost.toLocaleString()}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        setAlertState({
+            isOpen: true,
+            title: "ยืนยันการสร้างบิล",
+            message: "ตรวจสอบรายการก่อนยืนยัน การกระทำนี้จะสร้างบิลและส่งแจ้งเตือนทันที",
+            type: "warning",
+            content: content,
+            showCancel: true,
+            cancelLabel: "ยกเลิก",
+            actionLabel: "ยืนยันและส่งบิล",
+            onAction: handleSubmit,
+            onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+        });
+    }
+
+    async function handleSubmit() {
         setSubmitting(true);
+        // Update modal to show loading state
+        setAlertState(prev => ({
+            ...prev,
+            title: "กำลังประมวลผล...",
+            message: "กรุณารอสักครู่ ระบบกำลังสร้างบิลและส่งแจ้งเตือน",
+            type: "info",
+            showCancel: false,
+            actionLabel: "กำลังทำงาน...",
+            onAction: () => { }, // Keep open
+            content: undefined // Clear content
+        }));
 
         try {
             const payload = {
@@ -207,6 +259,7 @@ export default function BulkMeterPage() {
                 title: "สำเร็จ!",
                 message: message,
                 type: "success",
+                actionLabel: "ตกลง (ไปหน้าบิล)",
                 onAction: () => {
                     // Only redirect if at least one bill was created
                     if (result.created > 0) {
@@ -223,11 +276,12 @@ export default function BulkMeterPage() {
                 isOpen: true,
                 title: "เกิดข้อผิดพลาด",
                 message: error.message,
-                type: "error"
+                type: "error",
+                actionLabel: "ปิด",
+                onAction: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
         } finally {
             setSubmitting(false);
-            setShowPreview(false);
         }
     }
 
@@ -248,7 +302,13 @@ export default function BulkMeterPage() {
                 message={alertState.message}
                 type={alertState.type}
                 onAction={alertState.onAction}
-            />
+                showCancel={alertState.showCancel}
+                cancelLabel={alertState.cancelLabel}
+                onCancel={alertState.onCancel}
+                actionLabel={alertState.actionLabel}
+            >
+                {alertState.content}
+            </AlertModal>
 
             {/* Enhanced Gradient Header */}
             <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
@@ -443,7 +503,7 @@ export default function BulkMeterPage() {
             {/* Action Button */}
             <div className="mt-6 flex justify-end">
                 <button
-                    onClick={() => setShowPreview(true)}
+                    onClick={handlePreview}
                     disabled={completedEntries.length === 0}
                     className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
@@ -451,60 +511,6 @@ export default function BulkMeterPage() {
                     ตรวจสอบและสร้างบิล ({completedEntries.length} ห้อง)
                 </button>
             </div>
-
-            {/* Preview Modal */}
-            {showPreview && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowPreview(false)}>
-                    <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900">
-                            <AlertCircle className="text-yellow-600" />
-                            ตรวจสอบบิลก่อนส่ง
-                        </h2>
-
-                        <div className="bg-yellow-50 border-2 border-yellow-500 rounded-lg p-4 mb-4">
-                            <strong className="text-gray-900 text-base">⚠️ ระบบจะสร้างบิล {completedEntries.length} ห้อง</strong>
-                            <span className="text-gray-800"> และส่งการแจ้งเตือนผ่าน Line ให้ลูกค้าทันที</span>
-                        </div>
-
-                        <div className="space-y-2 mb-6 max-h-64 overflow-auto">
-                            {completedEntries.map(entry => (
-                                <div key={entry.roomId} className="flex justify-between items-center border-b pb-2">
-                                    <div>
-                                        <span className="font-bold text-indigo-700">{entry.roomNumber}</span>
-                                        <span className="text-xs text-gray-500 ml-2">
-                                            (น้ำ {entry.waterUsage} | ไฟ {entry.electricUsage} หน่วย)
-                                        </span>
-                                    </div>
-                                    <div className="font-bold text-green-700">฿{entry.totalCost.toLocaleString()}</div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="bg-gray-100 rounded p-4 mb-6">
-                            <div className="flex justify-between text-lg font-bold text-gray-900">
-                                <span>รายได้รวม:</span>
-                                <span className="text-green-700">฿{grandTotal.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowPreview(false)}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900"
-                            >
-                                ยกเลิก
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={submitting}
-                                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold disabled:opacity-50"
-                            >
-                                {submitting ? "กำลังสร้างบิล..." : "✅ ยืนยันและส่งบิล"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
