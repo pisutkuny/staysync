@@ -26,6 +26,7 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
             "Monthly Report": t.sidebar.monthlyReport,
             "Central Meter": t.sidebar.centralMeter,
             "Utility Analysis": t.sidebar.utilityAnalysis,
+            "Expense Tracking": t.sidebar.expenseTracking,
             "Maintenance": t.sidebar.maintenance,
             "Report Issue": t.sidebar.reportIssue,
             "Repair Requests": t.sidebar.repairRequests,
@@ -215,8 +216,8 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                                             onClick={handleClick}
                                             href={child.href!}
                                             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ml-2 ${isChildActive
-                                                    ? `${theme} bg-opacity-50` // Softer bg for child
-                                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                                                ? `${theme} bg-opacity-50` // Softer bg for child
+                                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                                                 }`}
                                         >
                                             <span className={`text-[13px] ${isChildActive ? "font-semibold" : "font-medium"}`}>

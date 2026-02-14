@@ -71,6 +71,11 @@ export const NAV_ITEMS: NavItem[] = [
                 label: "Utility Analysis",
                 href: "/admin/utility-analysis",
                 roles: ["OWNER"]
+            },
+            {
+                label: "Expense Tracking",
+                href: "/expenses",
+                roles: ["OWNER"]
             }
         ]
     },
