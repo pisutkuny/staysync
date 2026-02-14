@@ -392,11 +392,25 @@ export default function ReportsPage() {
                     /* Typography Adjustments - Increased size by +2px as requested */
                     h1 { font-size: 22px !important; margin-bottom: 8px !important; }
                     h2 { font-size: 18px !important; margin-bottom: 6px !important; }
-                    h3 { font-size: 17px !important; }
+                    h3 { font-size: 15px !important; } /* Reduced by 2px as requested */
                     h4 { font-size: 17px !important; margin-bottom: 6px !important; }
                     p { margin-bottom: 4px !important; }
                     td, th { padding-top: 4px !important; padding-bottom: 4px !important; }
 
+                    /* Center align summary cards text and flex items */
+                    .print-grid-3 > div {
+                        text-align: center !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                    /* Ensure headers in summary cards are centered */
+                    .print-grid-3 h3 {
+                        justify-content: center !important;
+                        width: 100% !important;
+                    }
+                    
                     /* Force Colors for Bars */
                     .print-force-bg-green {
                         background-color: #10b981 !important; /* emerald-500 */
