@@ -6,6 +6,8 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
 
+import BillDetailsModal from "./BillDetailsModal";
+
 type RoomData = {
     id: number;
     number: string;
@@ -21,6 +23,21 @@ type BillData = {
     status: string; // 'Pending', 'Paid', 'Overdue', 'Review', 'Rejected', 'Late'
     slipImage?: string | null;
     paymentStatus?: string; // Sometimes used interchangeably with status in your codebase
+    // Added for breakdown
+    waterMeterLast: number;
+    waterMeterCurrent: number;
+    waterRate: number;
+    electricMeterLast: number;
+    electricMeterCurrent: number;
+    electricRate: number;
+    internetFee: number;
+    trashFee: number;
+    otherFees: number;
+    commonWaterFee: number;
+    commonElectricFee: number;
+    commonInternetFee: number;
+    commonTrashFee: number;
+    room?: { price: number; number: string };
 };
 
 export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bills: BillData[] }) {
@@ -40,6 +57,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
     const [loading, setLoading] = useState<number | null>(null);
     const [reminderLoading, setReminderLoading] = useState(false);
     const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
+    const [selectedBill, setSelectedBill] = useState<BillData | null>(null);
     const [rejectingId, setRejectingId] = useState<number | null>(null);
     const [rejectReason, setRejectReason] = useState("");
 
@@ -391,7 +409,14 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                     <div className="mt-auto px-1">
                                         <div className="flex justify-between items-end mb-1">
                                             <p className="text-xs text-slate-600 uppercase tracking-wider font-extrabold">Total Bill</p>
-                                            {bill && <span className="text-xs text-indigo-700 font-bold cursor-pointer hover:underline">See Breakdown</span>}
+                                            {bill && (
+                                                <button
+                                                    onClick={() => setSelectedBill(bill)}
+                                                    className="text-xs text-indigo-700 font-bold cursor-pointer hover:underline hover:text-indigo-800 transition-colors"
+                                                >
+                                                    See Breakdown
+                                                </button>
+                                            )}
                                         </div>
                                         <div className={`text-5xl font-black tracking-tighter ${bill ? 'text-slate-900' : 'text-slate-400'}`}>
                                             {bill ? `฿${bill.totalAmount.toLocaleString()}` : '---'}
@@ -540,6 +565,13 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                         </div>
                     </div>
                 </div>
+            )}
+
+            {selectedBill && (
+                <BillDetailsModal
+                    bill={selectedBill}
+                    onClose={() => setSelectedBill(null)}
+                />
             )}
         </div>
     );
