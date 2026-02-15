@@ -367,11 +367,15 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                 <div className={`p-5 flex-grow flex flex-col gap-6 ${cardBg}`}>
                                     {/* Resident Block */}
                                     <div className="flex items-center gap-4 p-4 bg-white/60 rounded-xl border border-black/5 shadow-sm">
-                                        <div className="w-12 h-12 rounded-full bg-white border-2 border-black/10 flex items-center justify-center text-xl overflow-hidden shrink-0 font-bold text-slate-700">
+                                        <div className="w-12 h-12 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center overflow-hidden shrink-0 relative">
                                             {room.residents[0] ? (
-                                                room.residents[0].fullName.charAt(0)
+                                                <img
+                                                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(room.residents[0].fullName)}&backgroundColor=e5e7eb`}
+                                                    alt="Avatar"
+                                                    className="w-full h-full object-cover"
+                                                />
                                             ) : (
-                                                <span className="text-slate-400">👤</span>
+                                                <span className="text-2xl">👤</span>
                                             )}
                                         </div>
                                         <div className="min-w-0 flex-1">
