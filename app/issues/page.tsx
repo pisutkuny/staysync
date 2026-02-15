@@ -75,7 +75,7 @@ export default function IssuesPage() {
                         <p className="text-gray-500 mt-2">{t.issues.loading}</p>
                     </div>
                 ) : issues.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                    <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300">
                         <p className="text-gray-500">{t.issues.noIssues}</p>
                     </div>
                 ) : (

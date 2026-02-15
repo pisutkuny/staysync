@@ -53,7 +53,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
             </div>
 
             {monthlyData.length === 0 ? (
-                <div className="bg-white p-12 rounded-xl border border-gray-100 shadow-sm text-center">
+                <div className="bg-white p-12 rounded-xl border border-slate-300 shadow-sm text-center">
                     <p className="text-gray-500 mb-4">{t.utilityAnalysis.noData}</p>
                     <Link href="/admin/central-meter">
                         <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
@@ -67,7 +67,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                     {latestMonth && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Water Card */}
-                            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100 shadow-sm">
+                            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-300 shadow-sm">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">💧 {t.utilityAnalysis.water} - {formatMonth(latestMonth.month)}</h3>
 
                                 <div className="space-y-3">
@@ -79,7 +79,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.totalRooms}:</span>
                                         <span className="font-semibold text-gray-900">{latestMonth.roomWaterUsage.toLocaleString()} {t.centralMeter.unit}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-blue-200">
+                                    <div className="flex justify-between items-center pt-2 border-t border-blue-300">
                                         <span className="text-sm font-semibold text-blue-700">{t.utilityAnalysis.commonArea}:</span>
                                         <span className="font-bold text-blue-700">{latestMonth.commonWaterUsage.toLocaleString()} {t.centralMeter.unit} ({((latestMonth.commonWaterUsage / latestMonth.central.waterUsage) * 100).toFixed(1)}%)</span>
                                     </div>
@@ -89,7 +89,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-4 border-t border-blue-200">
+                                <div className="mt-4 pt-4 border-t border-blue-300">
                                     <div className="flex justify-between items-center mb-1">
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.revenue}:</span>
                                         <span className="font-semibold text-green-600">฿{latestMonth.waterRevenue.toLocaleString()}</span>
@@ -98,7 +98,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.actualCost}:</span>
                                         <span className="font-semibold text-gray-900">฿{latestMonth.central.waterTotalCost.toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-blue-200">
+                                    <div className="flex justify-between items-center pt-2 border-t border-blue-300">
                                         <span className="font-bold text-gray-900">{t.utilityAnalysis.profit}:</span>
                                         <span className={`font-bold text-lg ${latestMonth.waterProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                             ฿{latestMonth.waterProfit.toLocaleString()}
@@ -108,7 +108,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                             </div>
 
                             {/* Electric Card */}
-                            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-100 shadow-sm">
+                            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-300 shadow-sm">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">⚡ {t.utilityAnalysis.elec} - {formatMonth(latestMonth.month)}</h3>
 
                                 <div className="space-y-3">
@@ -120,7 +120,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.totalRooms}:</span>
                                         <span className="font-semibold text-gray-900">{latestMonth.roomElectricUsage.toLocaleString()} {t.centralMeter.unit}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-yellow-200">
+                                    <div className="flex justify-between items-center pt-2 border-t border-yellow-300">
                                         <span className="text-sm font-semibold text-orange-700">{t.utilityAnalysis.commonArea}:</span>
                                         <span className="font-bold text-orange-700">{latestMonth.commonElectricUsage.toLocaleString()} {t.centralMeter.unit} ({((latestMonth.commonElectricUsage / latestMonth.central.electricUsage) * 100).toFixed(1)}%)</span>
                                     </div>
@@ -130,7 +130,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-4 border-t border-yellow-200">
+                                <div className="mt-4 pt-4 border-t border-yellow-300">
                                     <div className="flex justify-between items-center mb-1">
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.revenue}:</span>
                                         <span className="font-semibold text-green-600">฿{latestMonth.electricRevenue.toLocaleString()}</span>
@@ -139,7 +139,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                         <span className="text-sm text-gray-600">{t.utilityAnalysis.actualCost}:</span>
                                         <span className="font-semibold text-gray-900">฿{latestMonth.central.electricTotalCost.toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-yellow-200">
+                                    <div className="flex justify-between items-center pt-2 border-t border-yellow-300">
                                         <span className="font-bold text-gray-900">{t.utilityAnalysis.profit}:</span>
                                         <span className={`font-bold text-lg ${latestMonth.electricProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                             ฿{latestMonth.electricProfit.toLocaleString()}
@@ -152,7 +152,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
 
                     {/* Total Profit Summary */}
                     {latestMonth && (
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100 shadow-sm">
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-300 shadow-sm">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">💰 {t.utilityAnalysis.summary}</h3>
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
@@ -173,19 +173,19 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                     </p>
                                 </div>
                             </div>
-                            <div className="mt-4 pt-4 border-t border-green-200">
+                            <div className="mt-4 pt-4 border-t border-green-300">
                                 <p className="text-sm text-gray-600">*{t.utilityAnalysis.ownerPays} ฿{(latestMonth.commonWaterCost + latestMonth.commonElectricCost).toLocaleString()}/{t.centralMeter.month}</p>
                             </div>
                         </div>
                     )}
 
                     {/* Historical Table */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div className="bg-white p-6 rounded-xl border border-slate-300 shadow-sm">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">📊 {t.utilityAnalysis.history}</h3>
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="border-b border-gray-200">
+                                    <tr className="border-b border-slate-300">
                                         <th className="text-left py-3 px-4 font-semibold text-gray-700">{t.centralMeter.month}</th>
                                         <th className="text-right py-3 px-4 font-semibold text-gray-700">{t.utilityAnalysis.waterCentral}</th>
                                         <th className="text-right py-3 px-4 font-semibold text-gray-700">{t.utilityAnalysis.waterRoom}</th>
@@ -196,7 +196,7 @@ export default function UtilityAnalysisClient({ monthlyData }: { monthlyData: Mo
                                 </thead>
                                 <tbody>
                                     {monthlyData.map((data, idx) => (
-                                        <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                                        <tr key={idx} className="border-b border-slate-200 hover:bg-gray-50">
                                             <td className="py-3 px-4 font-medium text-gray-900">
                                                 {new Date(data.month).toLocaleDateString('th-TH', { year: '2-digit', month: 'short' })}
                                             </td>

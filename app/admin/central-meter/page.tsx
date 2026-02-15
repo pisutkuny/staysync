@@ -168,7 +168,7 @@ export default function CentralMeterPage() {
 
             <div className="max-w-2xl mx-auto">
                 {/* Form Section */}
-                <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-6">
+                <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300 space-y-6">
                     {/* Month Selector */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.month}</label>
@@ -177,13 +177,13 @@ export default function CentralMeterPage() {
                             value={formData.month}
                             onChange={e => setFormData({ ...formData, month: e.target.value })}
                             required
-                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none"
+                            className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none"
                             style={{ colorScheme: 'light' }}
                         />
                     </div>
 
                     {/* Water Section */}
-                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                    <div className="border-t border-slate-300 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">💧 {t.centralMeter.waterTitle}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -200,7 +200,7 @@ export default function CentralMeterPage() {
                                     required={records.length === 0}
                                     className={`w-full rounded-lg border p-3 ${records.length > 0
                                         ? 'border-gray-200 text-gray-500 bg-gray-50'
-                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                        : 'border-slate-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
                                         }`}
                                 />
                                 {records.length === 0 && (
@@ -215,7 +215,7 @@ export default function CentralMeterPage() {
                                     value={formData.waterMeterCurrent}
                                     onChange={e => setFormData({ ...formData, waterMeterCurrent: parseFloat(e.target.value) || 0 })}
                                     required
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                             </div>
                         </div>
@@ -227,7 +227,7 @@ export default function CentralMeterPage() {
                                     type="number"
                                     value={calculated.waterUsage.toFixed(2)}
                                     disabled
-                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-500 bg-gray-50"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.unit}</p>
                             </div>
@@ -239,7 +239,7 @@ export default function CentralMeterPage() {
                                     value={formData.waterRateFromUtility}
                                     onChange={e => setFormData({ ...formData, waterRateFromUtility: parseFloat(e.target.value) || 0 })}
                                     required
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
@@ -250,7 +250,7 @@ export default function CentralMeterPage() {
                                     step="0.01"
                                     value={formData.waterMeterMaintenanceFee}
                                     onChange={e => setFormData({ ...formData, waterMeterMaintenanceFee: parseFloat(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">คงที่ต่อเดือน</p>
@@ -261,14 +261,14 @@ export default function CentralMeterPage() {
                                     type="text"
                                     value={`฿${calculated.waterCost.toLocaleString()}`}
                                     disabled
-                                    className="w-full rounded-lg border border-gray-200 p-3 text-indigo-600 font-bold bg-indigo-50"
+                                    className="w-full rounded-lg border border-indigo-200 p-3 text-indigo-600 font-bold bg-indigo-50"
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* Electric Section */}
-                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                    <div className="border-t border-slate-300 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">⚡ {t.centralMeter.elecTitle}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -285,7 +285,7 @@ export default function CentralMeterPage() {
                                     required={records.length === 0}
                                     className={`w-full rounded-lg border p-3 ${records.length > 0
                                         ? 'border-gray-200 text-gray-500 bg-gray-50'
-                                        : 'border-gray-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
+                                        : 'border-slate-300 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none'
                                         }`}
                                 />
                                 {records.length === 0 && (
@@ -300,7 +300,7 @@ export default function CentralMeterPage() {
                                     value={formData.electricMeterCurrent}
                                     onChange={e => setFormData({ ...formData, electricMeterCurrent: parseFloat(e.target.value) || 0 })}
                                     required
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                             </div>
                         </div>
@@ -312,7 +312,7 @@ export default function CentralMeterPage() {
                                     type="number"
                                     value={calculated.electricUsage.toFixed(2)}
                                     disabled
-                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-500 bg-gray-50"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.unit}</p>
                             </div>
@@ -324,7 +324,7 @@ export default function CentralMeterPage() {
                                     value={formData.electricTotalCost}
                                     onChange={e => setFormData({ ...formData, electricTotalCost: parseFloat(e.target.value) || 0 })}
                                     required
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">กรอกยอดจ่ายจริง</p>
                             </div>
@@ -335,7 +335,7 @@ export default function CentralMeterPage() {
                                     step="0.0001"
                                     value={formData.electricRateFromUtility.toFixed(4)}
                                     disabled
-                                    className="w-full rounded-lg border border-gray-200 p-3 text-gray-500 bg-gray-50"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-500 bg-gray-50"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
@@ -343,7 +343,7 @@ export default function CentralMeterPage() {
                     </div>
 
                     {/* Fixed Monthly Costs */}
-                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                    <div className="border-t border-slate-300 pt-4 space-y-4">
                         <h3 className="text-lg font-semibold text-gray-900">💰 {t.centralMeter.fixedCost}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -354,7 +354,7 @@ export default function CentralMeterPage() {
                                     step="0.01"
                                     value={formData.internetCost}
                                     onChange={e => setFormData({ ...formData, internetCost: parseFloat(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.perMonth}</p>
@@ -366,7 +366,7 @@ export default function CentralMeterPage() {
                                     step="0.01"
                                     value={formData.trashCost}
                                     onChange={e => setFormData({ ...formData, trashCost: parseFloat(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.perMonth}</p>
@@ -375,19 +375,19 @@ export default function CentralMeterPage() {
                     </div>
 
                     {/* Note */}
-                    <div className="border-t border-gray-100 pt-4">
+                    <div className="border-t border-slate-300 pt-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.note}</label>
                         <textarea
                             value={formData.note}
                             onChange={e => setFormData({ ...formData, note: e.target.value })}
                             rows={3}
-                            className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                             placeholder={t.centralMeter.notePlaceholder}
                         />
                     </div>
 
                     {/* Submit */}
-                    <div className="pt-4 border-t border-gray-100">
+                    <div className="pt-4 border-t border-slate-300">
                         <button
                             type="submit"
                             disabled={loading}
@@ -400,7 +400,7 @@ export default function CentralMeterPage() {
                 </form>
 
                 {/* Total Summary */}
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-100">
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-200">
                     <h3 className="font-bold text-gray-900 mb-3">💰 {t.centralMeter.summary}</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>

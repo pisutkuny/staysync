@@ -198,14 +198,14 @@ export default function ReportIssuePage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     {/* Room Selection */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-300 space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.selectRoom}</label>
                             <select
                                 required
                                 value={selectedRoomId}
                                 onChange={(e) => handleRoomChange(e.target.value)}
-                                className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all hover:border-indigo-300"
+                                className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all hover:border-indigo-300"
                             >
                                 <option value="">{t.issues.selectRoomPlaceholder}</option>
                                 <option value="public">{t.issues.publicOption}</option>
@@ -227,7 +227,7 @@ export default function ReportIssuePage() {
                                     disabled={!selectedRoomId}
                                     value={selectedResidentId}
                                     onChange={(e) => setSelectedResidentId(e.target.value)}
-                                    className="w-full p-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400 transition-all hover:border-indigo-300"
+                                    className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400 transition-all hover:border-indigo-300"
                                 >
                                     <option value="">
                                         {selectedRoomId ? t.issues.selectNamePlaceholder : t.issues.selectRoomFirst}
@@ -249,7 +249,7 @@ export default function ReportIssuePage() {
                                         value={guestInfo.name}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
                                         placeholder={t.issues.enterName}
-                                        className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
+                                        className="w-full p-3 rounded-lg border border-indigo-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 <div>
@@ -260,7 +260,7 @@ export default function ReportIssuePage() {
                                         value={guestInfo.contact}
                                         onChange={(e) => setGuestInfo({ ...guestInfo, contact: e.target.value })}
                                         placeholder={t.issues.enterContact}
-                                        className="w-full p-3 rounded-lg border border-indigo-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
+                                        className="w-full p-3 rounded-lg border border-indigo-300 focus:ring-2 focus:ring-indigo-500 outline-none bg-white/80"
                                     />
                                 </div>
                                 {guestInfo.lineUserId && (
@@ -273,7 +273,7 @@ export default function ReportIssuePage() {
                     </div>
 
                     {/* Category Selection */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-300">
                         <label className="block text-sm font-medium text-gray-700 mb-3">{t.issues.category}</label>
                         <div className="grid grid-cols-2 gap-3">
                             {["Water", "Electricity", "Internet", "Other"].map((cat) => (
@@ -283,7 +283,7 @@ export default function ReportIssuePage() {
                                     onClick={() => setFormData({ ...formData, category: cat })}
                                     className={`py-3 px-4 rounded-xl text-sm font-bold transition-all transform hover:scale-105 ${formData.category === cat
                                         ? "bg-indigo-600 text-white shadow-lg ring-2 ring-indigo-200"
-                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
+                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-slate-300"
                                         }`}
                                 >
 
@@ -297,7 +297,7 @@ export default function ReportIssuePage() {
                     </div>
 
                     {/* Description */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-300">
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.description}</label>
                         <textarea
                             required
@@ -305,12 +305,12 @@ export default function ReportIssuePage() {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder={t.issues.descPlaceholder}
-                            className="w-full rounded-xl border border-gray-300 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base shadow-inner transition-all hover:border-indigo-300"
+                            className="w-full rounded-xl border border-slate-300 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base shadow-inner transition-all hover:border-indigo-300"
                         />
                     </div>
 
                     {/* Photo Upload */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-300">
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t.issues.photo}</label>
 
                         {!previewUrl ? (
@@ -321,7 +321,7 @@ export default function ReportIssuePage() {
                                     onChange={handleFileChange}
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-400 group-hover:bg-gray-50 group-hover:border-indigo-300 transition-all duration-300">
+                                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-400 group-hover:bg-gray-50 group-hover:border-indigo-300 transition-all duration-300">
                                     <div className="bg-gray-50 p-3 rounded-full mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                         <ImageIcon size={32} />
                                     </div>
@@ -329,7 +329,7 @@ export default function ReportIssuePage() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="relative rounded-xl overflow-hidden border border-gray-200 shadow-md group">
+                            <div className="relative rounded-xl overflow-hidden border border-slate-300 shadow-md group">
                                 <img src={previewUrl} alt="Preview" className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105" />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                 <button
