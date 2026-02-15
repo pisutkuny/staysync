@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode, useRef } from "react";
 import AlertModal, { AlertType } from "@/app/components/AlertModal";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 interface ModalContextType {
     showAlert: (title: string, message: string, type?: AlertType, onAction?: () => void) => void;
@@ -37,20 +38,41 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         }
     }, [alertState.onAction]);
 
+    const resolveRef = useRef<((value: boolean) => void) | null>(null);
+    const [confirmState, setConfirmState] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        isDestructive: false
+    });
+
     // Keep SweetAlert for confirm dialogs for now, or implement a separate ConfirmModal later
-    const showConfirm = useCallback(async (title: string, message: string, isDestructive: boolean = false) => {
-        const Swal = (await import("sweetalert2")).default;
-        return Swal.fire({
-            title: title,
-            text: message,
-            icon: isDestructive ? 'warning' : 'question',
-            showCancelButton: true,
-            confirmButtonText: "Confirm",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: isDestructive ? '#EF4444' : '#4F46E5',
-        }).then((result) => {
-            return result.isConfirmed;
+    const showConfirm = useCallback((title: string, message: string, isDestructive: boolean = false) => {
+        return new Promise<boolean>((resolve) => {
+            resolveRef.current = resolve;
+            setConfirmState({
+                isOpen: true,
+                title,
+                message,
+                isDestructive
+            });
         });
+    }, []);
+
+    const handleConfirm = useCallback(() => {
+        if (resolveRef.current) {
+            resolveRef.current(true);
+            resolveRef.current = null;
+        }
+        setConfirmState(prev => ({ ...prev, isOpen: false }));
+    }, []);
+
+    const handleCancel = useCallback(() => {
+        if (resolveRef.current) {
+            resolveRef.current(false);
+            resolveRef.current = null;
+        }
+        setConfirmState(prev => ({ ...prev, isOpen: false }));
     }, []);
 
     return (
@@ -66,6 +88,14 @@ export function ModalProvider({ children }: { children: ReactNode }) {
                     closeAlert();
                     if (alertState.onAction) alertState.onAction();
                 }}
+            />
+            <ConfirmModal
+                isOpen={confirmState.isOpen}
+                onClose={handleCancel}
+                onConfirm={handleConfirm}
+                title={confirmState.title}
+                message={confirmState.message}
+                isDestructive={confirmState.isDestructive}
             />
         </ModalContext.Provider>
     );
