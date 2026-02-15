@@ -67,6 +67,18 @@ textarea {
   color: #0f172a;
   /* Slate 900 */
   background-color: #ffffff;
+  border-width: 2px;
+  border-color: #cbd5e1; /* slate-300 */
+  border-radius: 0.5rem; /* rounded-lg */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #4f46e5; /* indigo-600 */
+  ring: 2px;
+  ring-color: #e0e7ff; /* indigo-100 */
 }
 
 /* Premium Glassmorphism Utility */

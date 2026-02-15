@@ -36,32 +36,32 @@ export default function IssueItem({ issue }: { issue: any }) {
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white p-6 rounded-2xl border-2 border-slate-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow">
             <div className="space-y-1">
                 <div className="flex justify-between items-start mb-2">
-                    <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-lg uppercase">
+                    <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-lg uppercase border border-red-200">
                         {issue.category}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-500 font-bold">
                         {new Date(issue.createdAt).toLocaleDateString()}
                     </span>
                 </div>
-                <p className="text-gray-900 font-medium mb-1">{issue.description}</p>
+                <p className="text-slate-900 font-bold text-lg mb-1">{issue.description}</p>
                 {issue.photo && (
                     <div className="mb-2 mt-2">
                         <a href={issue.photo} target="_blank" rel="noopener noreferrer">
-                            <img src={issue.photo} alt="Issue" className="w-full h-32 object-cover rounded-lg border border-gray-100 hover:opacity-90 transition-opacity" />
+                            <img src={issue.photo} alt="Issue" className="w-full h-32 object-cover rounded-lg border-2 border-slate-200 hover:opacity-90 transition-opacity" />
                         </a>
                     </div>
                 )}
-                <p className="text-sm text-gray-600">
-                    {t.issues.reportedBy} <span className="font-medium text-indigo-600">{issue.resident?.fullName}</span> ({t.issues.room} {issue.resident?.room?.number || "N/A"})
+                <p className="text-sm text-slate-600">
+                    {t.issues.reportedBy} <span className="font-bold text-indigo-700">{issue.resident?.fullName}</span> ({t.issues.room} <span className="font-bold text-slate-900">{issue.resident?.room?.number || "N/A"}</span>)
                 </p>
             </div>
 
             <div className="flex gap-2">
                 {issue.status === "Done" ? (
-                    <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold border border-green-200">
+                    <span className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg font-bold border-2 border-emerald-200">
                         <CheckCircle2 size={18} />
                         {t.issues.resolved}
                     </span>
@@ -69,7 +69,7 @@ export default function IssueItem({ issue }: { issue: any }) {
                     <button
                         onClick={handleMarkDone}
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold transition-all disabled:opacity-50 border-2 border-transparent hover:border-emerald-800 shadow-sm"
                     >
                         {loading ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
                         {t.issues.markDone}
