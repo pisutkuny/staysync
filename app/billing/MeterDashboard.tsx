@@ -295,7 +295,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
             {/* Grid Layout */}
             <div className="p-4 overflow-y-auto h-[calc(100vh-220px)] min-h-[500px] bg-slate-200/80">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                     {filteredRooms.map((room) => {
                         const bill = room.bill;
                         const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
@@ -335,9 +335,9 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                         </div>
                                         {bill && (
                                             <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${status === 'Paid' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                                                    status === 'Pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                                                        status === 'Overdue' ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                                                            'bg-gray-100 text-gray-600 border-gray-200'
+                                                status === 'Pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                                    status === 'Overdue' ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                                                        'bg-gray-100 text-gray-600 border-gray-200'
                                                 }`}>
                                                 {status}
                                             </div>
