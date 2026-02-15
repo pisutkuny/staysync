@@ -7,11 +7,18 @@ import { format } from "date-fns";
 import { th, enUS } from "date-fns/locale";
 import Link from "next/link";
 
+import CreateBillModal from "./CreateBillModal";
+
 type RoomData = {
     id: number;
     number: string;
     status: string;
     residents: { fullName: string }[];
+    // Add props needed for billing form
+    price?: number;
+    chargeCommonArea?: boolean;
+    waterMeterInitial?: number;
+    electricMeterInitial?: number;
 };
 
 type BillData = {
@@ -22,7 +29,21 @@ type BillData = {
     status: string;
 };
 
-export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bills: BillData[] }) {
+type Rates = {
+    trash: number;
+    internet: number;
+    other: number;
+    common: number;
+};
+
+interface MeterDashboardProps {
+    rooms: RoomData[];
+    bills: BillData[];
+    initialRates: Rates;
+    config?: any;
+}
+
+export default function MeterDashboard({ rooms, bills, initialRates, config }: MeterDashboardProps) {
     const { t, language } = useLanguage();
     const [filter, setFilter] = useState("");
 
@@ -73,6 +94,19 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
         if (statusFilter === 'pending') return !r.isBilled;
         return true;
     });
+    // State for creating bill
+    const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const handleCreateClick = (room: RoomData) => {
+        setSelectedRoom(room);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleBillCreated = () => {
+        // Refresh the page or data to show new status
+        window.location.reload();
+    };
 
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -161,7 +195,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             </div>
 
             {/* List */}
-            <div className="max-h-[400px] overflow-y-auto">
+            <div className="max-h-[500px] overflow-y-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-600 font-medium sticky top-0 z-10 shadow-sm">
                         <tr>
@@ -184,7 +218,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                             <CheckCircle2 size={12} /> Billed
                                         </span>
                                     ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200 animate-pulse">
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
                                             <AlertCircle size={12} /> Pending
                                         </span>
                                     )}
@@ -195,12 +229,12 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                             ฿{room.bill?.totalAmount.toLocaleString()}
                                         </div>
                                     ) : (
-                                        <Link
-                                            href={`/billing/bulk?month=${selectedMonth}`}
+                                        <button
+                                            onClick={() => handleCreateClick(room as any)}
                                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm hover:shadow"
                                         >
                                             Create Bill <ArrowRight size={12} />
-                                        </Link>
+                                        </button>
                                     )}
                                 </td>
                             </tr>
@@ -215,6 +249,17 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                     </tbody>
                 </table>
             </div>
+
+            {/* Create Bill Modal */}
+            <CreateBillModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                room={selectedRoom as any}
+                initialRates={initialRates}
+                config={config}
+                totalRoomCount={rooms.length}
+                onSuccess={handleBillCreated}
+            />
         </div>
     );
 }
