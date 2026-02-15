@@ -1,8 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import BillingList from "./BillingList";
-
+import BillingForm from "./BillingForm";
 import MeterDashboard from "./MeterDashboard";
 import ExportButton from "./ExportButton";
 import Link from "next/link";
@@ -52,15 +51,26 @@ export default function BillingClient({ rooms, bills, allRooms, config }: Billin
             </div>
 
             {/* Dashboard Stats */}
-            <MeterDashboard
-                rooms={rooms}
-                bills={bills}
-                initialRates={initialRates}
-                config={config}
-            />
+            <MeterDashboard rooms={rooms} bills={bills} />
 
-            <div className="pt-4 border-t border-gray-200">
-                <BillingList initialBills={bills} />
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{t.billing.createBill}</h3>
+                    <p className="text-sm text-gray-500">
+                        💡 <strong>{t.billing.createBillDesc}</strong> |
+                        <span className="text-indigo-600 font-medium"> {t.billing.recordAllDesc}</span>
+                    </p>
+                </div>
+                {rooms.length > 0 ? (
+                    <BillingForm
+                        rooms={rooms} // Should be only occupied rooms
+                        initialRates={initialRates}
+                        config={config}
+                        totalRoomCount={allRooms.length}
+                    />
+                ) : (
+                    <p className="text-gray-500">No occupied rooms to bill.</p>
+                )}
             </div>
         </div>
     );

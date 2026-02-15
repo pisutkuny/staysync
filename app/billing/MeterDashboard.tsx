@@ -1,24 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { format } from "date-fns";
-import { th, enUS } from "date-fns/locale";
+import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
-
-import CreateBillModal from "./CreateBillModal";
 
 type RoomData = {
     id: number;
     number: string;
     status: string;
     residents: { fullName: string }[];
-    // Add props needed for billing form
-    price?: number;
-    chargeCommonArea?: boolean;
-    waterMeterInitial?: number;
-    electricMeterInitial?: number;
 };
 
 type BillData = {
@@ -26,25 +18,14 @@ type BillData = {
     roomId: number;
     totalAmount: number;
     createdAt: string | Date;
-    status: string;
+    status: string; // 'Pending', 'Paid', 'Overdue', 'Review', 'Rejected', 'Late'
+    slipImage?: string | null;
+    paymentStatus?: string; // Sometimes used interchangeably with status in your codebase
 };
 
-type Rates = {
-    trash: number;
-    internet: number;
-    other: number;
-    common: number;
-};
-
-interface MeterDashboardProps {
-    rooms: RoomData[];
-    bills: BillData[];
-    initialRates: Rates;
-    config?: any;
-}
-
-export default function MeterDashboard({ rooms, bills, initialRates, config }: MeterDashboardProps) {
-    const { t, language } = useLanguage();
+export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bills: BillData[] }) {
+    const { t } = useLanguage();
+    const { showAlert, showConfirm } = useModal();
     const [filter, setFilter] = useState("");
 
     // Default to current month YYYY-MM
@@ -53,7 +34,127 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
         return now.toISOString().slice(0, 7);
     });
 
-    const [statusFilter, setStatusFilter] = useState<'all' | 'billed' | 'pending'>('pending');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'billed' | 'pending'>('all');
+
+    // Billing Actions State
+    const [loading, setLoading] = useState<number | null>(null);
+    const [reminderLoading, setReminderLoading] = useState(false);
+    const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
+    const [rejectingId, setRejectingId] = useState<number | null>(null);
+    const [rejectReason, setRejectReason] = useState("");
+
+    // --- Helper Functions from BillingList ---
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'Paid': return 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-600/20';
+            case 'Pending': return 'bg-amber-100 text-amber-700 ring-1 ring-amber-600/20';
+            case 'Overdue': return 'bg-rose-100 text-rose-700 ring-1 ring-rose-600/20';
+            case 'Late': return 'bg-orange-100 text-orange-700 ring-1 ring-orange-600/20';
+            case 'Review': return 'bg-blue-100 text-blue-700 ring-1 ring-blue-600/20';
+            case 'Rejected': return 'bg-gray-100 text-gray-700 ring-1 ring-gray-600/20';
+            default: return 'bg-gray-100 text-gray-700 ring-1 ring-gray-600/20';
+        }
+    };
+
+    const handleSendReminders = async () => {
+        const confirmed = await showConfirm("Confirm", t.billing.confirmRemind, true);
+        if (!confirmed) return;
+
+        setReminderLoading(true);
+        try {
+            const res = await fetch("/api/notify/overdue", { method: "POST" });
+            const data = await res.json();
+
+            if (res.ok) {
+                showAlert("Success", `✅ ${t.billing.remindSuccess} \n- Overdue: ${data.overdueCount}\n- Sent: ${data.sentCount}`, "success");
+            } else {
+                showAlert("Error", `❌ ${t.billing.remindError}: ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setReminderLoading(false);
+        }
+    };
+
+    const handleCashPayment = async (id: number) => {
+        const confirmed = await showConfirm(t.status.Paid, t.billing.confirmCash, true);
+        if (!confirmed) return;
+
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}/pay-cash`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: 1 }),
+            });
+
+            if (res.ok) {
+                showAlert("Success", `✅ ${t.billing.cashSuccess}`, "success");
+                window.location.reload(); // Refresh to update status
+            } else {
+                const data = await res.json();
+                showAlert("Error", `❌ ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        const confirmed = await showConfirm("Delete", t.billing.confirmDelete, true);
+        if (!confirmed) return;
+
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}`, { method: "DELETE" });
+
+            if (res.ok) {
+                showAlert("Success", `✅ ${t.billing.deleteSuccess}`, "success");
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                showAlert("Error", `❌ ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleReview = async (id: number, action: "approve" | "reject", note?: string) => {
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}/review-slip`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, note, userId: 1 }),
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || "Failed to review");
+            }
+
+            showAlert("Success", action === "approve" ? `✅ ${t.billing.approveSuccess}` : `❌ ${t.billing.rejectSuccess}`, "success");
+            window.location.reload();
+
+        } catch (error: any) {
+            showAlert("Error", `Error: ${error.message}`, "error");
+        } finally {
+            setLoading(null);
+            if (action === "reject") {
+                setRejectingId(null);
+                setRejectReason("");
+            }
+        }
+    };
+
+    // --- Data Processing ---
 
     // Calculate Status
     const roomStatus = useMemo(() => {
@@ -94,19 +195,6 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
         if (statusFilter === 'pending') return !r.isBilled;
         return true;
     });
-    // State for creating bill
-    const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-    const handleCreateClick = (room: RoomData) => {
-        setSelectedRoom(room);
-        setIsCreateModalOpen(true);
-    };
-
-    const handleBillCreated = () => {
-        // Refresh the page or data to show new status
-        window.location.reload();
-    };
 
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -115,21 +203,32 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            📊 {t.meterDashboard?.title || "Billing Status"}
+                            📊 {t.meterDashboard?.title || "Billing Overview"}
                         </h3>
                         <p className="text-sm text-gray-500">
-                            {t.meterDashboard?.subtitle || "Overview of monthly billing progress"}
+                            {t.meterDashboard?.subtitle || "Manage monthly bills and payments"}
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-lg border border-gray-200">
-                        <Calendar size={16} className="text-gray-500 ml-2" />
-                        <input
-                            type="month"
-                            value={selectedMonth}
-                            onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer"
-                        />
+                    <div className="flex flex-wrap items-center gap-3">
+                        <button
+                            onClick={handleSendReminders}
+                            disabled={reminderLoading}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            {reminderLoading ? <Loader2 className="animate-spin" size={14} /> : <Bell size={14} />}
+                            {t.billing.sendReminder}
+                        </button>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+                            <Calendar size={16} className="text-gray-500 ml-2" />
+                            <input
+                                type="month"
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -169,7 +268,7 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
                             }`}
                     >
                         <div className="flex justify-between items-start">
-                            <div className="text-sm text-red-600 font-medium mb-1">Pending</div>
+                            <div className="text-sm text-red-600 font-medium mb-1">Pending Bill</div>
                             <AlertCircle size={18} className="text-red-500" />
                         </div>
                         <div className="text-3xl font-bold text-red-700">
@@ -195,53 +294,133 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
             </div>
 
             {/* List */}
-            <div className="max-h-[500px] overflow-y-auto">
+            <div className="max-h-[600px] overflow-y-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-600 font-medium sticky top-0 z-10 shadow-sm">
                         <tr>
                             <th className="p-4 w-24">Room</th>
                             <th className="p-4">Resident</th>
+                            <th className="p-4">Bill Amount</th>
                             <th className="p-4 text-center">Status</th>
+                            <th className="p-4 text-center">Slip</th>
                             <th className="p-4 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {filteredRooms.map((room) => (
-                            <tr key={room.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="p-4 font-bold text-gray-900">{room.number}</td>
-                                <td className="p-4 text-gray-600">
-                                    {room.residents[0]?.fullName || <span className="text-gray-300 italic">Vacant</span>}
-                                </td>
-                                <td className="p-4 text-center">
-                                    {room.isBilled ? (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
-                                            <CheckCircle2 size={12} /> Billed
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
-                                            <AlertCircle size={12} /> Pending
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="p-4 text-right">
-                                    {room.isBilled ? (
-                                        <div className="text-xs font-bold text-gray-900">
-                                            ฿{room.bill?.totalAmount.toLocaleString()}
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleCreateClick(room as any)}
-                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm hover:shadow"
-                                        >
-                                            Create Bill <ArrowRight size={12} />
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                        {filteredRooms.map((room) => {
+                            const bill = room.bill;
+                            const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
+
+                            return (
+                                <tr key={room.id} className="hover:bg-gray-50 transition-colors group">
+                                    {/* Room Number */}
+                                    <td className="p-4 font-bold text-gray-900">{room.number}</td>
+
+                                    {/* Resident */}
+                                    <td className="p-4 text-gray-600">
+                                        {room.residents[0]?.fullName || <span className="text-gray-300 italic">Vacant</span>}
+                                    </td>
+
+                                    {/* Amount */}
+                                    <td className="p-4 font-bold text-gray-900">
+                                        {bill ? `฿${bill.totalAmount.toLocaleString()}` : <span className="text-gray-300">-</span>}
+                                    </td>
+
+                                    {/* Status */}
+                                    <td className="p-4 text-center">
+                                        {bill ? (
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase shadow-sm ${getStatusColor(status)}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></span>
+                                                {status}
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-500 border border-gray-200">
+                                                Wait for Bill
+                                            </span>
+                                        )}
+                                    </td>
+
+                                    {/* Slip */}
+                                    <td className="p-4 text-center">
+                                        {bill?.slipImage ? (
+                                            <button
+                                                onClick={() => setSelectedSlip(bill.slipImage!)}
+                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 rounded-md font-medium text-xs transition-colors ring-1 ring-indigo-600/10"
+                                            >
+                                                <ExternalLink size={12} /> {t.billing.viewSlip}
+                                            </button>
+                                        ) : (status === 'Paid') ? (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md font-medium text-xs ring-1 ring-emerald-600/10">
+                                                <Banknote size={12} /> Cash
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-300">-</span>
+                                        )}
+                                    </td>
+
+                                    {/* Actions */}
+                                    <td className="p-4 text-right">
+                                        {bill ? (
+                                            <div className="flex justify-end items-center gap-2 opacity-90 group-hover:opacity-100 transition-opacity">
+                                                {/* Review Actions */}
+                                                {status === "Review" && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleReview(bill.id, "approve")}
+                                                            disabled={loading === bill.id}
+                                                            className="p-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors shadow-sm" title={t.billing.approve}>
+                                                            {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setRejectingId(bill.id)}
+                                                            disabled={loading === bill.id}
+                                                            className="p-1.5 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200 transition-colors shadow-sm" title={t.billing.reject}>
+                                                            <XCircle size={16} />
+                                                        </button>
+                                                    </>
+                                                )}
+
+                                                {/* Pay Cash */}
+                                                {(status === "Pending" || status === "Overdue" || status === "Late") && (
+                                                    <button
+                                                        onClick={() => handleCashPayment(bill.id)}
+                                                        disabled={loading === bill.id}
+                                                        className="flex items-center gap-1.5 px-2 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-xs font-semibold transition-all shadow-sm"
+                                                        title={t.billing.payCash}
+                                                    >
+                                                        {loading === bill.id ? <Loader2 className="animate-spin" size={14} /> : <Banknote size={14} />}
+                                                        <span className="hidden xl:inline">{t.billing.payCash}</span>
+                                                    </button>
+                                                )}
+
+                                                {/* Print */}
+                                                <a href={`/billing/${bill.id}/print?type=a4`} target="_blank"
+                                                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                                    title={t.billing.print}>
+                                                    <span className="text-lg">🖨️</span>
+                                                </a>
+
+                                                {/* Delete */}
+                                                <button
+                                                    onClick={() => handleDelete(bill.id)}
+                                                    disabled={loading === bill.id}
+                                                    className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                    title={t.billing.deleteBill}
+                                                >
+                                                    {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            // No bill action (maybe create one?)
+                                            <span className="text-xs text-gray-400 italic">Ready to bill</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            )
+                        })}
                         {filteredRooms.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-gray-400 italic">
+                                <td colSpan={6} className="p-8 text-center text-gray-400 italic">
                                     No rooms found matching "{filter}"
                                 </td>
                             </tr>
@@ -250,16 +429,67 @@ export default function MeterDashboard({ rooms, bills, initialRates, config }: M
                 </table>
             </div>
 
-            {/* Create Bill Modal */}
-            <CreateBillModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                room={selectedRoom as any}
-                initialRates={initialRates}
-                config={config}
-                totalRoomCount={rooms.length}
-                onSuccess={handleBillCreated}
-            />
+            {/* Slip Preview Modal */}
+            {selectedSlip && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+                    onClick={() => setSelectedSlip(null)}
+                >
+                    <div className="relative bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-4 border-b flex justify-between items-center bg-gray-50/50">
+                            <h3 className="font-bold text-gray-900">Payment Slip Reference</h3>
+                            <button
+                                onClick={() => setSelectedSlip(null)}
+                                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <XCircle size={20} />
+                            </button>
+                        </div>
+                        <div className="p-2 bg-gray-100 flex justify-center items-center min-h-[300px]">
+                            <img
+                                src={selectedSlip}
+                                alt="Payment Slip"
+                                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reject Reason Modal */}
+            {rejectingId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">{t.billing.rejectReason}</h3>
+                        <textarea
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none h-32 resize-none transition-all"
+                            placeholder="Enter reason..."
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-3 mt-4">
+                            <button
+                                onClick={() => {
+                                    setRejectingId(null);
+                                    setRejectReason("");
+                                }}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleReview(rejectingId, "reject", rejectReason)}
+                                disabled={!rejectReason.trim()}
+                                className="px-4 py-2 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 disabled:opacity-50 transition-colors shadow-sm"
+                            >
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
