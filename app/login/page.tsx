@@ -94,8 +94,8 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 space-y-6">
+        <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-300 p-6 md:p-8 space-y-6">
                 <div className="text-center space-y-2">
                     <div className="bg-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mx-auto text-white shadow-lg mb-4">
                         <Lock size={24} />
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-200">
                         {error}
                     </div>
                 )}
@@ -121,7 +121,7 @@ export default function LoginPage() {
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="admin@staysync.com"
-                                    className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full rounded-lg border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
@@ -138,7 +138,7 @@ export default function LoginPage() {
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     placeholder={t.common.loading ? "Enter password" : ""}
-                                    className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full rounded-lg border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </>

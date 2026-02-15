@@ -180,7 +180,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Tabs Navigation */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-300 p-2">
                 <div className="flex gap-2 overflow-x-auto">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                 {activeTab === "basic" && (
                     <div className="space-y-6">
                         {/* Dormitory Details */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
                                 <Building2 size={24} /> {t.settings.basic.dormInfo}
                             </h3>
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* LINE Integration */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700">
                                 <MessageSquare size={24} /> {t.settings.basic.lineIntegration}
                             </h3>
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                 {activeTab === "payment" && (
                     <div className="space-y-6">
                         {/* Bank Account */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700">
                                 <CreditCard size={24} /> {t.settings.payment.bankAccount}
                             </h3>
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Invoice Settings */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-purple-700">
                                 📄 {t.settings.payment.invoiceSettings}
                             </h3>
@@ -449,7 +449,7 @@ export default function SettingsPage() {
                 {activeTab === "rates" && (
                     <div className="space-y-6">
                         {/* Utility Rates */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-700">
                                 <Zap size={24} /> {t.settings.rates.utilityRates}
                             </h3>
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Fixed Fees */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-amber-700">
                                 💰 {t.settings.rates.fixedFees}
                             </h3>
@@ -529,7 +529,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Common Area Billing */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
                                 🏢 {t.settings.rates.commonArea}
                             </h3>
@@ -612,7 +612,7 @@ export default function SettingsPage() {
                 {activeTab === "chatbot" && (
                     <div className="space-y-6">
                         {/* WiFi Info */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-700">
                                 📶 {t.settings.chatbot.wifiInfo}
                             </h3>
@@ -643,7 +643,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Rules */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-700">
                                 📜 {t.settings.chatbot.rules}
                             </h3>
@@ -659,7 +659,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Auto Reminders */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-purple-700">
                                 🔔 {t.settings.chatbot.automation}
                             </h3>
@@ -731,7 +731,7 @@ export default function SettingsPage() {
                 {activeTab === "security" && (
                     <div className="space-y-6">
                         {userRole === "OWNER" && (
-                            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300">
                                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
                                     <Lock size={24} /> {t.settings.security.title}
                                 </h3>
@@ -760,7 +760,7 @@ export default function SettingsPage() {
 
                 {/* Save Button - Fixed at Bottom (Only show for non-security tabs) */}
                 {activeTab !== "security" && (
-                    <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-200">
+                    <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-slate-300">
                         <button
                             type="submit"
                             disabled={saving}
