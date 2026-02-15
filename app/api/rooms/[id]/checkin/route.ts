@@ -37,7 +37,8 @@ export async function POST(
                     contractEndDate,
                     contractDurationMonths: duration,
                     depositStatus: "Held",
-                    organizationId: targetRoom.organizationId
+                    organizationId: targetRoom.organizationId,
+                    isMainTenant: targetRoom.status === "Available" // Make first resident main tenant
                 },
             }),
             prisma.room.update({

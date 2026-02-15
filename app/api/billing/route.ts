@@ -66,7 +66,12 @@ export async function POST(req: Request) {
         // Fetch Room Price & Resident
         const room = await prisma.room.findUnique({
             where: { id: roomId },
-            include: { residents: { where: { status: "Active" } } }
+            include: {
+                residents: {
+                    where: { status: "Active" },
+                    orderBy: { isMainTenant: 'desc' } // Prioritize Main Tenant
+                }
+            }
         });
 
         if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });

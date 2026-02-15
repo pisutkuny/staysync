@@ -18,6 +18,7 @@ export async function getRooms() {
                         contractStartDate: true,
                         contractEndDate: true,
                         contractDurationMonths: true,
+                        isMainTenant: true,
                     }
                 }
             }

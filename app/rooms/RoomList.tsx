@@ -1,13 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus, CheckCircle2, Home } from "lucide-react";
+import { UserPlus, CheckCircle2, Home, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import DeleteRoomButton from "./DeleteRoomButton";
 import RoomCommonAreaToggle from "./RoomCommonAreaToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function RoomList({ rooms }: { rooms: any[] }) {
     const { t } = useLanguage();
+    const router = useRouter();
+
+    const handleSetMainTenant = async (e: React.MouseEvent, residentId: number) => {
+        e.preventDefault(); // Prevent Link navigation if nested, though we will separate them
+        e.stopPropagation();
+
+        try {
+            const res = await fetch(`/api/residents/${residentId}/set-main`, {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                router.refresh();
+            }
+        } catch (error) {
+            console.error("Failed to set main resident", error);
+        }
+    };
+
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,16 +105,31 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                                 <div className="grid grid-cols-2 gap-2">
                                     {room.residents && room.residents.length > 0 ? (
                                         room.residents.map((resident: any) => (
-                                            <Link key={resident.id} href={`/residents/${resident.id}`} className="flex items-center justify-between text-emerald-700 font-bold hover:text-emerald-900 hover:bg-emerald-100 px-2 py-1.5 rounded-lg transition text-xs group border-2 border-transparent hover:border-emerald-200">
-                                                <span className="truncate flex-1 flex items-center gap-1">
-                                                    👤 <span className="truncate">{resident.fullName}</span>
-                                                </span>
-                                                {resident.isChild && (
-                                                    <span title="Child" className="shrink-0 bg-orange-100 text-orange-700 text-[10px] px-1 rounded-md border border-orange-300">
-                                                        👶
+                                            <div key={resident.id} className="flex items-center gap-1 min-w-0">
+                                                <button
+                                                    onClick={(e) => handleSetMainTenant(e, resident.id)}
+                                                    className={`p-1.5 rounded-full transition-all shrink-0 ${resident.isMainTenant
+                                                        ? 'text-amber-500 bg-amber-50 ring-1 ring-amber-200 shadow-sm'
+                                                        : 'text-slate-300 hover:text-amber-400 hover:bg-slate-50 opacity-0 group-hover:opacity-100' // Hide empty stars until hover on card? No, maybe keep visible for accessibility or hint. Let's make them visible but subtle.
+                                                        } ${!resident.isMainTenant && 'text-slate-200 hover:text-amber-400'}`}
+                                                    title={resident.isMainTenant ? "Main Tenant" : "Set as Main Tenant"}
+                                                >
+                                                    <Star size={14} fill={resident.isMainTenant ? "currentColor" : "none"} strokeWidth={resident.isMainTenant ? 1.5 : 2} />
+                                                </button>
+                                                <Link href={`/residents/${resident.id}`} className={`flex-1 flex items-center justify-between font-bold px-2 py-1.5 rounded-lg transition text-xs border-2 min-w-0 ${resident.isMainTenant
+                                                    ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 hover:border-amber-300 shadow-sm'
+                                                    : 'text-emerald-700 border-transparent hover:text-emerald-900 hover:bg-emerald-100 hover:border-emerald-200'
+                                                    }`}>
+                                                    <span className="truncate flex-1 flex items-center gap-1">
+                                                        {resident.isMainTenant ? '👑' : '👤'} <span className="truncate">{resident.fullName}</span>
                                                     </span>
-                                                )}
-                                            </Link>
+                                                    {resident.isChild && (
+                                                        <span title="Child" className="shrink-0 bg-orange-100 text-orange-700 text-[10px] px-1 rounded-md border border-orange-300 ml-1">
+                                                            👶
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            </div>
                                         ))
                                     ) : (
                                         <p className="font-medium text-slate-900 col-span-2">{t.rooms.unknown}</p>
