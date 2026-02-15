@@ -165,7 +165,7 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                             <div className="flex justify-between items-center">
                                 <p className="font-bold text-lg text-gray-900">฿{bill.totalAmount.toLocaleString()}</p>
                                 <div className="flex gap-2">
-                                    {bill.slipImage && (
+                                    {bill.slipImage ? (
                                         <button
                                             onClick={() => setSelectedSlip(bill.slipImage)}
                                             className="p-2 bg-gray-50 text-indigo-600 rounded-lg border border-gray-100"
@@ -173,7 +173,11 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                         >
                                             <ExternalLink size={16} />
                                         </button>
-                                    )}
+                                    ) : bill.paymentStatus === 'Paid' ? (
+                                        <span className="p-2 bg-green-50 text-green-600 rounded-lg border border-green-100 flex items-center gap-1" title="Cash Payment">
+                                            <Banknote size={16} /> <span className="text-xs font-bold">{t.billing.cash}</span>
+                                        </span>
+                                    ) : null}
 
                                     <a href={`/billing/${bill.id}/print?type=a4`} target="_blank" className="p-2 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100" title="Print">
                                         <span>🖨️</span>
@@ -252,6 +256,10 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                             >
                                                 <ExternalLink size={14} /> {t.billing.viewSlip}
                                             </button>
+                                        ) : bill.paymentStatus === 'Paid' ? (
+                                            <span className="flex items-center gap-1 text-green-600 font-medium">
+                                                <Banknote size={14} /> {t.billing.cash}
+                                            </span>
                                         ) : (
                                             <span className="text-gray-400">-</span>
                                         )}

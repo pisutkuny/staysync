@@ -381,6 +381,8 @@ export const dictionary = {
             payCash: "รับเงินสด",
             confirmCash: "ยืนยันรับเงินสด?",
             cashSuccess: "บันทึกรับเงินสดเรียบร้อย",
+            cash: "เงินสด",
+            transfer: "โอนเงิน",
         },
         expenses: {
             title: "บันทึกรายจ่าย",
@@ -1078,6 +1080,8 @@ export const dictionary = {
             payCash: "Receive Cash",
             confirmCash: "Confirm cash payment?",
             cashSuccess: "Cash payment recorded successfully",
+            cash: "Cash",
+            transfer: "Transfer",
         },
         expenses: {
             title: "Expense Tracking",
