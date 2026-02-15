@@ -68,17 +68,30 @@ textarea {
   /* Slate 900 */
   background-color: #ffffff;
   border-width: 2px;
-  border-color: #cbd5e1; /* slate-300 */
-  border-radius: 0.5rem; /* rounded-lg */
+  border-color: #cbd5e1;
+  /* slate-300 */
+  border-radius: 0.5rem;
+  /* rounded-lg */
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #4f46e5; /* indigo-600 */
+  border-color: #4f46e5;
+  /* indigo-600 */
   ring: 2px;
-  ring-color: #e0e7ff; /* indigo-100 */
+  ring-color: #e0e7ff;
+  /* indigo-100 */
+}
+
+/* Fix for Calendar Icon visibility in Dark Mode */
+/* Since we enforce white background on inputs, we must force the browser to render the light-theme (dark) icon */
+input[type="date"],
+input[type="month"],
+input[type="datetime-local"],
+input[type="time"] {
+  color-scheme: light;
 }
 
 /* Premium Glassmorphism Utility */
