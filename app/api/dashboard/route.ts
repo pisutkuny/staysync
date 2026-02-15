@@ -23,8 +23,6 @@ export async function GET() {
 
         // If user is a TENANT, return simplified/empty data to prevent crash
         if (session.role === 'TENANT') {
-            // Fetch logged-in user's room info if needed, or just return empty for now
-            // For now, return a safe "empty" structure
             return NextResponse.json({
                 userRole: 'TENANT',
                 dormName,
@@ -45,60 +43,123 @@ export async function GET() {
 
         // --- OWNER / ADMIN LOGIC BELOW ---
 
-        // 1. Summary Cards Data
-        // Total Revenue (This Month) - Only Paid bills
-        const revenueAgg = await prisma.billing.aggregate({
-            _sum: { totalAmount: true },
-            where: {
-                paymentStatus: 'Paid',
-                paymentDate: {
-                    gte: startOfCurrentMonth,
-                    lte: endOfCurrentMonth
-                }
-            }
-        });
-
-        // Outstanding Debt (All Time)
-        const outstandingAgg = await prisma.billing.aggregate({
-            _sum: { totalAmount: true },
-            where: {
-                paymentStatus: {
-                    in: ['Pending', 'Review']
-                }
-            }
-        });
-
-        // Occupancy Rate
-        const totalRooms = await prisma.room.count();
-        const occupiedRooms = await prisma.room.count({ where: { status: 'Occupied' } });
-        const availableRooms = totalRooms - occupiedRooms;
-
-        // Active Maintenance Requests
-        const activeIssues = await prisma.issue.count({
-            where: {
-                status: {
-                    in: ['Pending', 'InProgress']
-                }
-            }
-        });
-
-        // 2. Revenue Trend (Last 6 Months) - Optimized with single query
+        // Prepare all promises for parallel execution
         const sixMonthsAgo = subMonths(today, 5);
-        const allBills = await prisma.billing.findMany({
-            where: {
-                paymentStatus: 'Paid',
-                paymentDate: {
-                    gte: startOfMonth(sixMonthsAgo),
-                    lte: endOfCurrentMonth
-                }
-            },
-            select: {
-                paymentDate: true,
-                totalAmount: true
-            }
-        });
 
-        // Group by month
+        const [
+            revenueAgg,
+            outstandingAgg,
+            totalRooms,
+            occupiedRooms,
+            activeIssues,
+            allBills,
+            recentBills,
+            recentIssues,
+            topSpenders
+        ] = await Promise.all([
+            // 1. Revenue
+            prisma.billing.aggregate({
+                _sum: { totalAmount: true },
+                where: {
+                    paymentStatus: 'Paid',
+                    paymentDate: {
+                        gte: startOfCurrentMonth,
+                        lte: endOfCurrentMonth
+                    }
+                }
+            }),
+            // 2. Outstanding
+            prisma.billing.aggregate({
+                _sum: { totalAmount: true },
+                where: {
+                    paymentStatus: {
+                        in: ['Pending', 'Review']
+                    }
+                }
+            }),
+            // 3. Rooms Total
+            prisma.room.count(),
+            // 4. Rooms Occupied
+            prisma.room.count({ where: { status: 'Occupied' } }),
+            // 5. Active Issues
+            prisma.issue.count({
+                where: {
+                    status: {
+                        in: ['Pending', 'InProgress']
+                    }
+                }
+            }),
+            // 6. Revenue Trend Source Data
+            prisma.billing.findMany({
+                where: {
+                    paymentStatus: 'Paid',
+                    paymentDate: {
+                        gte: startOfMonth(sixMonthsAgo),
+                        lte: endOfCurrentMonth
+                    }
+                },
+                select: {
+                    paymentDate: true,
+                    totalAmount: true
+                }
+            }),
+            // 7. Recent Bills
+            prisma.billing.findMany({
+                take: 10,
+                orderBy: { createdAt: 'desc' },
+                select: {
+                    id: true,
+                    createdAt: true,
+                    totalAmount: true,
+                    paymentStatus: true,
+                    room: {
+                        select: { number: true }
+                    }
+                }
+            }),
+            // 8. Recent Issues
+            prisma.issue.findMany({
+                take: 10,
+                orderBy: { createdAt: 'desc' },
+                select: {
+                    id: true,
+                    createdAt: true,
+                    category: true,
+                    description: true,
+                    status: true,
+                    resident: {
+                        select: {
+                            room: {
+                                select: { number: true }
+                            }
+                        }
+                    }
+                }
+            }),
+            // 9. Top Spenders
+            prisma.billing.findMany({
+                take: 5,
+                where: {
+                    month: {
+                        gte: startOfCurrentMonth,
+                        lte: endOfCurrentMonth
+                    }
+                },
+                orderBy: { totalAmount: 'desc' },
+                select: {
+                    waterMeterCurrent: true,
+                    waterMeterLast: true,
+                    electricMeterCurrent: true,
+                    electricMeterLast: true,
+                    totalAmount: true,
+                    room: {
+                        select: { number: true }
+                    }
+                }
+            })
+        ]);
+
+        // Process Revenue Trend
         const monthlyRevenueMap = new Map<string, number>();
         for (let i = 5; i >= 0; i--) {
             const date = subMonths(today, i);
@@ -106,7 +167,6 @@ export async function GET() {
             monthlyRevenueMap.set(key, 0);
         }
 
-        // Aggregate manually
         allBills.forEach(bill => {
             if (bill.paymentDate) {
                 const key = format(new Date(bill.paymentDate), 'yyyy-MM');
@@ -116,7 +176,6 @@ export async function GET() {
             }
         });
 
-        // Build result array
         const monthlyRevenue = [];
         for (let i = 5; i >= 0; i--) {
             const date = subMonths(today, i);
@@ -128,47 +187,14 @@ export async function GET() {
             });
         }
 
-        // 3. Occupancy Data (Pie Chart)
+        // Process Occupancy
+        const availableRooms = totalRooms - occupiedRooms;
         const occupancyData = [
-            { name: 'Occupied', value: occupiedRooms, color: '#10B981' }, // Emerald-500
-            { name: 'Available', value: availableRooms, color: '#E5E7EB' }, // Gray-200
+            { name: 'Occupied', value: occupiedRooms, color: '#10B981' },
+            { name: 'Available', value: availableRooms, color: '#E5E7EB' },
         ];
 
-        // 4. Recent Activity (Feed) - Optimized
-        // Fetch only what we need with proper limits
-        const recentBills = await prisma.billing.findMany({
-            take: 10,  // Increased to ensure we get enough after filtering
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                createdAt: true,
-                totalAmount: true,
-                paymentStatus: true,
-                room: {
-                    select: { number: true }
-                }
-            }
-        });
-
-        const recentIssues = await prisma.issue.findMany({
-            take: 10,
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                createdAt: true,
-                category: true,
-                description: true,
-                status: true,
-                resident: {
-                    select: {
-                        room: {
-                            select: { number: true }
-                        }
-                    }
-                }
-            }
-        });
-
+        // Process Recent Activity
         const recentActivity = [
             ...recentBills.map(b => ({
                 id: `bill-${b.id}`,
@@ -187,30 +213,9 @@ export async function GET() {
                 status: i.status
             }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 10); // Take top 10 combined
+            .slice(0, 10);
 
-        // 5. Top Spenders (Water/Electric) - Optimized
-        const topSpenders = await prisma.billing.findMany({
-            take: 5,
-            where: {
-                month: {
-                    gte: startOfCurrentMonth,
-                    lte: endOfCurrentMonth
-                }
-            },
-            orderBy: { totalAmount: 'desc' },
-            select: {
-                waterMeterCurrent: true,
-                waterMeterLast: true,
-                electricMeterCurrent: true,
-                electricMeterLast: true,
-                totalAmount: true,
-                room: {
-                    select: { number: true }
-                }
-            }
-        });
-
+        // Process Top Spenders
         const topSpendersData = topSpenders.map(b => ({
             room: b.room.number,
             water: b.waterMeterCurrent - b.waterMeterLast,
