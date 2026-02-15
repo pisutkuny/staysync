@@ -301,57 +301,67 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                         const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
                         const isOccupied = room.status === 'Occupied';
 
-                        // Status Config
+                        // Accessibility Config: Use High Contrast Solids
                         const statusColor =
-                            status === 'Paid' ? 'border-emerald-500 bg-emerald-50/30' :
-                                status === 'Pending' ? 'border-amber-400 bg-amber-50/30' :
-                                    status === 'Overdue' ? 'border-rose-500 bg-rose-50/30' :
-                                        'border-gray-300 bg-white';
+                            status === 'Paid' ? 'border-t-emerald-600' :
+                                status === 'Pending' ? 'border-t-amber-500' :
+                                    status === 'Overdue' ? 'border-t-rose-600' :
+                                        'border-t-slate-400';
+
+                        // Badge Styles: Solid Dark Backgrounds for clear text contrast
+                        const badgeStyle =
+                            status === 'Paid' ? 'bg-emerald-700 text-white' :
+                                status === 'Pending' ? 'bg-amber-600 text-white' :
+                                    status === 'Overdue' ? 'bg-rose-700 text-white' :
+                                        'bg-slate-600 text-white';
 
                         return (
                             <div
                                 key={room.id}
-                                className={`relative group flex flex-col bg-white rounded-2xl shadow-sm border-t-[6px] transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${statusColor} ${bill ? '' : 'border-t-gray-200'}`}
+                                className={`relative group flex flex-col bg-white rounded-xl shadow-md border-x border-b border-slate-300 border-t-[8px] transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${statusColor}`}
                             >
-                                {/* Header: Room & Status */}
-                                <div className={`p-5 pb-3 flex justify-between items-start rounded-t-xl ${bill ? '' : 'opacity-70'}`}>
+                                {/* Header: Structure (Gray Background) */}
+                                <div className="p-4 flex justify-between items-start bg-slate-100 border-b border-slate-300">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-4xl font-black text-gray-800 tracking-tighter">
+                                            <span className="text-4xl font-black text-slate-900 tracking-tighter">
                                                 {room.number}
                                             </span>
                                             {isOccupied && (
-                                                <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-sm" title="Occupied"></div>
+                                                <div className="px-2 py-0.5 rounded-full bg-slate-800 text-white text-[10px] font-bold uppercase tracking-wider">
+                                                    Occupied
+                                                </div>
                                             )}
                                         </div>
-                                        <div className="mt-1 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                            {isOccupied ? 'Occupied Unit' : 'Vacant Unit'}
-                                        </div>
+                                        {!isOccupied && (
+                                            <div className="mt-1 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                                Vacant Unit
+                                            </div>
+                                        )}
                                     </div>
                                     {bill && (
-                                        <div className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm ${getStatusColor(status)}`}>
+                                        <div className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide shadow-sm ${badgeStyle}`}>
                                             {status}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Body: Resident & Amount */}
-                                <div className="p-5 pt-0 flex-grow flex flex-col gap-5">
-                                    <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <div className="w-12 h-12 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-xl overflow-hidden shrink-0">
+                                {/* Body: Content (White Background) */}
+                                <div className="p-5 flex-grow flex flex-col gap-6 bg-white">
+                                    {/* Resident Block - High Contrast Border */}
+                                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border-2 border-slate-200">
+                                        <div className="w-12 h-12 rounded-full bg-slate-100 border-2 border-slate-300 flex items-center justify-center text-xl overflow-hidden shrink-0 font-bold text-slate-700">
                                             {room.residents[0] ? (
-                                                <div className="w-full h-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                                                    {room.residents[0].fullName.charAt(0)}
-                                                </div>
+                                                room.residents[0].fullName.charAt(0)
                                             ) : (
-                                                <span className="text-gray-300">👤</span>
+                                                <span className="text-slate-400">👤</span>
                                             )}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-base font-bold text-gray-900 truncate">
-                                                {room.residents[0]?.fullName || <span className="text-gray-400 font-normal italic">No Resident</span>}
+                                            <p className="text-base font-bold text-slate-900 truncate">
+                                                {room.residents[0]?.fullName || <span className="text-slate-400 italic">No Resident</span>}
                                             </p>
-                                            <p className="text-xs text-gray-500 truncate font-medium">
+                                            <p className="text-xs text-slate-500 truncate font-semibold uppercase">
                                                 Primary Resident
                                             </p>
                                         </div>
@@ -359,31 +369,31 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
                                     <div className="mt-auto px-1">
                                         <div className="flex justify-between items-end mb-1">
-                                            <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Total Bill</p>
-                                            {bill && <span className="text-xs text-indigo-500 font-bold cursor-pointer hover:underline">See Breakdown</span>}
+                                            <p className="text-xs text-slate-500 uppercase tracking-wider font-extrabold">Total Bill</p>
+                                            {bill && <span className="text-xs text-indigo-700 font-bold cursor-pointer hover:underline">See Breakdown</span>}
                                         </div>
-                                        <div className={`text-4xl font-black tracking-tighter ${bill ? 'text-gray-900' : 'text-gray-200'}`}>
+                                        <div className={`text-5xl font-black tracking-tighter ${bill ? 'text-slate-900' : 'text-slate-300'}`}>
                                             {bill ? `฿${bill.totalAmount.toLocaleString()}` : '---'}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Footer: Actions */}
-                                <div className="p-4 border-t border-gray-100 bg-gray-50/80 rounded-b-2xl flex gap-3">
+                                {/* Footer: Actions (Gray Background) */}
+                                <div className="p-4 border-t border-slate-300 bg-slate-100 flex gap-3 rounded-b-lg">
                                     {bill ? (
                                         <>
-                                            {/* Primary Action */}
+                                            {/* Primary Action - High Contrast Button */}
                                             {(status === "Pending" || status === "Overdue" || status === "Late") ? (
                                                 <button
                                                     onClick={() => handleCashPayment(bill.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white py-3 rounded-xl text-sm font-bold shadow-emerald-200 shadow-md hover:shadow-lg hover:bg-emerald-700 transition-all active:scale-95"
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-black transition-all active:scale-95 border border-transparent"
                                                 >
                                                     <Banknote size={18} /> Pay Cash
                                                 </button>
                                             ) : status === "Review" ? (
                                                 <button
                                                     onClick={() => handleReview(bill.id, "approve")}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl text-sm font-bold shadow-blue-200 shadow-md hover:shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-blue-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-blue-900 transition-all active:scale-95"
                                                 >
                                                     <CheckCircle2 size={18} /> Approve
                                                 </button>
@@ -391,7 +401,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 <button
                                                     onClick={() => bill.slipImage && setSelectedSlip(bill.slipImage)}
                                                     disabled={!bill.slipImage}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50"
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-slate-300 text-slate-700 py-3 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 hover:border-slate-400 transition-all disabled:opacity-50"
                                                 >
                                                     <ExternalLink size={18} /> View Slip
                                                 </button>
@@ -402,7 +412,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 <a
                                                     href={`/billing/${bill.id}/print?type=a4`}
                                                     target="_blank"
-                                                    className="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-colors shadow-sm"
+                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-500 transition-colors shadow-sm"
                                                     title="Print"
                                                 >
                                                     <span className="text-xl">🖨️</span>
@@ -411,7 +421,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 {status === "Review" && (
                                                     <button
                                                         onClick={() => setRejectingId(bill.id)}
-                                                        className="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-rose-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors shadow-sm"
+                                                        className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-rose-600 hover:text-rose-800 hover:border-rose-500 transition-colors shadow-sm"
                                                         title="Reject"
                                                     >
                                                         <XCircle size={22} />
@@ -420,7 +430,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
                                                 <button
                                                     onClick={() => handleDelete(bill.id)}
-                                                    className="w-11 h-11 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-300 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors shadow-sm"
+                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-slate-400 hover:text-rose-600 hover:border-rose-500 transition-colors shadow-sm"
                                                     title="Delete"
                                                 >
                                                     <Trash2 size={22} />
@@ -430,7 +440,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                     ) : (
                                         <Link
                                             href={`/billing/bulk?month=${selectedMonth}`}
-                                            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl text-sm font-bold shadow-indigo-200 shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all active:scale-95"
+                                            className="w-full flex items-center justify-center gap-2 bg-indigo-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-900 transition-all active:scale-95"
                                         >
                                             Create Bill <ArrowRight size={18} />
                                         </Link>
@@ -442,7 +452,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                 </div>
 
                 {filteredRooms.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                    <div className="flex flex-col items-center justify-center h-64 text-slate-400">
                         <Search size={48} className="mb-4 opacity-20" />
                         <span className="text-lg font-medium">No rooms found matching "{filter}"</span>
                     </div>
