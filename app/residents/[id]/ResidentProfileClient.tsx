@@ -41,7 +41,7 @@ export default function ResidentProfileClient({ resident }: { resident: any }) {
                 <div className="lg:col-span-2 space-y-6">
 
                     {/* Documents Section */}
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div className="bg-white rounded-xl border border-slate-300 shadow-sm p-6">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                                 <FileText className="text-indigo-600" size={20} />
@@ -57,15 +57,15 @@ export default function ResidentProfileClient({ resident }: { resident: any }) {
                         </div>
 
                         {resident.documents && resident.documents.length === 0 ? (
-                            <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                            <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-slate-300">
                                 <p className="text-gray-500 text-sm">{t.residents.noDocuments}</p>
                             </div>
                         ) : (
                             <div className="space-y-2">
                                 {resident.documents.map((doc: any) => (
-                                    <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-all">
+                                    <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-slate-200 hover:border-slate-300 transition-all">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200 shadow-sm text-red-500">
+                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-300 shadow-sm text-red-500">
                                                 {doc.url.endsWith('.pdf') ? "PDF" : "IMG"}
                                             </div>
                                             <div>
@@ -85,7 +85,7 @@ export default function ResidentProfileClient({ resident }: { resident: any }) {
                     </div>
 
                     {/* Verification Code Section */}
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div className="bg-white rounded-xl border border-slate-300 shadow-sm p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.lineConnection}</h2>
                         <div className="flex items-center justify-between">
                             <div>
@@ -108,7 +108,7 @@ export default function ResidentProfileClient({ resident }: { resident: any }) {
                     </div>
 
                     {/* Management Actions */}
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div className="bg-white rounded-xl border border-slate-300 shadow-sm p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.management}</h2>
                         <Link
                             href={`/residents/${resident.id}/checkout`}
@@ -123,7 +123,7 @@ export default function ResidentProfileClient({ resident }: { resident: any }) {
 
                 {/* Right Column: Billing History Summary */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                    <div className="bg-white rounded-xl border border-slate-300 shadow-sm p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">{t.residents.billingHistory}</h2>
                         <BillingHistory billings={resident.billings} />
                     </div>

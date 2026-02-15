@@ -88,7 +88,7 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
                     <p className="text-gray-500">Upload your transfer slip to verify payment.</p>
                 </div>
 
-                <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
                     <h3 className="font-bold text-indigo-900 mb-2">Bank Transfer Details</h3>
                     <div className="space-y-1">
                         <p className="text-sm text-indigo-700">Bank: <span className="font-bold text-indigo-900">{config?.bankName || "Not Configured"}</span></p>
@@ -100,7 +100,7 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
                             </p>
                         )}
                         {config?.promptPayId && billDetails?.totalAmount && (
-                            <div className="mt-4 flex flex-col items-center p-4 bg-white rounded-lg border border-dashed border-indigo-200">
+                            <div className="mt-4 flex flex-col items-center p-4 bg-white rounded-lg border border-dashed border-indigo-300">
                                 <QRCodeSVG
                                     value={generatePayload(config.promptPayId, { amount: billDetails.totalAmount })}
                                     size={160}
@@ -121,7 +121,7 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
                             accept="image/*"
                             onChange={handleFileChange}
                             required
-                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                            className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         />
                     </div>
 

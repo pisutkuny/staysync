@@ -29,13 +29,13 @@ export default function BillingHistory({ billings }: { billings: Billing[] }) {
     };
 
     if (billings.length === 0) {
-        return <p className="text-sm text-gray-400">{t.residents.noBillingHistory}</p>;
+        return <p className="text-sm text-gray-500">{t.residents.noBillingHistory}</p>;
     }
 
     return (
         <div className="space-y-3">
             {billings.map(bill => (
-                <div key={bill.id} className="border-b border-gray-50 last:border-0 pb-2">
+                <div key={bill.id} className="border-b border-slate-200 last:border-0 pb-2">
                     <div
                         onClick={() => toggle(bill.id)}
                         className="flex justify-between items-center py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors"

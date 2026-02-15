@@ -32,7 +32,7 @@ export default function BillSlip({ data }: { data: Props }) {
     const prevDateStr = `${prevMonthIdx}/${shortYear}`;
 
     return (
-        <div className="bg-white p-6 max-w-[400px] border border-gray-300 font-sans text-sm text-gray-900 mx-auto" id="bill-slip">
+        <div className="bg-white p-6 max-w-[400px] border border-slate-300 font-sans text-sm text-gray-900 mx-auto" id="bill-slip">
             <div className="text-center mb-4">
                 <h3 className="font-bold text-lg">{data.header.name}</h3>
                 <p className="text-xs">{data.header.address}</p>
@@ -137,7 +137,7 @@ export default function BillSlip({ data }: { data: Props }) {
                                 level={"L"}
                                 includeMargin={false}
                             />
-                            <p className="text-[10px] text-gray-500 mt-1">ยอดชำระ: {data.total.toLocaleString()} บาท</p>
+                            <p className="text-[10px] text-gray-700 mt-1">ยอดชำระ: {data.total.toLocaleString()} บาท</p>
                         </div>
                     )}
                 </div>

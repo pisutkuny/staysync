@@ -112,7 +112,7 @@ export default function AlertModal({
             />
 
             {/* Modal Content */}
-            <div className={`relative bg-white rounded-[24px] shadow-2xl w-full max-w-[360px] transform transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${show ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-8 opacity-0"}`}>
+            <div className={`relative bg-white rounded-[24px] shadow-2xl border border-slate-300 w-full max-w-[360px] transform transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${show ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-8 opacity-0"}`}>
                 <div className="p-8 flex flex-col items-center text-center">
                     <div className="mb-6">
                         {getIcon()}

@@ -46,7 +46,7 @@ export default function ConfirmModal({
             />
 
             {/* Modal Content */}
-            <div className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-sm transform transition-all duration-300 ${isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}`}>
+            <div className={`relative bg-white rounded-2xl shadow-2xl border border-slate-300 w-full max-w-sm transform transition-all duration-300 ${isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}`}>
                 <div className="p-6 flex flex-col items-center text-center">
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-inner ${isDestructive ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"}`}>
                         {isDestructive ? <AlertTriangle size={32} strokeWidth={3} /> : <HelpCircle size={32} strokeWidth={3} />}
@@ -70,8 +70,8 @@ export default function ConfirmModal({
                                 onClose();
                             }}
                             className={`flex-1 py-3 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all ${isDestructive
-                                    ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700"
-                                    : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                                ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700"
+                                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
                                 }`}
                         >
                             {confirmLabel}
