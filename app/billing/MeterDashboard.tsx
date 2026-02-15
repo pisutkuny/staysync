@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle } from "lucide-react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
@@ -327,28 +327,24 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                         // Accessibility & Color Config: Distinct Zones & High Contrast
                         // Gone with "All Gray" -> Now using "Distinct Colored Zones"
                         const statusColor =
-                            status === 'Paid' ? 'border-emerald-600' :
-                                status === 'Pending' ? 'border-amber-500' :
-                                    status === 'Overdue' ? 'border-rose-600' :
-                                        'border-slate-400';
+                            status === 'Paid' ? 'border-emerald-500 ring-1 ring-emerald-200' :
+                                status === 'Pending' ? 'border-amber-400 ring-1 ring-amber-200' :
+                                    status === 'Overdue' ? 'border-rose-500 ring-1 ring-rose-200' :
+                                        'border-slate-300';
 
                         const headerBg =
-                            status === 'Paid' ? 'bg-emerald-200' :
-                                status === 'Pending' ? 'bg-amber-200' :
-                                    status === 'Overdue' ? 'bg-rose-200' :
-                                        'bg-slate-200';
+                            status === 'Paid' ? 'bg-emerald-100 border-b-emerald-200' :
+                                status === 'Pending' ? 'bg-amber-100 border-b-amber-200' :
+                                    status === 'Overdue' ? 'bg-rose-100 border-b-rose-200' :
+                                        'bg-slate-100 border-b-slate-200';
 
-                        const cardBg =
-                            status === 'Paid' ? 'bg-emerald-50' :
-                                status === 'Pending' ? 'bg-amber-50' :
-                                    status === 'Overdue' ? 'bg-rose-50' :
-                                        'bg-white';
+                        const cardBg = 'bg-white';
 
                         const badgeStyle =
-                            status === 'Paid' ? 'bg-emerald-800 text-white' :
-                                status === 'Pending' ? 'bg-amber-700 text-white' :
-                                    status === 'Overdue' ? 'bg-rose-800 text-white' :
-                                        'bg-slate-700 text-white';
+                            status === 'Paid' ? 'bg-emerald-600 text-white border-emerald-700' :
+                                status === 'Pending' ? 'bg-amber-500 text-white border-amber-600' :
+                                    status === 'Overdue' ? 'bg-rose-600 text-white border-rose-700' :
+                                        'bg-slate-600 text-white border-slate-700';
 
                         return (
                             <div
@@ -375,7 +371,11 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                         )}
                                     </div>
                                     {bill && (
-                                        <div className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide shadow-sm border border-white/20 ${badgeStyle}`}>
+                                        <div className={`shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide shadow-sm border flex items-center gap-1.5 ${badgeStyle}`}>
+                                            {status === 'Paid' && <CheckCircle2 size={12} strokeWidth={3} />}
+                                            {status === 'Pending' && <Clock size={12} strokeWidth={3} />}
+                                            {status === 'Overdue' && <AlertTriangle size={12} strokeWidth={3} />}
+                                            {status === 'Rejected' && <XCircle size={12} strokeWidth={3} />}
                                             {status}
                                         </div>
                                     )}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { UserPlus, CheckCircle2, Home } from "lucide-react";
 import DeleteRoomButton from "./DeleteRoomButton";
 import RoomCommonAreaToggle from "./RoomCommonAreaToggle";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -12,7 +12,7 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room) => (
-                <div key={room.id} className="bg-gradient-to-br from-white to-green-50 p-6 rounded-2xl border-2 border-emerald-500/30 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 flex flex-col justify-between min-h-[14rem]">
+                <div key={room.id} className="bg-white p-6 rounded-2xl border-2 border-slate-300 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 flex flex-col justify-between min-h-[14rem]">
                     <div className="flex justify-between items-start">
                         <div>
                             <h3 className="text-xl font-black bg-gradient-to-r from-green-700 to-emerald-700 bg-clip-text text-transparent truncate" title={room.number}>{room.number}</h3>
@@ -26,8 +26,9 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                             <Link href={`/rooms/edit/${room.id}`} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all shadow-sm border-2 border-transparent hover:border-emerald-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                             </Link>
-                            <span className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-lg shadow-sm border border-black/5 ${room.status === "Occupied" ? "bg-gradient-to-r from-sky-500 to-cyan-500 text-white" : "bg-gradient-to-r from-emerald-500 to-green-500 text-white"
+                            <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wide rounded-lg shadow-sm border flex items-center gap-1.5 ${room.status === "Occupied" ? "bg-sky-100 text-sky-800 border-sky-200" : "bg-emerald-100 text-emerald-800 border-emerald-200"
                                 }`}>
+                                {room.status === "Occupied" ? <CheckCircle2 size={12} /> : <Home size={12} />}
                                 {t.status[room.status as keyof typeof t.status] || room.status}
                             </span>
                         </div>

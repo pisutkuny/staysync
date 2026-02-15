@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, AlertTriangle, CloudRain, Zap, Wifi, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -39,7 +39,11 @@ export default function IssueItem({ issue }: { issue: any }) {
         <div className="bg-white p-6 rounded-2xl border-2 border-slate-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow">
             <div className="space-y-1">
                 <div className="flex justify-between items-start mb-2">
-                    <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-lg uppercase border border-red-200">
+                    <span className="px-2 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-lg uppercase border-2 border-slate-200 flex items-center gap-1">
+                        {issue.category === 'Water' && <CloudRain size={12} />}
+                        {issue.category === 'Electric' && <Zap size={12} />}
+                        {issue.category === 'Internet' && <Wifi size={12} />}
+                        {issue.category === 'Other' && <HelpCircle size={12} />}
                         {issue.category}
                     </span>
                     <span className="text-xs text-slate-500 font-bold">
