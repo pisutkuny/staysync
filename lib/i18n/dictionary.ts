@@ -1327,18 +1327,7 @@ export const dictionary = {
                 emailVerifyDesc: "Require users to verify their email before logging in."
             }
         },
-        meterDashboard: {
-            title: "Billing Status (Monthly)",
-            subtitle: "Overview of monthly billing and meter readings",
-            searchPlaceholder: "Search room number...",
-            room: "Room",
-            status: "Status",
-            resident: "Resident",
-            lastWater: "Last Water",
-            lastElec: "Last Elec",
-            lastUpdate: "Last Update",
-            noRooms: "No rooms found",
-        },
+
         audit: {
             title: "Audit Logs",
             subtitle: "Track all changes and user activities",
