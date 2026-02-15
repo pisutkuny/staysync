@@ -7,7 +7,8 @@ export async function getBillingData() {
                 orderBy: { number: 'asc' },
                 include: {
                     residents: {
-                        where: { status: 'Active' }
+                        where: { status: 'Active' },
+                        orderBy: { isMainTenant: 'desc' } // Main Tenant first
                     }
                 }
             }),

@@ -49,6 +49,7 @@ export async function POST(req: Request) {
                         },
                         residents: {
                             where: { status: "Active" },
+                            orderBy: { isMainTenant: 'desc' },
                             take: 1
                         }
                     }

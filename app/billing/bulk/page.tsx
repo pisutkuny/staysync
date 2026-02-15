@@ -8,7 +8,10 @@ export default async function BulkPage() {
     const rooms = await prisma.room.findMany({
         where: { status: "Occupied" },
         include: {
-            residents: { where: { status: "Active" } },
+            residents: {
+                where: { status: "Active" },
+                orderBy: { isMainTenant: 'desc' }
+            },
             billings: {
                 take: 1,
                 orderBy: { createdAt: 'desc' },
