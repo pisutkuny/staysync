@@ -201,7 +201,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     month: selectedMonth,
-                    bills: billsToCreate.map(b => ({
+                    entries: billsToCreate.map(b => ({
                         roomId: b.roomId,
                         wCurr: b.wCurr,
                         eCurr: b.eCurr,
