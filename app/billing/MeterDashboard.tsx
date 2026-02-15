@@ -294,8 +294,8 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             </div>
 
             {/* Grid Layout */}
-            <div className="p-6 overflow-y-auto h-[calc(100vh-280px)] min-h-[500px] bg-gray-50/50">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="p-4 overflow-y-auto h-[calc(100vh-220px)] min-h-[500px] bg-slate-200/80">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {filteredRooms.map((room) => {
                         const bill = room.bill;
                         const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
@@ -303,144 +303,138 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
                         // Status Config
                         const statusColor =
-                            status === 'Paid' ? 'border-emerald-500 bg-emerald-50/30' :
-                                status === 'Pending' ? 'border-amber-400 bg-amber-50/30' :
-                                    status === 'Overdue' ? 'border-rose-500 bg-rose-50/30' :
-                                        'border-gray-300 bg-white';
+                            status === 'Paid' ? 'border-emerald-500 ring-emerald-500/20' :
+                                status === 'Pending' ? 'border-amber-400 ring-amber-400/20' :
+                                    status === 'Overdue' ? 'border-rose-500 ring-rose-500/20' :
+                                        'border-gray-300';
 
-                        const headerBg =
-                            status === 'Paid' ? 'bg-emerald-100/50 text-emerald-800' :
-                                status === 'Pending' ? 'bg-amber-100/50 text-amber-800' :
-                                    status === 'Overdue' ? 'bg-rose-100/50 text-rose-800' :
-                                        'bg-gray-100 text-gray-600';
+                        const cardBg =
+                            status === 'Paid' ? 'bg-emerald-50/10' :
+                                status === 'Pending' ? 'bg-amber-50/10' :
+                                    status === 'Overdue' ? 'bg-rose-50/10' :
+                                        'bg-white';
 
                         return (
                             <div
                                 key={room.id}
-                                className={`relative group flex flex-col bg-white rounded-2xl shadow-sm border-t-[6px] transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${statusColor} ${bill ? '' : 'border-t-gray-200'}`}
+                                className={`relative group flex flex-col bg-white rounded-lg shadow-sm border border-l-[6px] transition-all hover:shadow-md ${statusColor} ${cardBg}`}
                             >
-                                {/* Header: Room & Status */}
-                                <div className={`p-5 pb-3 flex justify-between items-start rounded-t-xl ${bill ? '' : 'opacity-70'}`}>
-                                    <div>
+                                {/* Compact Content */}
+                                <div className="p-3 flex flex-col gap-2 h-full">
+                                    {/* Header Row: Room + Status */}
+                                    <div className="flex justify-between items-center pb-2 border-b border-gray-100">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-4xl font-black text-gray-800 tracking-tighter">
+                                            <span className="text-xl font-black text-gray-800 tracking-tight">
                                                 {room.number}
                                             </span>
-                                            {isOccupied && (
-                                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Occupied"></div>
-                                            )}
-                                        </div>
-                                        <div className="mt-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                            {isOccupied ? 'Occupied Unit' : 'Vacant Unit'}
-                                        </div>
-                                    </div>
-                                    {bill && (
-                                        <div className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm ${getStatusColor(status)}`}>
-                                            {status}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Body: Resident & Amount */}
-                                <div className="p-5 pt-0 flex-grow flex flex-col gap-4">
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                        <div className="w-12 h-12 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-xl overflow-hidden">
-                                            {room.residents[0] ? (
-                                                <div className="w-full h-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                                                    {room.residents[0].fullName.charAt(0)}
-                                                </div>
+                                            {isOccupied ? (
+                                                <span className="w-2 h-2 rounded-full bg-emerald-500" title="Occupied"></span>
                                             ) : (
-                                                <span className="text-gray-300">👤</span>
+                                                <span className="w-2 h-2 rounded-full bg-gray-300" title="Vacant"></span>
                                             )}
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-base font-bold text-gray-900 truncate">
-                                                {room.residents[0]?.fullName || <span className="text-gray-400 font-normal italic">No Resident</span>}
-                                            </p>
-                                            <p className="text-xs text-gray-500 truncate font-medium">
-                                                Primary Resident
-                                            </p>
+                                        {bill && (
+                                            <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${status === 'Paid' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                                    status === 'Pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                                        status === 'Overdue' ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                                                            'bg-gray-100 text-gray-600 border-gray-200'
+                                                }`}>
+                                                {status}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Middle Row: Resident & Amount */}
+                                    <div className="flex justify-between items-center py-1">
+                                        {/* Resident */}
+                                        <div className="flex items-center gap-2 overflow-hidden max-w-[55%]">
+                                            <div className="w-6 h-6 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-500">
+                                                {room.residents[0]?.fullName.charAt(0) || "-"}
+                                            </div>
+                                            <div className="truncate">
+                                                <p className="text-xs font-bold text-gray-700 truncate" title={room.residents[0]?.fullName}>
+                                                    {room.residents[0]?.fullName || "Vacant"}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Amount */}
+                                        <div className="text-right">
+                                            <div className={`text-lg font-black tracking-tight leading-none ${bill ? 'text-gray-900' : 'text-gray-300'}`}>
+                                                {bill ? `฿${bill.totalAmount.toLocaleString()}` : '-'}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto px-1">
-                                        <div className="flex justify-between items-end">
-                                            <p className="text-xs text-gray-400 mb-1 uppercase tracking-wider font-bold">Total Bill</p>
-                                            {bill && <p className="text-xs text-indigo-500 font-medium mb-1 cursor-pointer hover:underline">See Breakdown</p>}
-                                        </div>
-                                        <div className={`text-3xl font-black tracking-tight ${bill ? 'text-gray-900' : 'text-gray-200'}`}>
-                                            {bill ? `฿${bill.totalAmount.toLocaleString()}` : '---'}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Footer: Actions */}
-                                <div className="p-4 border-t border-gray-100 bg-gray-50/80 rounded-b-xl flex gap-3">
-                                    {bill ? (
-                                        <>
-                                            {/* Primary Action */}
-                                            {(status === "Pending" || status === "Overdue" || status === "Late") ? (
-                                                <button
-                                                    onClick={() => handleCashPayment(bill.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-emerald-200 shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-emerald-700 transition-all active:scale-95"
-                                                >
-                                                    <Banknote size={18} /> Pay Cash
-                                                </button>
-                                            ) : status === "Review" ? (
-                                                <button
-                                                    onClick={() => handleReview(bill.id, "approve")}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-blue-200 shadow-md hover:shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all active:scale-95"
-                                                >
-                                                    <CheckCircle2 size={18} /> Approve
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => bill.slipImage && setSelectedSlip(bill.slipImage)}
-                                                    disabled={!bill.slipImage}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50"
-                                                >
-                                                    <ExternalLink size={18} /> View Slip
-                                                </button>
-                                            )}
-
-                                            {/* Secondary Actions Menu */}
-                                            <div className="flex gap-1.5">
-                                                <a
-                                                    href={`/billing/${bill.id}/print?type=a4`}
-                                                    target="_blank"
-                                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-colors shadow-sm"
-                                                    title="Print"
-                                                >
-                                                    <span className="text-lg">🖨️</span>
-                                                </a>
-
-                                                {status === "Review" && (
+                                    {/* Footer: Actions */}
+                                    <div className="pt-2 mt-auto flex gap-2">
+                                        {bill ? (
+                                            <>
+                                                {/* Primary Action */}
+                                                {(status === "Pending" || status === "Overdue" || status === "Late") ? (
                                                     <button
-                                                        onClick={() => setRejectingId(bill.id)}
-                                                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-rose-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors shadow-sm"
-                                                        title="Reject"
+                                                        onClick={() => handleCashPayment(bill.id)}
+                                                        className="flex-1 h-8 flex items-center justify-center gap-1.5 bg-emerald-600 text-white rounded-md text-xs font-bold hover:bg-emerald-700 transition-colors"
+                                                        title="Pay Cash"
                                                     >
-                                                        <XCircle size={20} />
+                                                        <Banknote size={14} /> Pay
+                                                    </button>
+                                                ) : status === "Review" ? (
+                                                    <button
+                                                        onClick={() => handleReview(bill.id, "approve")}
+                                                        className="flex-1 h-8 flex items-center justify-center gap-1.5 bg-blue-600 text-white rounded-md text-xs font-bold hover:bg-blue-700 transition-colors"
+                                                        title="Approve Slip"
+                                                    >
+                                                        <CheckCircle2 size={14} /> Approve
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => bill.slipImage && setSelectedSlip(bill.slipImage)}
+                                                        disabled={!bill.slipImage}
+                                                        className="flex-1 h-8 flex items-center justify-center gap-1.5 bg-white border border-gray-300 text-gray-700 rounded-md text-xs font-bold hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                                        title="View Slip"
+                                                    >
+                                                        <ExternalLink size={14} /> Slip
                                                     </button>
                                                 )}
 
-                                                <button
-                                                    onClick={() => handleDelete(bill.id)}
-                                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-300 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors shadow-sm"
-                                                    title="Delete"
+                                                {/* Small Actions */}
+                                                <a
+                                                    href={`/billing/${bill.id}/print?type=a4`}
+                                                    target="_blank"
+                                                    className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                                                    title="Print"
                                                 >
-                                                    <Trash2 size={20} />
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <Link
-                                            href={`/billing/bulk?month=${selectedMonth}`}
-                                            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-indigo-200 shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all active:scale-95"
-                                        >
-                                            Create Bill <ArrowRight size={18} />
-                                        </Link>
-                                    )}
+                                                    <span className="text-sm">🖨️</span>
+                                                </a>
+
+                                                {status === "Review" ? (
+                                                    <button
+                                                        onClick={() => setRejectingId(bill.id)}
+                                                        className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-rose-400 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-colors"
+                                                        title="Reject"
+                                                    >
+                                                        <XCircle size={16} />
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleDelete(bill.id)}
+                                                        className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-300 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <Link
+                                                href={`/billing/bulk?month=${selectedMonth}`}
+                                                className="w-full h-8 flex items-center justify-center gap-1.5 bg-indigo-600 text-white rounded-md text-xs font-bold hover:bg-indigo-700 transition-colors"
+                                            >
+                                                Create <ArrowRight size={14} />
+                                            </Link>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );
