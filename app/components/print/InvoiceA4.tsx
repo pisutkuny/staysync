@@ -44,13 +44,13 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
             <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
                     {/* Header */}
-                    <div className="flex justify-between items-start border-b border-gray-300 pb-6 mb-8">
+                    <div className="flex justify-between items-start border-b border-gray-400 pb-6 mb-8">
                         <div className="flex gap-6 items-start">
                             {/* Logo */}
                             {config.invoiceLogo ? (
                                 <img src={config.invoiceLogo} alt="Logo" className="w-24 h-24 object-contain rounded-full border border-gray-100 shadow-sm" />
                             ) : (
-                                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-gray-300">
+                                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 border border-gray-300">
                                     <span className="text-xs">No Logo</span>
                                 </div>
                             )}
@@ -71,7 +71,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                         <div>
                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">ออกบิลถึง / Bill To</h3>
                             <div className="text-2xl font-bold text-gray-900 mb-1">ห้อง {billing.room.number}</div>
-                            <p className="text-lg text-gray-700">{resident?.fullName || "ผู้เช่ารายวัน / Guest"}</p>
+                            <p className="text-lg text-black font-medium">{resident?.fullName || "ผู้เช่ารายวัน / Guest"}</p>
                             {resident?.phone && <p className="text-gray-500 text-sm mt-1">{resident.phone}</p>}
                         </div>
                         <div className="text-right">
@@ -83,14 +83,14 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                     <div className="mb-8">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-y-2 border-gray-200">
+                                <tr className="border-y-2 border-gray-400">
                                     <th className="py-3 text-left font-bold text-gray-600 text-sm uppercase tracking-wider">รายการ (Description)</th>
                                     <th className="py-3 text-right font-bold text-gray-600 text-sm uppercase tracking-wider">ราคาต่อหน่วย</th>
                                     <th className="py-3 text-center font-bold text-gray-600 text-sm uppercase tracking-wider">จำนวน</th>
                                     <th className="py-3 text-right font-bold text-gray-600 text-sm uppercase tracking-wider">รวมเป็นเงิน</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 text-sm">
+                            <tbody className="divide-y divide-gray-300 text-sm">
                                 <tr>
                                     <td className="py-4 font-medium text-gray-800">
                                         ค่าเช่าห้อง (Room Rent)
@@ -145,7 +145,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                         <td className="py-4 font-medium text-gray-800">อื่นๆ (Other Fees)</td>
                                         <td className="py-4 text-right">-</td>
                                         <td className="py-4 text-center">-</td>
-                                        <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.otherFees.toLocaleString()}</td>
+                                        <td className="py-4 text-right font-mono font-bold text-black">{billing.otherFees.toLocaleString()}</td>
                                     </tr>
                                 )}
                                 {/* Phase 2: Common Area Fees */}
@@ -202,20 +202,20 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                 {/* Footer Section: Totals, Payment, Signatures */}
                 <div className="mt-auto">
                     {/* Totals */}
-                    <div className="flex justify-end mb-8 border-t border-gray-300 pt-4">
+                    <div className="flex justify-end mb-8 border-t border-gray-400 pt-4">
                         <div className="w-1/3">
                             <div className="flex justify-between text-gray-600 mb-2">
                                 <span>รวมเงิน (Subtotal)</span>
                                 <span>{billing.totalAmount.toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between text-3xl font-bold mt-2 pt-2 border-t border-gray-200">
+                            <div className="flex justify-between text-3xl font-bold mt-2 pt-2 border-t border-gray-400">
                                 <span>ยอดสุทธิ</span>
                                 <span style={{ color: themeColor }}>฿{billing.totalAmount.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-end border-t-2 border-gray-100 pt-8">
+                    <div className="flex justify-between items-end border-t-2 border-gray-300 pt-8">
                         {/* Payment / QR */}
                         <div className="w-2/3 pr-8">
                             {type === 'receipt' ? (
@@ -262,7 +262,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
 
                         {/* Signature */}
                         <div className="text-center w-48">
-                            <div className="border-b-2 border-dotted border-gray-400 mb-2 h-16"></div>
+                            <div className="border-b-2 border-dotted border-black mb-2 h-16"></div>
                             <p className="text-sm font-bold text-gray-700">ผู้ดูแลหอพัก</p>
                             <p className="text-xs text-gray-500">(Dorm Manager)</p>
                         </div>

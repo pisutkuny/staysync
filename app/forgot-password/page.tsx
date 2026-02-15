@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
     if (submitted) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center space-y-4">
+                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-300 p-8 text-center space-y-4">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600">
                         <Mail size={32} />
                     </div>
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-300 p-8 space-y-6">
                 <Link href="/login" className="text-gray-400 hover:text-gray-600 flex items-center gap-2 text-sm">
                     <ArrowLeft size={16} /> {t.auth.backToLogin}
                 </Link>
@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full rounded-lg border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             placeholder="admin@staysync.com"
                         />
                     </div>
