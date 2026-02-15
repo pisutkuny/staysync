@@ -158,14 +158,14 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Activity */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-                    <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+                <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-slate-300 shadow-xl overflow-hidden">
+                    <div className="p-6 border-b-2 border-slate-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
                         <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                             <Activity className="text-indigo-600" size={22} />
                             {t.dashboard.recentActivity}
                         </h3>
                     </div>
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-slate-200">
                         {activity.length === 0 ? (
                             <div className="p-8 text-center text-gray-500">{t.dashboard.noActivity}</div>
                         ) : (
@@ -182,9 +182,9 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
                                         <p className="text-xs text-gray-400">
                                             {new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
                                         </p>
-                                        <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${item.status === 'Paid' ? 'bg-green-100 text-green-700' :
-                                            item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-gray-100 text-gray-700'
+                                        <span className={`text-[10px] px-2 py-1 rounded-full font-bold border ${item.status === 'Paid' ? 'bg-green-100 text-green-700 border-green-200' :
+                                            item.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                                                'bg-gray-100 text-gray-700 border-gray-200'
                                             }`}>
                                             {item.status}
                                         </span>
@@ -196,15 +196,15 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
                 </div>
 
                 {/* Top Spenders */}
-                <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-                    <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-yellow-50 to-white">
+                <div className="bg-white rounded-2xl border-2 border-slate-300 shadow-xl overflow-hidden">
+                    <div className="p-6 border-b-2 border-slate-200 bg-gradient-to-r from-yellow-50 to-white">
                         <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                             <Zap className="text-yellow-500" size={22} />
                             {t.dashboard.topSpenders}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">{t.dashboard.currentMonthBill}</p>
                     </div>
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-slate-200">
                         {topSpenders.length === 0 ? (
                             <div className="p-8 text-center text-gray-500">-</div>
                         ) : (
@@ -232,7 +232,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
             </div>
 
             {/* Enhanced Quick Actions */}
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 p-6 shadow-xl">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-slate-300 p-6 shadow-xl">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <span className="text-2xl">⚡</span>
                     {t.dashboard.quickActions}

@@ -167,7 +167,7 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                             href={item.href!}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${colorClass}`}
                         >
-                            <div className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? "" : "text-gray-400 group-hover:text-current"}`}>
+                            <div className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? "" : "text-slate-500 group-hover:text-current"}`}>
                                 {Icon && <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />}
                             </div>
                             <span className="text-sm font-medium leading-none">
@@ -197,7 +197,7 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-current opacity-40"></div>
                             )}
 
-                            <div className={`transition-transform duration-200 group-hover:scale-110 ${hasActiveChild ? "" : "text-gray-400 group-hover:text-current"}`}>
+                            <div className={`transition-transform duration-200 group-hover:scale-110 ${hasActiveChild ? "" : "text-slate-500 group-hover:text-current"}`}>
                                 {Icon && <Icon size={22} strokeWidth={hasActiveChild ? 2.5 : 2} />}
                             </div>
                             <span className="text-sm font-medium leading-none flex-1 text-left">
@@ -225,7 +225,7 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
                                             href={child.href!}
                                             className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ml-2 ${isChildActive
                                                 ? `${theme} bg-opacity-50` // Softer bg for child
-                                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                                                 }`}
                                         >
                                             <span className={`text-[13px] ${isChildActive ? "font-semibold" : "font-medium"}`}>

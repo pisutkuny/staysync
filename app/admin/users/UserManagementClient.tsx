@@ -226,7 +226,7 @@ export default function UserManagementClient({ initialUsers }: UserManagementCli
             </div>
 
             {/* Users Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow border border-gray-100 dark:border-slate-700 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow border border-slate-300 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-900 border-b dark:border-slate-700">

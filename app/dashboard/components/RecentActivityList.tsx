@@ -8,7 +8,7 @@ export default function RecentActivityList({ activity }: { activity: ActivityIte
     const { t } = useLanguage();
 
     return (
-        <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-2xl border-2 border-slate-300 shadow-xl overflow-hidden">
             <div className="p-6 border-b-2 border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <Activity className="text-indigo-600" size={22} />

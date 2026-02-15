@@ -53,7 +53,7 @@ export default function BillingClient({ rooms, bills, allRooms, config }: Billin
             {/* Dashboard Stats */}
             <MeterDashboard rooms={rooms} bills={bills} />
 
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <div className="bg-white p-6 rounded-xl border border-slate-300 shadow-sm">
                 <div className="mb-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-2">{t.billing.createBill}</h3>
                     <p className="text-sm text-gray-500">

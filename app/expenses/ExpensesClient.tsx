@@ -432,7 +432,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
                                     setSearchQuery(e.target.value);
                                     setPage(1);
                                 }}
-                                className="pl-11 w-full p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                className="pl-11 w-full p-3 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                             />
                         </div>
                     </div>
@@ -688,7 +688,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
                 </div>
 
                 {/* List Section */}
-                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="lg:col-span-2 bg-white rounded-xl border border-slate-300 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                         <h3 className="text-lg font-bold text-gray-900">{t.expenses.recent}</h3>
                         <select
