@@ -294,63 +294,80 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             </div>
 
             {/* Grid Layout */}
-            <div className="p-6 overflow-y-auto h-[calc(100vh-280px)] min-h-[500px] bg-slate-50">
+            <div className="p-6 overflow-y-auto h-[calc(100vh-280px)] min-h-[500px] bg-slate-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredRooms.map((room) => {
                         const bill = room.bill;
                         const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
                         const isOccupied = room.status === 'Occupied';
 
-                        // Accessibility Config: Use High Contrast Solids
-                        const statusColor =
-                            status === 'Paid' ? 'border-t-emerald-600' :
-                                status === 'Pending' ? 'border-t-amber-500' :
-                                    status === 'Overdue' ? 'border-t-rose-600' :
-                                        'border-t-slate-400';
+                        // Dynamic Font Size Logic
+                        const titleSize = room.number.length > 15 ? 'text-2xl' :
+                            room.number.length > 8 ? 'text-3xl' :
+                                'text-4xl';
 
-                        // Badge Styles: Solid Dark Backgrounds for clear text contrast
+                        // Accessibility & Color Config: Distinct Zones & High Contrast
+                        // Gone with "All Gray" -> Now using "Distinct Colored Zones"
+                        const statusColor =
+                            status === 'Paid' ? 'border-emerald-600' :
+                                status === 'Pending' ? 'border-amber-500' :
+                                    status === 'Overdue' ? 'border-rose-600' :
+                                        'border-slate-400';
+
+                        const headerBg =
+                            status === 'Paid' ? 'bg-emerald-200' :
+                                status === 'Pending' ? 'bg-amber-200' :
+                                    status === 'Overdue' ? 'bg-rose-200' :
+                                        'bg-slate-200';
+
+                        const cardBg =
+                            status === 'Paid' ? 'bg-emerald-50' :
+                                status === 'Pending' ? 'bg-amber-50' :
+                                    status === 'Overdue' ? 'bg-rose-50' :
+                                        'bg-white';
+
                         const badgeStyle =
-                            status === 'Paid' ? 'bg-emerald-700 text-white' :
-                                status === 'Pending' ? 'bg-amber-600 text-white' :
-                                    status === 'Overdue' ? 'bg-rose-700 text-white' :
-                                        'bg-slate-600 text-white';
+                            status === 'Paid' ? 'bg-emerald-800 text-white' :
+                                status === 'Pending' ? 'bg-amber-700 text-white' :
+                                    status === 'Overdue' ? 'bg-rose-800 text-white' :
+                                        'bg-slate-700 text-white';
 
                         return (
                             <div
                                 key={room.id}
-                                className={`relative group flex flex-col bg-white rounded-xl shadow-md border-x border-b border-slate-300 border-t-[8px] transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${statusColor}`}
+                                className={`relative group flex flex-col rounded-xl shadow-md border-x-2 border-b-2 border-t-[8px] overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${statusColor}`}
                             >
-                                {/* Header: Structure (Gray Background) */}
-                                <div className="p-4 flex justify-between items-start bg-slate-100 border-b border-slate-300">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-4xl font-black text-slate-900 tracking-tighter">
+                                {/* Header: Distinct Color Zone */}
+                                <div className={`p-4 flex justify-between items-start border-b border-black/5 ${headerBg}`}>
+                                    <div className="flex-1 mr-2">
+                                        <div className="flex flex-col">
+                                            <span className={`${titleSize} font-black text-slate-900 tracking-tight leading-tight break-words`}>
                                                 {room.number}
                                             </span>
                                             {isOccupied && (
-                                                <div className="px-2 py-0.5 rounded-full bg-slate-800 text-white text-[10px] font-bold uppercase tracking-wider">
+                                                <span className="inline-block mt-1 w-fit px-2 py-0.5 rounded-full bg-slate-900/10 text-slate-900 text-[10px] font-bold uppercase tracking-wider">
                                                     Occupied
-                                                </div>
+                                                </span>
                                             )}
                                         </div>
                                         {!isOccupied && (
-                                            <div className="mt-1 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                            <div className="mt-1 text-xs font-bold text-slate-600 uppercase tracking-widest">
                                                 Vacant Unit
                                             </div>
                                         )}
                                     </div>
                                     {bill && (
-                                        <div className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide shadow-sm ${badgeStyle}`}>
+                                        <div className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide shadow-sm border border-white/20 ${badgeStyle}`}>
                                             {status}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Body: Content (White Background) */}
-                                <div className="p-5 flex-grow flex flex-col gap-6 bg-white">
-                                    {/* Resident Block - High Contrast Border */}
-                                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border-2 border-slate-200">
-                                        <div className="w-12 h-12 rounded-full bg-slate-100 border-2 border-slate-300 flex items-center justify-center text-xl overflow-hidden shrink-0 font-bold text-slate-700">
+                                {/* Body: Light Tinted Zone */}
+                                <div className={`p-5 flex-grow flex flex-col gap-6 ${cardBg}`}>
+                                    {/* Resident Block */}
+                                    <div className="flex items-center gap-4 p-4 bg-white/60 rounded-xl border border-black/5 shadow-sm">
+                                        <div className="w-12 h-12 rounded-full bg-white border-2 border-black/10 flex items-center justify-center text-xl overflow-hidden shrink-0 font-bold text-slate-700">
                                             {room.residents[0] ? (
                                                 room.residents[0].fullName.charAt(0)
                                             ) : (
@@ -359,9 +376,9 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p className="text-base font-bold text-slate-900 truncate">
-                                                {room.residents[0]?.fullName || <span className="text-slate-400 italic">No Resident</span>}
+                                                {room.residents[0]?.fullName || <span className="text-slate-500 italic">No Resident</span>}
                                             </p>
-                                            <p className="text-xs text-slate-500 truncate font-semibold uppercase">
+                                            <p className="text-xs text-slate-600 truncate font-bold uppercase">
                                                 Primary Resident
                                             </p>
                                         </div>
@@ -369,24 +386,24 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
                                     <div className="mt-auto px-1">
                                         <div className="flex justify-between items-end mb-1">
-                                            <p className="text-xs text-slate-500 uppercase tracking-wider font-extrabold">Total Bill</p>
+                                            <p className="text-xs text-slate-600 uppercase tracking-wider font-extrabold">Total Bill</p>
                                             {bill && <span className="text-xs text-indigo-700 font-bold cursor-pointer hover:underline">See Breakdown</span>}
                                         </div>
-                                        <div className={`text-5xl font-black tracking-tighter ${bill ? 'text-slate-900' : 'text-slate-300'}`}>
+                                        <div className={`text-5xl font-black tracking-tighter ${bill ? 'text-slate-900' : 'text-slate-400'}`}>
                                             {bill ? `฿${bill.totalAmount.toLocaleString()}` : '---'}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Footer: Actions (Gray Background) */}
-                                <div className="p-4 border-t border-slate-300 bg-slate-100 flex gap-3 rounded-b-lg">
+                                {/* Footer: Actions (Darker Tint) */}
+                                <div className={`p-4 border-t border-black/10 flex gap-3 rounded-b-lg ${headerBg} bg-opacity-50`}>
                                     {bill ? (
                                         <>
-                                            {/* Primary Action - High Contrast Button */}
+                                            {/* Primary Action */}
                                             {(status === "Pending" || status === "Overdue" || status === "Late") ? (
                                                 <button
                                                     onClick={() => handleCashPayment(bill.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-black transition-all active:scale-95 border border-transparent"
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-black transition-all active:scale-95"
                                                 >
                                                     <Banknote size={18} /> Pay Cash
                                                 </button>
@@ -401,7 +418,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 <button
                                                     onClick={() => bill.slipImage && setSelectedSlip(bill.slipImage)}
                                                     disabled={!bill.slipImage}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-slate-300 text-slate-700 py-3 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 hover:border-slate-400 transition-all disabled:opacity-50"
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-black/10 text-slate-800 py-3 rounded-lg text-sm font-bold shadow-sm hover:bg-white/80 transition-all disabled:opacity-50"
                                                 >
                                                     <ExternalLink size={18} /> View Slip
                                                 </button>
@@ -412,7 +429,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 <a
                                                     href={`/billing/${bill.id}/print?type=a4`}
                                                     target="_blank"
-                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-500 transition-colors shadow-sm"
+                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-black/10 text-slate-700 hover:text-indigo-900 hover:border-indigo-500 transition-colors shadow-sm"
                                                     title="Print"
                                                 >
                                                     <span className="text-xl">🖨️</span>
@@ -421,7 +438,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 {status === "Review" && (
                                                     <button
                                                         onClick={() => setRejectingId(bill.id)}
-                                                        className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-rose-600 hover:text-rose-800 hover:border-rose-500 transition-colors shadow-sm"
+                                                        className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-black/10 text-rose-600 hover:text-rose-900 hover:border-rose-500 transition-colors shadow-sm"
                                                         title="Reject"
                                                     >
                                                         <XCircle size={22} />
@@ -430,7 +447,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
 
                                                 <button
                                                     onClick={() => handleDelete(bill.id)}
-                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-slate-300 text-slate-400 hover:text-rose-600 hover:border-rose-500 transition-colors shadow-sm"
+                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-black/10 text-slate-500 hover:text-rose-600 hover:border-rose-500 transition-colors shadow-sm"
                                                     title="Delete"
                                                 >
                                                     <Trash2 size={22} />
