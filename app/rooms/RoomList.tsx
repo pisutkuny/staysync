@@ -110,8 +110,8 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                                                     onClick={(e) => handleSetMainTenant(e, resident.id)}
                                                     className={`p-1.5 rounded-full transition-all shrink-0 ${resident.isMainTenant
                                                         ? 'text-amber-500 bg-amber-50 ring-1 ring-amber-200 shadow-sm'
-                                                        : 'text-slate-300 hover:text-amber-400 hover:bg-slate-50 opacity-0 group-hover:opacity-100' // Hide empty stars until hover on card? No, maybe keep visible for accessibility or hint. Let's make them visible but subtle.
-                                                        } ${!resident.isMainTenant && 'text-slate-200 hover:text-amber-400'}`}
+                                                        : 'text-slate-300 hover:text-amber-400 hover:bg-slate-50'
+                                                        }`}
                                                     title={resident.isMainTenant ? "Main Tenant" : "Set as Main Tenant"}
                                                 >
                                                     <Star size={14} fill={resident.isMainTenant ? "currentColor" : "none"} strokeWidth={resident.isMainTenant ? 1.5 : 2} />
