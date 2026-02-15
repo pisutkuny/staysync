@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Send, Save, CreditCard, Receipt, Calendar } from "lucide-react";
+import { Loader2, Send, Save, CreditCard, Receipt, Calendar, Droplets, Zap, Trash2, Wifi, HelpCircle, Users } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 
@@ -151,11 +151,13 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-blue-500 uppercase mb-1">{t.billing.waterCurr}</label>
+                                        <label className="block text-xs font-bold text-blue-600 uppercase mb-1 flex items-center gap-1">
+                                            <Droplets size={14} /> {t.billing.waterCurr}
+                                        </label>
                                         <input
                                             type="number"
                                             required
-                                            className="w-full border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                                            className="w-full border-2 border-blue-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none font-bold text-blue-900"
                                             value={formData.waterCurrent}
                                             onChange={(e) => setFormData({ ...formData, waterCurrent: e.target.value })}
                                             autoFocus
@@ -174,11 +176,13 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">{t.billing.elecCurr}</label>
+                                        <label className="block text-xs font-bold text-amber-600 uppercase mb-1 flex items-center gap-1">
+                                            <Zap size={14} /> {t.billing.elecCurr}
+                                        </label>
                                         <input
                                             type="number"
                                             required
-                                            className="w-full border border-yellow-400 rounded-lg p-2 text-sm focus:ring-2 focus:ring-yellow-100 outline-none"
+                                            className="w-full border-2 border-amber-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-amber-100 outline-none font-bold text-amber-900"
                                             value={formData.electricCurrent}
                                             onChange={(e) => setFormData({ ...formData, electricCurrent: e.target.value })}
                                         />
@@ -187,28 +191,34 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                                 <div className="grid grid-cols-3 gap-2 mt-4">
                                     <div>
-                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.trash}</label>
+                                        <label className="block text-xs text-slate-600 font-bold mb-1 flex items-center gap-1">
+                                            <Trash2 size={12} /> {t.billing.trash}
+                                        </label>
                                         <input
                                             type="number"
-                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            className="w-full border-2 border-slate-300 rounded-lg p-2 text-sm"
                                             value={formData.trashFee}
                                             onChange={(e) => setFormData({ ...formData, trashFee: e.target.value })}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.internet}</label>
+                                        <label className="block text-xs text-slate-600 font-bold mb-1 flex items-center gap-1">
+                                            <Wifi size={12} /> {t.billing.internet}
+                                        </label>
                                         <input
                                             type="number"
-                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            className="w-full border-2 border-slate-300 rounded-lg p-2 text-sm"
                                             value={formData.internetFee}
                                             onChange={(e) => setFormData({ ...formData, internetFee: e.target.value })}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.other}</label>
+                                        <label className="block text-xs text-slate-600 font-bold mb-1 flex items-center gap-1">
+                                            <HelpCircle size={12} /> {t.billing.other}
+                                        </label>
                                         <input
                                             type="number"
-                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            className="w-full border-2 border-slate-300 rounded-lg p-2 text-sm"
                                             value={formData.otherFees}
                                             onChange={(e) => setFormData({ ...formData, otherFees: e.target.value })}
                                         />
@@ -217,10 +227,12 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                                 {/* Common Area Fee Input */}
                                 <div className="mt-2">
-                                    <label className="block text-xs text-purple-600 mb-1 font-medium">{t.billing.commonFee}</label>
+                                    <label className="block text-xs text-purple-700 mb-1 font-bold flex items-center gap-1">
+                                        <Users size={14} /> {t.billing.commonFee}
+                                    </label>
                                     <input
                                         type="number"
-                                        className="w-full border border-purple-200 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all font-medium text-purple-700"
+                                        className="w-full border-2 border-purple-300 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-bold text-purple-900"
                                         value={formData.commonFee}
                                         onChange={(e) => setFormData({ ...formData, commonFee: e.target.value })}
                                         placeholder={config?.enableCommonAreaCharges ? t.billing.autoCalc : t.billing.manual}

@@ -129,15 +129,24 @@ export default function NavLinks({ userRole, onClick }: { userRole?: string, onC
         if (isGroup) {
             // style for Group Header
             if (isActive) { // Group is expanded or has active child
-                return `${theme.activeText} ${theme.activeBg} font-semibold`;
+                return `${theme.activeText} ${theme.activeBg} font-bold`;
             }
-            return `text-gray-600 ${theme.hoverBg} ${theme.hoverText}`;
+            return `text-slate-600 ${theme.hoverBg} ${theme.hoverText}`;
         } else {
             // Style for single link or child link
+            // Style for single link or child link
             if (isActive) {
-                return `${theme.activeBg} ${theme.activeText} font-semibold shadow-sm`;
+                // Add border-l-4 for active indication (Accessibility)
+                const activeBorder =
+                    baseColor === 'indigo' ? 'border-l-4 border-indigo-600 pl-[9px]' : // 12px padding - 3px border diff = 9px to keep alignment? No, border adds to width or consumes padding.
+                        baseColor === 'blue' ? 'border-l-4 border-blue-600' :
+                            baseColor === 'emerald' ? 'border-l-4 border-emerald-600' :
+                                baseColor === 'orange' ? 'border-l-4 border-orange-600' :
+                                    'border-l-4 border-slate-600';
+
+                return `${theme.activeBg} ${theme.activeText} font-bold shadow-sm ${activeBorder}`;
             }
-            return `text-gray-500 ${theme.hoverBg} ${theme.hoverText}`;
+            return `text-slate-500 ${theme.hoverBg} ${theme.hoverText} border-l-4 border-transparent`;
         }
     };
 
