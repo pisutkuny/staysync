@@ -739,7 +739,6 @@ export const dictionary = {
             rooms: "Rooms",
             billingUtilities: "Billing & Utilities",
             billing: "Billing & Invoices",
-            billDetails: "Bill Details",
             bulkMeter: "Bulk Meter Entry",
             monthlyReport: "Monthly Report",
             centralMeter: "Central Meter",
@@ -1040,6 +1039,7 @@ export const dictionary = {
         billing: {
             title: "Monthly Billing",
             subtitle: "Manage billing and view utility usage",
+            billDetails: "Bill Details",
             createBill: "Create New Bill",
             createBillDesc: "Create bill for specific room - Edit mid-month or special bills",
             recordAll: "Record All Meters",
