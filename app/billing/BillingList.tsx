@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell, Banknote } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell, Banknote, Trash2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 
@@ -67,6 +67,28 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                 // Update local state
                 setBills(bills.map(b => b.id === id ? { ...b, paymentStatus: "Paid" } : b));
                 showAlert("Success", `✅ ${t.billing.cashSuccess}`, "success");
+            } else {
+                showAlert("Error", `❌ ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        const confirmed = await showConfirm("Delete", t.billing.confirmDelete, true);
+        if (!confirmed) return;
+
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}`, { method: "DELETE" });
+            const data = await res.json();
+
+            if (res.ok) {
+                setBills(bills.filter((b) => b.id !== id));
+                showAlert("Success", `✅ ${t.billing.deleteSuccess}`, "success");
             } else {
                 showAlert("Error", `❌ ${data.error}`, "error");
             }
@@ -268,6 +290,15 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                                     <span className="hidden xl:inline">{t.billing.payCash}</span>
                                                 </button>
                                             )}
+                                            {/* Delete Button */}
+                                            <button
+                                                onClick={() => handleDelete(bill.id)}
+                                                disabled={loading === bill.id}
+                                                className="p-2 bg-red-50 text-red-600 rounded-lg border border-red-100 hover:bg-red-100 transition-colors shadow-sm"
+                                                title={t.billing.deleteBill}
+                                            >
+                                                {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
