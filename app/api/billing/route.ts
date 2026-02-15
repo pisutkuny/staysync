@@ -36,7 +36,8 @@ export async function POST(req: Request) {
             waterCurrent, waterLast,
             electricCurrent, electricLast,
             trashFee, internetFee, otherFees,
-            commonFee
+            commonFee,
+            billDate // Optional: YYYY-MM
         } = body;
 
         // Fetch System Config for Rates
@@ -96,7 +97,7 @@ export async function POST(req: Request) {
                 commonWaterFee: common, // Storing single common fee here
                 totalAmount,
                 paymentStatus: "Pending",
-                month: new Date(),
+                month: billDate ? new Date(`${billDate}-01`) : new Date(),
                 organizationId: session.organizationId
             }
         });

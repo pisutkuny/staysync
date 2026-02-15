@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Send, Save, CreditCard, Receipt } from "lucide-react";
+import { Loader2, Send, Save, CreditCard, Receipt, Calendar } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 
@@ -37,7 +37,8 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
         trashFee: initialRates.trash.toString(),
         internetFee: initialRates.internet.toString(),
         otherFees: initialRates.other.toString(),
-        commonFee: initialRates.common?.toString() || "0"
+        commonFee: initialRates.common?.toString() || "0",
+        billDate: new Date().toISOString().slice(0, 7) // Default to YYYY-MM
     });
 
     const handleSelectRoom = async (roomId: number) => {
@@ -57,7 +58,8 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                 const lastWater = (data.water !== undefined && data.water !== null) ? data.water.toString() : (room.waterMeterInitial?.toString() || "0");
                 const lastElectric = (data.electric !== undefined && data.electric !== null) ? data.electric.toString() : (room.electricMeterInitial?.toString() || "0");
 
-                setFormData({
+                setFormData(prev => ({
+                    ...prev,
                     waterCurrent: lastWater, // Default to last reading
                     waterLast: lastWater,
                     electricCurrent: lastElectric, // Default to last reading
@@ -67,7 +69,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                     otherFees: initialRates.other.toString(),
                     // Check if room has common area fee enabled
                     commonFee: room.chargeCommonArea ? (initialRates.common?.toString() || "0") : "0"
-                });
+                }));
             } catch (e) {
                 console.error("Failed to fetch latest readings");
             }
@@ -100,130 +102,149 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map((room) => (
-                <div key={room.id} className={`bg-white rounded-xl border transition-all ${selectedRoom === room.id ? 'border-indigo-600 ring-1 ring-indigo-600 shadow-md' : 'border-gray-100 shadow-sm hover:shadow-md'}`}>
-                    <div className="p-6 cursor-pointer" onClick={() => handleSelectRoom(room.id)}>
-                        <div className="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900">{t.billing.room} {room.number}</h3>
-                                <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "No Resident"}</p>
+        <div>
+            {/* Global Month Selection */}
+            <div className="mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <Calendar size={24} />
+                </div>
+                <div>
+                    <h3 className="font-bold text-slate-800">Billing Period</h3>
+                    <p className="text-xs text-slate-500">Select the month for these bills</p>
+                </div>
+                <input
+                    type="month"
+                    value={formData.billDate}
+                    onChange={(e) => setFormData({ ...formData, billDate: e.target.value })}
+                    className="ml-auto border-2 border-slate-300 rounded-lg px-4 py-2 text-slate-700 font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {rooms.map((room) => (
+                    <div key={room.id} className={`bg-white rounded-xl border transition-all ${selectedRoom === room.id ? 'border-indigo-600 ring-1 ring-indigo-600 shadow-md' : 'border-gray-100 shadow-sm hover:shadow-md'}`}>
+                        <div className="p-6 cursor-pointer" onClick={() => handleSelectRoom(room.id)}>
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">{t.billing.room} {room.number}</h3>
+                                    <p className="text-sm text-gray-500">{room.residents[0]?.fullName || "No Resident"}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-semibold text-indigo-600">฿{room.price}</p>
+                                </div>
                             </div>
-                            <div className="text-right">
-                                <p className="font-semibold text-indigo-600">฿{room.price}</p>
-                            </div>
+                            {selectedRoom !== room.id && (
+                                <p className="text-xs text-center text-gray-400 mt-4">Click to create bill</p>
+                            )}
                         </div>
-                        {selectedRoom !== room.id && (
-                            <p className="text-xs text-center text-gray-400 mt-4">Click to create bill</p>
+
+                        {selectedRoom === room.id && (
+                            <form onSubmit={(e) => handleSubmit(e, room.id)} className="p-6 pt-0 border-t border-gray-100">
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.waterPrev} (Edit)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
+                                            value={formData.waterLast}
+                                            onChange={(e) => setFormData({ ...formData, waterLast: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-blue-500 uppercase mb-1">{t.billing.waterCurr}</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            className="w-full border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none"
+                                            value={formData.waterCurrent}
+                                            onChange={(e) => setFormData({ ...formData, waterCurrent: e.target.value })}
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.elecPrev} (Edit)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
+                                            value={formData.electricLast}
+                                            onChange={(e) => setFormData({ ...formData, electricLast: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">{t.billing.elecCurr}</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            className="w-full border border-yellow-400 rounded-lg p-2 text-sm focus:ring-2 focus:ring-yellow-100 outline-none"
+                                            value={formData.electricCurrent}
+                                            onChange={(e) => setFormData({ ...formData, electricCurrent: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2 mt-4">
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.trash}</label>
+                                        <input
+                                            type="number"
+                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            value={formData.trashFee}
+                                            onChange={(e) => setFormData({ ...formData, trashFee: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.internet}</label>
+                                        <input
+                                            type="number"
+                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            value={formData.internetFee}
+                                            onChange={(e) => setFormData({ ...formData, internetFee: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{t.billing.other}</label>
+                                        <input
+                                            type="number"
+                                            className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                                            value={formData.otherFees}
+                                            onChange={(e) => setFormData({ ...formData, otherFees: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Common Area Fee Input */}
+                                <div className="mt-2">
+                                    <label className="block text-xs text-purple-600 mb-1 font-medium">{t.billing.commonFee}</label>
+                                    <input
+                                        type="number"
+                                        className="w-full border border-purple-200 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all font-medium text-purple-700"
+                                        value={formData.commonFee}
+                                        onChange={(e) => setFormData({ ...formData, commonFee: e.target.value })}
+                                        placeholder={config?.enableCommonAreaCharges ? t.billing.autoCalc : t.billing.manual}
+                                    />
+                                    {config?.enableCommonAreaCharges && config?.commonAreaCapType === 'fixed' && (
+                                        <p className="text-[10px] text-purple-400 mt-1">
+                                            {t.billing.fixedCap.replace("{amount}", String(config.commonAreaCapFixed)).replace("{rooms}", String(totalRoomCount || 0))}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading === room.id}
+                                    className="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {loading === room.id ? <Loader2 className="animate-spin" size={18} /> : <Receipt size={18} />}
+                                    {t.billing.calcAndSend}
+                                </button>
+                            </form>
                         )}
                     </div>
-
-                    {selectedRoom === room.id && (
-                        <form onSubmit={(e) => handleSubmit(e, room.id)} className="p-6 pt-0 border-t border-gray-100">
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.waterPrev} (Edit)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
-                                        value={formData.waterLast}
-                                        onChange={(e) => setFormData({ ...formData, waterLast: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-blue-500 uppercase mb-1">{t.billing.waterCurr}</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        className="w-full border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-100 outline-none"
-                                        value={formData.waterCurrent}
-                                        onChange={(e) => setFormData({ ...formData, waterCurrent: e.target.value })}
-                                        autoFocus
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">{t.billing.elecPrev} (Edit)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full bg-white border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none"
-                                        value={formData.electricLast}
-                                        onChange={(e) => setFormData({ ...formData, electricLast: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-yellow-600 uppercase mb-1">{t.billing.elecCurr}</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        className="w-full border border-yellow-400 rounded-lg p-2 text-sm focus:ring-2 focus:ring-yellow-100 outline-none"
-                                        value={formData.electricCurrent}
-                                        onChange={(e) => setFormData({ ...formData, electricCurrent: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-2 mt-4">
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.trash}</label>
-                                    <input
-                                        type="number"
-                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
-                                        value={formData.trashFee}
-                                        onChange={(e) => setFormData({ ...formData, trashFee: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.internet}</label>
-                                    <input
-                                        type="number"
-                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
-                                        value={formData.internetFee}
-                                        onChange={(e) => setFormData({ ...formData, internetFee: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">{t.billing.other}</label>
-                                    <input
-                                        type="number"
-                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm"
-                                        value={formData.otherFees}
-                                        onChange={(e) => setFormData({ ...formData, otherFees: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Common Area Fee Input */}
-                            <div className="mt-2">
-                                <label className="block text-xs text-purple-600 mb-1 font-medium">{t.billing.commonFee}</label>
-                                <input
-                                    type="number"
-                                    className="w-full border border-purple-200 rounded-lg p-2 text-sm bg-purple-50 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all font-medium text-purple-700"
-                                    value={formData.commonFee}
-                                    onChange={(e) => setFormData({ ...formData, commonFee: e.target.value })}
-                                    placeholder={config?.enableCommonAreaCharges ? t.billing.autoCalc : t.billing.manual}
-                                />
-                                {config?.enableCommonAreaCharges && config?.commonAreaCapType === 'fixed' && (
-                                    <p className="text-[10px] text-purple-400 mt-1">
-                                        {t.billing.fixedCap.replace("{amount}", String(config.commonAreaCapFixed)).replace("{rooms}", String(totalRoomCount || 0))}
-                                    </p>
-                                )}
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading === room.id}
-                                className="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                {loading === room.id ? <Loader2 className="animate-spin" size={18} /> : <Receipt size={18} />}
-                                {t.billing.calcAndSend}
-                            </button>
-                        </form>
-                    )}
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 }
