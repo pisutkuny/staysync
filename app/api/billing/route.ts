@@ -5,8 +5,9 @@ import { sendLineMessage, lineClient } from "@/lib/line";
 import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
 
 // Rates Configuration (Could be DB driven later)
-const WATER_RATE = 18;
-const ELECTRIC_RATE = 7;
+// Rates Configuration (Fallback if DB config missing)
+const DEFAULT_WATER_RATE = 18;
+const DEFAULT_ELECTRIC_RATE = 7;
 
 export async function GET() {
     try {
@@ -38,6 +39,11 @@ export async function POST(req: Request) {
             commonFee
         } = body;
 
+        // Fetch System Config for Rates
+        const config = await prisma.systemConfig.findFirst();
+        const waterRate = config?.waterRate ?? DEFAULT_WATER_RATE;
+        const electricRate = config?.electricRate ?? DEFAULT_ELECTRIC_RATE;
+
         // Parse numbers
         const wCurr = parseFloat(waterCurrent) || 0;
         const wLast = parseFloat(waterLast) || 0;
@@ -53,8 +59,8 @@ export async function POST(req: Request) {
         const electricUnits = Math.max(0, eCurr - eLast);
 
         // Calculate Totals
-        const waterCost = waterUnits * WATER_RATE;
-        const electricCost = electricUnits * ELECTRIC_RATE;
+        const waterCost = waterUnits * waterRate;
+        const electricCost = electricUnits * electricRate;
 
         // Fetch Room Price & Resident
         const room = await prisma.room.findUnique({
@@ -80,10 +86,10 @@ export async function POST(req: Request) {
                 residentId,
                 waterMeterLast: wLast,
                 waterMeterCurrent: wCurr,
-                waterRate: WATER_RATE,
+                waterRate: waterRate,
                 electricMeterLast: eLast,
                 electricMeterCurrent: eCurr,
-                electricRate: ELECTRIC_RATE,
+                electricRate: electricRate,
                 trashFee: trash,
                 internetFee: internet,
                 otherFees: other,
