@@ -294,134 +294,167 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             </div>
 
             {/* List */}
-            <div className="max-h-[600px] overflow-y-auto">
-                <table className="w-full text-left text-sm">
-                    <thead className="bg-gray-50 text-gray-600 font-medium sticky top-0 z-10 shadow-sm">
+            <div className="max-h-[600px] overflow-y-auto px-6 pb-6">
+                <table className="w-full text-left border-separate border-spacing-y-2">
+                    <thead className="bg-transparent text-gray-500 text-xs uppercase font-semibold tracking-wider sticky top-0 z-10">
                         <tr>
-                            <th className="p-4 w-24">Room</th>
-                            <th className="p-4">Resident</th>
-                            <th className="p-4">Bill Amount</th>
-                            <th className="p-4 text-center">Status</th>
-                            <th className="p-4 text-center">Slip</th>
-                            <th className="p-4 text-right">Action</th>
+                            <th className="px-4 py-3 w-32">Room</th>
+                            <th className="px-4 py-3">Resident</th>
+                            <th className="px-4 py-3">Amount</th>
+                            <th className="px-4 py-3 text-center">Status</th>
+                            <th className="px-4 py-3 text-center">Reference</th>
+                            <th className="px-4 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="">
                         {filteredRooms.map((room) => {
                             const bill = room.bill;
                             const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
 
                             return (
-                                <tr key={room.id} className="hover:bg-gray-50 transition-colors group">
-                                    {/* Room Number */}
-                                    <td className="p-4 font-bold text-gray-900">{room.number}</td>
+                                <tr key={room.id} className="group transition-all hover:bg-indigo-50/30">
+                                    {/* Room Info */}
+                                    <td className="p-4 rounded-l-xl border-y border-l border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
+                                        <div className="flex flex-col">
+                                            <span className="text-lg font-bold text-gray-900 leading-tight">{room.number}</span>
+                                            <span className={`text-xs font-medium px-2 py-0.5 rounded w-fit mt-1 ${room.status === 'Occupied' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                {room.status}
+                                            </span>
+                                        </div>
+                                    </td>
 
                                     {/* Resident */}
-                                    <td className="p-4 text-gray-600">
-                                        {room.residents[0]?.fullName || <span className="text-gray-300 italic">Vacant</span>}
+                                    <td className="p-4 border-y border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-sm">
+                                                {room.residents[0]?.fullName.charAt(0) || "?"}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-semibold text-gray-900 text-sm">
+                                                    {room.residents[0]?.fullName || <span className="text-gray-400 italic">Vacant</span>}
+                                                </span>
+                                                <span className="text-xs text-gray-400">Resident</span>
+                                            </div>
+                                        </div>
                                     </td>
 
                                     {/* Amount */}
-                                    <td className="p-4 font-bold text-gray-900">
-                                        {bill ? `฿${bill.totalAmount.toLocaleString()}` : <span className="text-gray-300">-</span>}
+                                    <td className="p-4 border-y border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
+                                        <div className="flex flex-col items-start">
+                                            <span className={`text-base font-bold font-mono ${bill ? 'text-gray-900' : 'text-gray-300'}`}>
+                                                {bill ? `฿${bill.totalAmount.toLocaleString()}` : '-'}
+                                            </span>
+                                            {bill && <span className="text-xs text-gray-400">Total</span>}
+                                        </div>
                                     </td>
 
                                     {/* Status */}
-                                    <td className="p-4 text-center">
+                                    <td className="p-4 text-center border-y border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
                                         {bill ? (
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase shadow-sm ${getStatusColor(status)}`}>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></span>
+                                            <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${status === 'Paid' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10' :
+                                                status === 'Pending' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/10' :
+                                                    status === 'Overdue' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/10' :
+                                                        'bg-gray-50 text-gray-700 ring-1 ring-gray-600/10'
+                                                }`}>
+                                                <span className={`w-2 h-2 rounded-full ${status === 'Paid' ? 'bg-emerald-500' :
+                                                    status === 'Pending' ? 'bg-amber-500' :
+                                                        status === 'Overdue' ? 'bg-rose-500' :
+                                                            'bg-gray-500'
+                                                    }`}></span>
                                                 {status}
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-500 border border-gray-200">
-                                                Wait for Bill
-                                            </span>
+                                            <span className="text-xs text-gray-400 font-medium">Wait for Bill</span>
                                         )}
                                     </td>
 
                                     {/* Slip */}
-                                    <td className="p-4 text-center">
+                                    <td className="p-4 text-center border-y border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
                                         {bill?.slipImage ? (
                                             <button
                                                 onClick={() => setSelectedSlip(bill.slipImage!)}
-                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 rounded-md font-medium text-xs transition-colors ring-1 ring-indigo-600/10"
+                                                className="text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:underline flex items-center justify-center gap-1"
                                             >
-                                                <ExternalLink size={12} /> {t.billing.viewSlip}
+                                                <ExternalLink size={14} /> View Slip
                                             </button>
                                         ) : (status === 'Paid') ? (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md font-medium text-xs ring-1 ring-emerald-600/10">
-                                                <Banknote size={12} /> Cash
+                                            <span className="text-xs font-medium text-emerald-600 flex items-center justify-center gap-1">
+                                                <Banknote size={14} /> Cash
                                             </span>
                                         ) : (
-                                            <span className="text-gray-300">-</span>
+                                            <span className="text-gray-300 text-xs">-</span>
                                         )}
                                     </td>
 
                                     {/* Actions */}
-                                    <td className="p-4 text-right">
-                                        {bill ? (
-                                            <div className="flex justify-end items-center gap-2 opacity-90 group-hover:opacity-100 transition-opacity">
-                                                {/* Review Actions */}
-                                                {status === "Review" && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleReview(bill.id, "approve")}
-                                                            disabled={loading === bill.id}
-                                                            className="p-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors shadow-sm" title={t.billing.approve}>
-                                                            {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setRejectingId(bill.id)}
-                                                            disabled={loading === bill.id}
-                                                            className="p-1.5 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200 transition-colors shadow-sm" title={t.billing.reject}>
-                                                            <XCircle size={16} />
-                                                        </button>
-                                                    </>
-                                                )}
+                                    <td className="p-4 text-right rounded-r-xl border-y border-r border-transparent group-hover:border-indigo-100 group-hover:shadow-sm">
+                                        <div className="flex justify-end items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            {bill ? (
+                                                <>
+                                                    {/* Review Actions */}
+                                                    {status === "Review" && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleReview(bill.id, "approve")}
+                                                                disabled={loading === bill.id}
+                                                                className="p-2 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200" title={t.billing.approve}>
+                                                                <CheckCircle2 size={18} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setRejectingId(bill.id)}
+                                                                disabled={loading === bill.id}
+                                                                className="p-2 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200" title={t.billing.reject}>
+                                                                <XCircle size={18} />
+                                                            </button>
+                                                        </>
+                                                    )}
 
-                                                {/* Pay Cash */}
-                                                {(status === "Pending" || status === "Overdue" || status === "Late") && (
+                                                    {/* Actions Default */}
+                                                    {(status === "Pending" || status === "Overdue" || status === "Late") && (
+                                                        <button
+                                                            onClick={() => handleCashPayment(bill.id)}
+                                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                                                            title={t.billing.payCash}
+                                                        >
+                                                            <Banknote size={18} />
+                                                        </button>
+                                                    )}
+
+                                                    <a href={`/billing/${bill.id}/print?type=a4`} target="_blank"
+                                                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg"
+                                                        title={t.billing.print}>
+                                                        <span className="text-xl leading-none">🖨️</span>
+                                                    </a>
+
                                                     <button
-                                                        onClick={() => handleCashPayment(bill.id)}
-                                                        disabled={loading === bill.id}
-                                                        className="flex items-center gap-1.5 px-2 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-xs font-semibold transition-all shadow-sm"
-                                                        title={t.billing.payCash}
+                                                        onClick={() => handleDelete(bill.id)}
+                                                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                                                        title={t.billing.deleteBill}
                                                     >
-                                                        {loading === bill.id ? <Loader2 className="animate-spin" size={14} /> : <Banknote size={14} />}
-                                                        <span className="hidden xl:inline">{t.billing.payCash}</span>
+                                                        <Trash2 size={18} />
                                                     </button>
-                                                )}
-
-                                                {/* Print */}
-                                                <a href={`/billing/${bill.id}/print?type=a4`} target="_blank"
-                                                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                                                    title={t.billing.print}>
-                                                    <span className="text-lg">🖨️</span>
-                                                </a>
-
-                                                {/* Delete */}
-                                                <button
-                                                    onClick={() => handleDelete(bill.id)}
-                                                    disabled={loading === bill.id}
-                                                    className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                                                    title={t.billing.deleteBill}
+                                                </>
+                                            ) : (
+                                                <Link
+                                                    href={`/billing/bulk?month=${selectedMonth}`}
+                                                    className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 shadow-sm"
                                                 >
-                                                    {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            // No bill action (maybe create one?)
-                                            <span className="text-xs text-gray-400 italic">Ready to bill</span>
-                                        )}
+                                                    Create
+                                                </Link>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             )
                         })}
                         {filteredRooms.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="p-8 text-center text-gray-400 italic">
-                                    No rooms found matching "{filter}"
+                                <td colSpan={6} className="p-12 text-center text-gray-400 italic">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Search size={32} className="opacity-20" />
+                                        <span>No rooms found matching "{filter}"</span>
+                                    </div>
                                 </td>
                             </tr>
                         )}
