@@ -375,6 +375,9 @@ export const dictionary = {
             statusPending: "รอชำระ",
             statusOverdue: "ค้างชำระ",
             sendReminder: "ส่งแจ้งเตือนค้างชำระ",
+            payCash: "รับเงินสด",
+            confirmCash: "ยืนยันรับเงินสด?",
+            cashSuccess: "บันทึกรับเงินสดเรียบร้อย",
         },
         expenses: {
             title: "บันทึกรายจ่าย",
@@ -1066,6 +1069,9 @@ export const dictionary = {
             statusPending: "Pending",
             statusOverdue: "Overdue",
             sendReminder: "Send Overdue Reminders",
+            payCash: "Receive Cash",
+            confirmCash: "Confirm cash payment?",
+            cashSuccess: "Cash payment recorded successfully",
         },
         expenses: {
             title: "Expense Tracking",

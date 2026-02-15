@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, Loader2, Bell, Banknote } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 
@@ -43,6 +43,37 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
             showAlert("Error", "❌ Network Error", "error");
         } finally {
             setReminderLoading(false);
+        }
+    };
+
+    const handleCashPayment = async (id: number) => {
+        const confirmed = await showConfirm(
+            t.status.Paid,
+            t.billing.confirmCash,
+            true
+        );
+        if (!confirmed) return;
+
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}/pay-cash`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: 1 }), // Default to admin for now
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                // Update local state
+                setBills(bills.map(b => b.id === id ? { ...b, paymentStatus: "Paid" } : b));
+                showAlert("Success", `✅ ${t.billing.cashSuccess}`, "success");
+            } else {
+                showAlert("Error", `❌ ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setLoading(null);
         }
     };
 
@@ -145,6 +176,17 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                     </button>
                                 </div>
                             )}
+                            {/* Mobile Cash Button */}
+                            {(bill.paymentStatus === "Pending" || bill.paymentStatus === "Overdue" || bill.paymentStatus === "Late") && (
+                                <button
+                                    onClick={() => handleCashPayment(bill.id)}
+                                    disabled={loading === bill.id}
+                                    className="w-full mt-2 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-green-100"
+                                >
+                                    {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <Banknote size={16} />}
+                                    {t.billing.payCash}
+                                </button>
+                            )}
                         </div>
                     ))}
                     {bills.length === 0 && (
@@ -214,6 +256,18 @@ export default function BillingList({ initialBills }: { initialBills: any[] }) {
                                                 className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-sm font-bold transition-all shadow-sm">
                                                 <span>🖨️</span> {t.billing.print}
                                             </a>
+                                            {/* Cash Payment Button */}
+                                            {(bill.paymentStatus === "Pending" || bill.paymentStatus === "Overdue" || bill.paymentStatus === "Late") && (
+                                                <button
+                                                    onClick={() => handleCashPayment(bill.id)}
+                                                    disabled={loading === bill.id}
+                                                    className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-lg text-sm font-bold transition-all shadow-sm"
+                                                    title={t.billing.payCash}
+                                                >
+                                                    {loading === bill.id ? <Loader2 className="animate-spin" size={16} /> : <Banknote size={16} />}
+                                                    <span className="hidden xl:inline">{t.billing.payCash}</span>
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
