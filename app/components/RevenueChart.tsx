@@ -12,13 +12,13 @@ export default function RevenueChart({ data }: { data: any[] }) {
                         dataKey="month"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: '#6b7280', fontSize: 12 }}
+                        tick={{ fill: '#374151', fontSize: 12 }}
                         dy={10}
                     />
                     <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: '#6b7280', fontSize: 12 }}
+                        tick={{ fill: '#374151', fontSize: 12 }}
                         tickFormatter={(value) => `฿${value / 1000}k`}
                     />
                     <Tooltip

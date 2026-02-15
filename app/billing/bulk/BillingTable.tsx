@@ -147,7 +147,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
 
         const content = (
             <div className="bg-gray-50 rounded-lg p-4 max-h-[60vh] overflow-y-auto">
-                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4 text-sm text-yellow-800">
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4 text-sm text-yellow-900">
                     ⚠️ {t.bulkBilling.confirmCreate} <br />
                     <strong>{billsToCreate.length}</strong> Rooms | Month: <strong>{selectedMonth}</strong> | Total <strong>฿{grandTotal.toLocaleString()}</strong>
                 </div>
@@ -312,7 +312,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">💧 {t.bulkBilling.waterRate}</span>
+                        <span className="text-xs font-bold text-amber-900 uppercase">💧 {t.bulkBilling.waterRate}</span>
                         <input
                             type="number"
                             value={rates.water}
@@ -321,7 +321,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">⚡ {t.bulkBilling.elecRate}</span>
+                        <span className="text-xs font-bold text-amber-900 uppercase">⚡ {t.bulkBilling.elecRate}</span>
                         <input
                             type="number"
                             value={rates.electric}
@@ -330,7 +330,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">🗑️ {t.bulkBilling.trash}</span>
+                        <span className="text-xs font-bold text-amber-900 uppercase">🗑️ {t.bulkBilling.trash}</span>
                         <input
                             type="number"
                             value={rates.trash}
@@ -339,7 +339,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">🌐 {t.bulkBilling.internet}</span>
+                        <span className="text-xs font-bold text-amber-900 uppercase">🌐 {t.bulkBilling.internet}</span>
                         <input
                             type="number"
                             value={rates.internet}
@@ -348,7 +348,7 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <span className="text-xs font-bold text-amber-800 uppercase">➕ {t.bulkBilling.other}</span>
+                        <span className="text-xs font-bold text-amber-900 uppercase">➕ {t.bulkBilling.other}</span>
                         <input
                             type="number"
                             value={rates.other}
@@ -426,10 +426,10 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
                         <tr>
                             <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.room}</th>
                             <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.resident}</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-50 text-blue-800 whitespace-nowrap">{t.billing.waterPrev}</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-100 text-blue-800 border-l border-blue-200 whitespace-nowrap">{t.bulkBilling.waterNew}</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-50 text-yellow-800 whitespace-nowrap">{t.billing.elecPrev}</th>
-                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-100 text-yellow-800 border-l border-yellow-200 whitespace-nowrap">{t.bulkBilling.elecNew}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-50 text-blue-900 whitespace-nowrap">{t.billing.waterPrev}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-blue-100 text-blue-900 border-l border-blue-200 whitespace-nowrap">{t.bulkBilling.waterNew}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-50 text-yellow-900 whitespace-nowrap">{t.billing.elecPrev}</th>
+                            <th className="px-2 py-3 sm:p-4 text-center bg-yellow-100 text-yellow-900 border-l border-yellow-200 whitespace-nowrap">{t.bulkBilling.elecNew}</th>
                             <th className="px-3 py-3 sm:p-4 text-right whitespace-nowrap">{t.bulkBilling.previewTotal}</th>
                             <th className="px-3 py-3 sm:p-4 whitespace-nowrap">{t.billing.status}</th>
                         </tr>
