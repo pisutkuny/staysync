@@ -18,6 +18,13 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     
+    // Check for action
+    if (data.action === 'delete') {
+      return deleteFile(data);
+    }
+    
+    // Default: Upload
+    
     // Get parameters
     const { fileName, fileData, mimeType, expenseId, uploadDate } = data;
     
@@ -98,9 +105,8 @@ function getOrCreateMonthlyFolder(rootFolderId, dateString) {
 /**
  * Delete file by ID
  */
-function deleteFile(e) {
+function deleteFile(data) {
   try {
-    const data = JSON.parse(e.postData.contents);
     const { fileId } = data;
     
     if (!fileId) {
