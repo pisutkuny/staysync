@@ -115,14 +115,22 @@ export default function PaymentForm({ id, config, billDetails }: { id: string, c
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Upload Transfer Slip</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            required
-                            className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                        />
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Upload Transfer Slip (Image/PDF)</label>
+                        <div className="border border-gray-300 rounded-lg p-3 flex items-center gap-3 bg-white">
+                            <input
+                                type="file"
+                                accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                onChange={handleFileChange}
+                                required
+                                className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                            />
+                        </div>
+                        {selectedFile && !selectedFile.type.startsWith("image/") && (
+                            <div className="mt-2 text-sm text-indigo-600 flex items-center gap-2 bg-indigo-50 p-2 rounded">
+                                <FileCheck size={16} />
+                                File selected: {selectedFile.name}
+                            </div>
+                        )}
                     </div>
 
                     <button

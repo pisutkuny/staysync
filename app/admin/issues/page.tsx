@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Wrench, CheckCircle, Clock, AlertCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { Loader2, Wrench, CheckCircle, Clock, AlertCircle, ArrowRight, ArrowLeft, FileCheck } from "lucide-react";
 import Link from "next/link";
 
 interface Issue {
@@ -211,13 +211,13 @@ function IssueCard({ issue, onMove, onBack, updating, type }: {
 
             {issue.photo && (
                 <div className="mb-2">
-                    <a href={issue.photo} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">View Issue Photo</a>
+                    <a href={issue.photo} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">View Attachment</a>
                 </div>
             )}
 
             {issue.afterPhoto && (
                 <div className="mb-3">
-                    <a href={issue.afterPhoto} target="_blank" rel="noreferrer" className="text-xs text-green-600 underline font-bold">View Completion Photo</a>
+                    <a href={issue.afterPhoto} target="_blank" rel="noreferrer" className="text-xs text-green-600 underline font-bold">View Completion File</a>
                 </div>
             )}
 
@@ -322,9 +322,16 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
                     <p className="text-gray-500 text-sm mb-4">The completion photo has been saved.</p>
 
                     <div className="mb-6 p-2 bg-gray-50 rounded border border-gray-200">
-                        <img src={uploadedUrl} alt="Uploaded" className="w-full h-32 object-cover rounded mb-2" />
+                        {file?.type.startsWith('image/') || uploadedUrl.startsWith('data:image') || uploadedUrl.includes('googleusercontent') ? (
+                            <img src={uploadedUrl} alt="Uploaded" className="w-full h-32 object-cover rounded mb-2" />
+                        ) : (
+                            <div className="w-full h-32 flex flex-col items-center justify-center bg-gray-100 text-gray-500 rounded mb-2">
+                                <FileCheck size={48} className="mb-2" />
+                                <span className="text-xs">{file?.name || "Document Uploaded"}</span>
+                            </div>
+                        )}
                         <a href={uploadedUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline block break-all">
-                            {uploadedUrl}
+                            View File
                         </a>
                     </div>
 
@@ -347,7 +354,7 @@ function CompletionModal({ issue, onClose, onComplete }: { issue: Issue, onClose
                 <p className="text-gray-600 mb-4 text-sm">Upload a photo of the completed repair (Optional).</p>
                 <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     onChange={e => setFile(e.target.files?.[0] || null)}
                     disabled={uploading}
                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-6"

@@ -525,12 +525,28 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                 <XCircle size={20} />
                             </button>
                         </div>
-                        <div className="p-2 bg-gray-100 flex justify-center items-center min-h-[300px]">
-                            <img
-                                src={selectedSlip}
-                                alt="Payment Slip"
-                                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm"
-                            />
+                        <div className="p-4 bg-gray-100 flex flex-col justify-center items-center min-h-[300px] gap-4">
+                            {/* Try to show image, but if it fails (e.g. PDF), the user can use the link below */}
+                            <object
+                                data={selectedSlip}
+                                type="image/jpeg" // hint
+                                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-sm"
+                            >
+                                <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                                    <ExternalLink size={48} className="mb-2" />
+                                    <p>File preview not available</p>
+                                </div>
+                            </object>
+
+                            <a
+                                href={selectedSlip}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                            >
+                                <ExternalLink size={18} />
+                                Open / Download File
+                            </a>
                         </div>
                     </div>
                 </div>
