@@ -298,91 +298,95 @@ export default function ReportsPage() {
                             </div>
                         </div>
 
-                        <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
-                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายจ่าย (Expenses)</h4>
+                        <div className="mt-6 md:mt-8 print:mt-4">
+                            <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">สถิติ (Stats)</h4>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs md:text-sm print:text-xs">
                                     <tbody>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าน้ำ (ประปา)</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.waterBill?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">น้ำรวม</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.waterUnits?.toLocaleString()} หน่วย</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าไฟ (การไฟฟ้า)</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.electricBill?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ไฟรวม</td>
+                                            <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.electricUnits?.toLocaleString()} หน่วย</td>
                                         </tr>
                                         <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/เน็ต</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
-                                        </tr>
-                                        {/* General Expenses Details */}
-                                        {data.expenses?.items && data.expenses.items.length > 0 && (
-                                            <>
-                                                <tr className="bg-gray-50/50">
-                                                    <td colSpan={2} className="py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2 print:py-1">
-                                                        {language === 'TH' ? 'รายการรายจ่ายทั่วไป' : 'General Expense Items'}
-                                                    </td>
-                                                </tr>
-                                                {data.expenses.items.map((item: any, index: number) => (
-                                                    <tr key={item.id || index} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                                                        <td className="py-2 text-gray-600 pr-2 print:py-1 pl-4 text-sm">
-                                                            <div className="flex flex-col md:flex-row md:items-center gap-1">
-                                                                <span className="text-xs text-gray-400 font-mono min-w-[40px]">
-                                                                    {new Date(item.date).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' })}
-                                                                </span>
-                                                                <span>{item.title}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-2 text-right font-medium text-red-500 whitespace-nowrap print:py-1 text-sm">
-                                                            -฿{item.amount.toLocaleString()}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </>
-                                        )}
-                                        <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
-                                            <td className="py-2 pl-2 print:py-1">รวมรายจ่าย</td>
-                                            <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap print:py-1">-฿{data.expenses?.total?.toLocaleString()}</td>
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">สถานะบิล</td>
+                                            <td className="py-2 text-right whitespace-nowrap print:py-1">
+                                                <span className="text-green-600 font-bold">{data.stats?.paidBills} จ่าย</span> /
+                                                <span className="text-red-500 font-bold ml-1">{data.stats?.unpaidBills} ค้าง</span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div className="mt-6 md:mt-8 print:mt-4">
-                                <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">สถิติ (Stats)</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-xs md:text-sm print:text-xs">
-                                        <tbody>
-                                            <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2 print:py-1">น้ำรวม</td>
-                                                <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.waterUnits?.toLocaleString()} หน่วย</td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2 print:py-1">ไฟรวม</td>
-                                                <td className="py-2 text-right font-medium whitespace-nowrap print:py-1">{data.usage?.electricUnits?.toLocaleString()} หน่วย</td>
-                                            </tr>
-                                            <tr className="border-b border-gray-100">
-                                                <td className="py-2 text-gray-600 pr-2 print:py-1">สถานะบิล</td>
-                                                <td className="py-2 text-right whitespace-nowrap print:py-1">
-                                                    <span className="text-green-600 font-bold">{data.stats?.paidBills} จ่าย</span> /
-                                                    <span className="text-red-500 font-bold ml-1">{data.stats?.unpaidBills} ค้าง</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
-                    {/* Footer for Print */}
-                    <div className="text-center text-xs text-gray-400 mt-12 border-t py-4 hidden print:block print:mt-4 print:py-2">
-                        Monthly Report generated by StaySync Dorm Management System
+                    <div className="print:break-inside-avoid border print:border-gray-200 p-4 rounded-lg">
+                        <h4 className="font-bold text-base md:text-lg mb-4 border-b pb-2 print:text-sm print:mb-2">รายจ่าย (Expenses)</h4>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-xs md:text-sm print:text-xs">
+                                <tbody>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าน้ำ (ประปา)</td>
+                                        <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.waterBill?.toLocaleString()}</td>
+                                    </tr>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-2 text-gray-600 pr-2 print:py-1">บิลค่าไฟ (การไฟฟ้า)</td>
+                                        <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.electricBill?.toLocaleString()}</td>
+                                    </tr>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/เน็ต</td>
+                                        <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
+                                    </tr>
+                                    {/* General Expenses Details */}
+                                    {data.expenses?.items && data.expenses.items.length > 0 && (
+                                        <>
+                                            <tr className="bg-gray-50/50">
+                                                <td colSpan={2} className="py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2 print:py-1">
+                                                    {language === 'TH' ? 'รายการรายจ่ายทั่วไป' : 'General Expense Items'}
+                                                </td>
+                                            </tr>
+                                            {data.expenses.items.map((item: any, index: number) => (
+                                                <tr key={item.id || index} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                                                    <td className="py-2 text-gray-600 pr-2 print:py-1 pl-4 text-sm">
+                                                        <div className="flex flex-col md:flex-row md:items-center gap-1">
+                                                            <span className="text-xs text-gray-400 font-mono min-w-[40px]">
+                                                                {new Date(item.date).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' })}
+                                                            </span>
+                                                            <span>{item.title}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-2 text-right font-medium text-red-500 whitespace-nowrap print:py-1 text-sm">
+                                                        -฿{item.amount.toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </>
+                                    )}
+                                    <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
+                                        <td className="py-2 pl-2 print:py-1">รวมรายจ่าย</td>
+                                        <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap print:py-1">-฿{data.expenses?.total?.toLocaleString()}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
                     </div>
                 </div>
-            ) : null}
 
-            <style jsx global>{`
+                    {/* Footer for Print */}
+            <div className="text-center text-xs text-gray-400 mt-12 border-t py-4 hidden print:block print:mt-4 print:py-2">
+                Monthly Report generated by StaySync Dorm Management System
+            </div>
+        </div>
+    ) : null
+}
+
+<style jsx global>{`
                 @media print {
                     @page { size: A4; margin: 10mm; }
                     
