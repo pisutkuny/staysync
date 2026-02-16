@@ -107,15 +107,16 @@ export const getRevenueChartData = unstable_cache(
 
         // Use raw query for much faster aggregation at database level
         try {
-            // Shift dates by 7 hours (Asia/Bangkok) for correct monthly grouping
+            // Revenue: Group by 'month' (Billing Cycle) so late payments still count for the correct month
+            // Expenses: Group by 'date' with timezone shift
             const [revenueResult, expenseResult] = await Promise.all([
                 prisma.$queryRaw`
                     SELECT 
-                        to_char("paymentDate" + interval '7 hours', 'YYYY-MM') as month_key,
+                        to_char("month" + interval '7 hours', 'YYYY-MM') as month_key,
                         SUM("totalAmount") as total
                     FROM "Billing"
                     WHERE "paymentStatus" = 'Paid'
-                    AND "paymentDate" >= ${sixMonthsAgo}
+                    AND "month" >= ${sixMonthsAgo}
                     GROUP BY month_key
                     ORDER BY month_key ASC
                 ` as Promise<{ month_key: string, total: number }[]>,
@@ -154,7 +155,7 @@ export const getRevenueChartData = unstable_cache(
             return [];
         }
     },
-    ['dashboard-revenue-chart-v2'],
+    ['dashboard-revenue-chart-v3'],
     { revalidate: 300 }
 );
 

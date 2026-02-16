@@ -29,9 +29,8 @@ export default function RevenueChart({ data }: { data: any[] }) {
                             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                             padding: '12px'
                         }}
-                        formatter={(value: any, name: any) => {
-                            const label = name === 'amount' ? 'Revenue' : 'Expenses';
-                            return [`฿${Number(value || 0).toLocaleString()}`, label];
+                        formatter={(value: any, name: string) => {
+                            return [`฿${Number(value || 0).toLocaleString()}`, name];
                         }}
                         labelStyle={{ fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}
                     />
