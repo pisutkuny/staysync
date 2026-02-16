@@ -60,40 +60,50 @@ export async function getDormName() {
 // Cached: 60 seconds
 export const getDashboardSummary = unstable_cache(
     async (): Promise<DashboardSummary> => {
-        const today = new Date();
-        const startOfCurrentMonth = startOfMonth(today);
-        const endOfCurrentMonth = endOfMonth(today);
+        try {
+            const today = new Date();
+            const startOfCurrentMonth = startOfMonth(today);
+            const endOfCurrentMonth = endOfMonth(today);
 
-        const [revenueAgg, outstandingAgg, totalRooms, occupiedRooms, activeIssues] = await Promise.all([
-            prisma.billing.aggregate({
-                _sum: { totalAmount: true },
-                where: {
-                    paymentStatus: 'Paid',
-                    paymentDate: {
-                        gte: startOfCurrentMonth,
-                        lte: endOfCurrentMonth
+            const [revenueAgg, outstandingAgg, totalRooms, occupiedRooms, activeIssues] = await Promise.all([
+                prisma.billing.aggregate({
+                    _sum: { totalAmount: true },
+                    where: {
+                        paymentStatus: 'Paid',
+                        paymentDate: {
+                            gte: startOfCurrentMonth,
+                            lte: endOfCurrentMonth
+                        }
                     }
-                }
-            }),
-            prisma.billing.aggregate({
-                _sum: { totalAmount: true },
-                where: {
-                    paymentStatus: { in: ['Pending', 'Review'] }
-                }
-            }),
-            prisma.room.count(),
-            prisma.room.count({ where: { status: 'Occupied' } }),
-            prisma.issue.count({
-                where: { status: { in: ['Pending', 'InProgress'] } }
-            })
-        ]);
+                }),
+                prisma.billing.aggregate({
+                    _sum: { totalAmount: true },
+                    where: {
+                        paymentStatus: { in: ['Pending', 'Review'] }
+                    }
+                }),
+                prisma.room.count(),
+                prisma.room.count({ where: { status: 'Occupied' } }),
+                prisma.issue.count({
+                    where: { status: { in: ['Pending', 'InProgress'] } }
+                })
+            ]);
 
-        return {
-            revenue: revenueAgg._sum.totalAmount || 0,
-            outstanding: outstandingAgg._sum.totalAmount || 0,
-            occupancyRate: totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0,
-            activeIssues
-        };
+            return {
+                revenue: revenueAgg._sum.totalAmount || 0,
+                outstanding: outstandingAgg._sum.totalAmount || 0,
+                occupancyRate: totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0,
+                activeIssues
+            };
+        } catch (error) {
+            console.error("Failed to fetch dashboard summary:", error);
+            return {
+                revenue: 0,
+                outstanding: 0,
+                occupancyRate: 0,
+                activeIssues: 0
+            };
+        }
     },
     ['dashboard-summary'],
     { revalidate: 60 }
@@ -192,55 +202,60 @@ export const getOccupancyChartData = unstable_cache(
 // Cached: 30 seconds (More real-time)
 export const getRecentActivity = unstable_cache(
     async (): Promise<ActivityItem[]> => {
-        const [recentBills, recentIssues] = await Promise.all([
-            prisma.billing.findMany({
-                take: 5,
-                orderBy: { createdAt: 'desc' },
-                select: {
-                    id: true,
-                    createdAt: true,
-                    totalAmount: true,
-                    paymentStatus: true,
-                    room: { select: { number: true } }
-                }
-            }),
-            prisma.issue.findMany({
-                take: 5,
-                orderBy: { createdAt: 'desc' },
-                select: {
-                    id: true,
-                    createdAt: true,
-                    category: true,
-                    description: true,
-                    status: true,
-                    resident: {
-                        select: {
-                            room: { select: { number: true } }
+        try {
+            const [recentBills, recentIssues] = await Promise.all([
+                prisma.billing.findMany({
+                    take: 5,
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        createdAt: true,
+                        totalAmount: true,
+                        paymentStatus: true,
+                        room: { select: { number: true } }
+                    }
+                }),
+                prisma.issue.findMany({
+                    take: 5,
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        createdAt: true,
+                        category: true,
+                        description: true,
+                        status: true,
+                        resident: {
+                            select: {
+                                room: { select: { number: true } }
+                            }
                         }
                     }
-                }
-            })
-        ]);
+                })
+            ]);
 
-        return [
-            ...recentBills.map(b => ({
-                id: `bill-${b.id}`,
-                type: 'bill_created',
-                title: `New Bill: Room ${b.room.number}`,
-                desc: `${b.totalAmount.toLocaleString()} THB`,
-                date: b.createdAt.toISOString(),
-                status: b.paymentStatus
-            })),
-            ...recentIssues.map(i => ({
-                id: `issue-${i.id}`,
-                type: 'issue_reported',
-                title: `Repair: ${i.category}`,
-                desc: `Room ${i.resident?.room?.number || 'Guest'} - ${i.description}`,
-                date: i.createdAt.toISOString(),
-                status: i.status
-            }))
-        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 10);
+            return [
+                ...recentBills.map(b => ({
+                    id: `bill-${b.id}`,
+                    type: 'bill_created',
+                    title: `New Bill: Room ${b.room.number}`,
+                    desc: `${b.totalAmount.toLocaleString()} THB`,
+                    date: b.createdAt.toISOString(),
+                    status: b.paymentStatus
+                })),
+                ...recentIssues.map(i => ({
+                    id: `issue-${i.id}`,
+                    type: 'issue_reported',
+                    title: `Repair: ${i.category}`,
+                    desc: `Room ${i.resident?.room?.number || 'Guest'} - ${i.description}`,
+                    date: i.createdAt.toISOString(),
+                    status: i.status
+                }))
+            ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .slice(0, 10);
+        } catch (error) {
+            console.error("Failed to fetch recent activity:", error);
+            return [];
+        }
     },
     ['dashboard-activity'],
     { revalidate: 30 }
@@ -249,35 +264,40 @@ export const getRecentActivity = unstable_cache(
 // Cached: 5 minutes
 export const getTopSpenders = unstable_cache(
     async (): Promise<TopSpenderItem[]> => {
-        const today = new Date();
-        const startOfCurrentMonth = startOfMonth(today);
-        const endOfCurrentMonth = endOfMonth(today);
+        try {
+            const today = new Date();
+            const startOfCurrentMonth = startOfMonth(today);
+            const endOfCurrentMonth = endOfMonth(today);
 
-        const topSpenders = await prisma.billing.findMany({
-            take: 5,
-            where: {
-                month: {
-                    gte: startOfCurrentMonth,
-                    lte: endOfCurrentMonth
+            const topSpenders = await prisma.billing.findMany({
+                take: 5,
+                where: {
+                    month: {
+                        gte: startOfCurrentMonth,
+                        lte: endOfCurrentMonth
+                    }
+                },
+                orderBy: { totalAmount: 'desc' },
+                select: {
+                    waterMeterCurrent: true,
+                    waterMeterLast: true,
+                    electricMeterCurrent: true,
+                    electricMeterLast: true,
+                    totalAmount: true,
+                    room: { select: { number: true } }
                 }
-            },
-            orderBy: { totalAmount: 'desc' },
-            select: {
-                waterMeterCurrent: true,
-                waterMeterLast: true,
-                electricMeterCurrent: true,
-                electricMeterLast: true,
-                totalAmount: true,
-                room: { select: { number: true } }
-            }
-        });
+            });
 
-        return topSpenders.map(b => ({
-            room: b.room.number,
-            water: b.waterMeterCurrent - b.waterMeterLast,
-            electric: b.electricMeterCurrent - b.electricMeterLast,
-            total: b.totalAmount
-        }));
+            return topSpenders.map(b => ({
+                room: b.room.number,
+                water: b.waterMeterCurrent - b.waterMeterLast,
+                electric: b.electricMeterCurrent - b.electricMeterLast,
+                total: b.totalAmount
+            }));
+        } catch (error) {
+            console.error("Failed to fetch top spenders:", error);
+            return [];
+        }
     },
     ['dashboard-top-spenders'],
     { revalidate: 300 }
