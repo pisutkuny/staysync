@@ -5,6 +5,11 @@ import { getCurrentSession } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
     try {
+        const session = await getCurrentSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '10');
@@ -16,7 +21,9 @@ export async function GET(req: Request) {
         const skip = (page - 1) * limit;
 
         // Build where clause
-        const where: any = {};
+        const where: any = {
+            organizationId: session.organizationId
+        };
 
         if (search) {
             where.OR = [

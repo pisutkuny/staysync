@@ -90,16 +90,21 @@ export default function ExpensesClient({ initialExpenses, initialPagination, ini
             });
 
             const res = await fetch(`/api/expenses?${params}`);
+
+            if (!res.ok) throw new Error("Failed to fetch");
+
             const data = await res.json();
 
-            if (data.expenses) {
+            if (data.expenses && Array.isArray(data.expenses)) {
                 setExpenses(data.expenses);
                 setPagination(data.pagination);
             } else {
-                setExpenses(data);
+                setExpenses([]); // Fallback to empty to avoid crash
             }
         } catch (error) {
             console.error(error);
+            showAlert("Error", t.common.error, "error");
+            setExpenses([]); // Prevent map error
         } finally {
             setLoading(false);
         }

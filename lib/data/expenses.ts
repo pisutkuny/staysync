@@ -1,10 +1,10 @@
 import prisma from "@/lib/prisma";
 
-export async function getExpensesData(page = 1, limit = 10, dateFrom?: string, dateTo?: string) {
+export async function getExpensesData(page = 1, limit = 10, organizationId: number, dateFrom?: string, dateTo?: string) {
     try {
         const skip = (page - 1) * limit;
 
-        const where: any = {};
+        const where: any = { organizationId };
         if (dateFrom || dateTo) {
             where.date = {};
             if (dateFrom) where.date.gte = new Date(dateFrom);

@@ -19,7 +19,7 @@ export default async function ExpensesPage() {
     const currentMonth = format(today, 'yyyy-MM');
 
     // Default to 100 items per page for monthly view to show most items
-    const { expenses, pagination } = await getExpensesData(1, 100, startDate, endDate);
+    const { expenses, pagination } = await getExpensesData(1, 100, session.organizationId, startDate, endDate);
 
     const serializedExpenses = expenses.map(expense => ({
         ...expense,
