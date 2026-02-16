@@ -209,18 +209,34 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
                             <div className="p-8 text-center text-gray-500">-</div>
                         ) : (
                             topSpenders.map((room: any, idx: number) => (
-                                <div key={idx} className="p-4 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-white transition-all flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xl font-bold bg-gradient-to-br from-yellow-400 to-orange-500 bg-clip-text text-transparent w-10">{room.room}</span>
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-1 text-xs font-medium text-blue-600">
-                                                <Droplets size={14} /> {room.water.toFixed(0)} {t.dashboard.unit}
-                                            </div>
-                                            <div className="flex items-center gap-1 text-xs font-medium text-yellow-600">
-                                                <Zap size={14} /> {room.electric.toFixed(0)} {t.dashboard.unit}
-                                            </div>
+                                <div key={idx} className="p-4 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 grid grid-cols-[auto_1fr_auto] gap-4 items-center">
+                                    {/* Rank */}
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${idx === 0 ? 'bg-yellow-100 text-yellow-700' :
+                                            idx === 1 ? 'bg-gray-100 text-gray-700' :
+                                                idx === 2 ? 'bg-orange-100 text-orange-700' :
+                                                    'text-gray-400 bg-slate-50'
+                                        }`}>
+                                        #{idx + 1}
+                                    </div>
+
+                                    {/* Room & Usage */}
+                                    <div className="min-w-0">
+                                        <div className="text-base font-bold text-gray-900 truncate mb-1">
+                                            {room.room}
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                <Droplets size={12} className="mr-1" />
+                                                {room.water.toFixed(0)} {t.dashboard.unit}
+                                            </span>
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-100">
+                                                <Zap size={12} className="mr-1" />
+                                                {room.electric.toFixed(0)} {t.dashboard.unit}
+                                            </span>
                                         </div>
                                     </div>
+
+                                    {/* Total */}
                                     <div className="text-right">
                                         <p className="text-sm font-bold text-gray-900">฿{room.total.toLocaleString()}</p>
                                     </div>
