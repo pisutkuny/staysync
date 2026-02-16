@@ -65,7 +65,7 @@ export const getDormName = unstable_cache(
             return "หอพัก";
         }
     },
-    ['dashboard-dorm-name'],
+    ['dashboard-dorm-name-v2'],
     { revalidate: 3600 }
 );
 
@@ -119,7 +119,7 @@ export const getDashboardSummary = unstable_cache(
             };
         }
     },
-    ['dashboard-summary'],
+    ['dashboard-summary-v2'],
     { revalidate: 60 }
 );
 
@@ -193,7 +193,7 @@ export const getRevenueChartData = unstable_cache(
             return fallbackData;
         }
     },
-    ['dashboard-revenue-chart-v5'], // Bump cache version
+    ['dashboard-revenue-chart-v6'],
     { revalidate: 300 }
 );
 
@@ -220,7 +220,7 @@ export const getOccupancyChartData = unstable_cache(
             ];
         }
     },
-    ['dashboard-occupancy'],
+    ['dashboard-occupancy-v2'],
     { revalidate: 60 }
 );
 
@@ -284,7 +284,7 @@ export const getRecentActivity = unstable_cache(
             return [];
         }
     },
-    ['dashboard-activity'],
+    ['dashboard-activity-v2'],
     { revalidate: 30 }
 );
 
@@ -327,7 +327,7 @@ export const getTopSpenders = unstable_cache(
             return [];
         }
     },
-    ['dashboard-top-spenders'],
+    ['dashboard-top-spenders-v2'],
     { revalidate: 300 }
 );
 
@@ -347,12 +347,12 @@ export async function getDashboardData(session: SessionPayload): Promise<Dashboa
     }
 
     const [dormName, summary, revenueChart, occupancyChart, activity, topSpenders] = await Promise.all([
-        getDormName(session.organizationId),
-        getDashboardSummary(session.organizationId),
-        getRevenueChartData(session.organizationId),
-        getOccupancyChartData(session.organizationId),
-        getRecentActivity(session.organizationId),
-        getTopSpenders(session.organizationId)
+        getDormName(Number(session.organizationId)),
+        getDashboardSummary(Number(session.organizationId)),
+        getRevenueChartData(Number(session.organizationId)),
+        getOccupancyChartData(Number(session.organizationId)),
+        getRecentActivity(Number(session.organizationId)),
+        getTopSpenders(Number(session.organizationId))
     ]);
 
     return {
