@@ -29,7 +29,7 @@ export default function RevenueChart({ data }: { data: any[] }) {
                             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                             padding: '12px'
                         }}
-                        formatter={(value: any, name: string) => {
+                        formatter={(value: any, name: any) => {
                             return [`฿${Number(value || 0).toLocaleString()}`, name];
                         }}
                         labelStyle={{ fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}
