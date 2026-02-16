@@ -33,7 +33,17 @@ export async function POST(
             try {
                 // Use the shared sendLineImageMessage function
                 const { sendLineImageMessage } = await import("@/lib/line");
-                await sendLineImageMessage(config.adminLineUserId, message, slipImage);
+
+                const adminIds = config.adminLineUserId.split(',').map(id => id.trim()).filter(id => id.length > 0);
+
+                await Promise.all(adminIds.map(async (adminId) => {
+                    try {
+                        await sendLineImageMessage(adminId, message, slipImage);
+                    } catch (err) {
+                        console.error(`Failed to send notification to ${adminId}:`, err);
+                    }
+                }));
+
             } catch (e) {
                 console.error("Failed to send Line Admin Alert", e);
             }

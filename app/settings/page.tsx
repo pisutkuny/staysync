@@ -272,7 +272,7 @@ export default function SettingsPage() {
                                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         placeholder="Uxxxxxxxxxxxxxxxxxxxx"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">🔍 {t.settings.basic.lineUserIdTip}</p>
+                                    <p className="text-xs text-gray-500 mt-1">🔍 {t.settings.basic.lineUserIdTip} (Can add multiple IDs separated by comma ,)</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">{t.settings.basic.lineDisplay}</label>

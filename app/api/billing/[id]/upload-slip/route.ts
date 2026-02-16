@@ -86,7 +86,15 @@ export async function POST(
                 const { sendLineMessage } = await import("@/lib/line");
                 const message = `🔔 มีสลิปใหม่รอตรวจสอบ!\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nเดือน: ${monthStr}\n\nกรุณารอตรวจสอบและอนุมัติจากผู้ดูแล`;
 
-                await sendLineMessage(config.adminLineUserId, message);
+                const adminIds = config.adminLineUserId.split(',').map(id => id.trim()).filter(id => id.length > 0);
+
+                await Promise.all(adminIds.map(async (adminId) => {
+                    try {
+                        await sendLineMessage(adminId, message);
+                    } catch (err) {
+                        console.error(`Failed to send notification to ${adminId}:`, err);
+                    }
+                }));
             }
         } catch (lineError) {
             console.error("Failed to send admin notification:", lineError);
