@@ -65,7 +65,7 @@ export const getDormName = unstable_cache(
             return "หอพัก";
         }
     },
-    ['dashboard-dorm-name-v2'],
+    ['dashboard-dorm-name-v3'],
     { revalidate: 3600 }
 );
 
@@ -73,6 +73,12 @@ export const getDormName = unstable_cache(
 export const getDashboardSummary = unstable_cache(
     async (organizationId: number): Promise<DashboardSummary> => {
         try {
+            // Validate organizationId
+            if (!organizationId || isNaN(organizationId)) {
+                console.warn("Invalid organizationId for summary, defaulting to 1");
+                organizationId = 1;
+            }
+
             const today = new Date();
             const startOfCurrentMonth = startOfMonth(today);
             const endOfCurrentMonth = endOfMonth(today);
@@ -119,7 +125,7 @@ export const getDashboardSummary = unstable_cache(
             };
         }
     },
-    ['dashboard-summary-v2'],
+    ['dashboard-summary-v3'],
     { revalidate: 60 }
 );
 
@@ -127,6 +133,11 @@ export const getDashboardSummary = unstable_cache(
 export const getRevenueChartData = unstable_cache(
     async (organizationId: number): Promise<RevenueChartData[]> => {
         try {
+            // Validate organizationId
+            if (!organizationId || isNaN(organizationId)) {
+                organizationId = 1;
+            }
+
             const today = new Date();
             // 6 months ago (start of that month)
             const sixMonthsAgo = startOfMonth(subMonths(today, 5));
@@ -193,7 +204,7 @@ export const getRevenueChartData = unstable_cache(
             return fallbackData;
         }
     },
-    ['dashboard-revenue-chart-v6'],
+    ['dashboard-revenue-chart-v7'],
     { revalidate: 300 }
 );
 
@@ -201,6 +212,8 @@ export const getRevenueChartData = unstable_cache(
 export const getOccupancyChartData = unstable_cache(
     async (organizationId: number): Promise<OccupancyChartData[]> => {
         try {
+            if (!organizationId || isNaN(organizationId)) organizationId = 1;
+
             const [totalRooms, occupiedRooms] = await Promise.all([
                 prisma.room.count({ where: { organizationId } }),
                 prisma.room.count({ where: { organizationId, status: 'Occupied' } })
@@ -220,7 +233,7 @@ export const getOccupancyChartData = unstable_cache(
             ];
         }
     },
-    ['dashboard-occupancy-v2'],
+    ['dashboard-occupancy-v3'],
     { revalidate: 60 }
 );
 
@@ -228,6 +241,8 @@ export const getOccupancyChartData = unstable_cache(
 export const getRecentActivity = unstable_cache(
     async (organizationId: number): Promise<ActivityItem[]> => {
         try {
+            if (!organizationId || isNaN(organizationId)) organizationId = 1;
+
             const [recentBills, recentIssues] = await Promise.all([
                 prisma.billing.findMany({
                     where: { organizationId },
@@ -284,7 +299,7 @@ export const getRecentActivity = unstable_cache(
             return [];
         }
     },
-    ['dashboard-activity-v2'],
+    ['dashboard-activity-v3'],
     { revalidate: 30 }
 );
 
@@ -292,6 +307,8 @@ export const getRecentActivity = unstable_cache(
 export const getTopSpenders = unstable_cache(
     async (organizationId: number): Promise<TopSpenderItem[]> => {
         try {
+            if (!organizationId || isNaN(organizationId)) organizationId = 1;
+
             const today = new Date();
             const startOfCurrentMonth = startOfMonth(today);
             const endOfCurrentMonth = endOfMonth(today);
@@ -327,7 +344,7 @@ export const getTopSpenders = unstable_cache(
             return [];
         }
     },
-    ['dashboard-top-spenders-v2'],
+    ['dashboard-top-spenders-v3'],
     { revalidate: 300 }
 );
 
@@ -347,12 +364,12 @@ export async function getDashboardData(session: SessionPayload): Promise<Dashboa
     }
 
     const [dormName, summary, revenueChart, occupancyChart, activity, topSpenders] = await Promise.all([
-        getDormName(Number(session.organizationId)),
-        getDashboardSummary(Number(session.organizationId)),
-        getRevenueChartData(Number(session.organizationId)),
-        getOccupancyChartData(Number(session.organizationId)),
-        getRecentActivity(Number(session.organizationId)),
-        getTopSpenders(Number(session.organizationId))
+        getDormName(Number(session.organizationId) || 1),
+        getDashboardSummary(Number(session.organizationId) || 1),
+        getRevenueChartData(Number(session.organizationId) || 1),
+        getOccupancyChartData(Number(session.organizationId) || 1),
+        getRecentActivity(Number(session.organizationId) || 1),
+        getTopSpenders(Number(session.organizationId) || 1)
     ]);
 
     return {
