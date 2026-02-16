@@ -8,6 +8,7 @@ export interface DashboardSummary {
     outstanding: number;
     occupancyRate: number;
     activeIssues: number;
+    expenses: number;
 }
 
 export interface RevenueChartData {
@@ -83,7 +84,7 @@ export const getDashboardSummary = unstable_cache(
             const startOfCurrentMonth = startOfMonth(today);
             const endOfCurrentMonth = endOfMonth(today);
 
-            const [revenueAgg, outstandingAgg, totalRooms, occupiedRooms, activeIssues] = await Promise.all([
+            const [revenueAgg, outstandingAgg, totalRooms, occupiedRooms, activeIssues, expenseAgg] = await Promise.all([
                 prisma.billing.aggregate({
                     _sum: { totalAmount: true },
                     where: {
@@ -106,6 +107,16 @@ export const getDashboardSummary = unstable_cache(
                 prisma.room.count({ where: { organizationId, status: 'Occupied' } }),
                 prisma.issue.count({
                     where: { organizationId, status: { in: ['Pending', 'InProgress'] } }
+                }),
+                prisma.expense.aggregate({
+                    _sum: { amount: true },
+                    where: {
+                        organizationId,
+                        date: {
+                            gte: startOfCurrentMonth,
+                            lte: endOfCurrentMonth
+                        }
+                    }
                 })
             ]);
 
@@ -113,7 +124,8 @@ export const getDashboardSummary = unstable_cache(
                 revenue: revenueAgg._sum.totalAmount || 0,
                 outstanding: outstandingAgg._sum.totalAmount || 0,
                 occupancyRate: totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0,
-                activeIssues
+                activeIssues,
+                expenses: expenseAgg._sum.amount || 0
             };
         } catch (error) {
             console.error("Failed to fetch dashboard summary:", error);
@@ -121,11 +133,12 @@ export const getDashboardSummary = unstable_cache(
                 revenue: 0,
                 outstanding: 0,
                 occupancyRate: 0,
-                activeIssues: 0
+                activeIssues: 0,
+                expenses: 0
             };
         }
     },
-    ['dashboard-summary-v3'],
+    ['dashboard-summary-v4'],
     { revalidate: 60 }
 );
 
@@ -356,7 +369,7 @@ export async function getDashboardData(session: SessionPayload): Promise<Dashboa
         return {
             userRole: 'TENANT',
             dormName,
-            summary: { revenue: 0, outstanding: 0, occupancyRate: 0, activeIssues: 0 },
+            summary: { revenue: 0, outstanding: 0, occupancyRate: 0, activeIssues: 0, expenses: 0 },
             charts: { revenue: [], occupancy: [] },
             activity: [],
             topSpenders: []

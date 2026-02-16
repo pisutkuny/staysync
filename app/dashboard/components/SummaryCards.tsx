@@ -54,7 +54,8 @@ export default function SummaryCards({ summary }: { summary: DashboardSummary })
                 <div className="p-6 bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border-2 border-purple-200 flex items-center justify-between hover:shadow-xl hover:scale-105 transition-all cursor-pointer h-full group">
                     <div>
                         <p className="text-sm font-medium text-gray-600">{t.dashboard.manageExpenses}</p>
-                        <p className="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">{t.dashboard.viewDetails} →</p>
+                        <p className="text-2xl md:text-3xl font-bold text-purple-600 mt-2">฿{summary.expenses.toLocaleString()}</p>
+                        <p className="text-xs text-purple-400 mt-1">{t.dashboard.viewDetails} →</p>
                     </div>
                     <div className="p-4 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
                         <TrendingUp size={28} className="rotate-180" />
