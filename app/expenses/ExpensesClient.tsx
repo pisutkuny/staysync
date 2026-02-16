@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Plus, Save, Trash2, Edit, FileText, Loader2, X, Upload, Eye, Check, Search, Filter, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from "lucide-react";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import imageCompression from 'browser-image-compression';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -31,9 +31,12 @@ type PaginationInfo = {
 interface ExpensesClientProps {
     initialExpenses: Expense[];
     initialPagination: PaginationInfo;
+    initialDateFrom: string;
+    initialDateTo: string;
+    initialMonth: string;
 }
 
-export default function ExpensesClient({ initialExpenses, initialPagination }: ExpensesClientProps) {
+export default function ExpensesClient({ initialExpenses, initialPagination, initialDateFrom, initialDateTo, initialMonth }: ExpensesClientProps) {
     const { t } = useLanguage();
     const { showAlert } = useModal();
     const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
@@ -43,14 +46,15 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
 
     // Pagination
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(100); // Default higher limit for monthly view
     const [pagination, setPagination] = useState<PaginationInfo>(initialPagination);
 
     // Search & Filter
     const [searchQuery, setSearchQuery] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
-    const [dateFrom, setDateFrom] = useState("");
-    const [dateTo, setDateTo] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+    const [dateFrom, setDateFrom] = useState(initialDateFrom);
+    const [dateTo, setDateTo] = useState(initialDateTo);
 
     // Form State
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -98,6 +102,23 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleMonthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const monthVal = e.target.value;
+        setSelectedMonth(monthVal);
+        if (monthVal) {
+            const [year, month] = monthVal.split('-');
+            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+            const start = format(startOfMonth(date), 'yyyy-MM-dd');
+            const end = format(endOfMonth(date), 'yyyy-MM-dd');
+            setDateFrom(start);
+            setDateTo(end);
+            setPage(1); // Reset page logic
+        } else {
+            setDateFrom("");
+            setDateTo("");
         }
     };
 
@@ -428,37 +449,41 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
 
             {/* Enhanced Search & Filter Bar */}
             <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-2">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder={t.expenses.searchPlaceholder}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+                    <div className="flex gap-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-3 text-indigo-400" size={20} />
                             <input
-                                type="text"
-                                placeholder={`🔍 ${t.expenses.search}`}
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="pl-11 w-full p-3 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                type="month"
+                                value={selectedMonth}
+                                onChange={handleMonthChange}
+                                className="pl-3 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
                             />
                         </div>
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="pl-3 pr-8 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white appearance-none cursor-pointer"
+                        >
+                            <option value="">{t.expenses.allCategories}</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Supplies">Supplies</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
-                    <select
-                        value={categoryFilter}
-                        onChange={(e) => {
-                            setCategoryFilter(e.target.value);
-                            setPage(1);
-                        }}
-                        className="p-3 border-2 border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
-                    >
-                        <option value="">📁 {t.expenses.allCats}</option>
-                        <option value="Maintenance">🔧 {t.expenses.catMaint}</option>
-                        <option value="Utilities">⚡ {t.expenses.catUtil}</option>
-                        <option value="Salary">💼 {t.expenses.catSalary}</option>
-                        <option value="Supplies">📦 {t.expenses.catSupply}</option>
-                        <option value="Other">📝 {t.expenses.catOther}</option>
-                    </select>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="flex gap-2">
                         {(searchQuery || categoryFilter || dateFrom || dateTo) && (
                             <button
