@@ -14,6 +14,7 @@ export interface RevenueChartData {
     month: string;
     fullDate: string;
     amount: number;
+    expense?: number;
 }
 
 export interface OccupancyChartData {
@@ -101,14 +102,12 @@ export const getDashboardSummary = unstable_cache(
 // Cached: 5 minutes (Historical data changes slowly)
 export const getRevenueChartData = unstable_cache(
     async (): Promise<RevenueChartData[]> => {
-        const today = new Date();
-        // 6 months ago (start of that month)
-        const sixMonthsAgo = startOfMonth(subMonths(today, 5));
-
-        // Use raw query for much faster aggregation at database level
         try {
-            // Revenue: Group by 'month' (Billing Cycle) so late payments still count for the correct month
-            // Expenses: Group by 'date' with timezone shift
+            const today = new Date();
+            // 6 months ago (start of that month)
+            const sixMonthsAgo = startOfMonth(subMonths(today, 5));
+
+            // Use raw query for much faster aggregation at database level
             const [revenueResult, expenseResult] = await Promise.all([
                 prisma.$queryRaw`
                     SELECT 
@@ -150,12 +149,24 @@ export const getRevenueChartData = unstable_cache(
             }
 
             return filledData;
-        } catch (e) {
-            console.error("Failed to fetch revenue/expense chart data", e);
-            return [];
+        } catch (error) {
+            console.error("Failed to fetch revenue chart data:", error);
+            // Return last 6 months with 0 values to prevent crash
+            const today = new Date();
+            const fallbackData = [];
+            for (let i = 5; i >= 0; i--) {
+                const date = subMonths(today, i);
+                fallbackData.push({
+                    month: format(date, 'MMM'),
+                    fullDate: format(date, 'MMM yyyy'),
+                    amount: 0,
+                    expense: 0
+                });
+            }
+            return fallbackData;
         }
     },
-    ['dashboard-revenue-chart-v3'],
+    ['dashboard-revenue-chart-v4'], // Bump cache version
     { revalidate: 300 }
 );
 
