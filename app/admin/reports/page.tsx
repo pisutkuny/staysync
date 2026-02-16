@@ -138,7 +138,7 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 print:mb-2 print-grid-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 print:mb-2 print-grid-4">
                         <div className="bg-green-50 p-3 md:p-4 rounded-xl border border-green-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
                             <h3 className="text-green-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingUp size={14} className="md:hidden" />
@@ -154,11 +154,22 @@ export default function ReportsPage() {
                             <h3 className="text-red-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
                                 <TrendingDown size={14} className="md:hidden" />
                                 <TrendingDown size={16} className="hidden md:block" />
-                                <span className="truncate">{language === 'TH' ? 'รายจ่าย (Expenses)' : 'Expenses'}</span>
+                                <span className="truncate">{language === 'TH' ? 'รายจ่ายตามบิล (Bill Expenses)' : 'Bill Expenses'}</span>
                             </h3>
                             <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
                             <p className="text-xs text-red-600 mt-1 truncate">
-                                {language === 'TH' ? 'ค่าน้ำ/ไฟ ส่วนกลาง' : 'Utilities + Common fees'}
+                                {language === 'TH' ? 'ค่าน้ำ/ไฟ ส่วนกลาง (หลวง)' : 'Utilities + Common fees'}
+                            </p>
+                        </div>
+                        <div className="bg-orange-50 p-3 md:p-4 rounded-xl border border-orange-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
+                            <h3 className="text-orange-800 text-xs md:text-sm font-semibold uppercase flex items-center gap-2">
+                                <TrendingDown size={14} className="md:hidden" />
+                                <TrendingDown size={16} className="hidden md:block" />
+                                <span className="truncate">{language === 'TH' ? 'รายจ่ายทั่วไป (General Expenses)' : 'General Expenses'}</span>
+                            </h3>
+                            <p className="text-2xl md:text-3xl font-bold text-orange-700 mt-2 print:text-xl">฿{data.expenses?.generalExpenses?.toLocaleString()}</p>
+                            <p className="text-xs text-orange-600 mt-1 truncate">
+                                {language === 'TH' ? 'จากบันทึกรายจ่าย' : 'From Expense Tracking'}
                             </p>
                         </div>
                         <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 print:print-no-border print:p-0 print:pt-2 print:pb-2">
@@ -395,6 +406,12 @@ export default function ReportsPage() {
                         gap: 12px !important;
                         visibility: visible !important;
                     }
+                    .print-grid-4 {
+                        display: grid !important;
+                        grid-template-columns: repeat(4, 1fr) !important;
+                        gap: 12px !important;
+                        visibility: visible !important;
+                    }
                     .print-grid-2 {
                         display: grid !important;
                         grid-template-columns: repeat(2, 1fr) !important;
@@ -427,6 +444,18 @@ export default function ReportsPage() {
                     }
                     /* Ensure headers in summary cards are centered */
                     .print-grid-3 h3 {
+                        justify-content: center !important;
+                        justify-content: center !important;
+                        width: 100% !important;
+                    }
+                    .print-grid-4 > div {
+                        text-align: center !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                    .print-grid-4 h3 {
                         justify-content: center !important;
                         width: 100% !important;
                     }
