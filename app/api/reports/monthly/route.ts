@@ -95,13 +95,26 @@ export async function GET(req: Request) {
         });
         const generalExpenses = expenseAgg._sum.amount || 0;
 
+        // Fetch detailed expense items
+        const expenseItems = await prisma.expense.findMany({
+            where: {
+                date: {
+                    gte: startDate,
+                    lt: nextMonthStart
+                },
+                organizationId
+            },
+            orderBy: { date: 'asc' }
+        });
+
         const expenses = {
             waterBill: centralMeter?.waterTotalCost || 0,
             electricBill: centralMeter?.electricTotalCost || 0,
             trashBill: centralMeter?.trashCost || 0,
             internetBill: centralMeter?.internetCost || 0,
             otherBill: 0,
-            generalExpenses, // Added general expenses
+            generalExpenses, // Maintain total for summary card
+            items: expenseItems, // Added detailed items
             total: (centralMeter?.waterTotalCost || 0) + (centralMeter?.electricTotalCost || 0) + (centralMeter?.trashCost || 0) + (centralMeter?.internetCost || 0) + generalExpenses
         };
 

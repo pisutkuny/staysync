@@ -315,10 +315,31 @@ export default function ReportsPage() {
                                             <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/เน็ต</td>
                                             <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
                                         </tr>
-                                        <tr className="border-b border-gray-100">
-                                            <td className="py-2 text-gray-600 pr-2 print:py-1">รายจ่ายทั่วไป (General Expenses)</td>
-                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.generalExpenses?.toLocaleString()}</td>
-                                        </tr>
+                                        {/* General Expenses Details */}
+                                        {data.expenses?.items && data.expenses.items.length > 0 && (
+                                            <>
+                                                <tr className="bg-gray-50/50">
+                                                    <td colSpan={2} className="py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2 print:py-1">
+                                                        {language === 'TH' ? 'รายการรายจ่ายทั่วไป' : 'General Expense Items'}
+                                                    </td>
+                                                </tr>
+                                                {data.expenses.items.map((item: any, index: number) => (
+                                                    <tr key={item.id || index} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                                                        <td className="py-2 text-gray-600 pr-2 print:py-1 pl-4 text-sm">
+                                                            <div className="flex flex-col md:flex-row md:items-center gap-1">
+                                                                <span className="text-xs text-gray-400 font-mono min-w-[40px]">
+                                                                    {new Date(item.date).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' })}
+                                                                </span>
+                                                                <span>{item.title}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-2 text-right font-medium text-red-500 whitespace-nowrap print:py-1 text-sm">
+                                                            -฿{item.amount.toLocaleString()}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </>
+                                        )}
                                         <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
                                             <td className="py-2 pl-2 print:py-1">รวมรายจ่าย</td>
                                             <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap print:py-1">-฿{data.expenses?.total?.toLocaleString()}</td>
