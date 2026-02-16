@@ -51,10 +51,15 @@ export interface DashboardData {
 }
 
 export async function getDormName() {
-    const config = await prisma.systemConfig.findFirst({
-        select: { dormName: true }
-    });
-    return config?.dormName || "หอพัก";
+    try {
+        const config = await prisma.systemConfig.findFirst({
+            select: { dormName: true }
+        });
+        return config?.dormName || "หอพัก";
+    } catch (error) {
+        console.error("Failed to fetch dorm name:", error);
+        return "หอพัก";
+    }
 }
 
 // Cached: 60 seconds
@@ -183,17 +188,25 @@ export const getRevenueChartData = unstable_cache(
 // Cached: 60 seconds
 export const getOccupancyChartData = unstable_cache(
     async (): Promise<OccupancyChartData[]> => {
-        const [totalRooms, occupiedRooms] = await Promise.all([
-            prisma.room.count(),
-            prisma.room.count({ where: { status: 'Occupied' } })
-        ]);
+        try {
+            const [totalRooms, occupiedRooms] = await Promise.all([
+                prisma.room.count(),
+                prisma.room.count({ where: { status: 'Occupied' } })
+            ]);
 
-        const availableRooms = totalRooms - occupiedRooms;
+            const availableRooms = totalRooms - occupiedRooms;
 
-        return [
-            { name: 'Occupied', value: occupiedRooms },
-            { name: 'Available', value: availableRooms },
-        ];
+            return [
+                { name: 'Occupied', value: occupiedRooms },
+                { name: 'Available', value: availableRooms },
+            ];
+        } catch (error) {
+            console.error("Failed to fetch occupancy chart data:", error);
+            return [
+                { name: 'Occupied', value: 0 },
+                { name: 'Available', value: 0 },
+            ];
+        }
     },
     ['dashboard-occupancy'],
     { revalidate: 60 }
