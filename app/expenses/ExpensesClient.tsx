@@ -759,7 +759,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination, ini
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto hidden md:block">
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-gray-50 text-gray-600 font-medium">
                                         <tr>
@@ -833,6 +833,64 @@ export default function ExpensesClient({ initialExpenses, initialPagination, ini
                                         )}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* Mobile Card View */}
+                            <div className="md:hidden space-y-4 p-4">
+                                {expenses.length === 0 ? (
+                                    <div className="text-center text-gray-400 py-8">{t.expenses.noExpenses}</div>
+                                ) : (
+                                    expenses.map((expense) => (
+                                        <div key={expense.id} className="bg-white border rounded-lg p-4 shadow-sm space-y-3">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <div className="font-bold text-gray-900">{expense.title}</div>
+                                                    <div className="text-xs text-gray-500">{format(new Date(expense.date), "dd MMM yyyy")}</div>
+                                                </div>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-bold 
+                                                    ${expense.category === 'Maintenance' ? 'bg-orange-100 text-orange-700' :
+                                                        expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
+                                                            expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
+                                                                'bg-gray-100 text-gray-700'}`}>
+                                                    {expense.category}
+                                                </span>
+                                            </div>
+
+                                            {expense.note && <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">{expense.note}</div>}
+
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                                                <div className="text-lg font-bold text-red-600">-฿{expense.amount.toLocaleString()}</div>
+                                                <div className="flex gap-2">
+                                                    {expense.receiptUrl && (
+                                                        <a
+                                                            href={expense.receiptUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
+                                                            title="View Receipt"
+                                                        >
+                                                            <FileText size={18} />
+                                                        </a>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleEdit(expense)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openDeleteModal(expense.id)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
                             {/* Pagination */}
