@@ -83,7 +83,7 @@ export const getDashboardSummary = unstable_cache(
                     where: {
                         organizationId,
                         paymentStatus: 'Paid',
-                        paymentDate: {
+                        month: {
                             gte: startOfCurrentMonth,
                             lte: endOfCurrentMonth
                         }
