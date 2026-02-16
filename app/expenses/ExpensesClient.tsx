@@ -128,38 +128,46 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
         const file = e.target.files?.[0];
         if (file) {
             setOriginalSize(file.size);
-            setCompressing(true);
 
-            try {
-                // Compress image
-                const options = {
-                    maxSizeMB: 0.5,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true
-                };
+            // If it's an image, proceed with compression
+            if (file.type.startsWith('image/')) {
+                setCompressing(true);
+                try {
+                    // Compress image
+                    const options = {
+                        maxSizeMB: 0.5,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true
+                    };
 
-                const compressedFile = await imageCompression(file, options);
-                setCompressedSize(compressedFile.size);
-                setReceiptFile(compressedFile);
+                    const compressedFile = await imageCompression(file, options);
+                    setCompressedSize(compressedFile.size);
+                    setReceiptFile(compressedFile);
 
-                // Preview
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setReceiptPreview(reader.result as string);
-                };
-                reader.readAsDataURL(compressedFile);
-            } catch (error) {
-                console.error('Compression error:', error);
+                    // Preview
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setReceiptPreview(reader.result as string);
+                    };
+                    reader.readAsDataURL(compressedFile);
+                } catch (error) {
+                    console.error('Compression error:', error);
+                    setReceiptFile(file);
+                    setCompressedSize(file.size);
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setReceiptPreview(reader.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                } finally {
+                    setCompressing(false);
+                }
+            } else {
+                // Documents (PDF, etc.) - No compression
                 setReceiptFile(file);
-                setCompressedSize(file.size);
-
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setReceiptPreview(reader.result as string);
-                };
-                reader.readAsDataURL(file);
-            } finally {
-                setCompressing(false);
+                setCompressedSize(0); // No compression
+                setReceiptPreview("DOC"); // Placeholder to trigger preview UI
             }
         }
     };
@@ -596,30 +604,40 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
                             <label className="block text-sm font-medium text-gray-700 mb-1">{t.expenses.receiptLabel}</label>
 
                             {existingReceiptUrl && !receiptPreview && (
-                                <div className="mb-2 relative">
-                                    <img
-                                        src={existingReceiptUrl}
-                                        alt="Existing receipt"
-                                        className="w-full h-32 object-cover rounded-lg border"
-                                    />
-                                    <a
-                                        href={existingReceiptUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-lg hover:bg-gray-100"
-                                    >
-                                        <Eye size={16} />
-                                    </a>
+                                <div className="mb-2 relative group">
+                                    <div className="w-full h-32 bg-gray-50 border rounded-lg flex flex-col items-center justify-center text-gray-500 overflow-hidden">
+                                        <FileText size={48} className="mb-2 text-indigo-400" />
+                                        <span className="text-xs">Saved Receipt</span>
+                                    </div>
+
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                        <a
+                                            href={existingReceiptUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bg-white text-indigo-600 px-4 py-2 rounded-full font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
+                                        >
+                                            <Eye size={16} /> View
+                                        </a>
+                                    </div>
                                 </div>
                             )}
 
                             {receiptPreview && (
                                 <div className="mb-2 relative">
-                                    <img
-                                        src={receiptPreview}
-                                        alt="New receipt"
-                                        className="w-full h-32 object-cover rounded-lg border border-blue-300"
-                                    />
+                                    {receiptFile?.type.startsWith('image/') || receiptPreview.startsWith('data:image') ? (
+                                        <img
+                                            src={receiptPreview}
+                                            alt="New receipt"
+                                            className="w-full h-32 object-cover rounded-lg border border-blue-300"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-32 flex flex-col items-center justify-center bg-gray-100 rounded-lg border border-blue-300 text-gray-500">
+                                            <FileText size={48} className="mb-2 text-indigo-500" />
+                                            <span className="text-xs px-2 text-center break-all">{receiptFile?.name}</span>
+                                        </div>
+                                    )}
+
                                     {compressing && (
                                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
                                             <Loader2 className="animate-spin text-white" size={24} />
@@ -640,7 +658,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
                                 </div>
                             )}
 
-                            {compressedSize > 0 && (
+                            {compressedSize > 0 && receiptFile?.type.startsWith('image/') && (
                                 <div className="mb-2 text-xs text-gray-600 bg-green-50 p-2 rounded">
                                     ✓ Compressed: {(originalSize / 1024).toFixed(0)}KB → {(compressedSize / 1024).toFixed(0)}KB
                                     ({(((originalSize - compressedSize) / originalSize) * 100).toFixed(0)}% smaller)
@@ -649,7 +667,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
 
                             <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                 onChange={handleFileChange}
                                 disabled={compressing}
                                 className="w-full p-2 border rounded-lg text-sm disabled:opacity-50"
@@ -746,7 +764,7 @@ export default function ExpensesClient({ initialExpenses, initialPagination }: E
                                                                 className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
                                                             >
                                                                 <FileText size={12} />
-                                                                {t.expenses.viewReceipt}
+                                                                {t.expenses.viewReceipt || "Attachment"}
                                                             </a>
                                                         )}
                                                     </td>
