@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Copy, Loader2, FileText, Check, AlertCircle, Calendar } from "lucide-react";
+import { Save, Copy, Loader2, FileText, Check, AlertCircle, Calendar, Droplets, Zap } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import AlertModal, { AlertType } from "@/app/components/AlertModal";
 
@@ -388,30 +388,58 @@ export default function BillingTable({ rooms, initialRates }: { rooms: RoomData[
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-xs font-bold text-blue-700">
-                                        <span>Water (Old: {room.lastWater})</span>
+                                    <div className="flex justify-between items-center text-blue-700">
+                                        <div className="flex items-center gap-1 font-bold text-sm">
+                                            <Droplets size={16} />
+                                            <span>Water</span>
+                                        </div>
+                                        <span className="text-xs bg-blue-50 px-2 py-1 rounded border border-blue-100">
+                                            Last: <span className="font-mono font-bold">{room.lastWater}</span>
+                                        </span>
                                     </div>
-                                    <input
-                                        type="number"
-                                        min={room.lastWater}
-                                        className="w-full p-2 border border-blue-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50/50"
-                                        value={wCurr}
-                                        onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
-                                        placeholder={room.lastWater.toString()}
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            inputMode="decimal"
+                                            min={room.lastWater}
+                                            className="w-full p-3 border border-blue-300 rounded-lg text-center font-bold text-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white shadow-sm placeholder:text-gray-300 placeholder:text-sm placeholder:font-normal"
+                                            value={wCurr}
+                                            onChange={(e) => handleChange(room.id, 'wCurr', e.target.value)}
+                                            placeholder="Current Reading"
+                                        />
+                                        {wCurr && Number(wCurr) < room.lastWater && (
+                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500">
+                                                <AlertCircle size={16} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-xs font-bold text-yellow-700">
-                                        <span>Elec (Old: {room.lastElectric})</span>
+                                    <div className="flex justify-between items-center text-yellow-700">
+                                        <div className="flex items-center gap-1 font-bold text-sm">
+                                            <Zap size={16} />
+                                            <span>Electric</span>
+                                        </div>
+                                        <span className="text-xs bg-yellow-50 px-2 py-1 rounded border border-yellow-100">
+                                            Last: <span className="font-mono font-bold">{room.lastElectric}</span>
+                                        </span>
                                     </div>
-                                    <input
-                                        type="number"
-                                        min={room.lastElectric}
-                                        className="w-full p-2 border border-yellow-300 rounded-lg text-center font-bold text-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-yellow-50/50"
-                                        value={eCurr}
-                                        onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
-                                        placeholder={room.lastElectric.toString()}
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            inputMode="decimal"
+                                            min={room.lastElectric}
+                                            className="w-full p-3 border border-yellow-300 rounded-lg text-center font-bold text-xl focus:ring-2 focus:ring-yellow-500 outline-none bg-white shadow-sm placeholder:text-gray-300 placeholder:text-sm placeholder:font-normal"
+                                            value={eCurr}
+                                            onChange={(e) => handleChange(room.id, 'eCurr', e.target.value)}
+                                            placeholder="Current Reading"
+                                        />
+                                        {eCurr && Number(eCurr) < room.lastElectric && (
+                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500">
+                                                <AlertCircle size={16} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
