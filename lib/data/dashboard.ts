@@ -106,18 +106,30 @@ export const getRevenueChartData = unstable_cache(
         const sixMonthsAgo = startOfMonth(subMonths(today, 5));
 
         // Use raw query for much faster aggregation at database level
-        // This avoids fetching thousands of rows into JS memory
         try {
-            const result = await prisma.$queryRaw`
-            SELECT 
-                to_char("paymentDate", 'YYYY-MM') as month_key,
-                SUM("totalAmount") as total
-            FROM "Billing"
-            WHERE "paymentStatus" = 'Paid'
-            AND "paymentDate" >= ${sixMonthsAgo}
-            GROUP BY month_key
-            ORDER BY month_key ASC
-        ` as { month_key: string, total: number }[];
+            // Shift dates by 7 hours (Asia/Bangkok) for correct monthly grouping
+            const [revenueResult, expenseResult] = await Promise.all([
+                prisma.$queryRaw`
+                    SELECT 
+                        to_char("paymentDate" + interval '7 hours', 'YYYY-MM') as month_key,
+                        SUM("totalAmount") as total
+                    FROM "Billing"
+                    WHERE "paymentStatus" = 'Paid'
+                    AND "paymentDate" >= ${sixMonthsAgo}
+                    GROUP BY month_key
+                    ORDER BY month_key ASC
+                ` as Promise<{ month_key: string, total: number }[]>,
+
+                prisma.$queryRaw`
+                    SELECT 
+                        to_char("date" + interval '7 hours', 'YYYY-MM') as month_key,
+                        SUM("amount") as total
+                    FROM "Expense"
+                    WHERE "date" >= ${sixMonthsAgo}
+                    GROUP BY month_key
+                    ORDER BY month_key ASC
+                ` as Promise<{ month_key: string, total: number }[]>
+            ]);
 
             // Fill in missing months with 0
             const filledData = [];
@@ -125,22 +137,24 @@ export const getRevenueChartData = unstable_cache(
                 const date = subMonths(today, i);
                 const key = format(date, 'yyyy-MM');
 
-                const match = result.find(r => r.month_key === key);
+                const revMatch = revenueResult.find(r => r.month_key === key);
+                const expMatch = expenseResult.find(r => r.month_key === key);
 
                 filledData.push({
                     month: format(date, 'MMM'),
                     fullDate: format(date, 'MMM yyyy'),
-                    amount: match ? Number(match.total) : 0
+                    amount: revMatch ? Number(revMatch.total) : 0,
+                    expense: expMatch ? Number(expMatch.total) : 0
                 });
             }
 
             return filledData;
         } catch (e) {
-            console.error("Failed to fetch revenue chart data via raw query", e);
+            console.error("Failed to fetch revenue/expense chart data", e);
             return [];
         }
     },
-    ['dashboard-revenue-chart'],
+    ['dashboard-revenue-chart-v2'],
     { revalidate: 300 }
 );
 
