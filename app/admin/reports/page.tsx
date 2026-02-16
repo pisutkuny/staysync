@@ -48,7 +48,18 @@ export default function ReportsPage() {
     }, [month]);
 
     const handlePrint = () => {
+        // Temporarily change document title for PDF filename
+        const originalTitle = document.title;
+        const monthFormatted = format(new Date(month + "-01"), "MMMM yyyy", { locale: dateLocale });
+        document.title = `${dormName} - Monthly Financial Report - ${monthFormatted}`;
+
         window.print();
+
+        // Restore original title after print dialog closes (though immediate restore might happen too fast in some browsers, 
+        // usually the title change registers before the print dialog opens)
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 500);
     };
 
     // Prepare chart data for single month
