@@ -23,6 +23,7 @@ type BillData = {
     status: string; // 'Pending', 'Paid', 'Overdue', 'Review', 'Rejected', 'Late'
     slipImage?: string | null;
     paymentStatus?: string; // Sometimes used interchangeably with status in your codebase
+    month?: string | Date;
     // Added for breakdown
     waterMeterLast: number;
     waterMeterCurrent: number;
@@ -181,7 +182,9 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             // Ensure bills is an array before finding
             const safeBills = Array.isArray(bills) ? bills : [];
             const bill = safeBills.find(b => {
-                const billDate = new Date(b.createdAt);
+                // Priority: Use 'month' field if available (correct logic), otherwise fallback to 'createdAt' (legacy)
+                const targetDate = b.month ? b.month : b.createdAt;
+                const billDate = new Date(targetDate);
                 const billMonth = billDate.toISOString().slice(0, 7);
                 return b.roomId === room.id && billMonth === selectedMonth;
             });
