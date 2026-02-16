@@ -38,12 +38,12 @@ export default async function DashboardPage() {
     }
 
     // Initiate fetching in parallel
-    const dormNameData = getDormName();
-    const summaryData = getDashboardSummary();
-    const revenueData = getRevenueChartData();
-    const occupancyData = getOccupancyChartData();
-    const activityData = getRecentActivity();
-    const topSpendersData = getTopSpenders();
+    const dormNameData = getDormName(session.organizationId);
+    const summaryData = getDashboardSummary(session.organizationId);
+    const revenueData = getRevenueChartData(session.organizationId);
+    const occupancyData = getOccupancyChartData(session.organizationId);
+    const activityData = getRecentActivity(session.organizationId);
+    const topSpendersData = getTopSpenders(session.organizationId);
 
     return (
         <div className="space-y-8 pb-10">
