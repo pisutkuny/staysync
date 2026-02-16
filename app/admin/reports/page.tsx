@@ -221,10 +221,8 @@ export default function ReportsPage() {
                                         {/* Income Segment (Left to Right) */}
                                         <div
                                             style={{ width: `${incomePercent}%` }}
-                                            className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 shadow-lg print:bg-green-600 print-force-bg-green transition-all duration-1000 ease-out flex items-center justify-start pl-4 relative"
+                                            className="h-full bg-emerald-500 shadow-md print:bg-emerald-500 print-force-bg-green transition-all duration-1000 ease-out flex items-center justify-start pl-4 relative"
                                         >
-                                            {/* Glossy Effect */}
-                                            <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 pointer-events-none print:hidden"></div>
                                             {incomePercent > 10 && (
                                                 <span className="text-white text-xs md:text-sm font-bold drop-shadow-md z-10 print:text-white print-force-color">{incomePercent.toFixed(0)}%</span>
                                             )}
@@ -233,10 +231,8 @@ export default function ReportsPage() {
                                         {/* Expense Segment (Right to Left visual - actually just taking remaining space) */}
                                         <div
                                             style={{ width: `${expensePercent}%` }}
-                                            className="h-full bg-gradient-to-l from-rose-400 via-red-500 to-pink-600 shadow-lg print:bg-red-600 print-force-bg-red transition-all duration-1000 ease-out flex items-center justify-end pr-4 relative"
+                                            className="h-full bg-rose-500 shadow-md print:bg-rose-500 print-force-bg-red transition-all duration-1000 ease-out flex items-center justify-end pr-4 relative"
                                         >
-                                            {/* Glossy Effect */}
-                                            <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 pointer-events-none print:hidden"></div>
                                             {expensePercent > 10 && (
                                                 <span className="text-white text-xs md:text-sm font-bold drop-shadow-md z-10 print:text-white print-force-color">{expensePercent.toFixed(0)}%</span>
                                             )}
