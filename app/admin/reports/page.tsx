@@ -156,7 +156,7 @@ export default function ReportsPage() {
                                 <TrendingDown size={16} className="hidden md:block" />
                                 <span className="truncate">{language === 'TH' ? 'รายจ่ายตามบิล (Bill Expenses)' : 'Bill Expenses'}</span>
                             </h3>
-                            <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{data.expenses?.total?.toLocaleString()}</p>
+                            <p className="text-2xl md:text-3xl font-bold text-red-700 mt-2 print:text-xl">฿{(data.expenses?.total - data.expenses?.generalExpenses)?.toLocaleString()}</p>
                             <p className="text-xs text-red-600 mt-1 truncate">
                                 {language === 'TH' ? 'ค่าน้ำ/ไฟ ส่วนกลาง (หลวง)' : 'Utilities + Common fees'}
                             </p>
