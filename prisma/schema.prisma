@@ -130,6 +130,7 @@ model Resident {
   @@index([depositStatus])
   @@index([contractEndDate])
   @@index([organizationId])
+  @@index([lineUserId])
 }
 
 model Document {
