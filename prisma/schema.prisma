@@ -205,6 +205,7 @@ model Billing {
   @@index([residentId])
   @@index([createdAt])
   @@index([organizationId])
+  @@index([roomId, residentId]) // Composite index for frequent queries
 }
 
 model Issue {

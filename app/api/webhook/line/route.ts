@@ -91,7 +91,7 @@ export async function POST(req: Request) {
                                 residentId: resident.id
                             },
                             orderBy: { createdAt: 'desc' },
-                            include: { room: true } // Ensure room details are loaded
+                            include: { room: true }
                         });
 
                         if (!latestBill) {
