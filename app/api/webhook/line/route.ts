@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { Client, WebhookEvent } from "@line/bot-sdk";
 import { sendLineMessage } from "@/lib/line";
 import { createInvoiceFlexMessage, createGuestFlexMessage } from "@/lib/line/flexMessages";
+import { getSystemConfig } from "@/lib/data/system-config";
 
 const config = {
     channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
@@ -26,25 +27,10 @@ export async function POST(req: Request) {
                 if (!userId) return;
 
                 // 1. Get User State & System Config
-                const [userStateObj, configObj] = await Promise.all([
+                const [userStateObj, sysConfig] = await Promise.all([
                     prisma.lineBotState.findUnique({ where: { lineUserId: userId } }),
-                    prisma.systemConfig.findFirst()
+                    getSystemConfig()
                 ]);
-
-                // Default fallbacks if config is missing (init)
-                const sysConfig = configObj || {
-                    dormName: "หอพัก",
-                    wifiSsid: "StaySync_Residences",
-                    wifiPassword: "staysync_wifi",
-                    rulesText: "1. ห้ามส่งเสียงดังหลัง 22.00 น.\n2. ห้ามสูบบุหรี่ในห้องพัก\n3. จ่ายค่าเช่าภายในวันที่ 5 ของทุกเดือน",
-                    emergencyPhone: "191",
-                    adminPhone: "081-234-5678",
-                    adminLineIdDisplay: "@staysync_admin",
-                    bankName: "Bank Name",
-                    bankAccountNumber: "000-0-00000-0",
-                    bankAccountName: "Account Name",
-                    promptPayId: null
-                };
 
                 let userState = userStateObj;
                 if (!userState) {
@@ -239,7 +225,7 @@ export async function POST(req: Request) {
                             reporterName: resident ? undefined : reporterName,
                             reporterContact: resident ? undefined : `Line:${userId}`,
                             reporterLineUserId: userId, // Capture Line ID for notifications
-                            organizationId: resident?.organizationId || configObj?.organizationId || 1
+                            organizationId: resident?.organizationId || sysConfig.organizationId || 1
                         }
                     });
 
