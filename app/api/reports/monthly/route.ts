@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { startOfMonth, endOfMonth } from "date-fns";
+import { getCurrentSession } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -10,6 +11,10 @@ export async function GET(req: Request) {
     if (!month) {
         return NextResponse.json({ error: "Month is required" }, { status: 400 });
     }
+
+    const session = await getCurrentSession();
+    // Default to 1 if no session/orgId for backward compatibility (though strictly should require auth)
+    const organizationId = session?.organizationId ? Number(session.organizationId) : 1;
 
     try {
         const selectedDate = new Date(month + "-01");
@@ -24,7 +29,8 @@ export async function GET(req: Request) {
         const paidBillings = await prisma.billing.findMany({
             where: {
                 month: { gte: startDate, lt: nextMonthStart },
-                paymentStatus: "Paid"
+                paymentStatus: "Paid",
+                organizationId // Filter by organization
             }
         });
 
@@ -68,8 +74,26 @@ export async function GET(req: Request) {
 
         // Fetch Central Meter for expenses
         const centralMeter = await prisma.centralMeter.findFirst({
-            where: { month: startDate }
+            where: {
+                month: startDate,
+                organizationId // Filter by organization
+            }
         });
+
+        // ==========================================
+        // NEW: Fetch General Expenses (Manual Tracking)
+        // ==========================================
+        const expenseAgg = await prisma.expense.aggregate({
+            _sum: { amount: true },
+            where: {
+                date: {
+                    gte: startDate,
+                    lt: nextMonthStart
+                },
+                organizationId // Filter by organization
+            }
+        });
+        const generalExpenses = expenseAgg._sum.amount || 0;
 
         const expenses = {
             waterBill: centralMeter?.waterTotalCost || 0,
@@ -77,14 +101,18 @@ export async function GET(req: Request) {
             trashBill: centralMeter?.trashCost || 0,
             internetBill: centralMeter?.internetCost || 0,
             otherBill: 0,
-            total: (centralMeter?.waterTotalCost || 0) + (centralMeter?.electricTotalCost || 0) + (centralMeter?.trashCost || 0) + (centralMeter?.internetCost || 0)
+            generalExpenses, // Added general expenses
+            total: (centralMeter?.waterTotalCost || 0) + (centralMeter?.electricTotalCost || 0) + (centralMeter?.trashCost || 0) + (centralMeter?.internetCost || 0) + generalExpenses
         };
 
         // Stats
-        const totalRooms = await prisma.room.count();
-        const occupiedRooms = await prisma.room.count({ where: { status: "Occupied" } });
+        const totalRooms = await prisma.room.count({ where: { organizationId } });
+        const occupiedRooms = await prisma.room.count({ where: { status: "Occupied", organizationId } });
         const totalBillsThisMonth = await prisma.billing.count({
-            where: { month: { gte: startDate, lt: nextMonthStart } }
+            where: {
+                month: { gte: startDate, lt: nextMonthStart },
+                organizationId
+            }
         });
         const paidCount = paidBillings.length;
         const unpaidCount = totalBillsThisMonth - paidCount;

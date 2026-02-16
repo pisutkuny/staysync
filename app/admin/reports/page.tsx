@@ -304,6 +304,10 @@ export default function ReportsPage() {
                                             <td className="py-2 text-gray-600 pr-2 print:py-1">ค่าขยะ/เน็ต</td>
                                             <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{(data.expenses?.trashBill + data.expenses?.internetBill).toLocaleString()}</td>
                                         </tr>
+                                        <tr className="border-b border-gray-100">
+                                            <td className="py-2 text-gray-600 pr-2 print:py-1">รายจ่ายทั่วไป (General Expenses)</td>
+                                            <td className="py-2 text-right font-medium text-red-600 whitespace-nowrap print:py-1">-฿{data.expenses?.generalExpenses?.toLocaleString()}</td>
+                                        </tr>
                                         <tr className="font-bold text-sm md:text-base bg-gray-50 print:bg-gray-100">
                                             <td className="py-2 pl-2 print:py-1">รวมรายจ่าย</td>
                                             <td className="py-2 pr-2 text-right text-red-700 whitespace-nowrap print:py-1">-฿{data.expenses?.total?.toLocaleString()}</td>
