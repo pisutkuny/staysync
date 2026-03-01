@@ -30,10 +30,10 @@ export async function POST(req: Request) {
 
         // Process each entry
         for (const entry of entries) {
-            const { roomId, waterCurrent, electricCurrent, lastWater: manualLastWater, lastElectric: manualLastElectric } = entry;
+            const { roomId, wCurr: waterCurrent, eCurr: electricCurrent, wLast: manualLastWater, eLast: manualLastElectric } = entry;
 
             // Skip if incomplete
-            if (waterCurrent === null || electricCurrent === null) {
+            if (waterCurrent == null || electricCurrent == null) {
                 results.skipped++;
                 continue;
             }
