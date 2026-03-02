@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle } from "lucide-react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle, SendHorizontal } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
@@ -112,6 +112,32 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             if (res.ok) {
                 showAlert("Success", `✅ ${t.billing.cashSuccess}`, "success");
                 window.location.reload(); // Refresh to update status
+            } else {
+                const data = await res.json();
+                showAlert("Error", `❌ ${data.error}`, "error");
+            }
+        } catch (error) {
+            showAlert("Error", "❌ Network Error", "error");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleTransferPayment = async (id: number) => {
+        const confirmed = await showConfirm("ยืนยันการโอนเงิน", "ยืนยันว่าได้รับเงินโอนจากผู้เช่าแล้ว?", true);
+        if (!confirmed) return;
+
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}/pay-cash`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: 1, paymentMethod: 'transfer' }),
+            });
+
+            if (res.ok) {
+                showAlert("Success", "✅ ยืนยันการรับโอนเงินเรียบร้อย", "success");
+                window.location.reload();
             } else {
                 const data = await res.json();
                 showAlert("Error", `❌ ${data.error}`, "error");
@@ -441,12 +467,20 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                         <>
                                             {/* Primary Action */}
                                             {(status === "Pending" || status === "Overdue" || status === "Late") ? (
-                                                <button
-                                                    onClick={() => handleCashPayment(bill.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-black transition-all active:scale-95"
-                                                >
-                                                    <Banknote size={18} /> Pay Cash
-                                                </button>
+                                                <div className="flex-1 flex gap-2">
+                                                    <button
+                                                        onClick={() => handleCashPayment(bill.id)}
+                                                        className="flex-1 flex items-center justify-center gap-1.5 bg-slate-900 text-white py-3 rounded-lg text-xs font-bold shadow-md hover:bg-black transition-all active:scale-95"
+                                                    >
+                                                        <Banknote size={16} /> Pay Cash
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleTransferPayment(bill.id)}
+                                                        className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-3 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-800 transition-all active:scale-95"
+                                                    >
+                                                        <SendHorizontal size={16} /> Transfer
+                                                    </button>
+                                                </div>
                                             ) : status === "Review" ? (
                                                 <button
                                                     onClick={() => handleReview(bill.id, "approve")}

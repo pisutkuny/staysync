@@ -8,7 +8,7 @@ export async function POST(
     try {
         const { id } = await params;
         const billId = parseInt(id);
-        const { userId } = await req.json(); // Admin User ID
+        const { userId, paymentMethod } = await req.json(); // Admin User ID + optional method
 
         // Fetch bill details
         const bill = await prisma.billing.findUnique({
@@ -34,6 +34,7 @@ export async function POST(
         }
 
         // Update bill to Paid (Cash)
+        const isTransfer = paymentMethod === 'transfer';
         const updatedBill = await prisma.billing.update({
             where: { id: billId },
             data: {
@@ -41,7 +42,7 @@ export async function POST(
                 paymentDate: new Date(),
                 reviewedBy: userId || 1, // Default to admin
                 reviewedAt: new Date(),
-                reviewNote: "Paid via Cash (Manual Entry)"
+                reviewNote: isTransfer ? "Paid via Transfer (Confirmed by Admin)" : "Paid via Cash (Manual Entry)"
             }
         });
 
@@ -49,7 +50,8 @@ export async function POST(
         if (bill.resident?.lineUserId) {
             try {
                 const { sendLineMessage } = await import("@/lib/line");
-                const message = `✅ ยืนยันการชำระเงิน (เงินสด)\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nสถานะ: ชำระแล้ว\n\nขอบคุณที่ชำระเงินครับ 🙏`;
+                const methodLabel = isTransfer ? 'โอนเงิน' : 'เงินสด';
+                const message = `✅ ยืนยันการชำระเงิน (${methodLabel})\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nสถานะ: ชำระแล้ว\n\nขอบคุณที่ชำระเงินครับ 🙏`;
                 await sendLineMessage(bill.resident.lineUserId, message);
             } catch (lineError) {
                 console.error("Failed to send customer notification:", lineError);
