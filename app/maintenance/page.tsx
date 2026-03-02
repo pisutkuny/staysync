@@ -1,5 +1,6 @@
 import { getCurrentSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 import MaintenanceClient from "./MaintenanceClient";
 
 export default async function MaintenancePage() {
@@ -9,5 +10,12 @@ export default async function MaintenancePage() {
         redirect("/login");
     }
 
-    return <MaintenanceClient />;
+    // Fetch rooms for per-room view
+    const rooms = await prisma.room.findMany({
+        where: { status: "Occupied" },
+        orderBy: { number: "asc" },
+        select: { id: true, number: true }
+    });
+
+    return <MaintenanceClient rooms={rooms} />;
 }
