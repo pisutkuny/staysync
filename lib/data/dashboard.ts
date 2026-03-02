@@ -286,7 +286,7 @@ export async function getTopSpenders(organizationId: number): Promise<TopSpender
         const endOfCurrentMonth = endOfMonth(today);
 
         const topSpenders = await prisma.billing.findMany({
-            take: 5,
+            take: 6,
             where: {
                 organizationId: orgId,
                 month: { gte: startOfCurrentMonth, lte: endOfCurrentMonth }
