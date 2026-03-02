@@ -225,7 +225,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                     </div>
                                     <div>
                                         <p className="text-xl font-bold text-red-600">ชำระเงินเรียบร้อยแล้ว</p>
-                                        <p className="text-gray-500 mt-1">วันที่ชำระ: {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                        <p className="text-gray-500 mt-1">วันที่ชำระ: {new Date(billing.paymentDate || billing.reviewedAt || billing.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                     </div>
                                 </div>
                             ) : (

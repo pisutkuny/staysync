@@ -214,7 +214,7 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                             <span className="text-3xl font-black text-red-500 tracking-widest">PAID</span>
                         </div>
                         <p className="text-lg font-bold text-red-600 mt-4">ชำระเงินแล้ว</p>
-                        <p className="text-xs text-red-400 mt-1">{new Date().toLocaleDateString('th-TH')}</p>
+                        <p className="text-xs text-red-400 mt-1">{new Date(billing.paymentDate || billing.reviewedAt || billing.createdAt).toLocaleDateString('th-TH')}</p>
                     </div>
                 ) : (
                     promptPayPayload && (
