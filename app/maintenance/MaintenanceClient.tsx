@@ -17,15 +17,16 @@ interface Equipment {
 
 // Common area equipment
 const COMMON_EQUIPMENT: Equipment[] = [
-    { id: "grease-trap", name: "ถังดักไขมัน", icon: "🛢️", intervalDays: 30, intervalLabel: "ทุก 1 เดือน", description: "ตักไขมัน ทำความสะอาดตะแกรง ล้างถัง" },
     { id: "water-pump", name: "ปั๊มน้ำ", icon: "💧", intervalDays: 90, intervalLabel: "ทุก 3 เดือน", description: "ตรวจเสียงผิดปกติ แรงดัน รอยรั่ว สายไฟ" },
     { id: "float-valve", name: "ลูกลอยถังเก็บน้ำ", icon: "🔴", intervalDays: 90, intervalLabel: "ทุก 3 เดือน", description: "ตรวจระดับน้ำ การปิด-เปิด สภาพลูกลอย" },
     { id: "cctv", name: "กล้องวงจรปิด CCTV", icon: "📹", intervalDays: 90, intervalLabel: "ทุก 3 เดือน", description: "เช็คภาพ มุมกล้อง HDD recording IR กลางคืน" },
+    { id: "solar-light", name: "ไฟส่องสว่างโซล่าเซลล์", icon: "☀️", intervalDays: 180, intervalLabel: "ทุก 6 เดือน", description: "เช็คแผงโซล่า แบตเตอรี่ หลอดไฟ เซ็นเซอร์" },
     { id: "internet", name: "Internet / Router", icon: "🌐", intervalDays: 180, intervalLabel: "ทุก 6 เดือน", description: "เช็คสาย LAN ความเร็ว reset ตั้งค่า firmware" },
 ];
 
 // Per-room equipment
 const ROOM_EQUIPMENT: Equipment[] = [
+    { id: "grease-trap", name: "ถังดักไขมัน", icon: "🛢️", intervalDays: 30, intervalLabel: "ทุก 1 เดือน", description: "ตักไขมัน ทำความสะอาดตะแกรง ล้างถัง" },
     { id: "air-conditioner", name: "แอร์ (ล้าง)", icon: "🧊", intervalDays: 90, intervalLabel: "ทุก 3 เดือน", description: "ล้างแผ่นฟิลเตอร์ คอยล์ ป้องกันเชื้อรา ลดกลิ่นอับ" },
     { id: "water-heater", name: "เครื่องทำน้ำอุ่น", icon: "🚿", intervalDays: 180, intervalLabel: "ทุก 6 เดือน", description: "เช็คขั้วไฟ สายดิน ประสิทธิภาพ อุณหภูมิ" },
     { id: "fan", name: "พัดลม", icon: "🌀", intervalDays: 180, intervalLabel: "ทุก 6 เดือน", description: "ทำความสะอาดใบพัด หล่อลื่น เช็คสวิทช์" },
@@ -294,8 +295,8 @@ export default function MaintenanceClient({ rooms }: { rooms: RoomInfo[] }) {
                                 key={room.id}
                                 onClick={() => setSelectedRoom(room)}
                                 className={`relative p-3 rounded-xl border-2 text-center font-bold transition-all ${isSelected
-                                        ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md scale-105"
-                                        : "border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-indigo-50/50"
+                                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md scale-105"
+                                    : "border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-indigo-50/50"
                                     }`}
                             >
                                 <div className="text-base">🏠</div>
