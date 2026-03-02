@@ -1,14 +1,16 @@
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
-export async function getBillingData() {
-    try {
+// Cached: 30 seconds — prevents redundant DB hits on navigation
+export const getBillingData = unstable_cache(
+    async () => {
         const [rooms, bills, config] = await Promise.all([
             prisma.room.findMany({
                 orderBy: { number: 'asc' },
                 include: {
                     residents: {
                         where: { status: 'Active' },
-                        orderBy: { isMainTenant: 'desc' } // Main Tenant first
+                        orderBy: { isMainTenant: 'desc' }
                     }
                 }
             }),
@@ -18,22 +20,13 @@ export async function getBillingData() {
                     room: true,
                     resident: true
                 },
-                take: 100 // Limit to 100 recent bills for performance
+                take: 100
             }),
             prisma.systemConfig.findFirst()
         ]);
 
-        return {
-            rooms, // All rooms
-            bills,
-            config
-        };
-    } catch (error) {
-        console.error("Failed to fetch billing data:", error);
-        return {
-            rooms: [],
-            bills: [],
-            config: null
-        };
-    }
-}
+        return { rooms, bills, config };
+    },
+    ['billing-data-v1'],
+    { revalidate: 30 }
+);

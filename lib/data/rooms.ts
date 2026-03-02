@@ -1,20 +1,18 @@
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
-export async function getRooms() {
-    try {
+// Cached: 30 seconds
+export const getRooms = unstable_cache(
+    async () => {
         const rooms = await prisma.room.findMany({
-            orderBy: {
-                number: 'asc',
-            },
+            orderBy: { number: 'asc' },
             include: {
                 residents: {
-                    where: {
-                        status: 'Active'
-                    },
+                    where: { status: 'Active' },
                     select: {
                         id: true,
                         fullName: true,
-                        isChild: true, // Assuming this field exists based on previous code
+                        isChild: true,
                         contractStartDate: true,
                         contractEndDate: true,
                         contractDurationMonths: true,
@@ -24,8 +22,7 @@ export async function getRooms() {
             }
         });
         return rooms;
-    } catch (error) {
-        console.error("Failed to fetch rooms:", error);
-        return [];
-    }
-}
+    },
+    ['rooms-data-v1'],
+    { revalidate: 30 }
+);

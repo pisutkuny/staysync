@@ -1,10 +1,19 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import BillingForm from "./BillingForm";
-import MeterDashboard from "./MeterDashboard";
+import dynamic from "next/dynamic";
 import ExportButton from "./ExportButton";
 import Link from "next/link";
+
+const MeterDashboard = dynamic(() => import("./MeterDashboard"), {
+    loading: () => <div className="h-96 bg-gray-100 rounded-2xl animate-pulse" />,
+    ssr: false
+});
+
+const BillingForm = dynamic(() => import("./BillingForm"), {
+    loading: () => <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />,
+    ssr: false
+});
 
 interface BillingClientProps {
     rooms: any[];

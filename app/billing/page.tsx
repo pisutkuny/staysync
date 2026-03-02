@@ -12,20 +12,26 @@ export default async function BillingPage() {
         redirect("/login");
     }
 
-    const { rooms, bills, config } = await getBillingData();
-
-    // Filter occupied rooms for billing form (matching original logic)
-    const occupiedRooms = rooms.filter((r: any) => r.status === "Occupied");
+    // Start fetching data without awaiting — Suspense will stream it
+    const billingData = getBillingData();
 
     return (
         <Suspense fallback={<BillingLoading />}>
-            <BillingClient
-                rooms={occupiedRooms}
-                bills={bills}
-                allRooms={rooms}
-                config={config}
-            />
+            <BillingContent billingData={billingData} />
         </Suspense>
     );
 }
 
+async function BillingContent({ billingData }: { billingData: ReturnType<typeof getBillingData> }) {
+    const { rooms, bills, config } = await billingData;
+    const occupiedRooms = rooms.filter((r: any) => r.status === "Occupied");
+
+    return (
+        <BillingClient
+            rooms={occupiedRooms}
+            bills={bills}
+            allRooms={rooms}
+            config={config}
+        />
+    );
+}
