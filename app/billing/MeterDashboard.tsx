@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle, SendHorizontal } from "lucide-react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle, SendHorizontal, Upload, ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
@@ -61,6 +61,12 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
     const [selectedBill, setSelectedBill] = useState<BillData | null>(null);
     const [rejectingId, setRejectingId] = useState<number | null>(null);
     const [rejectReason, setRejectReason] = useState("");
+
+    // Transfer Upload State
+    const [transferBillId, setTransferBillId] = useState<number | null>(null);
+    const [slipFile, setSlipFile] = useState<File | null>(null);
+    const [slipPreview, setSlipPreview] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     // --- Helper Functions from BillingList ---
 
@@ -123,29 +129,60 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
         }
     };
 
-    const handleTransferPayment = async (id: number) => {
-        const confirmed = await showConfirm("ยืนยันการโอนเงิน", "ยืนยันว่าได้รับเงินโอนจากผู้เช่าแล้ว?", true);
-        if (!confirmed) return;
+    const openTransferModal = (id: number) => {
+        setTransferBillId(id);
+        setSlipFile(null);
+        setSlipPreview(null);
+    };
 
-        setLoading(id);
+    const handleSlipFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSlipFile(file);
+            const reader = new FileReader();
+            reader.onload = (ev) => setSlipPreview(ev.target?.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const submitTransfer = async () => {
+        if (!transferBillId) return;
+        setUploading(true);
+
         try {
-            const res = await fetch(`/api/billing/${id}/pay-cash`, {
+            // Step 1: Upload slip to Google Drive if file provided
+            if (slipPreview) {
+                const uploadRes = await fetch(`/api/billing/${transferBillId}/upload-slip`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ image: slipPreview }),
+                });
+
+                if (!uploadRes.ok) {
+                    const err = await uploadRes.json();
+                    throw new Error(err.error || "Failed to upload slip");
+                }
+            }
+
+            // Step 2: Confirm payment as Transfer
+            const res = await fetch(`/api/billing/${transferBillId}/pay-cash`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: 1, paymentMethod: 'transfer' }),
             });
 
             if (res.ok) {
-                showAlert("Success", "✅ ยืนยันการรับโอนเงินเรียบร้อย", "success");
+                setTransferBillId(null);
+                showAlert("Success", "✅ ยืนยันการรับโอนเงินเรียบร้อย" + (slipPreview ? "\n📁 สลิปถูกบันทึกใน Google Drive แล้ว" : ""), "success");
                 window.location.reload();
             } else {
                 const data = await res.json();
-                showAlert("Error", `❌ ${data.error}`, "error");
+                throw new Error(data.error || "Failed");
             }
-        } catch (error) {
-            showAlert("Error", "❌ Network Error", "error");
+        } catch (error: any) {
+            showAlert("Error", `❌ ${error.message}`, "error");
         } finally {
-            setLoading(null);
+            setUploading(false);
         }
     };
 
@@ -475,7 +512,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                         <Banknote size={16} /> Pay Cash
                                                     </button>
                                                     <button
-                                                        onClick={() => handleTransferPayment(bill.id)}
+                                                        onClick={() => openTransferModal(bill.id)}
                                                         className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-3 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-800 transition-all active:scale-95"
                                                     >
                                                         <SendHorizontal size={16} /> Transfer
@@ -622,6 +659,69 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                 className="px-4 py-2 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 disabled:opacity-50 transition-colors shadow-sm"
                             >
                                 Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Transfer Upload Modal */}
+            {transferBillId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+                    onClick={() => !uploading && setTransferBillId(null)}
+                >
+                    <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+                            <SendHorizontal size={20} className="text-emerald-600" />
+                            ยืนยันการโอนเงิน
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-4">อัพโหลดสลิปเพื่อเก็บเป็นหลักฐาน (ไม่บังคับ)</p>
+
+                        {/* File Upload Area */}
+                        {slipPreview ? (
+                            <div className="relative mb-4">
+                                <img src={slipPreview} alt="Slip Preview" className="w-full max-h-[300px] object-contain rounded-lg border border-gray-200 bg-gray-50" />
+                                <button
+                                    onClick={() => { setSlipFile(null); setSlipPreview(null); }}
+                                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-md"
+                                >
+                                    <XCircle size={16} />
+                                </button>
+                            </div>
+                        ) : (
+                            <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all mb-4">
+                                <ImageIcon size={32} className="text-gray-300 mb-2" />
+                                <span className="text-sm font-medium text-gray-500">คลิกเพื่ออัพโหลดสลิป</span>
+                                <span className="text-xs text-gray-400 mt-1">JPG, PNG (ไม่บังคับ)</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleSlipFileChange}
+                                />
+                            </label>
+                        )}
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setTransferBillId(null)}
+                                disabled={uploading}
+                                className="px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors disabled:opacity-50"
+                            >
+                                ยกเลิก
+                            </button>
+                            <button
+                                onClick={submitTransfer}
+                                disabled={uploading}
+                                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm flex items-center gap-2"
+                            >
+                                {uploading ? (
+                                    <><Loader2 size={16} className="animate-spin" /> กำลังดำเนินการ...</>
+                                ) : (
+                                    <><CheckCircle2 size={16} /> ยืนยันรับเงิน</>
+                                )}
                             </button>
                         </div>
                     </div>
