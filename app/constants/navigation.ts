@@ -99,6 +99,11 @@ export const NAV_ITEMS: NavItem[] = [
                 label: "Issues Log",
                 href: "/issues",
                 roles: ["OWNER", "STAFF"]
+            },
+            {
+                label: "Maintenance Schedule",
+                href: "/maintenance",
+                roles: ["OWNER", "STAFF"]
             }
         ]
     },
