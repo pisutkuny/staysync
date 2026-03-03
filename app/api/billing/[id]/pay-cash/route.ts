@@ -8,7 +8,7 @@ export async function POST(
     try {
         const { id } = await params;
         const billId = parseInt(id);
-        const { userId, paymentMethod } = await req.json(); // Admin User ID + optional method
+        const { userId, paymentMethod, slipImage } = await req.json(); // Admin User ID + optional method + optional slip
 
         // Fetch bill details
         const bill = await prisma.billing.findUnique({
@@ -33,7 +33,46 @@ export async function POST(
             );
         }
 
-        // Update bill to Paid (Cash)
+        // If slip image provided (transfer with receipt), attempt Google Drive upload
+        let slipUrl: string | null = null;
+        let slipFileId: string | null = null;
+
+        if (slipImage) {
+            try {
+                const billMonth = new Date(bill.month);
+                const monthStr = `${billMonth.getFullYear()}-${String(billMonth.getMonth() + 1).padStart(2, '0')}`;
+
+                const scriptUrl = process.env.NEXT_PUBLIC_PAYMENT_SLIP_SCRIPT_URL;
+                if (scriptUrl) {
+                    const uploadResponse = await fetch(scriptUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            image: slipImage,
+                            roomNumber: bill.room.number,
+                            billId: bill.id,
+                            month: monthStr
+                        })
+                    });
+
+                    const uploadResult = await uploadResponse.json();
+
+                    if (uploadResult.success && uploadResult.fileId) {
+                        slipUrl = `https://lh3.googleusercontent.com/d/${uploadResult.fileId}=w1000`;
+                        slipFileId = uploadResult.fileId;
+                    } else {
+                        console.warn("Slip upload returned unsuccessful, continuing with payment:", uploadResult.error);
+                    }
+                } else {
+                    console.warn("NEXT_PUBLIC_PAYMENT_SLIP_SCRIPT_URL not configured, skipping slip upload");
+                }
+            } catch (uploadError) {
+                // Don't block payment if slip upload fails
+                console.error("Slip upload failed, continuing with payment confirmation:", uploadError);
+            }
+        }
+
+        // Update bill to Paid — single atomic update with slip data if available
         const isTransfer = paymentMethod === 'transfer';
         const updatedBill = await prisma.billing.update({
             where: { id: billId },
@@ -42,7 +81,9 @@ export async function POST(
                 paymentDate: new Date(),
                 reviewedBy: userId || 1, // Default to admin
                 reviewedAt: new Date(),
-                reviewNote: isTransfer ? "Paid via Transfer (Confirmed by Admin)" : "Paid via Cash (Manual Entry)"
+                reviewNote: isTransfer ? "Paid via Transfer (Confirmed by Admin)" : "Paid via Cash (Manual Entry)",
+                ...(slipUrl && { slipImage: slipUrl }),
+                ...(slipFileId && { slipFileId }),
             }
         });
 

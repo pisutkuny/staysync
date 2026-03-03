@@ -67,6 +67,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
     const [slipFile, setSlipFile] = useState<File | null>(null);
     const [slipPreview, setSlipPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [dragging, setDragging] = useState(false);
 
     // --- Helper Functions from BillingList ---
 
@@ -145,30 +146,38 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
         }
     };
 
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            setSlipFile(file);
+            const reader = new FileReader();
+            reader.onload = (ev) => setSlipPreview(ev.target?.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
     const submitTransfer = async () => {
         if (!transferBillId) return;
         setUploading(true);
 
         try {
-            // Step 1: Upload slip to Google Drive if file provided
-            if (slipPreview) {
-                const uploadRes = await fetch(`/api/billing/${transferBillId}/upload-slip`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ image: slipPreview }),
-                });
-
-                if (!uploadRes.ok) {
-                    const err = await uploadRes.json();
-                    throw new Error(err.error || "Failed to upload slip");
-                }
-            }
-
-            // Step 2: Confirm payment as Transfer
+            // Single atomic call: confirm payment + upload slip together
             const res = await fetch(`/api/billing/${transferBillId}/pay-cash`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: 1, paymentMethod: 'transfer' }),
+                body: JSON.stringify({
+                    userId: 1,
+                    paymentMethod: 'transfer',
+                    slipImage: slipPreview || undefined
+                }),
             });
 
             if (res.ok) {
@@ -669,6 +678,8 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             {transferBillId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
                     onClick={() => !uploading && setTransferBillId(null)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); }}
                 >
                     <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}
@@ -691,9 +702,20 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                 </button>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all mb-4">
-                                <ImageIcon size={32} className="text-gray-300 mb-2" />
-                                <span className="text-sm font-medium text-gray-500">คลิกเพื่ออัพโหลดสลิป</span>
+                            <label
+                                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all mb-4 ${dragging
+                                        ? 'border-emerald-500 bg-emerald-50 scale-[1.02]'
+                                        : 'border-gray-300 hover:border-emerald-400 hover:bg-emerald-50/50'
+                                    }`}
+                                onDrop={handleDrop}
+                                onDragOver={(e) => { handleDragOver(e); setDragging(true); }}
+                                onDragEnter={(e) => { e.preventDefault(); setDragging(true); }}
+                                onDragLeave={() => setDragging(false)}
+                            >
+                                <Upload size={32} className={`mb-2 ${dragging ? 'text-emerald-500' : 'text-gray-300'}`} />
+                                <span className={`text-sm font-medium ${dragging ? 'text-emerald-600' : 'text-gray-500'}`}>
+                                    {dragging ? 'ปล่อยไฟล์ตรงนี้' : 'คลิกหรือลากไฟล์มาวางที่นี่'}
+                                </span>
                                 <span className="text-xs text-gray-400 mt-1">JPG, PNG (ไม่บังคับ)</span>
                                 <input
                                     type="file"
