@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function POST(
     req: Request,
@@ -86,6 +87,9 @@ export async function POST(
                 ...(slipFileId && { slipFileId }),
             }
         });
+
+        // Bust the billing cache so UI reflects the new status immediately
+        revalidatePath('/billing');
 
         // Send Line notification to customer
         if (bill.resident?.lineUserId) {
