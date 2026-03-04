@@ -38,20 +38,20 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
         <div className="print-page" style={{ pageBreakAfter: "always", padding: "12mm" }}>
             {/* Header */}
             <div style={{ textAlign: "center", marginBottom: "16px", borderBottom: "3px solid #000", paddingBottom: "12px" }}>
-                <h1 style={{ fontSize: "20px", fontWeight: 800, margin: 0 }}>🔧 ตารางบันทึกการบำรุงรักษา</h1>
-                <h2 style={{ fontSize: "16px", fontWeight: 700, margin: "4px 0 0", color: "#333" }}>{title}</h2>
-                <p style={{ fontSize: "11px", color: "#666", margin: "4px 0 0" }}>{subtitle}</p>
+                <h1 style={{ fontSize: "26px", fontWeight: 800, margin: 0 }}>🔧 ตารางบันทึกการบำรุงรักษา</h1>
+                <h2 style={{ fontSize: "20px", fontWeight: 700, margin: "4px 0 0", color: "#333" }}>{title}</h2>
+                <p style={{ fontSize: "13px", color: "#666", margin: "4px 0 0" }}>{subtitle}</p>
             </div>
 
             {/* Table — Equipment as columns, check rows going down */}
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                 <thead>
                     {/* Row 1: Equipment icons + names */}
                     <tr>
                         <th style={{ ...thStyle, width: "60px", textAlign: "center" }} rowSpan={3}>ครั้งที่</th>
                         <th style={{ ...thStyle, width: "90px", textAlign: "center" }} rowSpan={3}>วัน/เดือน/ปี</th>
                         {equipmentList.map((eq, idx) => (
-                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "18px", paddingBottom: "2px" }}>
+                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "24px", paddingBottom: "2px" }}>
                                 {eq.icon}
                             </th>
                         ))}
@@ -59,7 +59,7 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
                     </tr>
                     <tr>
                         {equipmentList.map((eq, idx) => (
-                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "10px", fontWeight: 700, paddingTop: "2px" }}>
+                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "12px", fontWeight: 700, paddingTop: "2px" }}>
                                 {eq.name}
                             </th>
                         ))}
@@ -67,7 +67,7 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
                     {/* Row 2: Interval labels */}
                     <tr>
                         {equipmentList.map((eq, idx) => (
-                            <th key={idx} style={{ ...subThStyle, textAlign: "center", fontSize: "9px", color: "#d97706", fontWeight: 600 }}>
+                            <th key={idx} style={{ ...subThStyle, textAlign: "center", fontSize: "11px", color: "#d97706", fontWeight: 600 }}>
                                 {eq.intervalLabel}
                             </th>
                         ))}
@@ -76,8 +76,8 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
                 <tbody>
                     {Array.from({ length: CHECK_ROWS }).map((_, rowIdx) => (
                         <tr key={rowIdx}>
-                            <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700, fontSize: "12px" }}>{rowIdx + 1}</td>
-                            <td style={{ ...tdStyle, height: "36px" }}></td>
+                            <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700, fontSize: "14px" }}>{rowIdx + 1}</td>
+                            <td style={{ ...tdStyle, height: "40px" }}></td>
                             {equipmentList.map((_, colIdx) => (
                                 <td key={colIdx} style={{ ...tdStyle, textAlign: "center" }}>
                                     {/* Empty cell — technician marks ✓ */}
@@ -90,7 +90,7 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
             </table>
 
             {/* Description legend */}
-            <div style={{ marginTop: "12px", fontSize: "9px", color: "#555", border: "1px solid #ccc", borderRadius: "4px", padding: "8px" }}>
+            <div style={{ marginTop: "12px", fontSize: "11px", color: "#555", border: "1px solid #ccc", borderRadius: "4px", padding: "8px" }}>
                 <strong>📝 รายละเอียดการตรวจเช็ค:</strong>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "4px" }}>
                     {equipmentList.map((eq, idx) => (
@@ -100,7 +100,7 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
             </div>
 
             {/* Signature area */}
-            <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between", fontSize: "11px" }}>
+            <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                 <div>
                     <p style={{ margin: 0 }}>ผู้รับผิดชอบ: ________________________________</p>
                 </div>
@@ -115,10 +115,10 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
 // Shared cell styles
 const thStyle: React.CSSProperties = {
     border: "1.5px solid #333",
-    padding: "6px 4px",
+    padding: "8px 5px",
     backgroundColor: "#f1f5f9",
     fontWeight: 700,
-    fontSize: "10px",
+    fontSize: "12px",
 };
 
 const subThStyle: React.CSSProperties = {
@@ -129,7 +129,7 @@ const subThStyle: React.CSSProperties = {
 
 const tdStyle: React.CSSProperties = {
     border: "1px solid #999",
-    padding: "4px 5px",
+    padding: "6px 6px",
     verticalAlign: "middle",
 };
 
