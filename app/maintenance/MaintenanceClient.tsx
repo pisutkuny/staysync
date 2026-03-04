@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { CheckCircle2, Clock, AlertTriangle, RotateCcw, Wrench, ChevronDown, ChevronUp, Building2, Home } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, RotateCcw, Wrench, ChevronDown, ChevronUp, Building2, Home, Printer } from "lucide-react";
+import Link from "next/link";
 
 // ==========================================
 // Equipment Presets
@@ -262,10 +263,19 @@ export default function MaintenanceClient({ rooms }: { rooms: RoomInfo[] }) {
         <div className="space-y-6 pb-10">
             {/* Header */}
             <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-2xl p-6 sm:p-8 shadow-xl">
-                <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
-                    <Wrench size={28} /> ตารางบำรุงรักษา
-                </h2>
-                <p className="text-orange-100 mt-2 text-sm">ติดตามกำหนดการตรวจเช็คอุปกรณ์หอพัก</p>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white drop-shadow-lg flex items-center gap-3">
+                            <Wrench size={28} /> ตารางบำรุงรักษา
+                        </h2>
+                        <p className="text-orange-100 mt-2 text-sm">ติดตามกำหนดการตรวจเช็คอุปกรณ์หอพัก</p>
+                    </div>
+                    <Link href="/maintenance/print">
+                        <button className="bg-white text-orange-700 px-4 py-2.5 rounded-lg font-bold hover:bg-orange-50 shadow-md hover:shadow-lg transition-all flex items-center gap-2 border border-white/30 hover:scale-105 text-xs sm:text-sm">
+                            <Printer size={16} /> พิมพ์แม่แบบ
+                        </button>
+                    </Link>
+                </div>
             </div>
 
             {/* View Mode Tabs */}
