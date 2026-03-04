@@ -31,7 +31,7 @@ const ROOM_EQUIPMENT: Equipment[] = [
 ];
 
 // 12 columns for recording dates
-const DATE_COLUMNS = 12;
+const DATE_COLUMNS = 6;
 
 function PrintableTable({ title, subtitle, equipmentList }: { title: string; subtitle: string; equipmentList: Equipment[] }) {
     return (
@@ -194,7 +194,7 @@ export default function MaintenancePrintClient({ rooms }: { rooms: RoomInfo[] })
                     main { padding: 0 !important; margin: 0 !important; max-width: none !important; }
                     .print-page { page-break-after: always; }
                     .print-page:last-child { page-break-after: auto; }
-                    @page { size: A4 landscape; margin: 8mm; }
+                    @page { size: A4 portrait; margin: 8mm; }
                 }
             `}</style>
         </>
