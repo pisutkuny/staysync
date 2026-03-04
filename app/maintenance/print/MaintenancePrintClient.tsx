@@ -30,8 +30,8 @@ const ROOM_EQUIPMENT: Equipment[] = [
     { name: "พัดลม", icon: "🌀", intervalLabel: "ทุก 6 เดือน", description: "ใบพัด หล่อลื่น สวิทช์" },
 ];
 
-// 12 columns for recording dates
-const DATE_COLUMNS = 6;
+// Number of rows for recording dates
+const CHECK_ROWS = 12;
 
 function PrintableTable({ title, subtitle, equipmentList }: { title: string; subtitle: string; equipmentList: Equipment[] }) {
     return (
@@ -43,58 +43,69 @@ function PrintableTable({ title, subtitle, equipmentList }: { title: string; sub
                 <p style={{ fontSize: "11px", color: "#666", margin: "4px 0 0" }}>{subtitle}</p>
             </div>
 
-            {/* Table */}
+            {/* Table — Equipment as columns, check rows going down */}
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
                 <thead>
+                    {/* Row 1: Equipment icons + names */}
                     <tr>
-                        <th style={{ ...thStyle, width: "30px", textAlign: "center" }}>#</th>
-                        <th style={{ ...thStyle, width: "160px", textAlign: "left" }}>อุปกรณ์</th>
-                        <th style={{ ...thStyle, width: "70px", textAlign: "center" }}>กำหนดการ</th>
-                        <th style={{ ...thStyle, width: "130px", textAlign: "left" }}>รายละเอียดเช็ค</th>
-                        {Array.from({ length: DATE_COLUMNS }).map((_, i) => (
-                            <th key={i} style={{ ...thStyle, textAlign: "center", width: "auto", minWidth: "40px" }}>
-                                ครั้งที่ {i + 1}
+                        <th style={{ ...thStyle, width: "60px", textAlign: "center" }} rowSpan={3}>ครั้งที่</th>
+                        <th style={{ ...thStyle, width: "90px", textAlign: "center" }} rowSpan={3}>วัน/เดือน/ปี</th>
+                        {equipmentList.map((eq, idx) => (
+                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "18px", paddingBottom: "2px" }}>
+                                {eq.icon}
+                            </th>
+                        ))}
+                        <th style={{ ...thStyle, textAlign: "center" }} rowSpan={3}>ผู้ตรวจ</th>
+                    </tr>
+                    <tr>
+                        {equipmentList.map((eq, idx) => (
+                            <th key={idx} style={{ ...thStyle, textAlign: "center", fontSize: "10px", fontWeight: 700, paddingTop: "2px" }}>
+                                {eq.name}
                             </th>
                         ))}
                     </tr>
+                    {/* Row 2: Interval labels */}
                     <tr>
-                        <th style={subThStyle}></th>
-                        <th style={subThStyle}></th>
-                        <th style={subThStyle}></th>
-                        <th style={subThStyle}></th>
-                        {Array.from({ length: DATE_COLUMNS }).map((_, i) => (
-                            <th key={i} style={{ ...subThStyle, textAlign: "center", fontSize: "9px", color: "#999" }}>
-                                วัน/เดือน/ปี
+                        {equipmentList.map((eq, idx) => (
+                            <th key={idx} style={{ ...subThStyle, textAlign: "center", fontSize: "9px", color: "#d97706", fontWeight: 600 }}>
+                                {eq.intervalLabel}
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {equipmentList.map((eq, idx) => (
-                        <tr key={idx}>
-                            <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700 }}>{idx + 1}</td>
-                            <td style={{ ...tdStyle, fontWeight: 600 }}>
-                                <span>{eq.icon} {eq.name}</span>
-                            </td>
-                            <td style={{ ...tdStyle, textAlign: "center", fontSize: "10px", fontWeight: 600, color: "#d97706" }}>{eq.intervalLabel}</td>
-                            <td style={{ ...tdStyle, fontSize: "9px", color: "#555" }}>{eq.description}</td>
-                            {Array.from({ length: DATE_COLUMNS }).map((_, i) => (
-                                <td key={i} style={{ ...tdStyle, height: "40px" }}></td>
+                    {Array.from({ length: CHECK_ROWS }).map((_, rowIdx) => (
+                        <tr key={rowIdx}>
+                            <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700, fontSize: "12px" }}>{rowIdx + 1}</td>
+                            <td style={{ ...tdStyle, height: "36px" }}></td>
+                            {equipmentList.map((_, colIdx) => (
+                                <td key={colIdx} style={{ ...tdStyle, textAlign: "center" }}>
+                                    {/* Empty cell — technician marks ✓ */}
+                                </td>
                             ))}
+                            <td style={{ ...tdStyle }}></td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
+            {/* Description legend */}
+            <div style={{ marginTop: "12px", fontSize: "9px", color: "#555", border: "1px solid #ccc", borderRadius: "4px", padding: "8px" }}>
+                <strong>📝 รายละเอียดการตรวจเช็ค:</strong>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "4px" }}>
+                    {equipmentList.map((eq, idx) => (
+                        <span key={idx}>{eq.icon} {eq.name}: <em>{eq.description}</em></span>
+                    ))}
+                </div>
+            </div>
+
             {/* Signature area */}
-            <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between", fontSize: "11px" }}>
+            <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between", fontSize: "11px" }}>
                 <div>
-                    <p style={{ margin: 0 }}>ชื่อผู้ตรวจ: ________________________________</p>
-                    <p style={{ margin: "8px 0 0", color: "#666" }}>ตำแหน่ง: _________________________________</p>
+                    <p style={{ margin: 0 }}>ผู้รับผิดชอบ: ________________________________</p>
                 </div>
                 <div style={{ textAlign: "right" }}>
                     <p style={{ margin: 0 }}>หมายเหตุ: ________________________________</p>
-                    <p style={{ margin: "8px 0 0", color: "#666" }}>_________________________________________</p>
                 </div>
             </div>
         </div>
