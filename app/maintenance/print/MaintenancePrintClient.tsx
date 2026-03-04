@@ -35,7 +35,7 @@ const CHECK_ROWS = 12;
 
 function PrintableTable({ title, subtitle, equipmentList }: { title: string; subtitle: string; equipmentList: Equipment[] }) {
     return (
-        <div className="print-page" style={{ pageBreakAfter: "always", padding: "12mm" }}>
+        <div className="print-page" style={{ pageBreakAfter: "always", padding: "12mm", backgroundColor: "#fff", color: "#000" }}>
             {/* Header */}
             <div style={{ textAlign: "center", marginBottom: "16px", borderBottom: "3px solid #000", paddingBottom: "12px" }}>
                 <h1 style={{ fontSize: "26px", fontWeight: 800, margin: 0 }}>🔧 ตารางบันทึกการบำรุงรักษา</h1>
@@ -177,7 +177,7 @@ export default function MaintenancePrintClient({ rooms }: { rooms: RoomInfo[] })
             </div>
 
             {/* Printable Content */}
-            <div className="print-content">
+            <div className="print-content bg-white dark:bg-white rounded-xl">
                 {(printType === "all" || printType === "common") && (
                     <PrintableTable
                         title="ส่วนกลาง"
