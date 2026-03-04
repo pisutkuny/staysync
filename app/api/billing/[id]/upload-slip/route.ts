@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function POST(
     req: Request,
@@ -78,6 +79,10 @@ export async function POST(
                 paymentStatus: "Review" // Status changes to Review
             }
         });
+
+        // Bust the cache so UI reflects the new status immediately
+        revalidatePath('/billing');
+        revalidatePath('/dashboard');
 
         // Send Line notification to admin
         try {

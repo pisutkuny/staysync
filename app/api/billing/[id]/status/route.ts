@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function PATCH(
     request: Request,
@@ -16,6 +17,10 @@ export async function PATCH(
             data: { paymentStatus: status },
             include: { resident: true, room: true }
         });
+
+        // Bust the cache so UI reflects the new status immediately
+        revalidatePath('/billing');
+        revalidatePath('/dashboard');
 
         // Notify Resident via Line (Integration)
         const lineUserId = billing.resident?.lineUserId;

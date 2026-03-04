@@ -53,8 +53,9 @@ export async function POST(
             }
         });
 
-        // Bust the billing cache so UI reflects the new status immediately
+        // Bust the cache so UI reflects the new status immediately
         revalidatePath('/billing');
+        revalidatePath('/dashboard');
 
         // Send Line notification to customer
         if (bill.resident?.lineUserId) {
