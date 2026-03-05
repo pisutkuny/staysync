@@ -28,9 +28,33 @@ export async function GET(req: Request) {
 
         console.log(`Found ${recurringTemplates.length} recurring templates to process`);
 
+        // Start and end of the current month for idempotency check
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+
         // Create expenses from templates
         const created = [];
         for (const template of recurringTemplates) {
+            // Check if expense already created for this template in the current month
+            const existingExpense = await prisma.expense.findFirst({
+                where: {
+                    title: template.title,
+                    organizationId: template.organizationId,
+                    date: {
+                        gte: startOfMonth,
+                        lte: endOfMonth
+                    },
+                    note: {
+                        contains: 'Auto-created from recurring template'
+                    }
+                }
+            });
+
+            if (existingExpense) {
+                console.log(`Expense for template "${template.title}" already exists for this month. Skipping.`);
+                continue;
+            }
+
             const expense = await prisma.expense.create({
                 data: {
                     title: template.title,
