@@ -69,10 +69,13 @@ export async function sendRepairStatusUpdate(userId: string, issueId: number, st
         default: statusText = status;
     }
 
-    const message = `🔔 อัปเดตสถานะงานซ่อม (Request #${issueId})\n\n` +
-        `รายการ: ${description}\n` +
-        `สถานะใหม่: ${statusText}\n\n` +
-        `ขอบคุณครับ 🙏`;
+    const message = `🔔 แจ้งอัปเดตสถานะงานซ่อม\n\n` +
+        `สวัสดีครับ ขอแจ้งความคืบหน้างานซ่อมของท่านดังนี้ครับ\n\n` +
+        `📋 รายการ: ${description}\n` +
+        `🔢 เลขที่คำขอ: #${issueId}\n` +
+        `📌 สถานะ: ${statusText}\n\n` +
+        `หากท่านมีข้อสงสัยหรือต้องการสอบถามเพิ่มเติม สามารถติดต่อเจ้าหน้าที่ได้ตลอดเวลาครับ\n` +
+        `ขอบพระคุณที่ไว้วางใจครับ 🙏`;
 
     if (afterPhoto && status === "Done") {
         await sendLineImageMessage(userId, message, afterPhoto);

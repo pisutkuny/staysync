@@ -144,7 +144,7 @@ export async function POST(req: Request) {
                     } catch (e) {
                         console.error("Failed to push flex message:", e);
                         // Fallback to text message
-                        await sendLineMessage(resident.lineUserId, `บิลค่าเช่ามาแล้วครับ ยอด ${totalAmount} บาท (ดูรายละเอียดในเมนู Bill)`);
+                        await sendLineMessage(resident.lineUserId, `🧾 แจ้งค่าใช้จ่ายประจำเดือน\n\nสวัสดีครับ ขอแจ้งให้ท่านทราบว่าใบแจ้งค่าใช้จ่ายของท่านพร้อมแล้วครับ\n\n🏠 ห้อง: ${room.number}\n💰 ยอดรวม: ${totalAmount.toLocaleString()} บาท\n\nท่านสามารถดูรายละเอียดและชำระเงินได้ที่เมนู "Bill" ด้านล่างครับ\n\nขอบพระคุณครับ 🙏`);
                     }
                 }
             }

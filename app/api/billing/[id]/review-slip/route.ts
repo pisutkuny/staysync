@@ -64,9 +64,19 @@ export async function POST(
 
                 let message;
                 if (action === "approve") {
-                    message = `✅ การชำระเงินได้รับการอนุมัติแล้ว!\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nสถานะ: ชำระแล้ว\n\nขอบคุณที่ชำระเงินครับ 🙏`;
+                    message = `✅ การชำระเงินได้รับการอนุมัติเรียบร้อยแล้ว\n\n` +
+                        `สวัสดีครับ ขอแจ้งให้ท่านทราบว่าสลิปการชำระเงินของท่านได้ผ่านการตรวจสอบแล้วครับ\n\n` +
+                        `🏠 ห้อง: ${bill.room.number}\n` +
+                        `💰 ยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\n` +
+                        `📌 สถานะ: ชำระแล้ว\n\n` +
+                        `ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏`;
                 } else {
-                    message = `❌ การชำระเงินไม่ผ่านการอนุมัติ\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\n\nเหตุผล: ${note || "ไม่ระบุ"}\n\nกรุณาอัปโหลดสลิปใหม่อีกครั้ง`;
+                    message = `❌ แจ้งผลการตรวจสอบสลิปการชำระเงิน\n\n` +
+                        `สวัสดีครับ ขออภัยในความไม่สะดวก สลิปการชำระเงินของท่านยังไม่ผ่านการอนุมัติครับ\n\n` +
+                        `🏠 ห้อง: ${bill.room.number}\n` +
+                        `💰 ยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\n` +
+                        `📋 เหตุผล: ${note || "ไม่ระบุ"}\n\n` +
+                        `กรุณาอัปโหลดสลิปใหม่อีกครั้งนะครับ หากท่านมีข้อสงสัย สามารถติดต่อเจ้าหน้าที่ได้ตลอดเวลาครับ 🙏`;
                 }
 
                 await sendLineMessage(bill.resident.lineUserId, message);

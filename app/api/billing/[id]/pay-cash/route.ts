@@ -97,7 +97,13 @@ export async function POST(
             try {
                 const { sendLineMessage } = await import("@/lib/line");
                 const methodLabel = isTransfer ? 'โอนเงิน' : 'เงินสด';
-                const message = `✅ ยืนยันการชำระเงิน (${methodLabel})\n\nห้อง: ${bill.room.number}\nยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\nสถานะ: ชำระแล้ว\n\nขอบคุณที่ชำระเงินครับ 🙏`;
+                const message = `✅ ยืนยันการชำระเงินเรียบร้อยแล้ว\n\n` +
+                    `สวัสดีครับ ขอแจ้งให้ท่านทราบว่าการชำระเงินของท่านได้รับการยืนยันเรียบร้อยแล้วครับ\n\n` +
+                    `🏠 ห้อง: ${bill.room.number}\n` +
+                    `💰 ยอดเงิน: ${bill.totalAmount.toLocaleString()} บาท\n` +
+                    `💳 ช่องทาง: ${methodLabel}\n` +
+                    `📌 สถานะ: ชำระแล้ว\n\n` +
+                    `ขอบพระคุณที่ชำระเงินตรงเวลาครับ หากท่านมีข้อสงสัยประการใด สามารถติดต่อเจ้าหน้าที่ได้ตลอดเวลาครับ 🙏`;
                 await sendLineMessage(bill.resident.lineUserId, message);
             } catch (lineError) {
                 console.error("Failed to send customer notification:", lineError);

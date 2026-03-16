@@ -25,10 +25,12 @@ export async function PATCH(
         // Notify Resident via Line (Integration)
         const lineUserId = billing.resident?.lineUserId;
         if (lineUserId && status === "Paid") {
-            const message = `✅ ยืนยันการชำระเงิน\n` +
-                `ห้อง: ${billing.room.number}\n` +
-                `ยอดเงิน: ${billing.totalAmount} บาท\n` +
-                `ขอบคุณครับ`;
+            const message = `✅ ยืนยันการชำระเงินเรียบร้อยแล้ว\n\n` +
+                `สวัสดีครับ ขอแจ้งให้ท่านทราบว่าการชำระเงินของท่านได้รับการยืนยันเรียบร้อยแล้วครับ\n\n` +
+                `🏠 ห้อง: ${billing.room.number}\n` +
+                `💰 ยอดเงิน: ${billing.totalAmount.toLocaleString()} บาท\n` +
+                `📌 สถานะ: ชำระแล้ว\n\n` +
+                `ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏`;
 
             try {
                 const { sendLineMessage } = await import("@/lib/line");

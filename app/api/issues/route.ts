@@ -66,12 +66,13 @@ export async function POST(request: Request) {
             const roomText = resident?.room?.number || "Public/Guest";
             const reporterText = resident?.fullName || reporterName || "Unknown";
 
-            const message = `🔔 แจ้งซ่อมใหม่!\n` +
-                `ห้อง: ${roomText}\n` +
-                `ผู้แจ้ง: ${reporterText}\n` +
-                `ปัญหา: ${category}\n` +
-                `รายละเอียด: ${description}\n` +
-                `รูปภาพ: ${photo || "-"}`;
+            const message = `🔔 แจ้งเตือน: มีงานซ่อมใหม่\n\n` +
+                `🏠 ห้อง: ${roomText}\n` +
+                `👤 ผู้แจ้ง: ${reporterText}\n` +
+                `📂 หมวดหมู่: ${category}\n` +
+                `📋 รายละเอียด: ${description}\n` +
+                `📷 รูปภาพ: ${photo || "-"}\n\n` +
+                `กรุณาเข้าระบบเพื่อตรวจสอบและดำเนินการครับ`;
 
             try {
                 const { sendLineMessage } = await import("@/lib/line");

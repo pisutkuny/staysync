@@ -57,7 +57,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "🔧 แจ้งซ่อม: กรุณาพิมพ์แจ้งปัญหาที่คุณพบได้เลยครับ\n(เช่น แอร์ไม่เย็น, ท่อน้ำรั่ว)"
+                            text: "🔧 บริการแจ้งซ่อม\n\nสวัสดีครับ กรุณาพิมพ์รายละเอียดปัญหาที่ท่านพบได้เลยครับ\n\nตัวอย่างเช่น:\n• แอร์ไม่เย็น\n• ท่อน้ำรั่ว\n• ไฟไม่ติด\n\nเจ้าหน้าที่จะรับเรื่องและดำเนินการให้โดยเร็วที่สุดครับ"
                         });
                     }
                     return;
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `🆔 User ID ของคุณคือ:\n\n${userId}\n\n(สามารถคัดลอกรหัสนี้ส่งให้ดูแลหอพักได้เลยครับ)`
+                            text: `🆔 ข้อมูล User ID ของท่าน\n\n${userId}\n\nกรุณาคัดลอกรหัสนี้ส่งให้เจ้าหน้าที่ดูแลหอพักเพื่อทำการยืนยันตัวตนครับ`
                         });
                     }
                     return;
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
                             if (client) {
                                 await client.replyMessage(event.replyToken, {
                                     type: "text",
-                                    text: "✅ ไม่มียอดค้างชำระครับ\n\n(คุณยังไม่มีประวัติการแจ้งบิลในระบบ)"
+                                    text: "✅ ไม่มียอดค้างชำระ\n\nสวัสดีครับ ขณะนี้ท่านไม่มียอดค้างชำระในระบบครับ\n\nหากท่านมีข้อสงสัยเกี่ยวกับบิลค่าใช้จ่าย สามารถติดต่อเจ้าหน้าที่ได้ตลอดเวลาครับ 🙏"
                                 });
                             }
                         } else {
@@ -166,7 +166,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `📶 ข้อมูล Wi-Fi\n\nSSID: ${sysConfig.wifiSsid}\nPassword: ${sysConfig.wifiPassword}\n\n(หากเชื่อมต่อไม่ได้ แจ้งแอดมินได้เลยครับ)`
+                            text: `📶 ข้อมูล Wi-Fi ของหอพัก\n\nสวัสดีครับ ข้อมูลสำหรับเชื่อมต่อ Wi-Fi มีดังนี้ครับ\n\n🌐 ชื่อเครือข่าย (SSID): ${sysConfig.wifiSsid}\n🔑 รหัสผ่าน: ${sysConfig.wifiPassword}\n\nหากท่านเชื่อมต่อไม่ได้หรือสัญญาณมีปัญหา สามารถแจ้งเจ้าหน้าที่ได้ตลอดเวลาครับ 🙏`
                         });
                     }
                     return;
@@ -177,7 +177,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `📘 กฎระเบียบหอพัก\n\n${sysConfig.rulesText}\n\nขอบคุณที่ให้ความร่วมมือครับ 🙏`
+                            text: `📘 กฎระเบียบหอพัก\n\nสวัสดีครับ กฎระเบียบของหอพักมีดังนี้ครับ\n\n${sysConfig.rulesText}\n\nขอบพระคุณที่ให้ความร่วมมือครับ 🙏`
                         });
                     }
                     return;
@@ -188,7 +188,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `📞 ติดต่อเจ้าหน้าที่\n\nโทร: ${sysConfig.adminPhone}\nLine: ${sysConfig.adminLineIdDisplay}\n(ฉุกเฉิน: ${sysConfig.emergencyPhone})`
+                            text: `📞 ช่องทางติดต่อเจ้าหน้าที่\n\nสวัสดีครับ ท่านสามารถติดต่อเจ้าหน้าที่ได้ตามช่องทางดังนี้ครับ\n\n📱 โทรศัพท์: ${sysConfig.adminPhone}\n💬 Line: ${sysConfig.adminLineIdDisplay}\n🚨 กรณีฉุกเฉิน: ${sysConfig.emergencyPhone}\n\nเจ้าหน้าที่พร้อมให้บริการท่านครับ 🙏`
                         });
                     }
                     return;
@@ -233,7 +233,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `✅ รับเรื่องเรียบร้อยครับ! (Ticket #${issue.id})\n\nปัญหา: "${description}"\nเราจะรีบตรวจสอบให้นะครับ`
+                            text: `✅ รับเรื่องแจ้งซ่อมเรียบร้อยแล้วครับ\n\n🔢 เลขที่คำขอ: #${issue.id}\n📋 รายละเอียด: "${description}"\n📌 สถานะ: รอดำเนินการ\n\nเจ้าหน้าที่จะตรวจสอบและดำเนินการให้โดยเร็วที่สุดครับ\nท่านจะได้รับแจ้งอัปเดตสถานะผ่านช่องทางนี้ครับ 🙏`
                         });
                     }
 
@@ -242,7 +242,7 @@ export async function POST(req: Request) {
                     if (ownerLineId) {
                         const roomText = resident?.room?.number || "Guest";
                         const nameText = resident?.fullName || reporterName;
-                        await sendLineMessage(ownerLineId, `🔔 แจ้งซ่อมใหม่ (Chatbot)\nห้อง: ${roomText}\nผู้แจ้ง: ${nameText}\nปัญหา: ${description}`);
+                        await sendLineMessage(ownerLineId, `🔔 แจ้งเตือน: มีงานซ่อมใหม่จาก Chatbot\n\n🏠 ห้อง: ${roomText}\n👤 ผู้แจ้ง: ${nameText}\n📋 ปัญหา: ${description}\n\nกรุณาเข้าระบบเพื่อตรวจสอบและดำเนินการครับ`);
                     }
 
                     // Reset State
@@ -274,14 +274,14 @@ export async function POST(req: Request) {
                         if (client) {
                             await client.replyMessage(event.replyToken, {
                                 type: "text",
-                                text: `✅ เชื่อมต่อบัญชีสำเร็จ!\nคุณคือ: ${resident.fullName}\nห้อง: ${resident.room?.number || 'ไม่ระบุ'}\n\nจากนี้คุณจะได้รับการแจ้งเตือนบิลและข่าวสารผ่านช่องทางนี้ครับ`
+                                text: `✅ เชื่อมต่อบัญชีสำเร็จเรียบร้อยแล้วครับ\n\n👤 ชื่อ: ${resident.fullName}\n🏠 ห้อง: ${resident.room?.number || 'ไม่ระบุ'}\n\nตั้งแต่บัดนี้เป็นต้นไป ท่านจะได้รับการแจ้งเตือนบิลค่าใช้จ่าย ข่าวสาร และประกาศต่างๆ ผ่านช่องทางนี้ครับ\n\nขอบพระคุณครับ 🙏`
                             });
                         }
                     } else {
                         if (client) {
                             await client.replyMessage(event.replyToken, {
                                 type: "text",
-                                text: "❌ รหัสยืนยันไม่ถูกต้อง หรือถูกใช้ไปแล้ว"
+                                text: "❌ ไม่สามารถยืนยันตัวตนได้\n\nรหัสยืนยันที่ท่านป้อนไม่ถูกต้อง หรือถูกใช้งานไปแล้วครับ\n\nกรุณาตรวจสอบรหัสอีกครั้ง หรือติดต่อเจ้าหน้าที่เพื่อขอรับรหัสใหม่ครับ 🙏"
                             });
                         }
                     }
@@ -298,7 +298,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: "เริ่มการแจ้งซ่อม: กรุณาพิมพ์รายละเอียดปัญหาได้เลยครับ"
+                            text: "🔧 บริการแจ้งซ่อม\n\nสวัสดีครับ กรุณาพิมพ์รายละเอียดปัญหาที่ท่านพบได้เลยครับ\nเจ้าหน้าที่จะรับเรื่องและดำเนินการให้โดยเร็วที่สุดครับ"
                         });
                     }
                     return;
@@ -326,7 +326,7 @@ export async function POST(req: Request) {
                     if (client) {
                         await client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: `สวัสดีครับ ยินดีต้อนรับสู่ ${dormName} 🏡✨\n\nกรุณาพิมพ์ myid ส่งเข้ามาในแชท เพื่อยืนยันสถานะการเข้าพักและเริ่มใช้งานระบบครับ`
+                            text: `🏡 สวัสดีครับ ยินดีต้อนรับสู่ ${dormName} ✨\n\nขอบพระคุณที่เพิ่มเพื่อนกับเราครับ\n\nหากท่านเป็นผู้เช่าของหอพัก กรุณาพิมพ์ myid ส่งเข้ามาในแชท เพื่อรับรหัสยืนยันตัวตนและเริ่มใช้งานระบบครับ\n\nหากมีข้อสงสัย สามารถพิมพ์ "Admin" เพื่อดูช่องทางติดต่อเจ้าหน้าที่ได้ครับ 🙏`
                         });
                     }
                     console.log(`New follower: ${userId}`);

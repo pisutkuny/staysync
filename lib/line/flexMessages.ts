@@ -185,7 +185,7 @@ export function createInvoiceFlexMessage(
                     } as FlexComponent] : []),
                     {
                         "type": "text",
-                        "text": isPaid ? "ขอบพระคุณที่ชำระค่าเช่าครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน",
+                        "text": isPaid ? "ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน ขอบพระคุณครับ",
                         "size": "xs",
                         "color": "#aaaaaa",
                         "align": "center",
