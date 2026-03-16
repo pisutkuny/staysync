@@ -450,6 +450,7 @@ model Organization {
   auditLogs     AuditLog[]
   systemConfig  SystemConfig?
   recurringExpenses RecurringExpense[]
+  maintenanceChecks MaintenanceCheck[]
 
   @@index([slug])
   @@index([status])
@@ -497,4 +498,18 @@ model AuditLog {
   @@index([organizationId])
   @@index([createdAt])
   @@index([action])
+}
+
+model MaintenanceCheck {
+  id          Int      @id @default(autoincrement())
+  equipmentId String   // e.g. "air-conditioner", "water-pump"
+  scope       String   // "common" or "room-{roomId}"
+  note        String   @default("ตรวจเช็คเรียบร้อย")
+  checkedAt   DateTime @default(now())
+
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, scope, equipmentId])
+  @@index([checkedAt])
 }

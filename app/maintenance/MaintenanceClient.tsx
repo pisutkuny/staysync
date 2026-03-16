@@ -37,6 +37,7 @@ const ROOM_EQUIPMENT: Equipment[] = [
 // Types
 // ==========================================
 interface CheckRecord {
+    id: number;
     date: string;
     note: string;
 }
@@ -52,31 +53,28 @@ interface RoomInfo {
 
 type ViewMode = "common" | "rooms";
 
-const STORAGE_KEY = "staysync-maintenance-v2";
-
 // ==========================================
-// Helpers
+// API Helpers
 // ==========================================
-function loadData(): MaintenanceData {
-    if (typeof window === "undefined") return {};
-    try {
-        // Migrate v1 data
-        const v1 = localStorage.getItem("staysync-maintenance-v1");
-        if (v1) {
-            const old = JSON.parse(v1);
-            const migrated: MaintenanceData = {};
-            Object.keys(old).forEach(k => { migrated[`common:${k}`] = old[k]; });
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-            localStorage.removeItem("staysync-maintenance-v1");
-            return migrated;
-        }
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : {};
-    } catch { return {}; }
+async function fetchData(): Promise<MaintenanceData> {
+    const res = await fetch("/api/maintenance");
+    if (!res.ok) return {};
+    return res.json();
 }
 
-function saveData(data: MaintenanceData) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+async function postCheck(equipmentId: string, scope: string, note: string): Promise<CheckRecord | null> {
+    const res = await fetch("/api/maintenance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ equipmentId, scope, note }),
+    });
+    if (!res.ok) return null;
+    return res.json();
+}
+
+async function deleteCheck(id: number): Promise<boolean> {
+    const res = await fetch(`/api/maintenance?id=${id}`, { method: "DELETE" });
+    return res.ok;
 }
 
 function getDataKey(equipmentId: string, scope: string) {
@@ -118,22 +116,27 @@ function EquipmentCard({ eq, records, scope, data, setData }: {
     const statusTextColor = status.color === "red" ? "text-red-600" : status.color === "amber" ? "text-amber-600" : "text-emerald-600";
     const statusBgColor = status.color === "red" ? "bg-red-100" : status.color === "amber" ? "bg-amber-100" : "bg-emerald-100";
 
-    const handleCheck = () => {
-        const updated = { ...data };
-        if (!updated[key]) updated[key] = [];
-        updated[key].push({ date: new Date().toISOString(), note: noteInput.trim() || "ตรวจเช็คเรียบร้อย" });
-        saveData(updated);
-        setData(updated);
+    const handleCheck = async () => {
+        const note = noteInput.trim() || "ตรวจเช็คเรียบร้อย";
+        const result = await postCheck(eq.id, scope, note);
+        if (result) {
+            const updated = { ...data };
+            if (!updated[key]) updated[key] = [];
+            updated[key].push(result);
+            setData(updated);
+        }
         setIsChecking(false);
         setNoteInput("");
     };
 
-    const handleDelete = (idx: number) => {
-        const updated = { ...data };
-        if (updated[key]) {
-            updated[key].splice(idx, 1);
-            saveData(updated);
-            setData(updated);
+    const handleDelete = async (record: CheckRecord) => {
+        const ok = await deleteCheck(record.id);
+        if (ok) {
+            const updated = { ...data };
+            if (updated[key]) {
+                updated[key] = updated[key].filter(r => r.id !== record.id);
+                setData(updated);
+            }
         }
     };
 
@@ -186,7 +189,7 @@ function EquipmentCard({ eq, records, scope, data, setData }: {
                                         <span className="text-xs font-bold text-gray-700">{formatDate(record.date)}</span>
                                         <span className="text-xs text-gray-500 ml-2">{record.note}</span>
                                     </div>
-                                    <button onClick={() => handleDelete(records.length - 1 - idx)}
+                                    <button onClick={() => handleDelete(record)}
                                         className="text-red-400 hover:text-red-600 text-xs font-bold px-2 py-1 hover:bg-red-50 rounded transition-colors">ลบ</button>
                                 </div>
                             ))}
@@ -236,7 +239,11 @@ export default function MaintenanceClient({ rooms }: { rooms: RoomInfo[] }) {
     const [viewMode, setViewMode] = useState<ViewMode>("common");
     const [selectedRoom, setSelectedRoom] = useState<RoomInfo | null>(rooms[0] || null);
 
-    useEffect(() => { setData(loadData()); }, []);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchData().then(d => { setData(d); setLoading(false); });
+    }, []);
 
     const currentScope = viewMode === "common" ? "common" : `room-${selectedRoom?.id}`;
     const currentEquipment = viewMode === "common" ? COMMON_EQUIPMENT : ROOM_EQUIPMENT;
@@ -356,7 +363,7 @@ export default function MaintenanceClient({ rooms }: { rooms: RoomInfo[] }) {
             {/* Info */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center">
                 <p className="text-sm text-blue-700 font-medium">
-                    💡 ข้อมูลจะเก็บบนเครื่องนี้ (localStorage) — ไม่หายแม้ปิดเบราว์เซอร์
+                    💡 ข้อมูลเก็บออนไลน์ — เข้าจากเครื่องไหนก็เห็นข้อมูลเดียวกัน
                 </p>
             </div>
         </div>
