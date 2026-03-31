@@ -67,53 +67,63 @@ export default function BillDetailsModal({ bill, onClose }: BillDetailsModalProp
                         {/* Utilities */}
                         <div className="space-y-2">
                             {/* Water */}
-                            <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                <span className="flex items-center gap-2 text-slate-600">
-                                    <Droplets size={16} className="text-blue-500" />
-                                    {t.billing.water} ({bill.waterMeterCurrent - bill.waterMeterLast} units)
-                                </span>
-                                <span className="font-mono font-medium text-slate-900">฿{waterTotal.toLocaleString()}</span>
+                            <div className="flex justify-between items-start text-sm p-3 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="flex items-center gap-2 text-slate-700 font-bold">
+                                        <Droplets size={16} className="text-blue-500" />
+                                        {t.billing.water}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 ml-6 font-medium bg-blue-50 w-fit px-1.5 py-0.5 rounded">
+                                        {bill.waterMeterLast.toLocaleString()} → {bill.waterMeterCurrent.toLocaleString()} ({(bill.waterMeterCurrent - bill.waterMeterLast).toLocaleString()} {t.dashboard.unit})
+                                    </span>
+                                </div>
+                                <span className="font-mono font-bold text-slate-900 mt-1">฿{waterTotal.toLocaleString()}</span>
                             </div>
 
                             {/* Electric */}
-                            <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                <span className="flex items-center gap-2 text-slate-600">
-                                    <Zap size={16} className="text-amber-500" />
-                                    {t.billing.electric} ({bill.electricMeterCurrent - bill.electricMeterLast} units)
-                                </span>
-                                <span className="font-mono font-medium text-slate-900">฿{electricTotal.toLocaleString()}</span>
+                            <div className="flex justify-between items-start text-sm p-3 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="flex items-center gap-2 text-slate-700 font-bold">
+                                        <Zap size={16} className="text-amber-500" />
+                                        {t.billing.electric}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 ml-6 font-medium bg-amber-50 w-fit px-1.5 py-0.5 rounded">
+                                        {bill.electricMeterLast.toLocaleString()} → {bill.electricMeterCurrent.toLocaleString()} ({(bill.electricMeterCurrent - bill.electricMeterLast).toLocaleString()} {t.dashboard.unit})
+                                    </span>
+                                </div>
+                                <span className="font-mono font-bold text-slate-900 mt-1">฿{electricTotal.toLocaleString()}</span>
                             </div>
 
                             {/* Internet */}
                             {(bill.internetFee > 0) && (
-                                <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <span className="flex items-center gap-2 text-slate-600">
+                                <div className="flex justify-between items-center text-sm p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                    <span className="flex items-center gap-2 text-slate-600 font-bold">
                                         <Wifi size={16} className="text-sky-500" />
                                         {t.billing.internet}
                                     </span>
-                                    <span className="font-mono font-medium text-slate-900">฿{bill.internetFee.toLocaleString()}</span>
+                                    <span className="font-mono font-bold text-slate-900">฿{bill.internetFee.toLocaleString()}</span>
                                 </div>
                             )}
 
                             {/* Common Fee */}
                             {commonFee > 0 && (
-                                <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <span className="flex items-center gap-2 text-slate-600">
+                                <div className="flex justify-between items-center text-sm p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                    <span className="flex items-center gap-2 text-slate-600 font-bold">
                                         <Home size={16} className="text-emerald-500" />
-                                        Common Fees
+                                        {t.billing.commonFee}
                                     </span>
-                                    <span className="font-mono font-medium text-slate-900">฿{commonFee.toLocaleString()}</span>
+                                    <span className="font-mono font-bold text-slate-900">฿{commonFee.toLocaleString()}</span>
                                 </div>
                             )}
 
                             {/* Trash */}
                             {(bill.trashFee > 0) && (
-                                <div className="flex justify-between items-center text-sm p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                                    <span className="flex items-center gap-2 text-slate-600">
+                                <div className="flex justify-between items-center text-sm p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                    <span className="flex items-center gap-2 text-slate-600 font-bold">
                                         <Trash2 size={16} className="text-gray-500" />
-                                        Trash
+                                        {t.billing.trash}
                                     </span>
-                                    <span className="font-mono font-medium text-slate-900">฿{bill.trashFee.toLocaleString()}</span>
+                                    <span className="font-mono font-bold text-slate-900">฿{bill.trashFee.toLocaleString()}</span>
                                 </div>
                             )}
                         </div>
