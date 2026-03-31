@@ -460,13 +460,13 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                             </span>
                                             {isOccupied && (
                                                 <span className="inline-block mt-1 w-fit px-2 py-0.5 rounded-full bg-slate-900/10 text-slate-900 text-[10px] font-bold uppercase tracking-wider">
-                                                    Occupied
+                                                    {t.status.Occupied}
                                                 </span>
                                             )}
                                         </div>
                                         {!isOccupied && (
                                             <div className="mt-1 text-xs font-bold text-slate-600 uppercase tracking-widest">
-                                                Vacant Unit
+                                                {t.rooms.emptyRoom}
                                             </div>
                                         )}
                                     </div>
@@ -476,7 +476,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                             {status === 'Pending' && <Clock size={12} strokeWidth={3} />}
                                             {status === 'Overdue' && <AlertTriangle size={12} strokeWidth={3} />}
                                             {status === 'Rejected' && <XCircle size={12} strokeWidth={3} />}
-                                            {status}
+                                            {(t.billing as any)[`status${status}`] || status}
                                         </div>
                                     )}
                                 </div>
@@ -501,20 +501,20 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 {room.residents[0]?.fullName || <span className="text-slate-500 italic">No Resident</span>}
                                             </p>
                                             <p className="text-xs text-slate-600 truncate font-bold uppercase">
-                                                Primary Resident
+                                                {t.residents.fullName}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="mt-auto px-1">
                                         <div className="flex justify-between items-end mb-1">
-                                            <p className="text-xs text-slate-600 uppercase tracking-wider font-extrabold">Total Bill</p>
+                                            <p className="text-xs text-slate-600 uppercase tracking-wider font-extrabold">{t.billing.total}</p>
                                             {bill && (
                                                 <button
                                                     onClick={() => setSelectedBill(bill)}
                                                     className="text-xs text-indigo-700 font-bold cursor-pointer hover:underline hover:text-indigo-800 transition-colors"
                                                 >
-                                                    See Breakdown
+                                                    {t.billing.billDetails}
                                                 </button>
                                             )}
                                         </div>
@@ -533,15 +533,17 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                 <div className="flex-1 flex gap-2">
                                                     <button
                                                         onClick={() => handleCashPayment(bill.id)}
-                                                        className="flex-1 flex items-center justify-center gap-1.5 bg-slate-900 text-white py-3 rounded-lg text-xs font-bold shadow-md hover:bg-black transition-all active:scale-95"
+                                                        className="flex-1 flex flex-col items-center justify-center gap-1 bg-slate-900 text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-tight shadow-md hover:bg-black transition-all active:scale-95"
                                                     >
-                                                        <Banknote size={16} /> Pay Cash
+                                                        <Banknote size={18} />
+                                                        <span>{t.billing.cash}</span>
                                                     </button>
                                                     <button
                                                         onClick={() => openTransferModal(bill.id)}
-                                                        className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-3 rounded-lg text-xs font-bold shadow-md hover:bg-emerald-800 transition-all active:scale-95"
+                                                        className="flex-1 flex flex-col items-center justify-center gap-1 bg-emerald-700 text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-tight shadow-md hover:bg-emerald-800 transition-all active:scale-95"
                                                     >
-                                                        <SendHorizontal size={16} /> Transfer
+                                                        <SendHorizontal size={18} />
+                                                        <span>{t.billing.transfer}</span>
                                                     </button>
                                                 </div>
                                             ) : status === "Review" ? (
@@ -549,7 +551,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                     onClick={() => handleReview(bill.id, "approve")}
                                                     className="flex-1 flex items-center justify-center gap-2 bg-blue-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-blue-900 transition-all active:scale-95"
                                                 >
-                                                    <CheckCircle2 size={18} /> Approve
+                                                    <CheckCircle2 size={18} /> {t.billing.approve}
                                                 </button>
                                             ) : (
                                                 <button
@@ -557,7 +559,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                     disabled={!bill.slipImage}
                                                     className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-black/10 text-slate-800 py-3 rounded-lg text-sm font-bold shadow-sm hover:bg-white/80 transition-all disabled:opacity-50"
                                                 >
-                                                    <ExternalLink size={18} /> View Slip
+                                                    <ExternalLink size={18} /> {t.billing.viewSlip}
                                                 </button>
                                             )}
 
@@ -605,7 +607,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                             href={`/billing/bulk?month=${selectedMonth}`}
                                             className="w-full flex items-center justify-center gap-2 bg-indigo-800 text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-900 transition-all active:scale-95"
                                         >
-                                            Create Bill <ArrowRight size={18} />
+                                            {t.billing.createBill} <ArrowRight size={18} />
                                         </Link>
                                     )}
                                 </div>

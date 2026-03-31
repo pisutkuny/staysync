@@ -266,7 +266,7 @@ export async function getRecentActivity(organizationId: number): Promise<Activit
                 status: i.status
             }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 15); // Show up to 15 items on dashboard
+            .slice(0, 7); // Adjusted to 7 items as requested
     };
 
     return unstable_cache(
