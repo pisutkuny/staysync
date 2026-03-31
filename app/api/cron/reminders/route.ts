@@ -55,35 +55,40 @@ export async function GET(request: Request) {
 
         // 3. Send Notifications
         const results = await Promise.all(overdueBills.map(async (bill) => {
-            const resident = bill.room.residents[0];
-            if (!resident || !resident.lineUserId) return { roomId: bill.room.number, status: "skipped" };
+            const notifyResidents = bill.room.residents.filter(r => r.lineUserId);
+            if (notifyResidents.length === 0) return [{ roomId: bill.room.number, status: "skipped" }];
 
             const message = `⚠️ แจ้งเตือนยอดค้างชำระ\n\nห้อง ${bill.room.number} มียอดค้างชำระ ${bill.totalAmount.toLocaleString()} บาท\nประจำรอบบิล ${new Date(bill.createdAt).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}\n\nกรุณาชำระเงินเพื่อหลีกเลี่ยงค่าปรับ ขอบคุณครับ 🙏`;
 
             if (!lineClient) {
                 console.warn("Skipping Line alert: Line Client not initialized");
-                return { roomId: bill.room.number, status: "skipped_no_client" };
+                return [{ roomId: bill.room.number, status: "skipped_no_client" }];
             }
 
-            try {
-                // Using pushMessage (Requires Multicast/Push Plan or simple dev bot)
-                // Note: Standard Line OA free plan allows Limited Push messages. 
-                // If hitting limits, consider just returning list for Admin to manually nudge.
-                await lineClient.pushMessage(resident.lineUserId, {
-                    type: "text",
-                    text: message
-                });
-                return { roomId: bill.room.number, resident: resident.fullName, status: "sent" };
-            } catch (err) {
-                console.error(`Failed to send to ${resident.fullName}:`, err);
-                return { roomId: bill.room.number, status: "failed", error: String(err) };
-            }
+            return await Promise.all(notifyResidents.map(async (resident) => {
+                if (!resident.lineUserId) return { roomId: bill.room.number, resident: resident.fullName, status: "skipped" };
+                try {
+                    // Using pushMessage (Requires Multicast/Push Plan or simple dev bot)
+                    // Note: Standard Line OA free plan allows Limited Push messages. 
+                    // If hitting limits, consider just returning list for Admin to manually nudge.
+                    await lineClient!.pushMessage(resident.lineUserId, {
+                        type: "text",
+                        text: message
+                    });
+                    return { roomId: bill.room.number, resident: resident.fullName, status: "sent" };
+                } catch (err) {
+                    console.error(`Failed to send to ${resident.fullName}:`, err);
+                    return { roomId: bill.room.number, status: "failed", error: String(err) };
+                }
+            }));
         }));
+
+        const flatResults = results.flat();
 
         return NextResponse.json({
             success: true,
-            processed: results.length,
-            details: results
+            processed: flatResults.length,
+            details: flatResults
         });
 
     } catch (error) {

@@ -219,7 +219,7 @@ export async function getRecentActivity(organizationId: number): Promise<Activit
         const [recentBills, recentIssues] = await Promise.all([
             prisma.billing.findMany({
                 where: { organizationId: orgId },
-                take: 5,
+                take: 15, // Increased to capture bulk billings
                 orderBy: { createdAt: 'desc' },
                 select: {
                     id: true,
@@ -231,7 +231,7 @@ export async function getRecentActivity(organizationId: number): Promise<Activit
             }),
             prisma.issue.findMany({
                 where: { organizationId: orgId },
-                take: 5,
+                take: 10,
                 orderBy: { createdAt: 'desc' },
                 select: {
                     id: true,
@@ -266,7 +266,7 @@ export async function getRecentActivity(organizationId: number): Promise<Activit
                 status: i.status
             }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 10);
+            .slice(0, 15); // Show up to 15 items on dashboard
     };
 
     return unstable_cache(

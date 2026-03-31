@@ -107,42 +107,21 @@ export async function POST(req: Request) {
             }
         });
 
-        // Send Line Notification
-        if (residentId) {
-            const resident = await prisma.resident.findUnique({ where: { id: residentId } });
-            if (resident?.lineUserId) {
-                const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
+        // Send Line Notification to ALL residents with Line ID in that room
+        const notifyResidents = room.residents.filter(r => r.lineUserId);
+        
+        if (notifyResidents.length > 0) {
+            const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')}/pay/${newBill.id}`;
+            const config = await prisma.systemConfig.findFirst();
+            const billForFlex = { ...newBill, room };
 
-                const items = [
-                    { label: "ค่าห้อง", value: `${room.price.toLocaleString()} ฿` },
-                    { label: `ค่าน้ำ (${waterUnits} หน่วย)`, value: `${waterCost.toLocaleString()} ฿` },
-                    { label: `ค่าไฟ (${electricUnits} หน่วย)`, value: `${electricCost.toLocaleString()} ฿` },
-                    { label: "ค่าขยะ", value: `${trash.toLocaleString()} ฿` }
-                ];
-
-                if (common > 0) items.push({ label: "ค่าส่วนกลาง", value: `${common.toLocaleString()} ฿` });
-                if (internet > 0) items.push({ label: "ค่าอินเทอร์เน็ต", value: `${internet.toLocaleString()} ฿` });
-                if (other > 0) items.push({ label: "อื่นๆ", value: `${other.toLocaleString()} ฿` });
-
-                // Fetch Config for PromptPay ID
-                const config = await prisma.systemConfig.findFirst();
-
-                // Prepare Data for Flex Message
-                // newBill doesn't have 'room' relation loaded, but we have 'room' object
-                const billForFlex = {
-                    ...newBill,
-                    room: room
-                };
-
-                // Use the Unified Flex Message Function
-                const flexMessage = createInvoiceFlexMessage(billForFlex, resident, config, payUrl);
-
-                // Send Push Message
+            for (const resident of notifyResidents) {
                 if (resident.lineUserId && lineClient) {
                     try {
+                        const flexMessage = createInvoiceFlexMessage(billForFlex, resident, config, payUrl);
                         await lineClient.pushMessage(resident.lineUserId, flexMessage);
                     } catch (e) {
-                        console.error("Failed to push flex message:", e);
+                        console.error(`Failed to push flex message to ${resident.lineUserId}:`, e);
                         // Fallback to text message
                         await sendLineMessage(resident.lineUserId, `🧾 แจ้งค่าใช้จ่ายประจำเดือน\n\nสวัสดีครับ ขอแจ้งให้ท่านทราบว่าใบแจ้งค่าใช้จ่ายของท่านพร้อมแล้วครับ\n\n🏠 ห้อง: ${room.number}\n💰 ยอดรวม: ${totalAmount.toLocaleString()} บาท\n\nท่านสามารถดูรายละเอียดและชำระเงินได้ที่เมนู "Bill" ด้านล่างครับ\n\nขอบพระคุณครับ 🙏`);
                     }

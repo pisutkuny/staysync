@@ -34,26 +34,27 @@ async function processOverdueReminders() {
 
     // 4. Send Notifications
     for (const bill of overdueBills) {
-        let lineUserId = bill.resident?.lineUserId;
+        // Find ALL active residents with Line ID in that room
+        const activeResidents = await prisma.resident.findMany({
+            where: { roomId: bill.roomId, status: "Active", lineUserId: { not: null } },
+            select: { lineUserId: true }
+        });
+        
+        const notifyLineIds = activeResidents.map(r => r.lineUserId as string).filter(Boolean);
 
-        if (!lineUserId && bill.room) {
-            const activeResident = await prisma.resident.findFirst({
-                where: { roomId: bill.roomId, status: "Active", lineUserId: { not: null } }
-            });
-            lineUserId = activeResident?.lineUserId;
-        }
-
-        if (lineUserId && lineClient) {
+        if (notifyLineIds.length > 0 && lineClient) {
             // Use Public Payment URL (No Login Required)
             const payUrl = `${process.env.NEXT_PUBLIC_APP_URL}/pay/${bill.id}`;
             const flexMsg = createOverdueFlexMessage(bill, sysConfig, payUrl);
 
-            try {
-                await lineClient.pushMessage(lineUserId, flexMsg);
-                sentCount++;
-                sentLogs.push(`Sent to Room ${bill.room.number} (${lineUserId})`);
-            } catch (err) {
-                console.error(`Failed to send overdue to ${lineUserId}:`, err);
+            for (const lineId of notifyLineIds) {
+                try {
+                    await lineClient.pushMessage(lineId, flexMsg);
+                    sentCount++;
+                    sentLogs.push(`Sent to Room ${bill.room.number} (${lineId})`);
+                } catch (err) {
+                    console.error(`Failed to send overdue to ${lineId}:`, err);
+                }
             }
         }
     }

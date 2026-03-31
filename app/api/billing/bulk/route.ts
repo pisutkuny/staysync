@@ -50,7 +50,7 @@ export async function POST(req: Request) {
                         residents: {
                             where: { status: "Active" },
                             orderBy: { isMainTenant: 'desc' },
-                            take: 1
+                            // intentionally removed take: 1 to get all active residents for Line notifications
                         }
                     }
                 });
@@ -141,13 +141,13 @@ export async function POST(req: Request) {
                 results.created++;
 
                 // Send Line notification using Flex Message
-                if (room.residents[0]?.lineUserId) {
+                const notifyResidents = room.residents.filter(r => r.lineUserId);
+                if (notifyResidents.length > 0) {
                     try {
                         const { lineClient } = await import("@/lib/line");
                         const { createInvoiceFlexMessage } = await import("@/lib/line/flexMessages");
 
                         const sysConfig = await prisma.systemConfig.findFirst();
-                        const resident = room.residents[0];
 
                         // Find the bill we just created
                         const createdBill = await prisma.billing.findFirst({
@@ -155,12 +155,16 @@ export async function POST(req: Request) {
                             include: { room: true }
                         });
 
-                        if (createdBill && lineClient && resident.lineUserId) {
+                        if (createdBill && lineClient) {
                             const payUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pay/${createdBill.id}`;
                             const billForFlex = { ...createdBill, room };
-                            const flexMessage = createInvoiceFlexMessage(billForFlex, resident, sysConfig, payUrl);
-
-                            await lineClient.pushMessage(resident.lineUserId, flexMessage);
+                            
+                            for (const resident of notifyResidents) {
+                                if (resident.lineUserId) {
+                                    const flexMessage = createInvoiceFlexMessage(billForFlex, resident, sysConfig, payUrl);
+                                    await lineClient.pushMessage(resident.lineUserId, flexMessage);
+                                }
+                            }
                         }
                     } catch (lineError) {
                         console.error(`Failed to send notification to room ${room.number}:`, lineError);
