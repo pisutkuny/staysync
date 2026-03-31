@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle, SendHorizontal, Upload, ImageIcon } from "lucide-react";
+import { Search, Calendar, CheckCircle2, AlertCircle, ArrowRight, Loader2, Bell, Banknote, Trash2, ExternalLink, XCircle, Clock, AlertTriangle, SendHorizontal, Upload, ImageIcon, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
 import Link from "next/link";
@@ -101,6 +101,23 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             showAlert("Error", "❌ Network Error", "error");
         } finally {
             setReminderLoading(false);
+        }
+    };
+
+    const handleSendNotify = async (id: number) => {
+        setLoading(id);
+        try {
+            const res = await fetch(`/api/billing/${id}/notify`, { method: "POST" });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert("Success", "✅ Notification sent successfully", "success");
+            } else {
+                throw new Error(data.error || "Failed to send");
+            }
+        } catch (error: any) {
+            showAlert("Error", `❌ ${error.message}`, "error");
+        } finally {
+            setLoading(null);
         }
     };
 
@@ -564,6 +581,15 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                                         <XCircle size={22} />
                                                     </button>
                                                 )}
+
+                                                <button
+                                                    onClick={() => handleSendNotify(bill.id)}
+                                                    disabled={loading === bill.id}
+                                                    className="w-12 h-12 flex items-center justify-center rounded-lg bg-white border-2 border-black/10 text-emerald-600 hover:text-emerald-900 hover:border-emerald-500 transition-colors shadow-sm disabled:opacity-50"
+                                                    title="Send to Line"
+                                                >
+                                                    {loading === bill.id ? <Loader2 className="animate-spin" size={18} /> : <MessageSquare size={18} />}
+                                                </button>
 
                                                 <button
                                                     onClick={() => handleDelete(bill.id)}
