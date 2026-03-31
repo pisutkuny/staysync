@@ -21,7 +21,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
     const themeColor = config.invoiceColor || "#4f46e5";
 
     // Date Formatters
-    const billDate = new Date(billing.createdAt);
+    const billDate = new Date(billing.month || billing.createdAt);
     const rentMonth = billDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
 
     const prevDate = new Date(billDate);

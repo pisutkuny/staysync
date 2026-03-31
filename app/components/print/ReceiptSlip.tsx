@@ -14,7 +14,7 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
     const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
 
     // Date Formatters
-    const billDate = new Date(billing.createdAt);
+    const billDate = new Date(billing.month || billing.createdAt);
     const rentMonth = billDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
 
     const prevDate = new Date(billDate);
