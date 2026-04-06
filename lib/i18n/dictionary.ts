@@ -457,7 +457,11 @@ export const dictionary = {
             total: "รวมทั้งหมด",
             ownerPays: "(เจ้าของออกค่าส่วนกลาง)",
             saveSuccess: "บันทึกมาตรส่วนกลางสำเร็จ!",
-            error: "เกิดข้อผิดพลาดในการบันทึก"
+            error: "เกิดข้อผิดพลาดในการบันทึก",
+            editMode: "โหมดแก้ไขข้อมูลที่บันทึกไว้แล้ว",
+            update: "อัปเดตข้อมูล",
+            delete: "ลบระเบียนนี้",
+            deleteSuccess: "ลบระเบียนเรียบร้อย!"
         },
         meterDashboard: {
             title: "แดชบอร์ดสถานะมิเตอร์",
@@ -1165,7 +1169,11 @@ export const dictionary = {
             total: "Total",
             ownerPays: "(Owner pays central costs)",
             saveSuccess: "Central meter saved successfully!",
-            error: "Error saving record"
+            error: "Error saving record",
+            editMode: "Editing saved record",
+            update: "Update Record",
+            delete: "Delete Record",
+            deleteSuccess: "Record deleted successfully!"
         },
         meterDashboard: {
             title: "Meter Status Dashboard",
