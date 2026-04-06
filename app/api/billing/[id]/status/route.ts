@@ -22,21 +22,34 @@ export async function PATCH(
         revalidatePath('/billing');
         revalidatePath('/dashboard');
 
-        // Notify Resident via Line (Integration)
-        const lineUserId = billing.resident?.lineUserId;
-        if (lineUserId && status === "Paid") {
-            const message = `✅ ยืนยันการชำระเงินเรียบร้อยแล้ว\n\n` +
-                `สวัสดีครับ ขอแจ้งให้ท่านทราบว่าการชำระเงินของท่านได้รับการยืนยันเรียบร้อยแล้วครับ\n\n` +
-                `🏠 ห้อง: ${billing.room.number}\n` +
-                `💰 ยอดเงิน: ${billing.totalAmount.toLocaleString()} บาท\n` +
-                `📌 สถานะ: ชำระแล้ว\n\n` +
-                `ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏`;
+        // Notify ALL active Residents in this room via Line
+        if (status === "Paid") {
+            const residents = await prisma.resident.findMany({
+                where: {
+                    roomId: billing.roomId,
+                    status: "Active",
+                    lineUserId: { not: null }
+                }
+            });
 
-            try {
-                const { sendLineMessage } = await import("@/lib/line");
-                await sendLineMessage(lineUserId, message);
-            } catch (e) {
-                console.error("Failed to send Line notification", e);
+            if (residents.length > 0) {
+                const message = `✅ ยืนยันการชำระเงินเรียบร้อยแล้ว\n\n` +
+                    `สวัสดีครับ ขอแจ้งให้ท่านทราบว่าการชำระเงินของท่านได้รับการยืนยันเรียบร้อยแล้วครับ\n\n` +
+                    `🏠 ห้อง: ${billing.room.number}\n` +
+                    `💰 ยอดเงิน: ${billing.totalAmount.toLocaleString()} บาท\n` +
+                    `📌 สถานะ: ชำระแล้ว\n\n` +
+                    `ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏`;
+
+                try {
+                    const { sendLineMessage } = await import("@/lib/line");
+                    for (const res of residents) {
+                        if (res.lineUserId) {
+                            await sendLineMessage(res.lineUserId, message);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to send Line notifications", e);
+                }
             }
         }
 

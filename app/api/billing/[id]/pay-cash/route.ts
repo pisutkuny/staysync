@@ -92,8 +92,16 @@ export async function POST(
         revalidatePath('/billing');
         revalidatePath('/dashboard');
 
-        // Send Line notification to customer
-        if (bill.resident?.lineUserId) {
+        // Send Line notification to ALL active residents in this room
+        const residents = await prisma.resident.findMany({
+            where: {
+                roomId: bill.roomId,
+                status: "Active",
+                lineUserId: { not: null }
+            }
+        });
+
+        if (residents.length > 0) {
             try {
                 const { sendLineMessage } = await import("@/lib/line");
                 const methodLabel = isTransfer ? 'โอนเงิน' : 'เงินสด';
@@ -104,9 +112,14 @@ export async function POST(
                     `💳 ช่องทาง: ${methodLabel}\n` +
                     `📌 สถานะ: ชำระแล้ว\n\n` +
                     `ขอบพระคุณที่ชำระเงินตรงเวลาครับ หากท่านมีข้อสงสัยประการใด สามารถติดต่อเจ้าหน้าที่ได้ตลอดเวลาครับ 🙏`;
-                await sendLineMessage(bill.resident.lineUserId, message);
+
+                for (const res of residents) {
+                    if (res.lineUserId) {
+                        await sendLineMessage(res.lineUserId, message);
+                    }
+                }
             } catch (lineError) {
-                console.error("Failed to send customer notification:", lineError);
+                console.error("Failed to send customer notifications:", lineError);
             }
         }
 
