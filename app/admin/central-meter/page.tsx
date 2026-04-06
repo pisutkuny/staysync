@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Save, ArrowLeft } from "lucide-react";
+import { Loader2, Save, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -10,9 +10,12 @@ import { useModal } from "@/app/context/ModalContext";
 export default function CentralMeterPage() {
     const { t } = useLanguage();
     const router = useRouter();
-    const { showAlert } = useModal();
+    const { showAlert, showConfirm } = useModal();
     const [loading, setLoading] = useState(false);
     const [records, setRecords] = useState<any[]>([]);
+
+    // Track whether we are editing an existing record
+    const [editingRecord, setEditingRecord] = useState<any | null>(null);
 
     // Get current month as default
     const currentMonth = new Date().toISOString().slice(0, 7);
@@ -55,37 +58,65 @@ export default function CentralMeterPage() {
         }
     };
 
-    // Auto-fill previous readings when month changes
+    // When month changes: check if record already exists → edit mode; otherwise auto-fill from previous record
     useEffect(() => {
-        const selectedMonth = new Date(formData.month + "-01");
-        const lastRecord = records.find((r) => {
-            const recordMonth = new Date(r.month);
-            return recordMonth < selectedMonth;
+        if (records.length === 0) return;
+
+        // Parse selected month using UTC to avoid timezone shift
+        const [selYear, selMon] = formData.month.split("-").map(Number);
+
+        // Check if there's an existing record for the exact selected month (compare in UTC)
+        const existingRecord = records.find((r) => {
+            const rm = new Date(r.month);
+            return rm.getUTCFullYear() === selYear &&
+                rm.getUTCMonth() + 1 === selMon;
         });
 
-        if (lastRecord) {
-            // Has previous record - auto-fill readings AND carry forward rate/maintenance
+        if (existingRecord) {
+            // EDIT MODE: load existing record values
+            setEditingRecord(existingRecord);
             setFormData(prev => ({
                 ...prev,
-                waterMeterLast: lastRecord.waterMeterCurrent,
-                electricMeterLast: lastRecord.electricMeterCurrent,
-                waterRateFromUtility: lastRecord.waterRateFromUtility ?? prev.waterRateFromUtility,
-                waterMeterMaintenanceFee: lastRecord.waterMeterMaintenanceFee ?? prev.waterMeterMaintenanceFee,
+                waterMeterLast: existingRecord.waterMeterLast,
+                waterMeterCurrent: existingRecord.waterMeterCurrent,
+                waterRateFromUtility: existingRecord.waterRateFromUtility,
+                waterMeterMaintenanceFee: existingRecord.waterMeterMaintenanceFee ?? 0,
+                electricMeterLast: existingRecord.electricMeterLast,
+                electricMeterCurrent: existingRecord.electricMeterCurrent,
+                electricRateFromUtility: existingRecord.electricRateFromUtility,
+                electricTotalCost: existingRecord.electricTotalCost ?? 0,
+                internetCost: existingRecord.internetCost ?? 0,
+                trashCost: existingRecord.trashCost ?? 0,
+                note: existingRecord.note ?? "",
             }));
+        } else {
+            // CREATE MODE: auto-fill previous record values
+            setEditingRecord(null);
+            const lastRecord = records.find((r) => {
+                const rm = new Date(r.month);
+                const rmYear = rm.getUTCFullYear();
+                const rmMon = rm.getUTCMonth() + 1;
+                return rmYear < selYear || (rmYear === selYear && rmMon < selMon);
+            });
+
+            if (lastRecord) {
+                setFormData(prev => ({
+                    ...prev,
+                    waterMeterLast: lastRecord.waterMeterCurrent,
+                    electricMeterLast: lastRecord.electricMeterCurrent,
+                    waterRateFromUtility: lastRecord.waterRateFromUtility ?? prev.waterRateFromUtility,
+                    waterMeterMaintenanceFee: lastRecord.waterMeterMaintenanceFee ?? prev.waterMeterMaintenanceFee,
+                }));
+            }
         }
-        // If no previous record, we don't overwrite user's manual input
     }, [formData.month, records]);
 
     // Auto-calculate usage and costs
     useEffect(() => {
-        // Water: Calculate Cost from Rate (Standard)
         const waterUsage = Math.max(0, formData.waterMeterCurrent - formData.waterMeterLast);
         const waterCost = (waterUsage * formData.waterRateFromUtility) + (formData.waterMeterMaintenanceFee || 0);
 
-        // Electric: Calculate Rate from Cost (User Request)
         const electricUsage = Math.max(0, formData.electricMeterCurrent - formData.electricMeterLast);
-        // Cost is now an input (formData.electricTotalCost)
-        // We calculate Rate for reference/API
         let electricRate = 0;
         if (electricUsage > 0 && formData.electricTotalCost > 0) {
             electricRate = formData.electricTotalCost / electricUsage;
@@ -101,12 +132,9 @@ export default function CentralMeterPage() {
             totalCost
         });
 
-        // Sync calculated rate back to formData for submission (avoid infinite loop by checking diff)
-        // We use a small epsilon for float comparison or just simple check
         if (Math.abs(formData.electricRateFromUtility - electricRate) > 0.0001) {
             setFormData(prev => ({ ...prev, electricRateFromUtility: electricRate }));
         }
-
     }, [
         formData.waterMeterCurrent,
         formData.waterMeterLast,
@@ -114,11 +142,10 @@ export default function CentralMeterPage() {
         formData.waterMeterMaintenanceFee,
         formData.electricMeterCurrent,
         formData.electricMeterLast,
-        formData.electricTotalCost, // Changed dependency
-        // formData.electricRateFromUtility, // Removed to avoid loop
+        formData.electricTotalCost,
         formData.internetCost,
         formData.trashCost,
-        formData.electricRateFromUtility // Need this to check for consistency? No, checking logic inside.
+        formData.electricRateFromUtility
     ]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -126,18 +153,39 @@ export default function CentralMeterPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/central-meter", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
+            let res: Response;
+
+            if (editingRecord) {
+                // UPDATE existing record
+                res = await fetch(`/api/central-meter/${editingRecord.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        waterMeterCurrent: formData.waterMeterCurrent,
+                        waterRateFromUtility: formData.waterRateFromUtility,
+                        waterMeterMaintenanceFee: formData.waterMeterMaintenanceFee,
+                        electricMeterCurrent: formData.electricMeterCurrent,
+                        electricRateFromUtility: formData.electricRateFromUtility,
+                        electricTotalCost: formData.electricTotalCost,
+                        internetCost: formData.internetCost,
+                        trashCost: formData.trashCost,
+                        note: formData.note,
+                    }),
+                });
+            } else {
+                // CREATE new record
+                res = await fetch("/api/central-meter", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+            }
 
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.error || "Failed to save");
             }
 
-            // Save success - navigate back
             showAlert(t.common.success, t.centralMeter.saveSuccess, "success", () => {
                 router.push("/admin/utility-analysis");
                 router.refresh();
@@ -148,6 +196,24 @@ export default function CentralMeterPage() {
             setLoading(false);
         }
     };
+
+    const handleDelete = async () => {
+        if (!editingRecord) return;
+        const confirmed = await showConfirm(t.common.confirmDelete, t.centralMeter.deleteSuccess, true);
+        if (!confirmed) return;
+        try {
+            const res = await fetch(`/api/central-meter/${editingRecord.id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete");
+            showAlert(t.common.success, t.centralMeter.deleteSuccess, "success", () => {
+                router.push("/admin/utility-analysis");
+                router.refresh();
+            });
+        } catch {
+            showAlert(t.common.error, t.centralMeter.error, "error");
+        }
+    };
+
+    const isEditMode = !!editingRecord;
 
     return (
         <div className="space-y-6">
@@ -170,6 +236,14 @@ export default function CentralMeterPage() {
             </div>
 
             <div className="max-w-2xl mx-auto">
+                {/* Edit mode banner */}
+                {isEditMode && (
+                    <div className="mb-3 flex items-center gap-2 bg-amber-50 border border-amber-300 text-amber-800 rounded-xl px-4 py-3 text-sm font-medium">
+                        <Pencil size={16} />
+                        {t.centralMeter.editMode} — {new Date(editingRecord.month).toLocaleDateString("th-TH", { year: "numeric", month: "long" })}
+                    </div>
+                )}
+
                 {/* Form Section */}
                 <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-lg border border-slate-300 space-y-6">
                     {/* Month Selector */}
@@ -240,10 +314,7 @@ export default function CentralMeterPage() {
                                     type="number"
                                     step="0.01"
                                     value={formData.waterRateFromUtility}
-                                    onChange={e => {
-                                        const val = parseFloat(e.target.value) || 0;
-                                        setFormData({ ...formData, waterRateFromUtility: val });
-                                    }}
+                                    onChange={e => setFormData({ ...formData, waterRateFromUtility: parseFloat(e.target.value) || 0 })}
                                     required
                                     className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
@@ -255,10 +326,7 @@ export default function CentralMeterPage() {
                                     type="number"
                                     step="0.01"
                                     value={formData.waterMeterMaintenanceFee}
-                                    onChange={e => {
-                                        const val = parseFloat(e.target.value) || 0;
-                                        setFormData({ ...formData, waterMeterMaintenanceFee: val });
-                                    }}
+                                    onChange={e => setFormData({ ...formData, waterMeterMaintenanceFee: parseFloat(e.target.value) || 0 })}
                                     className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
@@ -395,16 +463,31 @@ export default function CentralMeterPage() {
                         />
                     </div>
 
-                    {/* Submit */}
-                    <div className="pt-4 border-t border-slate-300">
+                    {/* Submit + Delete */}
+                    <div className="pt-4 border-t border-slate-300 flex gap-3">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                            className={`flex-1 py-3 text-white rounded-lg font-bold disabled:opacity-50 transition-all flex items-center justify-center gap-2 ${isEditMode
+                                ? 'bg-amber-500 hover:bg-amber-600'
+                                : 'bg-indigo-600 hover:bg-indigo-700'
+                                }`}
                         >
-                            {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                            {t.centralMeter.save}
+                            {loading ? <Loader2 className="animate-spin" /> : isEditMode ? <Pencil size={20} /> : <Save size={20} />}
+                            {isEditMode ? t.centralMeter.update : t.centralMeter.save}
                         </button>
+
+                        {isEditMode && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                disabled={loading}
+                                className="px-5 py-3 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-600 hover:text-white disabled:opacity-50 transition-all flex items-center gap-2"
+                            >
+                                <Trash2 size={18} />
+                                {t.centralMeter.delete}
+                            </button>
+                        )}
                     </div>
                 </form>
 
@@ -440,6 +523,6 @@ export default function CentralMeterPage() {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
