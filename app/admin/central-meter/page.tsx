@@ -64,11 +64,13 @@ export default function CentralMeterPage() {
         });
 
         if (lastRecord) {
-            // Has previous record - auto-fill from that record
+            // Has previous record - auto-fill readings AND carry forward rate/maintenance
             setFormData(prev => ({
                 ...prev,
                 waterMeterLast: lastRecord.waterMeterCurrent,
-                electricMeterLast: lastRecord.electricMeterCurrent
+                electricMeterLast: lastRecord.electricMeterCurrent,
+                waterRateFromUtility: lastRecord.waterRateFromUtility ?? prev.waterRateFromUtility,
+                waterMeterMaintenanceFee: lastRecord.waterMeterMaintenanceFee ?? prev.waterMeterMaintenanceFee,
             }));
         }
         // If no previous record, we don't overwrite user's manual input
@@ -135,6 +137,7 @@ export default function CentralMeterPage() {
                 throw new Error(err.error || "Failed to save");
             }
 
+            // Save success - navigate back
             showAlert(t.common.success, t.centralMeter.saveSuccess, "success", () => {
                 router.push("/admin/utility-analysis");
                 router.refresh();
@@ -208,7 +211,7 @@ export default function CentralMeterPage() {
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.curr} *</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -237,23 +240,29 @@ export default function CentralMeterPage() {
                                     type="number"
                                     step="0.01"
                                     value={formData.waterRateFromUtility}
-                                    onChange={e => setFormData({ ...formData, waterRateFromUtility: parseFloat(e.target.value) || 0 })}
+                                    onChange={e => {
+                                        const val = parseFloat(e.target.value) || 0;
+                                        setFormData({ ...formData, waterRateFromUtility: val });
+                                    }}
                                     required
                                     className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                                 <p className="text-xs text-gray-400 mt-1">{t.centralMeter.rateUnit}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">ค่ารักษามาตร (฿)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.maintenance}</label>
                                 <input
                                     type="number"
                                     step="0.01"
                                     value={formData.waterMeterMaintenanceFee}
-                                    onChange={e => setFormData({ ...formData, waterMeterMaintenanceFee: parseFloat(e.target.value) || 0 })}
+                                    onChange={e => {
+                                        const val = parseFloat(e.target.value) || 0;
+                                        setFormData({ ...formData, waterMeterMaintenanceFee: val });
+                                    }}
                                     className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                     placeholder="0"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">คงที่ต่อเดือน</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.maintenanceUnit}</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.cost}</label>
@@ -293,7 +302,7 @@ export default function CentralMeterPage() {
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">เลขปัจจุบัน *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.curr} *</label>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -326,7 +335,7 @@ export default function CentralMeterPage() {
                                     required
                                     className="w-full rounded-lg border border-slate-300 p-3 text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
-                                <p className="text-xs text-gray-400 mt-1">กรอกยอดจ่ายจริง</p>
+                                <p className="text-xs text-gray-400 mt-1">{t.centralMeter.elecActualPayment}</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">{t.centralMeter.rate} (Calc)</label>
