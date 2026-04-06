@@ -804,7 +804,11 @@ export default function ExpensesClient({ initialExpenses, initialPagination, ini
                                                                 expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
                                                                     expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
                                                                         'bg-gray-100 text-gray-700'}`}>
-                                                            {expense.category}
+                                                            {expense.category === 'Maintenance' ? t.expenses.catMaint :
+                                                                expense.category === 'Utilities' ? t.expenses.catUtil :
+                                                                    expense.category === 'Salary' ? t.expenses.catSalary :
+                                                                        expense.category === 'Supplies' ? t.expenses.catSupply :
+                                                                            t.expenses.catOther}
                                                         </span>
                                                     </td>
                                                     <td className="px-2 py-3 sm:p-4 text-right font-bold text-red-600">
@@ -852,7 +856,11 @@ export default function ExpensesClient({ initialExpenses, initialPagination, ini
                                                         expense.category === 'Utilities' ? 'bg-blue-100 text-blue-700' :
                                                             expense.category === 'Salary' ? 'bg-green-100 text-green-700' :
                                                                 'bg-gray-100 text-gray-700'}`}>
-                                                    {expense.category}
+                                                    {expense.category === 'Maintenance' ? t.expenses.catMaint :
+                                                        expense.category === 'Utilities' ? t.expenses.catUtil :
+                                                            expense.category === 'Salary' ? t.expenses.catSalary :
+                                                                expense.category === 'Supplies' ? t.expenses.catSupply :
+                                                                    t.expenses.catOther}
                                                 </span>
                                             </div>
 
