@@ -1149,7 +1149,7 @@ export const dictionary = {
             rate: "Actual Rate",
             rateUnit: "฿/Unit",
             cost: "Total Cost",
-            maintenance: "Meter Maintenance Fee (฿)",
+            maintenance: "Meter Fee (฿)",
             maintenanceUnit: "Fixed per month",
             elecActualPayment: "Enter actual payment amount",
             fixedCost: "Monthly Fixed Costs (If any)",
