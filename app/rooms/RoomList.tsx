@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus, CheckCircle2, Home, Star } from "lucide-react";
+import { UserPlus, CheckCircle2, Home, Star, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DeleteRoomButton from "./DeleteRoomButton";
 import RoomCommonAreaToggle from "./RoomCommonAreaToggle";
@@ -153,12 +153,29 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                                 <DeleteRoomButton roomId={room.id} />
                             </>
                         ) : (
-                            <Link href={`/rooms/checkin/${room.id}`} className="w-full">
-                                <button className="w-full py-2 bg-gradient-to-r from-cyan-500 to-sky-500 text-white rounded-lg hover:from-cyan-600 hover:to-sky-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm border-2 border-transparent hover:border-sky-700">
-                                    <UserPlus size={18} />
-                                    {t.rooms.addResident}
-                                </button>
-                            </Link>
+                            <div className="w-full flex gap-2">
+                                <Link href={`/rooms/checkin/${room.id}`} className="flex-1">
+                                    <button className="w-full py-2 bg-gradient-to-r from-cyan-500 to-sky-500 text-white rounded-lg hover:from-cyan-600 hover:to-sky-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm border-2 border-transparent hover:border-sky-700">
+                                        <UserPlus size={18} />
+                                        {t.rooms.addResident}
+                                    </button>
+                                </Link>
+                                {/* ปุ่ม Check-out — link ไปยัง main tenant */}
+                                {room.residents && room.residents.length > 0 && (() => {
+                                    const mainTenant = room.residents.find((r: any) => r.isMainTenant) || room.residents[0];
+                                    return (
+                                        <Link href={`/rooms/checkout/${mainTenant.id}`}>
+                                            <button
+                                                title="ย้ายออก (Check Out)"
+                                                className="py-2 px-3 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-1.5 text-sm border-2 border-red-200 hover:border-red-700 shadow-sm hover:shadow-md"
+                                            >
+                                                <LogOut size={16} />
+                                                <span className="hidden sm:inline">ย้ายออก</span>
+                                            </button>
+                                        </Link>
+                                    );
+                                })()}
+                            </div>
                         )}
                     </div>
                 </div>

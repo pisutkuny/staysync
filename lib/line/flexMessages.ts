@@ -361,3 +361,85 @@ export function createOverdueFlexMessage(
         }
     };
 }
+
+// ============================================================
+// CHECK-OUT SUMMARY FLEX MESSAGE
+// ============================================================
+export function createCheckoutSummaryFlexMessage(
+    data: {
+        residentName: string;
+        roomNumber: string;
+        checkoutDate: Date;
+        isEarlyCheckout: boolean;
+        daysEarly: number;
+        finalWaterCost: number;
+        finalElectricCost: number;
+        totalDamageRepairCost: number;
+        pendingBillsTotal: number;
+        depositAmount: number;
+        depositDeductions: number;
+        depositReturned: number;
+    },
+    sysConfig: any
+): FlexMessage {
+    const fmt = (n: number) => n.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const dateStr = new Date(data.checkoutDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
+    const dormName = sysConfig?.dormName || "StaySync";
+
+    const rows = [
+        { label: "💧 ค่าน้ำงวดสุดท้าย", value: `฿${fmt(data.finalWaterCost)}` },
+        { label: "⚡ ค่าไฟงวดสุดท้าย", value: `฿${fmt(data.finalElectricCost)}` },
+        ...(data.totalDamageRepairCost > 0 ? [{ label: "🔧 ค่าซ่อมแซม", value: `฿${fmt(data.totalDamageRepairCost)}` }] : []),
+        ...(data.pendingBillsTotal > 0 ? [{ label: "📋 บิลค้างชำระ", value: `฿${fmt(data.pendingBillsTotal)}` }] : []),
+    ];
+
+    const makeRow = (label: string, value: string, valueColor = "#333333"): any => ({
+        type: "box", layout: "horizontal", paddingBottom: "4px",
+        contents: [
+            { type: "text", text: label, size: "sm", color: "#666666", flex: 4 },
+            { type: "text", text: value, size: "sm", color: valueColor, align: "end", flex: 3, weight: "bold" }
+        ]
+    });
+
+    return {
+        type: "flex",
+        altText: `🚪 สรุปการย้ายออก — ห้อง ${data.roomNumber}`,
+        contents: {
+            type: "bubble", size: "kilo",
+            header: {
+                type: "box", layout: "vertical", paddingAll: "16px",
+                backgroundColor: data.depositReturned > 0 ? "#1565C0" : "#B71C1C",
+                contents: [
+                    { type: "text", text: "🚪 สรุปการย้ายออก", color: "#FFFFFF", size: "lg", weight: "bold" },
+                    { type: "text", text: dormName, color: "#BBDEFB", size: "xs", margin: "xs" }
+                ]
+            } as any,
+            body: {
+                type: "box", layout: "vertical", paddingAll: "16px", spacing: "sm",
+                contents: [
+                    { type: "text", text: data.residentName, size: "md", weight: "bold", color: "#1A237E" },
+                    { type: "text", text: `ห้อง ${data.roomNumber} • ${dateStr}`, size: "xs", color: "#888888", margin: "xs" },
+                    ...(data.isEarlyCheckout ? [{ type: "text", text: `⚠️ ย้ายออกก่อนกำหนด ${data.daysEarly} วัน`, size: "xs", color: "#E65100", margin: "sm" }] : []),
+                    { type: "separator", margin: "md" } as any,
+                    ...rows.map(r => makeRow(r.label, r.value)),
+                    { type: "separator", margin: "sm" } as any,
+                    makeRow("💰 เงินประกัน", `฿${fmt(data.depositAmount)}`),
+                    makeRow("💳 หักทั้งหมด", `- ฿${fmt(data.depositDeductions)}`, "#C62828"),
+                    { type: "separator", margin: "sm" } as any,
+                    {
+                        type: "box", layout: "horizontal", cornerRadius: "8px", paddingAll: "10px", margin: "sm",
+                        backgroundColor: data.depositReturned > 0 ? "#E3F2FD" : "#FFEBEE",
+                        contents: [
+                            { type: "text", text: data.depositReturned > 0 ? "✅ เงินที่คืนให้" : "❌ ไม่ได้รับเงินคืน", size: "sm", color: "#333333", flex: 4 },
+                            { type: "text", text: `฿${fmt(data.depositReturned)}`, size: "md", weight: "bold", color: data.depositReturned > 0 ? "#1565C0" : "#C62828", align: "end", flex: 3 }
+                        ]
+                    } as any
+                ]
+            } as any,
+            footer: {
+                type: "box", layout: "vertical", backgroundColor: "#F5F5F5", paddingAll: "12px",
+                contents: [{ type: "text", text: "ขอบคุณที่เคยพักอาศัยกับเรา 🙏", size: "xs", color: "#888888", align: "center" }]
+            } as any
+        } as any
+    };
+}

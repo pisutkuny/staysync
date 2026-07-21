@@ -451,9 +451,78 @@ model Organization {
   systemConfig  SystemConfig?
   recurringExpenses RecurringExpense[]
   maintenanceChecks MaintenanceCheck[]
+  checkoutChecklistTemplates CheckoutChecklistTemplate[]
+  checkoutRecords CheckoutRecord[]
 
   @@index([slug])
   @@index([status])
+}
+
+// ============================================
+// CHECK-OUT SYSTEM
+// ============================================
+
+model CheckoutChecklistTemplate {
+  id       Int    @id @default(autoincrement())
+  category String // เช่น "กุญแจ", "เครื่องใช้ไฟฟ้า", "เฟอร์นิเจอร์"
+  label    String // รายการ เช่น "กุญแจห้อง / การ์ดเข้าออก"
+  order    Int    @default(0) // สำหรับเรียงลำดับ
+  isDefault Boolean @default(false) // ลบไม่ได้ (แต่ซ่อนได้)
+  isActive Boolean @default(true)
+
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([organizationId, isActive])
+  @@index([organizationId, order])
+}
+
+model CheckoutRecord {
+  id         Int      @id @default(autoincrement())
+  checkoutAt DateTime @default(now())
+
+  // ผู้เช่าที่ย้ายออก
+  residentId Int
+  residentName String  // snapshot ณ วันย้ายออก
+  roomNumber   String  // snapshot
+
+  // ประเภทการย้ายออก
+  isEarlyCheckout Boolean @default(false)
+  daysEarly       Int     @default(0)
+
+  // มิเตอร์ครั้งสุดท้าย
+  finalWaterMeter    Float @default(0)
+  finalElectricMeter Float @default(0)
+  finalWaterUsage    Float @default(0)
+  finalElectricUsage Float @default(0)
+  finalWaterCost     Float @default(0)
+  finalElectricCost  Float @default(0)
+
+  // Checklist ผลการตรวจสภาพห้อง (JSON array)
+  // [{ label, category, status: "pass"|"damaged", repairCost, note }]
+  checklistResult Json?
+
+  // การเงิน
+  totalDamageRepairCost Float @default(0)
+  pendingBillsTotal     Float @default(0)
+  depositAmount         Float @default(0)
+  depositDeductions     Float @default(0) // รวมค่าปรับ+ซ่อม
+  depositReturned       Float @default(0)
+  depositForfeitReason  String?
+
+  // เอกสาร
+  note String?
+
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([residentId])
+  @@index([checkoutAt])
 }
 
 model UserSession {
