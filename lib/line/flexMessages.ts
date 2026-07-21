@@ -1,5 +1,6 @@
 
 import { FlexContainer, FlexMessage, FlexComponent } from "@line/bot-sdk";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 // Helper to format currency
 const formatMoney = (amount: number) => {
@@ -26,9 +27,9 @@ export function createInvoiceFlexMessage(
     const isPaid = bill.paymentStatus === 'Paid';
     const hasPromptPay = !!sysConfig.promptPayId;
 
-    // Calculate Usage
-    const waterUsage = (bill.waterMeterCurrent - bill.waterMeterLast).toFixed(1);
-    const electricUsage = (bill.electricMeterCurrent - bill.electricMeterLast).toFixed(1);
+    // Calculate Usage (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
+    const waterUsage = calcMeterUsage(bill.waterMeterLast, bill.waterMeterCurrent, WATER_METER_MAX).toFixed(1);
+    const electricUsage = calcMeterUsage(bill.electricMeterLast, bill.electricMeterCurrent, ELECTRIC_METER_MAX).toFixed(1);
 
     const items = [
         { label: "🏠 ค่าเช่าห้อง", value: `${formatMoney(bill.room?.price || 0)} ฿` },

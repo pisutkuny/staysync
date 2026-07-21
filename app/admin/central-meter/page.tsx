@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 export default function CentralMeterPage() {
     const { t } = useLanguage();
@@ -113,10 +114,10 @@ export default function CentralMeterPage() {
 
     // Auto-calculate usage and costs
     useEffect(() => {
-        const waterUsage = Math.max(0, formData.waterMeterCurrent - formData.waterMeterLast);
+        const waterUsage = calcMeterUsage(formData.waterMeterLast, formData.waterMeterCurrent, WATER_METER_MAX);
         const waterCost = (waterUsage * formData.waterRateFromUtility) + (formData.waterMeterMaintenanceFee || 0);
 
-        const electricUsage = Math.max(0, formData.electricMeterCurrent - formData.electricMeterLast);
+        const electricUsage = calcMeterUsage(formData.electricMeterLast, formData.electricMeterCurrent, ELECTRIC_METER_MAX);
         let electricRate = 0;
         if (electricUsage > 0 && formData.electricTotalCost > 0) {
             electricRate = formData.electricTotalCost / electricUsage;

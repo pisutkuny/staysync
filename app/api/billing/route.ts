@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/auth/session";
 import { sendLineMessage, lineClient } from "@/lib/line";
 import { createInvoiceFlexMessage } from "@/lib/line/flexMessages";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 // Rates Configuration (Could be DB driven later)
 // Rates Configuration (Fallback if DB config missing)
@@ -55,9 +56,9 @@ export async function POST(req: Request) {
         const other = parseFloat(otherFees) || 0;
         const common = parseFloat(commonFee) || 0;
 
-        // Calculate Usage
-        const waterUnits = Math.max(0, wCurr - wLast);
-        const electricUnits = Math.max(0, eCurr - eLast);
+        // Calculate Usage (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
+        const waterUnits = calcMeterUsage(wLast, wCurr, WATER_METER_MAX);
+        const electricUnits = calcMeterUsage(eLast, eCurr, ELECTRIC_METER_MAX);
 
         // Calculate Totals
         const waterCost = waterUnits * waterRate;

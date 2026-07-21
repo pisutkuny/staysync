@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/auth/session";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 export async function POST(req: Request) {
     try {
@@ -97,15 +98,9 @@ export async function POST(req: Request) {
                 const waterLast = manualLastWater ?? (lastBilling?.waterMeterCurrent ?? room.waterMeterInitial);
                 const electricLast = manualLastElectric ?? (lastBilling?.electricMeterCurrent ?? room.electricMeterInitial);
 
-                // Calculate usage
-                const waterUsage = waterCurrent - waterLast;
-                const electricUsage = electricCurrent - electricLast;
-
-                // Validate readings
-                if (waterUsage < 0 || electricUsage < 0) {
-                    results.errors.push(`Room ${room.number}: Invalid meter reading (negative usage)`);
-                    continue;
-                }
+                // Calculate usage (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
+                const waterUsage = calcMeterUsage(waterLast, waterCurrent, WATER_METER_MAX);
+                const electricUsage = calcMeterUsage(electricLast, electricCurrent, ELECTRIC_METER_MAX);
 
                 // Calculate costs
                 const waterCost = waterUsage * config.waterRate;
@@ -211,12 +206,12 @@ export async function POST(req: Request) {
                         }
                     });
 
-                    // 3. Calculate total room usage
+                    // 3. Calculate total room usage (รองรับ rollover)
                     const totalRoomWater = allBillings.reduce((sum, b) =>
-                        sum + (b.waterMeterCurrent - b.waterMeterLast), 0
+                        sum + calcMeterUsage(b.waterMeterLast, b.waterMeterCurrent, WATER_METER_MAX), 0
                     );
                     const totalRoomElectric = allBillings.reduce((sum, b) =>
-                        sum + (b.electricMeterCurrent - b.electricMeterLast), 0
+                        sum + calcMeterUsage(b.electricMeterLast, b.electricMeterCurrent, ELECTRIC_METER_MAX), 0
                     );
 
                     // 4. Calculate common area usage

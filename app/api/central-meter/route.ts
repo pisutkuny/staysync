@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/auth/session";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 // GET /api/central-meter - Get all central meter records
 export async function GET() {
@@ -54,12 +55,12 @@ export async function POST(request: Request) {
         const waterLast = waterMeterLastOverride !== undefined ? waterMeterLastOverride : (lastRecord?.waterMeterCurrent || 0);
         const electricLast = electricMeterLastOverride !== undefined ? electricMeterLastOverride : (lastRecord?.electricMeterCurrent || 0);
 
-        // Calculate usage and costs
-        const waterUsage = waterMeterCurrent - waterLast;
+        // Calculate usage and costs (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
+        const waterUsage = calcMeterUsage(waterLast, waterMeterCurrent, WATER_METER_MAX);
         const waterMaintenanceFee = Number(waterMeterMaintenanceFee) || 0;
         const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
-        const electricUsage = electricMeterCurrent - electricLast;
+        const electricUsage = calcMeterUsage(electricLast, electricMeterCurrent, ELECTRIC_METER_MAX);
         // Prioritize manual total cost if provided, otherwise calculate
         const finalElectricTotalCost = electricTotalCost !== undefined
             ? Number(electricTotalCost)

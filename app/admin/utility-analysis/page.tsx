@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import UtilityAnalysisClient from "./UtilityAnalysisClient";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 export const dynamic = 'force-dynamic';
 
@@ -32,8 +33,8 @@ export default async function UtilityAnalysisPage() {
             new Date(b.month).toISOString().slice(0, 7) === monthStr
         );
 
-        const roomWaterUsage = monthBillings.reduce((sum, b) => sum + (b.waterMeterCurrent - b.waterMeterLast), 0);
-        const roomElectricUsage = monthBillings.reduce((sum, b) => sum + (b.electricMeterCurrent - b.electricMeterLast), 0);
+        const roomWaterUsage = monthBillings.reduce((sum, b) => sum + calcMeterUsage(b.waterMeterLast, b.waterMeterCurrent, WATER_METER_MAX), 0);
+        const roomElectricUsage = monthBillings.reduce((sum, b) => sum + calcMeterUsage(b.electricMeterLast, b.electricMeterCurrent, ELECTRIC_METER_MAX), 0);
 
         // Calculate revenue from rooms (average rate * usage)
         const avgWaterRate = monthBillings.length > 0

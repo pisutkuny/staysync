@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { logCRUDAudit } from "@/lib/audit/helpers";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 // GET /api/central-meter/[id] - Get single record
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -49,12 +50,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             return NextResponse.json({ error: "Record not found" }, { status: 404 });
         }
 
-        // Recalculate usage and costs
-        const waterUsage = waterMeterCurrent - currentRecord.waterMeterLast;
+        // Recalculate usage and costs (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
+        const waterUsage = calcMeterUsage(currentRecord.waterMeterLast, waterMeterCurrent, WATER_METER_MAX);
         const waterMaintenanceFee = waterMeterMaintenanceFee !== undefined ? Number(waterMeterMaintenanceFee) : (currentRecord.waterMeterMaintenanceFee || 0);
         const waterTotalCost = (waterUsage * waterRateFromUtility) + waterMaintenanceFee;
 
-        const electricUsage = electricMeterCurrent - currentRecord.electricMeterLast;
+        const electricUsage = calcMeterUsage(currentRecord.electricMeterLast, electricMeterCurrent, ELECTRIC_METER_MAX);
 
         // Prioritize manual total cost if provided, otherwise calculate
         const finalElectricTotalCost = electricTotalCost !== undefined

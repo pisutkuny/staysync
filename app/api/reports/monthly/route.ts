@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { getCurrentSession } from "@/lib/auth/session";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -50,8 +51,8 @@ export async function GET(req: Request) {
         for (const bill of paidBillings) {
             totalIncome += bill.totalAmount;
 
-            const waterUsage = bill.waterMeterCurrent - bill.waterMeterLast;
-            const electricUsage = bill.electricMeterCurrent - bill.electricMeterLast;
+            const waterUsage = calcMeterUsage(bill.waterMeterLast, bill.waterMeterCurrent, WATER_METER_MAX);
+            const electricUsage = calcMeterUsage(bill.electricMeterLast, bill.electricMeterCurrent, ELECTRIC_METER_MAX);
 
             totalWaterUnits += waterUsage;
             totalElectricUnits += electricUsage;
