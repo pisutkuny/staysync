@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon, Lock, Eye, EyeOff } from "lucide-react";
+import { Loader2, Save, Building2, CreditCard, Zap, MessageSquare, Settings as SettingsIcon, Lock, Eye, EyeOff, ClipboardList, Plus, Trash2 } from "lucide-react";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import Setup2FA from "../components/Setup2FA";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -46,6 +46,12 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState("basic");
+
+    // Checklist state
+    const [checklist, setChecklist] = useState<any[]>([]);
+    const [checklistLoading, setChecklistLoading] = useState(false);
+    const [newItem, setNewItem] = useState({ category: "", label: "" });
+    const [addingItem, setAddingItem] = useState(false);
     const [config, setConfig] = useState<SystemConfig>({
         dormName: "",
         dormAddress: "",
@@ -154,11 +160,47 @@ export default function SettingsPage() {
 
     if (loading) return <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-indigo-500" size={40} /></div>;
 
+    // Load checklist when tab is active
+    const loadChecklist = async () => {
+        setChecklistLoading(true);
+        try {
+            const res = await fetch("/api/checkout/checklist");
+            const data = await res.json();
+            setChecklist(Array.isArray(data) ? data : []);
+        } catch { /* ignore */ }
+        setChecklistLoading(false);
+    };
+
+    const handleAddChecklistItem = async () => {
+        if (!newItem.category.trim() || !newItem.label.trim()) return;
+        setAddingItem(true);
+        try {
+            const res = await fetch("/api/checkout/checklist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newItem),
+            });
+            if (res.ok) {
+                setNewItem({ category: "", label: "" });
+                await loadChecklist();
+            }
+        } catch { /* ignore */ }
+        setAddingItem(false);
+    };
+
+    const handleDeleteChecklistItem = async (id: number) => {
+        try {
+            await fetch(`/api/checkout/checklist?id=${id}`, { method: "DELETE" });
+            setChecklist(prev => prev.filter(i => i.id !== id));
+        } catch { /* ignore */ }
+    };
+
     const allTabs = [
         { id: "basic", label: t.settings.tabs.basic, icon: Building2, roles: ["OWNER", "ADMIN"] },
         { id: "payment", label: t.settings.tabs.payment, icon: CreditCard, roles: ["OWNER", "ADMIN"] },
         { id: "rates", label: t.settings.tabs.rates, icon: Zap, roles: ["OWNER", "ADMIN"] },
         { id: "chatbot", label: t.settings.tabs.chatbot, icon: MessageSquare, roles: ["OWNER", "ADMIN"] },
+        { id: "checklist", label: "Checklist ย้ายออก", icon: ClipboardList, roles: ["OWNER", "ADMIN"] },
         { id: "security", label: t.settings.tabs.security, icon: Lock, roles: ["OWNER", "ADMIN", "STAFF", "TENANT", "USER"] }
     ];
 
@@ -187,7 +229,10 @@ export default function SettingsPage() {
                         return (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => {
+                                    setActiveTab(tab.id);
+                                    if (tab.id === "checklist") loadChecklist();
+                                }}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${activeTab === tab.id
                                     ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
                                     : "text-gray-600 hover:bg-gray-100"
@@ -758,8 +803,92 @@ export default function SettingsPage() {
                     </div>
                 )}
 
-                {/* Save Button - Fixed at Bottom (Only show for non-security tabs) */}
-                {activeTab !== "security" && (
+                {/* Checklist Tab */}
+                {activeTab === "checklist" && (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div className="bg-gradient-to-r from-rose-50 to-pink-50 px-6 py-4 border-b border-slate-200">
+                                <h3 className="font-bold text-gray-800 flex items-center gap-2"><ClipboardList size={18} className="text-rose-600" /> รายการตรวจสภาพห้อง (Check-out Checklist)</h3>
+                                <p className="text-sm text-gray-500 mt-1">รายการเหล่านี้จะปรากฏใน Wizard ย้ายออกทุกครั้ง สามารถเพิ่มหรือลบได้ตามต้องการ</p>
+                            </div>
+
+                            {/* Add new item form */}
+                            <div className="p-6 border-b border-slate-100">
+                                <p className="text-sm font-semibold text-gray-700 mb-3">➕ เพิ่มรายการใหม่</p>
+                                <div className="flex gap-3">
+                                    <input
+                                        type="text"
+                                        placeholder="หมวด เช่น 🔑 กุญแจ"
+                                        value={newItem.category}
+                                        onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
+                                        className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="รายการ เช่น กุญแจห้อง"
+                                        value={newItem.label}
+                                        onChange={e => setNewItem(p => ({ ...p, label: e.target.value }))}
+                                        onKeyDown={e => e.key === "Enter" && handleAddChecklistItem()}
+                                        className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAddChecklistItem}
+                                        disabled={addingItem || !newItem.category || !newItem.label}
+                                        className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2 text-sm disabled:opacity-50"
+                                    >
+                                        {addingItem ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                                        เพิ่ม
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* List */}
+                            {checklistLoading ? (
+                                <div className="flex justify-center py-10"><Loader2 className="animate-spin text-indigo-400" size={32} /></div>
+                            ) : checklist.length === 0 ? (
+                                <div className="text-center py-10 text-gray-400">ยังไม่มีรายการ กดปุ่ม &quot;เพิ่ม&quot; เพื่อเพิ่มรายการแรก</div>
+                            ) : (
+                                <div className="divide-y divide-slate-50">
+                                    {Object.entries(
+                                        checklist.reduce((acc: any, item: any) => {
+                                            if (!acc[item.category]) acc[item.category] = [];
+                                            acc[item.category].push(item);
+                                            return acc;
+                                        }, {})
+                                    ).map(([category, items]: [string, any]) => (
+                                        <div key={category}>
+                                            <div className="px-6 py-2 bg-gray-50">
+                                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{category}</p>
+                                            </div>
+                                            {items.map((item: any) => (
+                                                <div key={item.id} className="flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition">
+                                                    <div className="flex items-center gap-3">
+                                                        {item.isDefault && (
+                                                            <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">DEFAULT</span>
+                                                        )}
+                                                        <span className="text-sm text-gray-800">{item.label}</span>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteChecklistItem(item.id)}
+                                                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        title="ลบรายการ"
+                                                    >
+                                                        <Trash2 size={15} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Save Button - Fixed at Bottom (Only show for non-security, non-checklist tabs) */}
+                {activeTab !== "security" && activeTab !== "checklist" && (
                     <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-slate-300">
                         <button
                             type="submit"
