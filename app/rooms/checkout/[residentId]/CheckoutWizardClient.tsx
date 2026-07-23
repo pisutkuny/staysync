@@ -15,6 +15,7 @@ interface ChecklistItem {
     id: number;
     category: string;
     label: string;
+    suggestedRepairCost: number;
     status: "pass" | "damaged" | null;
     repairCost: number;
     note: string;
@@ -106,6 +107,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             setFinalElectricMeter(previewData.lastElectricMeter);
             setChecklist(checklistTemplates.map((t: any) => ({
                 ...t,
+                suggestedRepairCost: t.suggestedRepairCost || 0,
                 status: null,
                 repairCost: 0,
                 note: "",
@@ -305,20 +307,39 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                             className={`px-3 py-1 rounded-lg text-xs font-bold border-2 transition-all ${item.status === "pass" ? "bg-emerald-500 text-white border-emerald-500" : "bg-white text-gray-500 border-gray-200 hover:border-emerald-300"}`}>
                                             ✅ ผ่าน
                                         </button>
-                                        <button onClick={() => updateChecklist(item.id, "status", "damaged")}
+                                        <button onClick={() => {
+                                            updateChecklist(item.id, "status", "damaged");
+                                            // Auto-fill suggested cost if repairCost is still 0
+                                            if (item.repairCost === 0 && item.suggestedRepairCost > 0) {
+                                                updateChecklist(item.id, "repairCost", item.suggestedRepairCost);
+                                            }
+                                        }}
                                             className={`px-3 py-1 rounded-lg text-xs font-bold border-2 transition-all ${item.status === "damaged" ? "bg-red-500 text-white border-red-500" : "bg-white text-gray-500 border-gray-200 hover:border-red-300"}`}>
                                             ❌ ชำรุด
                                         </button>
                                     </div>
                                 </div>
                                 {item.status === "damaged" && (
-                                    <div className="mt-2 grid grid-cols-2 gap-2">
-                                        <input type="number" step="1" min="0" placeholder="ค่าซ่อม (บาท)" value={item.repairCost || ""}
-                                            onChange={e => updateChecklist(item.id, "repairCost", parseFloat(e.target.value) || 0)}
-                                            className="col-span-1 rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
-                                        <input type="text" placeholder="หมายเหตุ" value={item.note}
-                                            onChange={e => updateChecklist(item.id, "note", e.target.value)}
-                                            className="col-span-1 rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
+                                    <div className="mt-2 space-y-1.5">
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <input type="number" step="1" min="0"
+                                                    placeholder={item.suggestedRepairCost > 0 ? `แนะนำ: ฿${item.suggestedRepairCost}` : "ค่าซ่อม (บาท)"}
+                                                    value={item.repairCost || ""}
+                                                    onChange={e => updateChecklist(item.id, "repairCost", parseFloat(e.target.value) || 0)}
+                                                    className="w-full rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
+                                                {item.suggestedRepairCost > 0 && (
+                                                    <button type="button"
+                                                        onClick={() => updateChecklist(item.id, "repairCost", item.suggestedRepairCost)}
+                                                        className="mt-1 text-xs text-indigo-600 hover:underline">
+                                                        ใช้ราคาแนะนำ ฿{item.suggestedRepairCost}
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <input type="text" placeholder="หมายเหตุ" value={item.note}
+                                                onChange={e => updateChecklist(item.id, "note", e.target.value)}
+                                                className="flex-1 rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
+                                        </div>
                                     </div>
                                 )}
                             </div>

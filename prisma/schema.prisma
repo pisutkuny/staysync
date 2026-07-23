@@ -466,6 +466,7 @@ model CheckoutChecklistTemplate {
   id       Int    @id @default(autoincrement())
   category String // เช่น "กุญแจ", "เครื่องใช้ไฟฟ้า", "เฟอร์นิเจอร์"
   label    String // รายการ เช่น "กุญแจห้อง / การ์ดเข้าออก"
+  suggestedRepairCost Float @default(0) // ราคาค่าซ่อมแนะนำ (บาท)
   order    Int    @default(0) // สำหรับเรียงลำดับ
   isDefault Boolean @default(false) // ลบไม่ได้ (แต่ซ่อนได้)
   isActive Boolean @default(true)

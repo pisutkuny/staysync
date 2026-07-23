@@ -50,7 +50,7 @@ export default function SettingsPage() {
     // Checklist state
     const [checklist, setChecklist] = useState<any[]>([]);
     const [checklistLoading, setChecklistLoading] = useState(false);
-    const [newItem, setNewItem] = useState({ category: "", label: "" });
+    const [newItem, setNewItem] = useState({ category: "", label: "", suggestedRepairCost: 0 });
     const [addingItem, setAddingItem] = useState(false);
     const [config, setConfig] = useState<SystemConfig>({
         dormName: "",
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                 body: JSON.stringify(newItem),
             });
             if (res.ok) {
-                setNewItem({ category: "", label: "" });
+                setNewItem({ category: "", label: "", suggestedRepairCost: 0 });
                 await loadChecklist();
             }
         } catch { /* ignore */ }
@@ -815,13 +815,13 @@ export default function SettingsPage() {
                             {/* Add new item form */}
                             <div className="p-6 border-b border-slate-100">
                                 <p className="text-sm font-semibold text-gray-700 mb-3">➕ เพิ่มรายการใหม่</p>
-                                <div className="flex gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                                     <input
                                         type="text"
                                         placeholder="หมวด เช่น 🔑 กุญแจ"
                                         value={newItem.category}
                                         onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
-                                        className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                        className="sm:col-span-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
                                     />
                                     <input
                                         type="text"
@@ -829,13 +829,21 @@ export default function SettingsPage() {
                                         value={newItem.label}
                                         onChange={e => setNewItem(p => ({ ...p, label: e.target.value }))}
                                         onKeyDown={e => e.key === "Enter" && handleAddChecklistItem()}
-                                        className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                        className="sm:col-span-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                    />
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        placeholder="ราคาแนะนำ (฿)"
+                                        value={newItem.suggestedRepairCost || ""}
+                                        onChange={e => setNewItem(p => ({ ...p, suggestedRepairCost: parseFloat(e.target.value) || 0 }))}
+                                        className="sm:col-span-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
                                     />
                                     <button
                                         type="button"
                                         onClick={handleAddChecklistItem}
                                         disabled={addingItem || !newItem.category || !newItem.label}
-                                        className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2 text-sm disabled:opacity-50"
+                                        className="sm:col-span-1 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                                     >
                                         {addingItem ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                         เพิ่ม
@@ -863,20 +871,27 @@ export default function SettingsPage() {
                                             </div>
                                             {items.map((item: any) => (
                                                 <div key={item.id} className="flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition">
-                                                    <div className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
                                                         {item.isDefault && (
-                                                            <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">DEFAULT</span>
+                                                            <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full shrink-0">DEFAULT</span>
                                                         )}
-                                                        <span className="text-sm text-gray-800">{item.label}</span>
+                                                        <span className="text-sm text-gray-800 truncate">{item.label}</span>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDeleteChecklistItem(item.id)}
-                                                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                        title="ลบรายการ"
-                                                    >
-                                                        <Trash2 size={15} />
-                                                    </button>
+                                                    <div className="flex items-center gap-3 shrink-0">
+                                                        {item.suggestedRepairCost > 0 && (
+                                                            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg">
+                                                                ฿{item.suggestedRepairCost.toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteChecklistItem(item.id)}
+                                                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                            title="ลบรายการ"
+                                                        >
+                                                            <Trash2 size={15} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
