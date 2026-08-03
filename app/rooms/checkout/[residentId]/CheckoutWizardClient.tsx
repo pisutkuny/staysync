@@ -25,10 +25,15 @@ interface CheckoutData {
     resident: any;
     lastWaterMeter: number;
     lastElectricMeter: number;
+    prevWaterMeter: number | null;
+    prevElectricMeter: number | null;
+    hasPrevBilling: boolean;
     waterRate: number;
     electricRate: number;
     pendingBills: any[];
     pendingBillsTotal: number;
+    effectiveDeposit: number;
+    depositSource: "recorded" | "room_price";
 }
 
 const STEPS = [
@@ -97,6 +102,10 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const [checkoutSummary, setCheckoutSummary] = useState<any>(null);
     const [depositAmount, setDepositAmount] = useState(0);
     const [depositSource, setDepositSource] = useState<"recorded" | "room_price">("recorded");
+    // Editable previous meter (normally last billing, can switch to second-to-last)
+    const [prevWaterMeter, setPrevWaterMeter] = useState(0);
+    const [prevElectricMeter, setPrevElectricMeter] = useState(0);
+    const [usingPrevBilling, setUsingPrevBilling] = useState(false);
 
     // Load preview data + checklist templates
     useEffect(() => {
@@ -115,6 +124,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 setData(previewData);
                 setFinalWaterMeter(previewData.lastWaterMeter ?? 0);
                 setFinalElectricMeter(previewData.lastElectricMeter ?? 0);
+                setPrevWaterMeter(previewData.lastWaterMeter ?? 0);
+                setPrevElectricMeter(previewData.lastElectricMeter ?? 0);
                 setDepositAmount(previewData.effectiveDeposit ?? 0);
                 setDepositSource(previewData.depositSource ?? "recorded");
 
@@ -145,8 +156,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
 
 
     // ── Derived calculations ──────────────────────────────────
-    const waterUsage = data ? calcMeterUsage(data.lastWaterMeter, finalWaterMeter, WATER_METER_MAX) : 0;
-    const electricUsage = data ? calcMeterUsage(data.lastElectricMeter, finalElectricMeter, ELECTRIC_METER_MAX) : 0;
+    const waterUsage = data ? calcMeterUsage(prevWaterMeter, finalWaterMeter, WATER_METER_MAX) : 0;
+    const electricUsage = data ? calcMeterUsage(prevElectricMeter, finalElectricMeter, ELECTRIC_METER_MAX) : 0;
     const finalWaterCost = waterUsage * (data?.waterRate ?? 18);
     const finalElectricCost = electricUsage * (data?.electricRate ?? 7);
     const totalDamageRepairCost = checklist.filter(i => i.status === "damaged").reduce((s, i) => s + (i.repairCost || 0), 0);
@@ -288,13 +299,52 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         <div className="space-y-5">
             <p className="text-sm text-gray-500">กรอกค่ามิเตอร์ ณ วันย้ายออก ระบบจะคำนวณยอดสุดท้ายให้อัตโนมัติ</p>
 
+            {/* Toggle prev billing */}
+            {data.hasPrevBilling && (
+                <div className={`rounded-xl border-2 p-3 flex items-center justify-between transition-all ${
+                    usingPrevBilling ? "bg-violet-50 border-violet-300" : "bg-gray-50 border-gray-200"
+                }`}>
+                    <div>
+                        <p className="text-sm font-bold text-gray-700">📅 ถอยย้อนหลัง 1 รอบบิล</p>
+                        <p className="text-xs text-gray-500">ใช้เมื่อออกบิลเดือนสุดท้ายไปก่อนแล้ว</p>
+                        {usingPrevBilling && (
+                            <p className="text-xs text-violet-700 font-semibold mt-1">
+                                น้ำ: {data.prevWaterMeter?.toFixed(1) ?? "-"} | ไฟ: {data.prevElectricMeter?.toFixed(1) ?? "-"}
+                            </p>
+                        )}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const next = !usingPrevBilling;
+                            setUsingPrevBilling(next);
+                            if (next) {
+                                setPrevWaterMeter(data.prevWaterMeter ?? data.lastWaterMeter);
+                                setPrevElectricMeter(data.prevElectricMeter ?? data.lastElectricMeter);
+                            } else {
+                                setPrevWaterMeter(data.lastWaterMeter);
+                                setPrevElectricMeter(data.lastElectricMeter);
+                            }
+                        }}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                            usingPrevBilling ? "bg-violet-500" : "bg-gray-300"
+                        }`}>
+                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow ${
+                            usingPrevBilling ? "translate-x-6" : "translate-x-1"
+                        }`} />
+                    </button>
+                </div>
+            )}
+
             {/* Water */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
                 <h4 className="font-bold text-blue-800 flex items-center gap-2 mb-4"><Droplets size={18} /> มิเตอร์น้ำ (4 หลัก)</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                     <div className="bg-white rounded-xl p-3 border border-blue-100">
                         <p className="text-gray-500">ค่ามิเตอร์ครั้งก่อน</p>
-                        <p className="text-2xl font-mono font-black text-blue-700">{data.lastWaterMeter.toFixed(1)}</p>
+                        <input type="number" step="0.1" value={prevWaterMeter}
+                            onChange={e => { setPrevWaterMeter(parseFloat(e.target.value) || 0); setUsingPrevBilling(false); }}
+                            className="w-full text-2xl font-mono font-black text-blue-700 bg-transparent border-b-2 border-blue-200 focus:outline-none focus:border-blue-500" />
                     </div>
                     <div className="bg-white rounded-xl p-3 border border-blue-200">
                         <p className="text-gray-500 mb-1">ค่ามิเตอร์ปัจจุบัน</p>
@@ -315,7 +365,9 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                     <div className="bg-white rounded-xl p-3 border border-amber-100">
                         <p className="text-gray-500">ค่ามิเตอร์ครั้งก่อน</p>
-                        <p className="text-2xl font-mono font-black text-amber-700">{data.lastElectricMeter.toFixed(1)}</p>
+                        <input type="number" step="0.1" value={prevElectricMeter}
+                            onChange={e => { setPrevElectricMeter(parseFloat(e.target.value) || 0); setUsingPrevBilling(false); }}
+                            className="w-full text-2xl font-mono font-black text-amber-700 bg-transparent border-b-2 border-amber-200 focus:outline-none focus:border-amber-500" />
                     </div>
                     <div className="bg-white rounded-xl p-3 border border-amber-200">
                         <p className="text-gray-500 mb-1">ค่ามิเตอร์ปัจจุบัน</p>

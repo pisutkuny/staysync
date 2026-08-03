@@ -212,6 +212,12 @@ export async function GET(req: Request) {
             orderBy: { createdAt: "desc" },
         });
 
+        // Second-to-last billing (for cases where final bill was already issued)
+        const prevBilling = await prisma.billing.findFirst({
+            where: { roomId: resident.roomId!, id: { not: lastBilling?.id ?? 0 } },
+            orderBy: { createdAt: "desc" },
+        });
+
         const config = await prisma.systemConfig.findFirst({
             where: { organizationId: session.organizationId },
         });
@@ -226,6 +232,10 @@ export async function GET(req: Request) {
             resident,
             lastWaterMeter: lastBilling?.waterMeterCurrent ?? resident.room?.waterMeterInitial ?? 0,
             lastElectricMeter: lastBilling?.electricMeterCurrent ?? resident.room?.electricMeterInitial ?? 0,
+            // Previous billing meters (one period back)
+            prevWaterMeter: prevBilling?.waterMeterCurrent ?? resident.room?.waterMeterInitial ?? null,
+            prevElectricMeter: prevBilling?.electricMeterCurrent ?? resident.room?.electricMeterInitial ?? null,
+            hasPrevBilling: !!prevBilling,
             waterRate: config?.waterRate ?? 18,
             electricRate: config?.electricRate ?? 7,
             pendingBills: resident.billings,
