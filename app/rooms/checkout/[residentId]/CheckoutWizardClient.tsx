@@ -563,8 +563,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                         <p className="font-bold text-gray-700">เงินประกัน</p>
                     </div>
                     <div className="p-4 space-y-3">
-                        <div className="flex justify-between"><span className="text-gray-600 text-sm">💰 เงินประกันทั้งหมด</span><span className="font-bold">฿{depositAmount.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600 text-sm">💳 หักทั้งหมด</span><span className="font-bold text-red-600">- ฿{depositDeductions.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💰 เงินประกันทั้งหมด</span><span className="font-bold text-gray-900 text-base">฿{depositAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💳 หักทั้งหมด</span><span className="font-bold text-red-600 text-base">- ฿{depositDeductions.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
                     </div>
                     <div className={`px-4 py-4 ${depositReturned > 0 ? "bg-emerald-50" : "bg-red-50"}`}>
                         <div className="flex justify-between items-center">
