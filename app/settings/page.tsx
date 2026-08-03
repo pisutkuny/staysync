@@ -848,16 +848,24 @@ export default function SettingsPage() {
                             <div className="p-6 border-b border-slate-100">
                                 <p className="text-sm font-semibold text-gray-700 mb-3">➕ เพิ่มรายการใหม่</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                    <div className="sm:col-span-1 relative">
+                                        <input
+                                            type="text"
+                                            list="category-suggestions"
+                                            placeholder="เลือกหรือพิมพ์หมวด..."
+                                            value={newItem.category}
+                                            onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
+                                            className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
+                                        />
+                                        <datalist id="category-suggestions">
+                                            {Array.from(new Set(checklist.map((i: any) => i.category))).map((cat: any) => (
+                                                <option key={cat} value={cat} />
+                                            ))}
+                                        </datalist>
+                                    </div>
                                     <input
                                         type="text"
-                                        placeholder="หมวด เช่น 🔑 กุญแจ"
-                                        value={newItem.category}
-                                        onChange={e => setNewItem(p => ({ ...p, category: e.target.value }))}
-                                        className="sm:col-span-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm focus:border-indigo-400 focus:outline-none"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="รายการ เช่น กุญแจห้อง"
+                                        placeholder="รายการ เช่น พัดลมแขวนผนัง"
                                         value={newItem.label}
                                         onChange={e => setNewItem(p => ({ ...p, label: e.target.value }))}
                                         onKeyDown={e => e.key === "Enter" && handleAddChecklistItem()}
