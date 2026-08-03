@@ -95,6 +95,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const [sendLine, setSendLine] = useState(true);
     const [note, setNote] = useState("");
     const [checkoutSummary, setCheckoutSummary] = useState<any>(null);
+    const [depositAmount, setDepositAmount] = useState(0);
+    const [depositSource, setDepositSource] = useState<"recorded" | "room_price">("recorded");
 
     // Load preview data + checklist templates
     useEffect(() => {
@@ -113,6 +115,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 setData(previewData);
                 setFinalWaterMeter(previewData.lastWaterMeter ?? 0);
                 setFinalElectricMeter(previewData.lastElectricMeter ?? 0);
+                setDepositAmount(previewData.effectiveDeposit ?? 0);
+                setDepositSource(previewData.depositSource ?? "recorded");
 
                 // Load checklist templates (optional — fallback to empty if table not ready)
                 try {
@@ -147,7 +151,6 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const finalElectricCost = electricUsage * (data?.electricRate ?? 7);
     const totalDamageRepairCost = checklist.filter(i => i.status === "damaged").reduce((s, i) => s + (i.repairCost || 0), 0);
     const pendingBillsTotal = data?.pendingBillsTotal ?? 0;
-    const depositAmount = data?.resident?.deposit ?? 0;
     const checkoutAt = new Date(checkoutDate);
     const contractEnd = data?.resident?.contractEndDate ? new Date(data.resident.contractEndDate) : null;
     const isEarlyCheckout = contractEnd ? checkoutAt < contractEnd : false;
@@ -185,6 +188,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                     depositForfeitReason: (isEarlyCheckout && depositForfeitReason) ? depositForfeitReason : null,
                     note,
                     sendLineNotification: sendLine,
+                    finalDepositAmount: depositAmount,
                 }),
             });
 
@@ -248,10 +252,34 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             )}
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-                <p className="font-semibold text-amber-800 mb-1">💰 เงินประกัน: ฿{depositAmount.toLocaleString()}</p>
-                {data.pendingBillsTotal > 0 && (
-                    <p className="text-amber-700">⚠️ มีบิลค้างชำระ ฿{pendingBillsTotal.toLocaleString()} ({data.pendingBills.length} บิล)</p>
+                <div className="flex items-center justify-between mb-1">
+                    <p className="font-semibold text-amber-800">💰 เงินประกัน</p>
+                    {depositSource === "room_price" && (
+                        <span className="text-[10px] bg-orange-100 text-orange-700 font-bold px-2 py-0.5 rounded-full border border-orange-300">
+                            ใช้ราคาค่าเช่า (ไม่พบข้อมูล)
+                        </span>
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-amber-700 font-bold text-lg">฿</span>
+                    <input
+                        type="number"
+                        min="0"
+                        step="100"
+                        value={depositAmount || ""}
+                        onChange={e => setDepositAmount(parseFloat(e.target.value) || 0)}
+                        className="flex-1 text-lg font-bold text-amber-900 bg-amber-50 border-b-2 border-amber-400 focus:outline-none focus:border-amber-600"
+                        placeholder="0"
+                    />
+                </div>
+                {depositSource === "room_price" && (
+                    <p className="text-xs text-orange-600 mt-1">
+                        ⚠️ ระบบไม่พบเงินประกันที่บันทึกไว้ ใช้ค่าเช่ารายเดือนแทน — แก้ไขได้ตามจริง
+                    </p>
                 )}
+                {data?.pendingBillsTotal && data.pendingBillsTotal > 0 ? (
+                    <p className="text-amber-700 mt-2">⚠️ มีบิลค้างชำระ ฿{data.pendingBillsTotal.toLocaleString()} ({data.pendingBills?.length || 0} บิล)</p>
+                ) : null}
             </div>
         </div>
     );

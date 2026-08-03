@@ -216,6 +216,12 @@ export async function GET(req: Request) {
             where: { organizationId: session.organizationId },
         });
 
+        // Effective deposit: use resident.deposit if set, otherwise fallback to room.price (1 month rent)
+        const effectiveDeposit = (resident.deposit && resident.deposit > 0)
+            ? resident.deposit
+            : (resident.room?.price ?? 0);
+        const depositSource = (resident.deposit && resident.deposit > 0) ? "recorded" : "room_price";
+
         return NextResponse.json({
             resident,
             lastWaterMeter: lastBilling?.waterMeterCurrent ?? resident.room?.waterMeterInitial ?? 0,
@@ -224,6 +230,8 @@ export async function GET(req: Request) {
             electricRate: config?.electricRate ?? 7,
             pendingBills: resident.billings,
             pendingBillsTotal: resident.billings.reduce((s, b) => s + b.totalAmount, 0),
+            effectiveDeposit,
+            depositSource,
         });
     } catch (error) {
         console.error("Checkout GET Error:", error);
