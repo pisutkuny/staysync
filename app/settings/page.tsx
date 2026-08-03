@@ -839,9 +839,21 @@ export default function SettingsPage() {
                 {activeTab === "checklist" && (
                     <div className="space-y-6">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                            <div className="bg-gradient-to-r from-rose-50 to-pink-50 px-6 py-4 border-b border-slate-200">
-                                <h3 className="font-bold text-gray-800 flex items-center gap-2"><ClipboardList size={18} className="text-rose-600" /> รายการตรวจสภาพห้อง (Check-out Checklist)</h3>
-                                <p className="text-sm text-gray-500 mt-1">รายการเหล่านี้จะปรากฏใน Wizard ย้ายออกทุกครั้ง สามารถเพิ่มหรือลบได้ตามต้องการ</p>
+                            <div className="bg-gradient-to-r from-rose-50 to-pink-50 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div>
+                                    <h3 className="font-bold text-gray-800 flex items-center gap-2"><ClipboardList size={18} className="text-rose-600" /> รายการตรวจสภาพห้อง (Check-out Checklist)</h3>
+                                    <p className="text-sm text-gray-500 mt-1">รายการเหล่านี้จะปรากฏใน Wizard ย้ายออกทุกครั้ง สามารถเพิ่มหรือลบได้ตามต้องการ</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleSeedDefaultChecklist}
+                                    disabled={addingItem}
+                                    className="px-4 py-2 bg-white text-rose-600 font-bold text-xs rounded-xl border border-rose-200 shadow-sm hover:bg-rose-50 transition shrink-0 flex items-center gap-1.5 disabled:opacity-50"
+                                    title="โหลดรายการมาตรฐานที่ขาดอยู่เข้ามาเพิ่มเติมในระบบ"
+                                >
+                                    {addingItem ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                    🔄 โหลดรายการมาตรฐานเริ่มต้น (23 รายการ)
+                                </button>
                             </div>
 
                             {/* Add new item form */}

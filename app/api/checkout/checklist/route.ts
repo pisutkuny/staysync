@@ -155,14 +155,22 @@ export async function PUT(req: Request) {
         const session = await getCurrentSession();
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        // Seed default items sequentially for max compatibility
+        // Get existing items for this org
+        const existingItems = await prisma.checkoutChecklistTemplate.findMany({
+            where: { organizationId: session.organizationId },
+        });
+        const existingLabels = new Set(existingItems.map(i => i.label.trim()));
+
+        // Seed default items that do not exist yet
         for (const item of DEFAULT_CHECKLIST_ITEMS) {
-            await prisma.checkoutChecklistTemplate.create({
-                data: {
-                    ...item,
-                    organizationId: session.organizationId,
-                },
-            });
+            if (!existingLabels.has(item.label.trim())) {
+                await prisma.checkoutChecklistTemplate.create({
+                    data: {
+                        ...item,
+                        organizationId: session.organizationId,
+                    },
+                });
+            }
         }
 
         const items = await prisma.checkoutChecklistTemplate.findMany({
