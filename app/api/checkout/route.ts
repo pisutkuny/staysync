@@ -216,10 +216,10 @@ export async function GET(req: Request) {
             where: { organizationId: session.organizationId },
         });
 
-        // Effective deposit: use resident.deposit if set, otherwise fallback to room.price (1 month rent)
+        // Effective deposit: use resident.deposit if set, otherwise fallback to room.defaultDeposit
         const effectiveDeposit = (resident.deposit && resident.deposit > 0)
             ? resident.deposit
-            : (resident.room?.price ?? 0);
+            : (resident.room?.defaultDeposit ?? 0);
         const depositSource = (resident.deposit && resident.deposit > 0) ? "recorded" : "room_price";
 
         return NextResponse.json({
