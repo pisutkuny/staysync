@@ -106,6 +106,9 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const [prevWaterMeter, setPrevWaterMeter] = useState(0);
     const [prevElectricMeter, setPrevElectricMeter] = useState(0);
     const [usingPrevBilling, setUsingPrevBilling] = useState(false);
+    // Include pending bills toggle & override
+    const [includePendingBills, setIncludePendingBills] = useState(true);
+    const [customPendingBillsTotal, setCustomPendingBillsTotal] = useState<number | null>(null);
 
     const loadDefaultChecklist = () => {
         const defaults = [
@@ -200,7 +203,9 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const finalWaterCost = waterUsage * (data?.waterRate ?? 18);
     const finalElectricCost = electricUsage * (data?.electricRate ?? 7);
     const totalDamageRepairCost = checklist.filter(i => i.status === "damaged").reduce((s, i) => s + (i.repairCost || 0), 0);
-    const pendingBillsTotal = data?.pendingBillsTotal ?? 0;
+    const pendingBillsTotal = includePendingBills
+        ? (customPendingBillsTotal !== null ? customPendingBillsTotal : (data?.pendingBillsTotal ?? 0))
+        : 0;
     const checkoutAt = new Date(checkoutDate);
     const contractEnd = data?.resident?.contractEndDate ? new Date(data.resident.contractEndDate) : null;
     const isEarlyCheckout = contractEnd ? checkoutAt < contractEnd : false;
@@ -501,10 +506,44 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             { label: "💧 ค่าน้ำงวดสุดท้าย", amount: finalWaterCost, color: "text-blue-700" },
             { label: "⚡ ค่าไฟงวดสุดท้าย", amount: finalElectricCost, color: "text-amber-700" },
             ...(totalDamageRepairCost > 0 ? [{ label: "🔧 ค่าซ่อมแซม", amount: totalDamageRepairCost, color: "text-red-700" }] : []),
-            ...(pendingBillsTotal > 0 ? [{ label: "📋 บิลค้างชำระ", amount: pendingBillsTotal, color: "text-orange-700" }] : []),
+            ...(includePendingBills && pendingBillsTotal > 0 ? [{ label: "📋 บิลค้างชำระ", amount: pendingBillsTotal, color: "text-orange-700" }] : []),
         ];
         return (
             <div className="space-y-4">
+                {/* Pending bills toggle control */}
+                {(data?.pendingBillsTotal ?? 0) > 0 && (
+                    <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-bold text-orange-900 text-sm">📋 บิลค้างชำระก่อนหน้า</p>
+                                <p className="text-xs text-orange-700">มีบิลค้างชำระในระบบ ฿{(data?.pendingBillsTotal ?? 0).toLocaleString()}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIncludePendingBills(!includePendingBills)}
+                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${includePendingBills ? "bg-orange-500" : "bg-gray-300"}`}
+                            >
+                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow ${includePendingBills ? "translate-x-6" : "translate-x-1"}`} />
+                            </button>
+                        </div>
+                        {includePendingBills && (
+                            <div className="pt-2 border-t border-orange-200/60 flex items-center justify-between text-xs">
+                                <span className="text-orange-800 font-semibold">ปรับยอดบิลค้างชำระที่นำมารวม:</span>
+                                <div className="flex items-center gap-1">
+                                    <span className="font-bold text-orange-900">฿</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={customPendingBillsTotal !== null ? customPendingBillsTotal : (data?.pendingBillsTotal ?? 0)}
+                                        onChange={e => setCustomPendingBillsTotal(parseFloat(e.target.value) || 0)}
+                                        className="w-28 text-right font-bold text-orange-900 bg-white border border-orange-300 rounded-lg p-1 text-xs focus:outline-none focus:border-orange-500"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <div className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
                         <p className="font-bold text-gray-700">รายละเอียดค่าใช้จ่าย</p>
