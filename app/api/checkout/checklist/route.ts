@@ -61,11 +61,18 @@ export async function GET() {
         }
 
         return NextResponse.json(items);
-    } catch (error) {
+    } catch (error: any) {
+        // If table doesn't exist yet (migration pending), return empty array gracefully
+        const isTableMissing = error?.code === "P2021" || error?.message?.includes("does not exist");
+        if (isTableMissing) {
+            console.warn("CheckoutChecklistTemplate table not found — migration pending");
+            return NextResponse.json([]);
+        }
         console.error("Get Checklist Error:", error);
         return NextResponse.json({ error: "Failed to fetch checklist" }, { status: 500 });
     }
 }
+
 
 // POST /api/checkout/checklist — Add new checklist item
 export async function POST(req: Request) {

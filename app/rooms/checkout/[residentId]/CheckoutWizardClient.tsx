@@ -98,26 +98,47 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
 
     // Load preview data + checklist templates
     useEffect(() => {
-        Promise.all([
-            fetch(`/api/checkout?residentId=${residentId}`).then(r => r.json()),
-            fetch("/api/checkout/checklist").then(r => r.json()),
-        ]).then(([previewData, checklistTemplates]) => {
-            setData(previewData);
-            setFinalWaterMeter(previewData.lastWaterMeter);
-            setFinalElectricMeter(previewData.lastElectricMeter);
-            setChecklist(checklistTemplates.map((t: any) => ({
-                ...t,
-                suggestedRepairCost: t.suggestedRepairCost || 0,
-                status: null,
-                repairCost: 0,
-                note: "",
-            })));
-            setLoading(false);
-        }).catch(() => {
-            showAlert("ข้อผิดพลาด", "ไม่สามารถโหลดข้อมูลได้", "error");
-            setLoading(false);
-        });
+        const loadData = async () => {
+            try {
+                // Load resident preview data (required)
+                const previewRes = await fetch(`/api/checkout?residentId=${residentId}`);
+                const previewData = await previewRes.json();
+
+                if (!previewRes.ok || previewData.error) {
+                    showAlert("ข้อผิดพลาด", previewData.error || "ไม่พบข้อมูลผู้เช่า", "error");
+                    setLoading(false);
+                    return;
+                }
+
+                setData(previewData);
+                setFinalWaterMeter(previewData.lastWaterMeter ?? 0);
+                setFinalElectricMeter(previewData.lastElectricMeter ?? 0);
+
+                // Load checklist templates (optional — fallback to empty if table not ready)
+                try {
+                    const clRes = await fetch("/api/checkout/checklist");
+                    const clData = await clRes.json();
+                    const templates = Array.isArray(clData) ? clData : [];
+                    setChecklist(templates.map((t: any) => ({
+                        ...t,
+                        suggestedRepairCost: t.suggestedRepairCost || 0,
+                        status: null,
+                        repairCost: 0,
+                        note: "",
+                    })));
+                } catch {
+                    setChecklist([]); // checklist table not ready — wizard still works
+                }
+
+                setLoading(false);
+            } catch (err: any) {
+                showAlert("ข้อผิดพลาด", "ไม่สามารถโหลดข้อมูลได้: " + (err.message || ""), "error");
+                setLoading(false);
+            }
+        };
+        loadData();
     }, [residentId]);
+
 
     // ── Derived calculations ──────────────────────────────────
     const waterUsage = data ? calcMeterUsage(data.lastWaterMeter, finalWaterMeter, WATER_METER_MAX) : 0;
