@@ -160,15 +160,28 @@ export default function SettingsPage() {
 
     if (loading) return <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-indigo-500" size={40} /></div>;
 
-    // Load checklist when tab is active
+    // Load checklist when tab is active (including inactive items for settings management)
     const loadChecklist = async () => {
         setChecklistLoading(true);
         try {
-            const res = await fetch("/api/checkout/checklist");
+            const res = await fetch("/api/checkout/checklist?includeInactive=true");
             const data = await res.json();
             setChecklist(Array.isArray(data) ? data : []);
         } catch { /* ignore */ }
         setChecklistLoading(false);
+    };
+
+    const handleToggleChecklistItem = async (id: number, currentActive: boolean) => {
+        try {
+            const res = await fetch("/api/checkout/checklist", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, isActive: !currentActive }),
+            });
+            if (res.ok) {
+                setChecklist(prev => prev.map(i => i.id === id ? { ...i, isActive: !currentActive } : i));
+            }
+        } catch { /* ignore */ }
     };
 
     const handleAddChecklistItem = async () => {
@@ -906,24 +919,42 @@ export default function SettingsPage() {
                                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{category}</p>
                                             </div>
                                             {items.map((item: any) => (
-                                                <div key={item.id} className="flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition">
+                                                <div key={item.id} className={`flex items-center justify-between px-6 py-3 transition ${!item.isActive ? "bg-slate-50/60 opacity-60" : "hover:bg-slate-50"}`}>
                                                     <div className="flex items-center gap-3 flex-1 min-w-0">
                                                         {item.isDefault && (
                                                             <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full shrink-0">DEFAULT</span>
                                                         )}
-                                                        <span className="text-sm text-gray-800 truncate">{item.label}</span>
+                                                        <span className={`text-sm ${!item.isActive ? "text-gray-400 line-through" : "text-gray-800"} truncate`}>
+                                                            {item.label}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex items-center gap-3 shrink-0">
+                                                    <div className="flex items-center gap-4 shrink-0">
                                                         {item.suggestedRepairCost > 0 && (
-                                                            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg">
+                                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${!item.isActive ? "bg-gray-100 text-gray-400 border border-gray-200" : "text-emerald-700 bg-emerald-50 border border-emerald-200"}`}>
                                                                 ฿{item.suggestedRepairCost.toLocaleString()}
                                                             </span>
                                                         )}
+
+                                                        {/* Toggle Switch Active / Inactive */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleToggleChecklistItem(item.id, item.isActive)}
+                                                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border ${
+                                                                item.isActive 
+                                                                    ? "bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100" 
+                                                                    : "bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200"
+                                                            }`}
+                                                            title={item.isActive ? "คลิกเพื่อซ่อนรายการนี้ใน Wizard ย้ายออก" : "คลิกเพื่อเปิดใช้งานรายการนี้ใน Wizard ย้ายออก"}
+                                                        >
+                                                            <span className={`w-2 h-2 rounded-full ${item.isActive ? "bg-emerald-500 animate-pulse" : "bg-gray-400"}`}></span>
+                                                            {item.isActive ? "เปิดใช้งาน" : "ซ่อนอยู่"}
+                                                        </button>
+
                                                         <button
                                                             type="button"
                                                             onClick={() => handleDeleteChecklistItem(item.id)}
-                                                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                            title="ลบรายการ"
+                                                            className="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                            title="ลบรายการถาวร"
                                                         >
                                                             <Trash2 size={15} />
                                                         </button>

@@ -36,26 +36,36 @@ const DEFAULT_CHECKLIST_ITEMS = [
 ];
 
 // GET /api/checkout/checklist — Get all checklist templates for org
-export async function GET() {
+export async function GET(req: Request) {
     try {
         const session = await getCurrentSession();
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+        const { searchParams } = new URL(req.url);
+        const includeInactive = searchParams.get("includeInactive") === "true";
+
+        const whereCondition: any = { organizationId: session.organizationId };
+        if (!includeInactive) {
+            whereCondition.isActive = true;
+        }
+
         let items = await prisma.checkoutChecklistTemplate.findMany({
-            where: { organizationId: session.organizationId, isActive: true },
+            where: whereCondition,
             orderBy: { order: "asc" },
         });
 
-        // Auto-seed defaults if empty
-        if (items.length === 0) {
-            await prisma.checkoutChecklistTemplate.createMany({
-                data: DEFAULT_CHECKLIST_ITEMS.map(item => ({
-                    ...item,
-                    organizationId: session.organizationId,
-                })),
-            });
+        // Auto-seed defaults if completely empty for this org
+        if (items.length === 0 && !includeInactive) {
+            for (const item of DEFAULT_CHECKLIST_ITEMS) {
+                await prisma.checkoutChecklistTemplate.create({
+                    data: {
+                        ...item,
+                        organizationId: session.organizationId,
+                    },
+                });
+            }
             items = await prisma.checkoutChecklistTemplate.findMany({
-                where: { organizationId: session.organizationId, isActive: true },
+                where: whereCondition,
                 orderBy: { order: "asc" },
             });
         }
@@ -72,7 +82,6 @@ export async function GET() {
         return NextResponse.json({ error: "Failed to fetch checklist" }, { status: 500 });
     }
 }
-
 
 // POST /api/checkout/checklist — Add new checklist item
 export async function POST(req: Request) {
@@ -110,6 +119,35 @@ export async function POST(req: Request) {
     }
 }
 
+// PATCH /api/checkout/checklist — Toggle isActive status
+export async function PATCH(req: Request) {
+    try {
+        const session = await getCurrentSession();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const { id, isActive } = await req.json();
+        if (typeof id !== "number" || typeof isActive !== "boolean") {
+            return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
+        }
+
+        const item = await prisma.checkoutChecklistTemplate.findFirst({
+            where: { id, organizationId: session.organizationId },
+        });
+
+        if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+
+        const updated = await prisma.checkoutChecklistTemplate.update({
+            where: { id },
+            data: { isActive },
+        });
+
+        return NextResponse.json(updated);
+    } catch (error) {
+        console.error("Toggle Checklist Item Error:", error);
+        return NextResponse.json({ error: "Failed to update item status" }, { status: 500 });
+    }
+}
+
 // PUT /api/checkout/checklist — Seed default items in batch
 export async function PUT(req: Request) {
     try {
@@ -127,7 +165,7 @@ export async function PUT(req: Request) {
         }
 
         const items = await prisma.checkoutChecklistTemplate.findMany({
-            where: { organizationId: session.organizationId, isActive: true },
+            where: { organizationId: session.organizationId },
             orderBy: { order: "asc" },
         });
 
@@ -138,7 +176,7 @@ export async function PUT(req: Request) {
     }
 }
 
-// DELETE /api/checkout/checklist?id=X — Deactivate (soft delete)
+// DELETE /api/checkout/checklist?id=X — Hard delete item
 export async function DELETE(req: Request) {
     try {
         const session = await getCurrentSession();
@@ -153,9 +191,8 @@ export async function DELETE(req: Request) {
 
         if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
 
-        await prisma.checkoutChecklistTemplate.update({
+        await prisma.checkoutChecklistTemplate.delete({
             where: { id },
-            data: { isActive: false },
         });
 
         return NextResponse.json({ success: true });
