@@ -116,13 +116,15 @@ export async function PUT(req: Request) {
         const session = await getCurrentSession();
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        // Seed default items
-        await prisma.checkoutChecklistTemplate.createMany({
-            data: DEFAULT_CHECKLIST_ITEMS.map(item => ({
-                ...item,
-                organizationId: session.organizationId,
-            })),
-        });
+        // Seed default items sequentially for max compatibility
+        for (const item of DEFAULT_CHECKLIST_ITEMS) {
+            await prisma.checkoutChecklistTemplate.create({
+                data: {
+                    ...item,
+                    organizationId: session.organizationId,
+                },
+            });
+        }
 
         const items = await prisma.checkoutChecklistTemplate.findMany({
             where: { organizationId: session.organizationId, isActive: true },
@@ -130,9 +132,9 @@ export async function PUT(req: Request) {
         });
 
         return NextResponse.json(items);
-    } catch (error) {
+    } catch (error: any) {
         console.error("Seed Checklist Error:", error);
-        return NextResponse.json({ error: "Failed to seed checklist" }, { status: 500 });
+        return NextResponse.json({ error: error?.message || "Failed to seed checklist" }, { status: 500 });
     }
 }
 
