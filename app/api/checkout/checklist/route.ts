@@ -7,9 +7,10 @@ const DEFAULT_CHECKLIST_ITEMS = [
     // 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า
     { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องปรับอากาศ (ความเย็น, รีโมท, แผ่นกรอง, ไม่มีน้ำหยด)", suggestedRepairCost: 500, order: 1, isDefault: true },
     { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องทำน้ำอุ่น (ความร้อน, ฝักบัวไม่รั่ว, ปุ่มทดสอบ ELCB ปกติ)", suggestedRepairCost: 300, order: 2, isDefault: true },
-    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "หลอดไฟและสวิตช์ (สว่างครบทุกดวง, สวิตช์ไม่หลวม/ไม่มีรอยไหม้)", suggestedRepairCost: 100, order: 3, isDefault: true },
-    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เต้ารับปลั๊กไฟ (ไม่หลวม, ไม่มีรอยไหม้, ฝาครอบไม่แตกหัก)", suggestedRepairCost: 100, order: 4, isDefault: true },
-    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "ตู้คอนซูมเมอร์ยูนิต / เบรกเกอร์ (สภาพปกติ, ไม่มีกลิ่นไหม้)", suggestedRepairCost: 300, order: 5, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "พัดลมแขวนผนัง / พัดลมเพดาน (ชำรุด/เสียหาย)", suggestedRepairCost: 250, order: 3, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "หลอดไฟและสวิตช์ (สว่างครบทุกดวง, สวิตช์ไม่หลวม/ไม่มีรอยไหม้)", suggestedRepairCost: 100, order: 4, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เต้ารับปลั๊กไฟ (ไม่หลวม, ไม่มีรอยไหม้, ฝาครอบไม่แตกหัก)", suggestedRepairCost: 100, order: 5, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "ตู้คอนซูมเมอร์ยูนิต / เบรกเกอร์ (สภาพปกติ, ไม่มีกลิ่นไหม้)", suggestedRepairCost: 300, order: 6, isDefault: true },
 
     // 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป
     { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ประตูและลูกบิด / คีย์การ์ด (เปิด-ปิดสนิท, ล็อกปกติ)", suggestedRepairCost: 300, order: 6, isDefault: true },
