@@ -110,6 +110,32 @@ export async function POST(req: Request) {
     }
 }
 
+// PUT /api/checkout/checklist — Seed default items in batch
+export async function PUT(req: Request) {
+    try {
+        const session = await getCurrentSession();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        // Seed default items
+        await prisma.checkoutChecklistTemplate.createMany({
+            data: DEFAULT_CHECKLIST_ITEMS.map(item => ({
+                ...item,
+                organizationId: session.organizationId,
+            })),
+        });
+
+        const items = await prisma.checkoutChecklistTemplate.findMany({
+            where: { organizationId: session.organizationId, isActive: true },
+            orderBy: { order: "asc" },
+        });
+
+        return NextResponse.json(items);
+    } catch (error) {
+        console.error("Seed Checklist Error:", error);
+        return NextResponse.json({ error: "Failed to seed checklist" }, { status: 500 });
+    }
+}
+
 // DELETE /api/checkout/checklist?id=X — Deactivate (soft delete)
 export async function DELETE(req: Request) {
     try {
