@@ -107,6 +107,39 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const [prevElectricMeter, setPrevElectricMeter] = useState(0);
     const [usingPrevBilling, setUsingPrevBilling] = useState(false);
 
+    const loadDefaultChecklist = () => {
+        const defaults = [
+            { id: 1, category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องปรับอากาศ (ความเย็น, รีโมท, แผ่นกรอง, ไม่มีน้ำหยด)", suggestedRepairCost: 500 },
+            { id: 2, category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องทำน้ำอุ่น (ความร้อน, ฝักบัวไม่รั่ว, ปุ่มทดสอบ ELCB ปกติ)", suggestedRepairCost: 300 },
+            { id: 3, category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "หลอดไฟและสวิตช์ (สว่างครบทุกดวง, สวิตช์ไม่หลวม/ไม่มีรอยไหม้)", suggestedRepairCost: 100 },
+            { id: 4, category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เต้ารับปลั๊กไฟ (ไม่หลวม, ไม่มีรอยไหม้, ฝาครอบไม่แตกหัก)", suggestedRepairCost: 100 },
+            { id: 5, category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "ตู้คอนซูมเมอร์ยูนิต / เบรกเกอร์ (สภาพปกติ, ไม่มีกลิ่นไหม้)", suggestedRepairCost: 300 },
+            { id: 6, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ประตูและลูกบิด / คีย์การ์ด (เปิด-ปิดสนิท, ล็อกปกติ)", suggestedRepairCost: 300 },
+            { id: 7, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "กุญแจ / คีย์การ์ด (ได้รับคืนครบถ้วน)", suggestedRepairCost: 150 },
+            { id: 8, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ผนังและเพดาน (ไม่มีรอยเจาะ/ขีดข่วน/คราบฝังลึก/น้ำซึม)", suggestedRepairCost: 100 },
+            { id: 9, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "พื้นห้อง / บัวเชิงผนัง (กระเบื้อง/ลามิเนต ไม่บวม/ไม่แตก)", suggestedRepairCost: 200 },
+            { id: 10, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "เตียงและฟูกที่นอน (โครงแข็งแรง, ฟูกไม่มีคราบ/รอยไหม้)", suggestedRepairCost: 500 },
+            { id: 11, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ตู้เสื้อผ้า (บานพับปกติ, ราวไม่หัก, ลิ้นชักเลื่อนได้)", suggestedRepairCost: 300 },
+            { id: 12, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "โต๊ะและเก้าอี้ (ขาแข็งแรง, ผิวไม่บวมน้ำ)", suggestedRepairCost: 200 },
+            { id: 13, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "หน้าต่างและมุ้งลวด (กระจกไม่แตก, ล็อกได้, มุ้งลวดไม่ขาด)", suggestedRepairCost: 300 },
+            { id: 14, category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ผ้าม่านและราวม่าน (แข็งแรง, ผ้าไม่ขาด/ไม่มีคราบฝังลึก)", suggestedRepairCost: 200 },
+            { id: 15, category: "🚿 3. หมวดห้องน้ำ", label: "ประตูห้องน้ำ (เปิด-ปิดปกติ, บานพับไม่ผุ, ลูกบิดล็อกได้)", suggestedRepairCost: 250 },
+            { id: 16, category: "🚿 3. หมวดห้องน้ำ", label: "อ่างล้างหน้าและกระจก (กระจกไม่ร้าว, อ่างไม่บิ่น, ก๊อกไม่รั่ว)", suggestedRepairCost: 200 },
+            { id: 17, category: "🚿 3. หมวดห้องน้ำ", label: "ชักโครกและสายชำระ (กดน้ำลงปกติ, สายชำระไม่แตก/ไม่รั่ว)", suggestedRepairCost: 250 },
+            { id: 18, category: "🚿 3. หมวดห้องน้ำ", label: "ท่อระบายน้ำที่พื้น (น้ำระบายได้เร็ว ไม่ตันทิ้งคราบ)", suggestedRepairCost: 200 },
+            { id: 19, category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ประตูระเบียง (เลื่อนลื่นไหล, ล็อกได้)", suggestedRepairCost: 250 },
+            { id: 20, category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ราวตากผ้า / พื้นที่ซักล้าง (ก๊อกน้ำใช้งานได้, ไม่มีขยะอุดตัน)", suggestedRepairCost: 200 },
+            { id: 21, category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ค่าทำความสะอาดทั่วไป (ห้องไม่สะอาด)", suggestedRepairCost: 250 },
+            { id: 22, category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "เคลียร์ขยะและของส่วนตัวออกหมดแล้ว", suggestedRepairCost: 0 },
+        ];
+        setChecklist(defaults.map(t => ({
+            ...t,
+            status: null,
+            repairCost: 0,
+            note: "",
+        })));
+    };
+
     // Load preview data + checklist templates
     useEffect(() => {
         const loadData = async () => {
@@ -129,20 +162,25 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 setDepositAmount(previewData.effectiveDeposit ?? 0);
                 setDepositSource(previewData.depositSource ?? "recorded");
 
-                // Load checklist templates (optional — fallback to empty if table not ready)
+                // Load checklist templates (optional — fallback to default items if empty or table not ready)
                 try {
                     const clRes = await fetch("/api/checkout/checklist");
                     const clData = await clRes.json();
                     const templates = Array.isArray(clData) ? clData : [];
-                    setChecklist(templates.map((t: any) => ({
-                        ...t,
-                        suggestedRepairCost: t.suggestedRepairCost || 0,
-                        status: null,
-                        repairCost: 0,
-                        note: "",
-                    })));
+                    if (templates.length > 0) {
+                        setChecklist(templates.map((t: any) => ({
+                            ...t,
+                            suggestedRepairCost: t.suggestedRepairCost || 0,
+                            status: null,
+                            repairCost: 0,
+                            note: "",
+                        })));
+                    } else {
+                        // DB returned empty checklist, use default local list
+                        loadDefaultChecklist();
+                    }
                 } catch {
-                    setChecklist([]); // checklist table not ready — wizard still works
+                    loadDefaultChecklist();
                 }
 
                 setLoading(false);

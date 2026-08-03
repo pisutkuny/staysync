@@ -4,35 +4,35 @@ import { getCurrentSession } from "@/lib/auth/session";
 
 // Default checklist items to seed for new organizations
 const DEFAULT_CHECKLIST_ITEMS = [
-    // 🔑 กุญแจ
-    { category: "🔑 กุญแจ", label: "กุญแจห้อง (สูญหาย/เปลี่ยนชุด)", suggestedRepairCost: 300, order: 1, isDefault: true },
-    { category: "🔑 กุญแจ", label: "คีย์การ์ดเข้าออก (สูญหาย)", suggestedRepairCost: 150, order: 2, isDefault: true },
+    // 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องปรับอากาศ (ความเย็น, รีโมท, แผ่นกรอง, ไม่มีน้ำหยด)", suggestedRepairCost: 500, order: 1, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เครื่องทำน้ำอุ่น (ความร้อน, ฝักบัวไม่รั่ว, ปุ่มทดสอบ ELCB ปกติ)", suggestedRepairCost: 300, order: 2, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "หลอดไฟและสวิตช์ (สว่างครบทุกดวง, สวิตช์ไม่หลวม/ไม่มีรอยไหม้)", suggestedRepairCost: 100, order: 3, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "เต้ารับปลั๊กไฟ (ไม่หลวม, ไม่มีรอยไหม้, ฝาครอบไม่แตกหัก)", suggestedRepairCost: 100, order: 4, isDefault: true },
+    { category: "⚡ 1. ระบบไฟฟ้าและเครื่องใช้ไฟฟ้า", label: "ตู้คอนซูมเมอร์ยูนิต / เบรกเกอร์ (สภาพปกติ, ไม่มีกลิ่นไหม้)", suggestedRepairCost: 300, order: 5, isDefault: true },
 
-    // ❄️ เครื่องใช้ไฟฟ้า
-    { category: "❄️ เครื่องใช้ไฟฟ้า", label: "แอร์ (ชำรุด/เสียหาย)", suggestedRepairCost: 500, order: 3, isDefault: true },
-    { category: "❄️ เครื่องใช้ไฟฟ้า", label: "รีโมทแอร์ (สูญหาย/ชำรุด)", suggestedRepairCost: 250, order: 4, isDefault: true },
-    { category: "❄️ เครื่องใช้ไฟฟ้า", label: "พัดลม (ชำรุด/เสียหาย)", suggestedRepairCost: 300, order: 5, isDefault: true },
-    { category: "❄️ เครื่องใช้ไฟฟ้า", label: "ตู้เย็น (ถ้ามี — ชำรุด)", suggestedRepairCost: 500, order: 6, isDefault: true },
+    // 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ประตูและลูกบิด / คีย์การ์ด (เปิด-ปิดสนิท, ล็อกปกติ)", suggestedRepairCost: 300, order: 6, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "กุญแจ / คีย์การ์ด (ได้รับคืนครบถ้วน)", suggestedRepairCost: 150, order: 7, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ผนังและเพดาน (ไม่มีรอยเจาะ/ขีดข่วน/คราบฝังลึก/น้ำซึม)", suggestedRepairCost: 100, order: 8, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "พื้นห้อง / บัวเชิงผนัง (กระเบื้อง/ลามิเนต ไม่บวม/ไม่แตก)", suggestedRepairCost: 200, order: 9, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "เตียงและฟูกที่นอน (โครงแข็งแรง, ฟูกไม่มีคราบ/รอยไหม้)", suggestedRepairCost: 500, order: 10, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ตู้เสื้อผ้า (บานพับปกติ, ราวไม่หัก, ลิ้นชักเลื่อนได้)", suggestedRepairCost: 300, order: 11, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "โต๊ะและเก้าอี้ (ขาแข็งแรง, ผิวไม่บวมน้ำ)", suggestedRepairCost: 200, order: 12, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "หน้าต่างและมุ้งลวด (กระจกไม่แตก, ล็อกได้, มุ้งลวดไม่ขาด)", suggestedRepairCost: 300, order: 13, isDefault: true },
+    { category: "🪑 2. หมวดเฟอร์นิเจอร์และพื้นที่ทั่วไป", label: "ผ้าม่านและราวม่าน (แข็งแรง, ผ้าไม่ขาด/ไม่มีคราบฝังลึก)", suggestedRepairCost: 200, order: 14, isDefault: true },
 
-    // 🪑 เฟอร์นิเจอร์
-    { category: "🪑 เฟอร์นิเจอร์", label: "เตียงนอน / ที่นอน (ชำรุด)", suggestedRepairCost: 500, order: 7, isDefault: true },
-    { category: "🪑 เฟอร์นิเจอร์", label: "ตู้เสื้อผ้า (ชำรุด)", suggestedRepairCost: 300, order: 8, isDefault: true },
-    { category: "🪑 เฟอร์นิเจอร์", label: "โต๊ะ / เก้าอี้ (ชำรุด)", suggestedRepairCost: 200, order: 9, isDefault: true },
+    // 3. หมวดห้องน้ำ
+    { category: "🚿 3. หมวดห้องน้ำ", label: "ประตูห้องน้ำ (เปิด-ปิดปกติ, บานพับไม่ผุ, ลูกบิดล็อกได้)", suggestedRepairCost: 250, order: 15, isDefault: true },
+    { category: "🚿 3. หมวดห้องน้ำ", label: "อ่างล้างหน้าและกระจก (กระจกไม่ร้าว, อ่างไม่บิ่น, ก๊อกไม่รั่ว)", suggestedRepairCost: 200, order: 16, isDefault: true },
+    { category: "🚿 3. หมวดห้องน้ำ", label: "ชักโครกและสายชำระ (กดน้ำลงปกติ, สายชำระไม่แตก/ไม่รั่ว)", suggestedRepairCost: 250, order: 17, isDefault: true },
+    { category: "🚿 3. หมวดห้องน้ำ", label: "ท่อระบายน้ำที่พื้น (น้ำระบายได้เร็ว ไม่ตันทิ้งคราบ)", suggestedRepairCost: 200, order: 18, isDefault: true },
 
-    // 🚿 ห้องน้ำ
-    { category: "🚿 ห้องน้ำ", label: "สุขภัณฑ์ / โถส้วม (ชำรุด)", suggestedRepairCost: 300, order: 10, isDefault: true },
-    { category: "🚿 ห้องน้ำ", label: "ท่อระบายน้ำ / ชักโครก (อุดตัน)", suggestedRepairCost: 250, order: 11, isDefault: true },
-    { category: "🚿 ห้องน้ำ", label: "ฝักบัว / ก๊อกน้ำ (ชำรุด)", suggestedRepairCost: 200, order: 12, isDefault: true },
-    { category: "🚿 ห้องน้ำ", label: "กระจก (แตก/ชำรุด)", suggestedRepairCost: 200, order: 13, isDefault: true },
-
-    // 🏠 ห้องโดยรวม
-    { category: "🏠 ห้องโดยรวม", label: "ผนัง/พื้น (รอยเจาะ, ตอกตะปู, ขีดข่วน)", suggestedRepairCost: 100, order: 14, isDefault: true },
-    { category: "🏠 ห้องโดยรวม", label: "หน้าต่าง / มู่ลี่ (ชำรุด)", suggestedRepairCost: 300, order: 15, isDefault: true },
-
-    // 🗑️ ความสะอาด
-    { category: "🗑️ ความสะอาด", label: "ค่าทำความสะอาดทั่วไป (ห้องไม่สะอาด)", suggestedRepairCost: 250, order: 16, isDefault: true },
-    { category: "🗑️ ความสะอาด", label: "ขนย้ายขยะชิ้นใหญ่ (จ้างขนทิ้ง)", suggestedRepairCost: 400, order: 17, isDefault: true },
-    { category: "🗑️ ความสะอาด", label: "เคลียร์ขยะและของส่วนตัวออกหมดแล้ว", suggestedRepairCost: 0, order: 18, isDefault: true },
+    // 4. หมวดระเบียง & ความสะอาด
+    { category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ประตูระเบียง (เลื่อนลื่นไหล, ล็อกได้)", suggestedRepairCost: 250, order: 19, isDefault: true },
+    { category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ราวตากผ้า / พื้นที่ซักล้าง (ก๊อกน้ำใช้งานได้, ไม่มีขยะอุดตัน)", suggestedRepairCost: 200, order: 20, isDefault: true },
+    { category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "ค่าทำความสะอาดทั่วไป (ห้องไม่สะอาด)", suggestedRepairCost: 250, order: 21, isDefault: true },
+    { category: "🏞️ 4. หมวดระเบียง & ความสะอาด", label: "เคลียร์ขยะและของส่วนตัวออกหมดแล้ว", suggestedRepairCost: 0, order: 22, isDefault: true },
 ];
 
 // GET /api/checkout/checklist — Get all checklist templates for org
