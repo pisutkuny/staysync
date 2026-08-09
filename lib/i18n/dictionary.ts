@@ -93,6 +93,8 @@ export const dictionary = {
         },
         status: {
             Available: "ว่าง",
+            Vacant: "ห้องว่าง",
+            vacant: "ห้องว่าง",
             Occupied: "มีผู้เช่า",
             Maintenance: "ซ่อมบำรุง",
             Pending: "รอตรวจสอบ",
@@ -805,7 +807,9 @@ export const dictionary = {
             createBill: "Create Bill",
         },
         status: {
-            Available: "Available",
+            Available: "Vacant",
+            Vacant: "Vacant",
+            vacant: "Vacant",
             Occupied: "Occupied",
             Maintenance: "Maintenance",
             Pending: "Pending",
