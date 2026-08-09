@@ -416,8 +416,8 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredRooms.map((room) => {
                         const bill = room.bill;
-                        const status = bill ? (bill.paymentStatus || bill.status || 'Pending') : 'No Bill';
-                        const isOccupied = room.status === 'Occupied';
+                        const hasActiveResidents = Array.isArray(room.residents) && room.residents.length > 0;
+                        const isOccupied = room.status === 'Occupied' && hasActiveResidents;
 
                         // Dynamic Font Size Logic
                         const titleSize = room.number.length > 15 ? 'text-2xl' :
@@ -498,10 +498,10 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p className="text-base font-bold text-slate-900 truncate">
-                                                {room.residents[0]?.fullName || <span className="text-slate-500 italic">No Resident</span>}
+                                                {hasActiveResidents ? (room.residents[0]?.fullName || t.residents.fullName) : <span className="text-slate-400 italic">ห้องว่าง (ไม่มีผู้เช่า)</span>}
                                             </p>
                                             <p className="text-xs text-slate-600 truncate font-bold uppercase">
-                                                {t.residents.fullName}
+                                                {hasActiveResidents ? t.residents.fullName : "สถานะห้องพัก"}
                                             </p>
                                         </div>
                                     </div>
