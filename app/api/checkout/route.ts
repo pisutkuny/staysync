@@ -80,8 +80,6 @@ export async function POST(req: Request) {
             data: {
                 checkoutDate: checkoutAt,
                 residentId,
-                residentName: resident.fullName,
-                roomNumber: resident.room.number,
                 isEarlyCheckout,
                 daysEarly,
                 finalWaterMeter,

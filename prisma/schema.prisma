@@ -486,8 +486,6 @@ model CheckoutRecord {
 
   // ผู้เช่าที่ย้ายออก
   residentId   Int
-  residentName String? // snapshot ณ วันย้ายออก
-  roomNumber   String? // snapshot
 
   // ประเภทการย้ายออก
   isEarlyCheckout Boolean @default(false)
