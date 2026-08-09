@@ -46,41 +46,181 @@ const STEPS = [
     { icon: Send, label: "ยืนยัน & ส่ง" },
 ];
 
-// ─── PDF Generator ───────────────────────────────────────────
-function generatePDF(data: CheckoutData, summary: any, checklist: ChecklistItem[], checkoutDate: string) {
-    const lines: string[] = [];
-    const fmt = (n: number) => `฿${n.toLocaleString("th-TH", { minimumFractionDigits: 2 })}`;
+// ─── PDF / Print Document Generator ───────────────────────────
+function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: ChecklistItem[], checkoutDate: string, note?: string) {
+    const fmt = (n: number) => `฿${(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })}`;
     const d = data.resident;
+    const roomNumber = d.room?.number || "-";
+    const formattedCheckoutDate = new Date(checkoutDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
+    const formattedStartDate = d.contractStartDate ? new Date(d.contractStartDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" }) : "-";
+    const formattedEndDate = d.contractEndDate ? new Date(d.contractEndDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" }) : "ไม่ระบุ";
 
-    lines.push(`สรุปการย้ายออก — ${d.fullName}`);
-    lines.push(`ห้อง: ${d.room?.number}   วันย้ายออก: ${new Date(checkoutDate).toLocaleDateString("th-TH")}`);
-    lines.push(`สัญญา: ${new Date(d.contractStartDate).toLocaleDateString("th-TH")} → ${d.contractEndDate ? new Date(d.contractEndDate).toLocaleDateString("th-TH") : "ไม่ระบุ"}`);
-    lines.push(``);
-    lines.push(`── มิเตอร์ ──`);
-    lines.push(`น้ำ: ใช้ ${summary.finalWaterUsage?.toFixed(1)} หน่วย = ${fmt(summary.finalWaterCost)}`);
-    lines.push(`ไฟ: ใช้ ${summary.finalElectricUsage?.toFixed(1)} หน่วย = ${fmt(summary.finalElectricCost)}`);
-    lines.push(``);
-    lines.push(`── ผลการตรวจสภาพห้อง ──`);
-    checklist.forEach(item => {
-        const statusTh = item.status === "pass" ? "✅ ผ่าน" : item.status === "damaged" ? `❌ ชำรุด (${fmt(item.repairCost)})` : "— ไม่ได้ตรวจ";
-        lines.push(`${item.category} / ${item.label}: ${statusTh}${item.note ? ` — ${item.note}` : ""}`);
-    });
-    lines.push(``);
-    lines.push(`── สรุปการเงิน ──`);
-    lines.push(`ค่าน้ำ + ไฟ: ${fmt(summary.finalWaterCost + summary.finalElectricCost)}`);
-    if (summary.totalDamageRepairCost > 0) lines.push(`ค่าซ่อมแซม: ${fmt(summary.totalDamageRepairCost)}`);
-    if (summary.pendingBillsTotal > 0) lines.push(`บิลค้างชำระ: ${fmt(summary.pendingBillsTotal)}`);
-    lines.push(`เงินประกัน: ${fmt(summary.depositAmount)}`);
-    lines.push(`หักทั้งหมด: ${fmt(summary.depositDeductions)}`);
-    lines.push(`เงินที่คืน: ${fmt(summary.depositReturned)}`);
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
 
-    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `checkout_${d.fullName.replace(/\s/g, "_")}_${checkoutDate}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="th">
+    <head>
+        <meta charset="UTF-8">
+        <title>เอกสารสรุปการย้ายออก - ห้อง ${roomNumber} (${d.fullName})</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+            * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+            body { margin: 0; padding: 20px; color: #1e293b; background: #fff; font-size: 13px; line-height: 1.5; }
+            .page { max-width: 800px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 8px; }
+            .header { text-align: center; border-bottom: 2px solid #6366f1; padding-bottom: 15px; margin-bottom: 20px; }
+            .header h1 { margin: 0 0 5px 0; font-size: 22px; color: #4338ca; }
+            .header p { margin: 0; color: #64748b; font-size: 13px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f1f5f9; }
+            .info-item { margin-bottom: 5px; }
+            .info-label { font-weight: 600; color: #475569; }
+            .section-title { font-size: 15px; font-weight: 700; color: #1e1b4b; border-left: 4px solid #4f46e5; padding-left: 10px; margin: 20px 0 10px 0; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+            th { background-color: #f1f5f9; font-weight: 700; color: #334155; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .badge-pass { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+            .badge-damaged { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+            .summary-box { background: #faf5ff; border: 2px solid #e9d5ff; border-radius: 8px; padding: 15px; margin-top: 20px; }
+            .summary-row { display: flex; justify-between: space-between; padding: 6px 0; border-bottom: 1px dashed #e9d5ff; }
+            .summary-row:last-child { border-bottom: none; font-size: 16px; font-weight: 700; color: #581c87; padding-top: 10px; }
+            .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; text-align: center; }
+            .sig-line { border-bottom: 1px dashed #94a3b8; height: 50px; margin-bottom: 8px; }
+            @media print {
+                body { padding: 0; }
+                .page { border: none; padding: 0; }
+                .no-print { display: none; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="no-print" style="max-width: 800px; margin: 0 auto 15px auto; text-align: right;">
+            <button onclick="window.print()" style="background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ พิมพ์เอกสาร / บันทึกเป็น PDF</button>
+        </div>
+        <div class="page">
+            <div class="header">
+                <h1>ใบสรุปการย้ายออกและคืนเงินประกัน (Check-out Settlement Form)</h1>
+                <p>เอกสารหลักฐานการย้ายออกและการเคลียร์ค่าใช้จ่ายหอพัก</p>
+            </div>
+
+            <div class="info-grid">
+                <div>
+                    <div class="info-item"><span class="info-label">ผู้เช่า:</span> ${d.fullName}</div>
+                    <div class="info-item"><span class="info-label">เบอร์โทรศัพท์:</span> ${d.phone || "-"}</div>
+                    <div class="info-item"><span class="info-label">ห้องพัก:</span> ห้อง ${roomNumber}</div>
+                </div>
+                <div>
+                    <div class="info-item"><span class="info-label">วันที่ย้ายเข้า:</span> ${formattedStartDate}</div>
+                    <div class="info-item"><span class="info-label">วันหมดสัญญา:</span> ${formattedEndDate}</div>
+                    <div class="info-item"><span class="info-label">วันที่ย้ายออก:</span> ${formattedCheckoutDate}</div>
+                </div>
+            </div>
+
+            <div class="section-title">1. รายการค่าน้ำ - ค่าไฟงวดสุดท้าย</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>รายการ</th>
+                        <th class="text-right">มิเตอร์ครั้งก่อน</th>
+                        <th class="text-right">มิเตอร์ปัจจุบัน</th>
+                        <th class="text-right">หน่วยที่ใช้</th>
+                        <th class="text-right">อัตรา</th>
+                        <th class="text-right">จำนวนเงิน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>💧 ค่าน้ำประปา</td>
+                        <td class="text-right">${(summary.prevWaterMeter ?? 0).toFixed(1)}</td>
+                        <td class="text-right">${(summary.finalWaterMeter ?? 0).toFixed(1)}</td>
+                        <td class="text-right">${(summary.finalWaterUsage ?? 0).toFixed(1)}</td>
+                        <td class="text-right">฿${data.waterRate}/หน่วย</td>
+                        <td class="text-right">${fmt(summary.finalWaterCost)}</td>
+                    </tr>
+                    <tr>
+                        <td>⚡ ค่าไฟฟ้า</td>
+                        <td class="text-right">${(summary.prevElectricMeter ?? 0).toFixed(1)}</td>
+                        <td class="text-right">${(summary.finalElectricMeter ?? 0).toFixed(1)}</td>
+                        <td class="text-right">${(summary.finalElectricUsage ?? 0).toFixed(1)}</td>
+                        <td class="text-right">฿${data.electricRate}/หน่วย</td>
+                        <td class="text-right">${fmt(summary.finalElectricCost)}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-title">2. ผลการตรวจสภาพห้องพัก & ความเสียหาย</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>หมวดหมู่ / รายการสิ่งของ</th>
+                        <th class="text-center" style="width: 100px;">สถานะ</th>
+                        <th class="text-right" style="width: 120px;">ค่าปรับ/ค่าซ่อม</th>
+                        <th>หมายเหตุเพิ่มเติม</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${checklist.map(item => `
+                        <tr>
+                            <td>${item.category} — ${item.label}</td>
+                            <td class="text-center">${item.status === "pass" ? '<span class="badge-pass">✅ ผ่าน</span>' : item.status === "damaged" ? '<span class="badge-damaged">❌ ชำรุด</span>' : '<span style="color:#94a3b8;">—</span>'}</td>
+                            <td class="text-right">${item.status === "damaged" ? fmt(item.repairCost) : "฿0.00"}</td>
+                            <td>${item.note || "-"}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+
+            <div class="section-title">3. สรุปยอดเงินประกันและการหักชำระ</div>
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span>💰 เงินประกันทั้งหมดที่เก็บไว้:</span>
+                    <span>${fmt(summary.depositAmount)}</span>
+                </div>
+                <div class="summary-row" style="color: #c2410c;">
+                    <span>💧 ค่าน้ำประปางวดสุดท้าย:</span>
+                    <span>- ${fmt(summary.finalWaterCost)}</span>
+                </div>
+                <div class="summary-row" style="color: #c2410c;">
+                    <span>⚡ ค่าไฟฟ้างวดสุดท้าย:</span>
+                    <span>- ${fmt(summary.finalElectricCost)}</span>
+                </div>
+                ${summary.totalDamageRepairCost > 0 ? `
+                <div class="summary-row" style="color: #b91c1c;">
+                    <span>🔧 ค่าซ่อมแซมสิ่งของชำรุด:</span>
+                    <span>- ${fmt(summary.totalDamageRepairCost)}</span>
+                </div>` : ''}
+                ${summary.pendingBillsTotal > 0 ? `
+                <div class="summary-row" style="color: #b91c1c;">
+                    <span>📋 บิลค้างชำระก่อนหน้า:</span>
+                    <span>- ${fmt(summary.pendingBillsTotal)}</span>
+                </div>` : ''}
+                <div class="summary-row" style="margin-top: 8px; background: #fff; padding: 10px; border-radius: 6px;">
+                    <span>${summary.depositReturned > 0 ? "✅ สรุปยอดเงินคืนให้ผู้เช่า:" : "❌ สรุปยอดที่ต้องชำระเพิ่ม:"}</span>
+                    <span style="color: ${summary.depositReturned > 0 ? '#15803d' : '#b91c1c'};">${fmt(summary.depositReturned)}</span>
+                </div>
+            </div>
+
+            ${note ? `<div style="margin-top: 15px; background: #fffbebf8; padding: 10px 15px; border-radius: 6px; border: 1px solid #fef3c7;"><strong>📝 หมายเหตุเพิ่มเติม:</strong> ${note}</div>` : ''}
+
+            <div class="signatures">
+                <div>
+                    <div class="sig-line"></div>
+                    <p>ลงชื่อ .................................................... ผู้เช่า<br>(${d.fullName})<br>วันที่ ....... / ....... / ...........</p>
+                </div>
+                <div>
+                    <div class="sig-line"></div>
+                    <p>ลงชื่อ .................................................... ผู้รับห้อง/ผู้ดูแล<br>วันที่ ....... / ....... / ...........</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
 }
 
 // ─── Main Component ───────────────────────────────────────────
@@ -766,9 +906,29 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             </div>
 
             <button
-                onClick={() => generatePDF(data!, { finalWaterCost, finalElectricCost, totalDamageRepairCost, pendingBillsTotal, depositAmount, depositDeductions, depositReturned, finalWaterUsage: waterUsage, finalElectricUsage: electricUsage }, checklist, checkoutDate)}
-                className="w-full py-3 border-2 border-indigo-300 text-indigo-700 rounded-xl font-bold hover:bg-indigo-50 transition flex items-center justify-center gap-2">
-                <FileText size={18} /> ดาวน์โหลดสรุป (TXT)
+                onClick={() => exportCheckoutPDF(
+                    data!,
+                    {
+                        prevWaterMeter,
+                        finalWaterMeter,
+                        finalWaterUsage: waterUsage,
+                        finalWaterCost,
+                        prevElectricMeter,
+                        finalElectricMeter,
+                        finalElectricUsage: electricUsage,
+                        finalElectricCost,
+                        totalDamageRepairCost,
+                        pendingBillsTotal,
+                        depositAmount,
+                        depositDeductions,
+                        depositReturned,
+                    },
+                    checklist,
+                    checkoutDate,
+                    note
+                )}
+                className="w-full py-3 bg-indigo-50 border-2 border-indigo-200 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100 transition flex items-center justify-center gap-2 shadow-sm">
+                <FileText size={18} /> 📄 พิมพ์เอกสารสรุปการย้ายออก (PDF)
             </button>
         </div>
     );
