@@ -7,7 +7,8 @@ import { useModal } from "@/app/context/ModalContext";
 import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 import {
     CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft,
-    Droplets, Zap, ClipboardList, DollarSign, Send, Loader2, FileText
+    Droplets, Zap, ClipboardList, DollarSign, Send, Loader2, FileText,
+    Camera, Image as ImageIcon, X, Plus
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -19,6 +20,7 @@ interface ChecklistItem {
     status: "pass" | "damaged" | null;
     repairCost: number;
     note: string;
+    images?: string[];
 }
 
 interface CheckoutData {
@@ -93,6 +95,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
 
     // Form state
+    const [uploadingItemId, setUploadingItemId] = useState<number | null>(null);
     const [checkoutDate, setCheckoutDate] = useState(new Date().toISOString().slice(0, 10));
     const [finalWaterMeter, setFinalWaterMeter] = useState(0);
     const [finalElectricMeter, setFinalElectricMeter] = useState(0);
@@ -141,6 +144,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             status: null,
             repairCost: 0,
             note: "",
+            images: [],
         })));
     };
 
@@ -178,6 +182,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                             status: null,
                             repairCost: 0,
                             note: "",
+                            images: [],
                         })));
                     } else {
                         // DB returned empty checklist, use default local list
@@ -217,9 +222,48 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const depositReturned = Math.max(0, depositAmount - depositDeductions);
 
     // ── Handlers ─────────────────────────────────────────────
-    const updateChecklist = useCallback((id: number, field: keyof ChecklistItem, value: any) => {
+    const updateChecklist = (id: number, field: string, value: any) => {
         setChecklist(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
-    }, []);
+    };
+
+    const handleUploadImage = async (itemId: number, file: File) => {
+        if (!file) return;
+        setUploadingItemId(itemId);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            if (res.ok && data.url) {
+                setChecklist(prev => prev.map(item => {
+                    if (item.id === itemId) {
+                        const currentImages = item.images || [];
+                        return { ...item, images: [...currentImages, data.url] };
+                    }
+                    return item;
+                }));
+            } else {
+                showAlert("ข้อผิดพลาด", data.error || "ไม่สามารถอัปโหลดรูปภาพได้", "error");
+            }
+        } catch (err: any) {
+            showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ", "error");
+        }
+        setUploadingItemId(null);
+    };
+
+    const handleRemoveImage = (itemId: number, imgIndex: number) => {
+        setChecklist(prev => prev.map(item => {
+            if (item.id === itemId) {
+                const updatedImages = (item.images || []).filter((_, idx) => idx !== imgIndex);
+                return { ...item, images: updatedImages };
+            }
+            return item;
+        }));
+    };
 
     const handleSubmit = async () => {
         const confirmed = await showConfirm("ยืนยันการย้ายออก", `ดำเนินการย้ายออก ${data?.resident?.fullName} ออกจากห้อง ${data?.resident?.room?.number} ใช่ไหมครับ?`, true);
@@ -465,7 +509,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                     </div>
                                 </div>
                                 {item.status === "damaged" && (
-                                    <div className="mt-2 space-y-1.5">
+                                    <div className="mt-2 space-y-2.5">
                                         <div className="flex gap-2">
                                             <div className="flex-1">
                                                 <input type="number" step="1" min="0"
@@ -476,14 +520,62 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                                 {item.suggestedRepairCost > 0 && (
                                                     <button type="button"
                                                         onClick={() => updateChecklist(item.id, "repairCost", item.suggestedRepairCost)}
-                                                        className="mt-1 text-xs text-indigo-600 hover:underline">
+                                                        className="mt-1 text-xs text-indigo-600 hover:underline font-medium">
                                                         ใช้ราคาแนะนำ ฿{item.suggestedRepairCost}
                                                     </button>
                                                 )}
                                             </div>
-                                            <input type="text" placeholder="หมายเหตุ" value={item.note}
+                                            <input type="text" placeholder="หมายเหตุเพิ่มเติม..." value={item.note}
                                                 onChange={e => updateChecklist(item.id, "note", e.target.value)}
                                                 className="flex-1 rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
+                                        </div>
+
+                                        {/* Image Upload Area */}
+                                        <div className="bg-red-50/50 p-2.5 rounded-xl border border-red-100 space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-bold text-red-800 flex items-center gap-1.5">
+                                                    <Camera size={14} /> แนบรูปภาพถ่ายความเสียหาย
+                                                </span>
+                                                <label className="cursor-pointer inline-flex items-center gap-1 px-3 py-1 bg-white text-red-600 text-xs font-bold rounded-lg border border-red-200 hover:bg-red-50 transition shadow-sm">
+                                                    {uploadingItemId === item.id ? (
+                                                        <Loader2 size={13} className="animate-spin text-red-500" />
+                                                    ) : (
+                                                        <Plus size={13} />
+                                                    )}
+                                                    <span>เพิ่มรูปภาพ</span>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        disabled={uploadingItemId === item.id}
+                                                        onChange={e => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleUploadImage(item.id, file);
+                                                            e.target.value = "";
+                                                        }}
+                                                    />
+                                                </label>
+                                            </div>
+
+                                            {/* Preview Thumbnail List */}
+                                            {item.images && item.images.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 pt-1">
+                                                    {item.images.map((imgUrl, imgIdx) => (
+                                                        <div key={imgIdx} className="relative group w-16 h-16 rounded-lg overflow-hidden border-2 border-red-200 shadow-sm bg-white">
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                            <img src={imgUrl} alt={`Damage photo ${imgIdx + 1}`} className="w-full h-full object-cover" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveImage(item.id, imgIdx)}
+                                                                className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 opacity-90 hover:opacity-100 transition shadow"
+                                                                title="ลบรูปภาพ"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -586,6 +678,30 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 <p className="text-sm text-gray-600">{resident.fullName} — ห้อง {resident.room?.number}</p>
                 <p className="text-sm text-gray-600">วันที่ย้ายออก: {new Date(checkoutDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}</p>
             </div>
+
+            {/* Damage items with photos summary */}
+            {checklist.some(i => i.status === "damaged" && i.images && i.images.length > 0) && (
+                <div className="bg-white border-2 border-red-100 rounded-2xl p-4 space-y-3">
+                    <h4 className="font-bold text-red-800 text-sm flex items-center gap-1.5">
+                        <Camera size={16} /> ภาพถ่ายหลักฐานความเสียหายที่แนบ
+                    </h4>
+                    <div className="space-y-3 divide-y divide-gray-100">
+                        {checklist.filter(i => i.status === "damaged" && i.images && i.images.length > 0).map(item => (
+                            <div key={item.id} className="pt-2">
+                                <p className="text-xs font-bold text-gray-800 mb-1">{item.label} (฿{item.repairCost})</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {item.images?.map((imgUrl, idx) => (
+                                        <a key={idx} href={imgUrl} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 block">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={imgUrl} alt="Evidence" className="w-full h-full object-cover" />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {resident.lineUserId && (
                 <div className="flex items-center justify-between bg-green-50 border-2 border-green-200 rounded-2xl p-4">
