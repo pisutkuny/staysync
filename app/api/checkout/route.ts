@@ -78,7 +78,7 @@ export async function POST(req: Request) {
         // 7. Create CheckoutRecord
         const checkoutRecord = await prisma.checkoutRecord.create({
             data: {
-                checkoutAt,
+                checkoutDate: checkoutAt,
                 residentId,
                 residentName: resident.fullName,
                 roomNumber: resident.room.number,
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
                 finalWaterCost,
                 finalElectricCost,
                 checklistResult: checklistResult || [],
-                totalDamageRepairCost,
+                totalDamageCost: totalDamageRepairCost,
                 pendingBillsTotal,
                 depositAmount,
                 depositDeductions,

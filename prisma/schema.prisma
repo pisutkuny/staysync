@@ -481,13 +481,13 @@ model CheckoutChecklistTemplate {
 }
 
 model CheckoutRecord {
-  id         Int      @id @default(autoincrement())
-  checkoutAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  checkoutDate DateTime @default(now())
 
   // ผู้เช่าที่ย้ายออก
-  residentId Int
-  residentName String  // snapshot ณ วันย้ายออก
-  roomNumber   String  // snapshot
+  residentId   Int
+  residentName String? // snapshot ณ วันย้ายออก
+  roomNumber   String? // snapshot
 
   // ประเภทการย้ายออก
   isEarlyCheckout Boolean @default(false)
@@ -502,28 +502,26 @@ model CheckoutRecord {
   finalElectricCost  Float @default(0)
 
   // Checklist ผลการตรวจสภาพห้อง (JSON array)
-  // [{ label, category, status: "pass"|"damaged", repairCost, note }]
   checklistResult Json?
 
   // การเงิน
-  totalDamageRepairCost Float @default(0)
-  pendingBillsTotal     Float @default(0)
-  depositAmount         Float @default(0)
-  depositDeductions     Float @default(0) // รวมค่าปรับ+ซ่อม
-  depositReturned       Float @default(0)
+  totalDamageCost      Float   @default(0)
+  pendingBillsTotal     Float   @default(0)
+  depositAmount         Float   @default(0)
+  depositDeductions     Float   @default(0) // รวมค่าปรับ+ซ่อม
+  depositReturned       Float   @default(0)
   depositForfeitReason  String?
 
   // เอกสาร
-  note String?
+  note      String?
+  createdAt DateTime @default(now())
 
   organizationId Int
   organization   Organization @relation(fields: [organizationId], references: [id])
 
-  createdAt DateTime @default(now())
-
   @@index([organizationId])
   @@index([residentId])
-  @@index([checkoutAt])
+  @@index([checkoutDate])
 }
 
 model UserSession {
