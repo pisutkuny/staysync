@@ -232,6 +232,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         try {
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("folderType", "checkout-damages");
 
             const res = await fetch("/api/upload", {
                 method: "POST",

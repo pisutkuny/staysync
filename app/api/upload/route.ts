@@ -16,6 +16,7 @@ export async function POST(request: Request) {
         }
 
         const folderId = formData.get("folderId") as string | undefined;
+        const folderType = formData.get("folderType") as string | undefined;
 
         // Check availability of Google Drive (Apps Script Method)
         const useDrive = !!(process.env.GOOGLE_SCRIPT_URL || process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL);
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
         if (useDrive) {
             try {
                 // Upload to Google Drive via Apps Script
-                const result = await uploadToDrive(file, folderId);
+                const result = await uploadToDrive(file, folderId, folderType);
                 return NextResponse.json({
                     success: true,
                     url: result.thumbnailLink, // Use thumbnailLink for better display support

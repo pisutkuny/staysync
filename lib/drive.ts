@@ -1,4 +1,4 @@
-export async function uploadToDrive(file: File, folderId?: string) {
+export async function uploadToDrive(file: File, folderId?: string, folderType?: string) {
     const scriptUrl = process.env.GOOGLE_SCRIPT_URL || process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
 
     if (!scriptUrl) {
@@ -13,7 +13,8 @@ export async function uploadToDrive(file: File, folderId?: string) {
             filename: file.name,
             mimeType: file.type,
             file: base64,
-            folderId: folderId // Pass folderId if provided
+            folderId: folderId, // Pass folderId if provided
+            folderType: folderType || "general", // Pass folderType (e.g. checkout_damages, slips)
         };
 
         const response = await fetch(scriptUrl, {
