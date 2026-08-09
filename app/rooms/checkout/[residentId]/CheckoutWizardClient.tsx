@@ -96,6 +96,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
 
     // Form state
     const [uploadingItemId, setUploadingItemId] = useState<number | null>(null);
+    const [dragOverItemId, setDragOverItemId] = useState<number | null>(null);
     const [checkoutDate, setCheckoutDate] = useState(new Date().toISOString().slice(0, 10));
     const [finalWaterMeter, setFinalWaterMeter] = useState(0);
     const [finalElectricMeter, setFinalElectricMeter] = useState(0);
@@ -264,6 +265,14 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
             }
             return item;
         }));
+    };
+
+    const handleDropImages = async (itemId: number, files: FileList | File[]) => {
+        const fileList = Array.from(files).filter(f => f.type.startsWith("image/"));
+        if (fileList.length === 0) return;
+        for (const file of fileList) {
+            await handleUploadImage(itemId, file);
+        }
     };
 
     const handleSubmit = async () => {
@@ -531,13 +540,40 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                                 className="flex-1 rounded-lg border-2 border-red-200 p-2 text-sm focus:outline-none focus:border-red-400" />
                                         </div>
 
-                                        {/* Image Upload Area */}
-                                        <div className="bg-red-50/50 p-2.5 rounded-xl border border-red-100 space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold text-red-800 flex items-center gap-1.5">
-                                                    <Camera size={14} /> แนบรูปภาพถ่ายความเสียหาย
-                                                </span>
-                                                <label className="cursor-pointer inline-flex items-center gap-1 px-3 py-1 bg-white text-red-600 text-xs font-bold rounded-lg border border-red-200 hover:bg-red-50 transition shadow-sm">
+                                        {/* Image Upload Area with Drag & Drop */}
+                                        <div
+                                            onDragOver={e => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setDragOverItemId(item.id);
+                                            }}
+                                            onDragLeave={e => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setDragOverItemId(null);
+                                            }}
+                                            onDrop={e => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setDragOverItemId(null);
+                                                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                                                    handleDropImages(item.id, e.dataTransfer.files);
+                                                }
+                                            }}
+                                            className={`p-3 rounded-xl border-2 transition-all ${
+                                                dragOverItemId === item.id
+                                                    ? "bg-red-100/80 border-dashed border-red-500 shadow-md scale-[1.01]"
+                                                    : "bg-red-50/50 border-red-100 hover:border-red-200"
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <Camera size={14} className="text-red-700 shrink-0" />
+                                                    <span className="text-xs font-bold text-red-900 truncate">
+                                                        {dragOverItemId === item.id ? "📥 วางรูปภาพที่นี่..." : "แนบรูปภาพถ่ายความเสียหาย (ลากวางได้)"}
+                                                    </span>
+                                                </div>
+                                                <label className="cursor-pointer inline-flex items-center gap-1 px-3 py-1 bg-white text-red-600 text-xs font-bold rounded-lg border border-red-200 hover:bg-red-50 transition shadow-sm shrink-0">
                                                     {uploadingItemId === item.id ? (
                                                         <Loader2 size={13} className="animate-spin text-red-500" />
                                                     ) : (
@@ -547,11 +583,12 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                                     <input
                                                         type="file"
                                                         accept="image/*"
+                                                        multiple
                                                         className="hidden"
                                                         disabled={uploadingItemId === item.id}
                                                         onChange={e => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) handleUploadImage(item.id, file);
+                                                            const files = e.target.files;
+                                                            if (files && files.length > 0) handleDropImages(item.id, files);
                                                             e.target.value = "";
                                                         }}
                                                     />
@@ -559,8 +596,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                             </div>
 
                                             {/* Preview Thumbnail List */}
-                                            {item.images && item.images.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 pt-1">
+                                            {item.images && item.images.length > 0 ? (
+                                                <div className="flex flex-wrap gap-2 pt-2">
                                                     {item.images.map((imgUrl, imgIdx) => (
                                                         <div key={imgIdx} className="relative group w-16 h-16 rounded-lg overflow-hidden border-2 border-red-200 shadow-sm bg-white">
                                                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -575,6 +612,10 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                                             </button>
                                                         </div>
                                                     ))}
+                                                </div>
+                                            ) : (
+                                                <div className="mt-1 text-center py-2 border border-dashed border-red-200/80 rounded-lg text-[11px] text-red-400">
+                                                    💡 ลากไฟล์รูปภาพมาวางในกล่องนี้ หรือกดปุ่มเพิ่มรูปภาพด้านบน
                                                 </div>
                                             )}
                                         </div>
