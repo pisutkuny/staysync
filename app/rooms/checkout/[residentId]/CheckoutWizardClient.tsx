@@ -235,6 +235,11 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
                     <span>💰 เงินประกันทั้งหมดที่เก็บไว้:</span>
                     <span>${fmt(summary.depositAmount)}</span>
                 </div>
+                ${summary.finalMonthRentCost > 0 ? `
+                <div class="summary-row" style="color: #6b21a8;">
+                    <span>🏠 ค่าเช่าเดือนสุดท้าย:</span>
+                    <span>- ${fmt(summary.finalMonthRentCost)}</span>
+                </div>` : ''}
                 <div class="summary-row" style="color: #c2410c;">
                     <span>💧 ค่าน้ำประปางวดสุดท้าย:</span>
                     <span>- ${fmt(summary.finalWaterCost)}</span>
@@ -310,6 +315,9 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     // Include pending bills toggle & override
     const [includePendingBills, setIncludePendingBills] = useState(true);
     const [customPendingBillsTotal, setCustomPendingBillsTotal] = useState<number | null>(null);
+    // Final month rent option
+    const [finalMonthRentType, setFinalMonthRentType] = useState<"none" | "full" | "prorated" | "custom">("none");
+    const [customFinalMonthRent, setCustomFinalMonthRent] = useState<number>(0);
 
     const loadDefaultChecklist = () => {
         const defaults = [
@@ -409,6 +417,21 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const pendingBillsTotal = includePendingBills
         ? (customPendingBillsTotal !== null ? customPendingBillsTotal : (data?.pendingBillsTotal ?? 0))
         : 0;
+
+    // Final month rent calculation
+    const monthlyRentPrice = data?.resident?.room?.price ?? 2500;
+    const checkoutDayOfMonth = new Date(checkoutDate).getDate() || 1;
+    const daysInCheckoutMonth = new Date(new Date(checkoutDate).getFullYear(), new Date(checkoutDate).getMonth() + 1, 0).getDate() || 30;
+    const proratedRentCost = Math.round((monthlyRentPrice / daysInCheckoutMonth) * checkoutDayOfMonth);
+
+    const finalMonthRentCost = finalMonthRentType === "full"
+        ? monthlyRentPrice
+        : finalMonthRentType === "prorated"
+        ? proratedRentCost
+        : finalMonthRentType === "custom"
+        ? customFinalMonthRent
+        : 0;
+
     const checkoutAt = new Date(checkoutDate);
     const contractEnd = data?.resident?.contractEndDate ? new Date(data.resident.contractEndDate) : null;
     const isEarlyCheckout = contractEnd ? checkoutAt < contractEnd : false;
@@ -416,7 +439,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         ? Math.ceil((contractEnd.getTime() - checkoutAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
     const depositDeductions = isEarlyCheckout && depositForfeitReason
         ? depositAmount
-        : finalWaterCost + finalElectricCost + totalDamageRepairCost + pendingBillsTotal;
+        : finalWaterCost + finalElectricCost + totalDamageRepairCost + pendingBillsTotal + finalMonthRentCost;
     const depositReturned = Math.max(0, depositAmount - depositDeductions);
 
     // ── Handlers ─────────────────────────────────────────────
@@ -853,6 +876,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
 
     const renderStep3 = () => {
         const rows = [
+            ...(finalMonthRentCost > 0 ? [{ label: `🏠 ค่าเช่าเดือนสุดท้าย (${finalMonthRentType === "full" ? "เต็มเดือน" : finalMonthRentType === "prorated" ? `เฉลี่ย ${checkoutDayOfMonth}/${daysInCheckoutMonth} วัน` : "กำหนดเอง"})`, amount: finalMonthRentCost, color: "text-purple-700" }] : []),
             { label: "💧 ค่าน้ำงวดสุดท้าย", amount: finalWaterCost, color: "text-blue-700" },
             { label: "⚡ ค่าไฟงวดสุดท้าย", amount: finalElectricCost, color: "text-amber-700" },
             ...(totalDamageRepairCost > 0 ? [{ label: "🔧 ค่าซ่อมแซม", amount: totalDamageRepairCost, color: "text-red-700" }] : []),
@@ -860,6 +884,64 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         ];
         return (
             <div className="space-y-4">
+                {/* Final Month Rent Selector */}
+                <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 space-y-3">
+                    <div>
+                        <p className="font-bold text-purple-950 text-sm">🏠 ค่าเช่าเดือนสุดท้ายก่อนย้ายออก</p>
+                        <p className="text-xs text-purple-700">เลือกวิธีคำนวณค่าเช่าตามรอบวันย้ายออก (อัตราปัจจุบัน ฿{monthlyRentPrice.toLocaleString()}/เดือน)</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <button
+                            type="button"
+                            onClick={() => setFinalMonthRentType("none")}
+                            className={`p-2.5 rounded-xl border-2 font-bold text-left transition ${finalMonthRentType === "none" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-700 border-purple-100 hover:border-purple-300"}`}
+                        >
+                            <span className="block">🚫 ไม่คิดค่าเช่าเพิ่ม</span>
+                            <span className={`text-[10px] font-normal block ${finalMonthRentType === "none" ? "text-purple-100" : "text-gray-400"}`}>ชำระค่าเช่าเรียบร้อยแล้ว</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFinalMonthRentType("full")}
+                            className={`p-2.5 rounded-xl border-2 font-bold text-left transition ${finalMonthRentType === "full" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-700 border-purple-100 hover:border-purple-300"}`}
+                        >
+                            <span className="block">🏢 เต็มเดือน (฿{monthlyRentPrice.toLocaleString()})</span>
+                            <span className={`text-[10px] font-normal block ${finalMonthRentType === "full" ? "text-purple-100" : "text-gray-400"}`}>ย้ายออกปลายเดือน/คิดเต็ม</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFinalMonthRentType("prorated")}
+                            className={`p-2.5 rounded-xl border-2 font-bold text-left transition ${finalMonthRentType === "prorated" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-700 border-purple-100 hover:border-purple-300"}`}
+                        >
+                            <span className="block">📅 เฉลี่ยรายวัน (฿{proratedRentCost.toLocaleString()})</span>
+                            <span className={`text-[10px] font-normal block ${finalMonthRentType === "prorated" ? "text-purple-100" : "text-gray-400"}`}>คำนวณ {checkoutDayOfMonth} วันจาก {daysInCheckoutMonth} วัน</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFinalMonthRentType("custom")}
+                            className={`p-2.5 rounded-xl border-2 font-bold text-left transition ${finalMonthRentType === "custom" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-700 border-purple-100 hover:border-purple-300"}`}
+                        >
+                            <span className="block">✏️ ระบุยอดเอง</span>
+                            <span className={`text-[10px] font-normal block ${finalMonthRentType === "custom" ? "text-purple-100" : "text-gray-400"}`}>กรอกระบุตัวเลขเอง</span>
+                        </button>
+                    </div>
+                    {finalMonthRentType === "custom" && (
+                        <div className="pt-2 border-t border-purple-200 flex items-center justify-between text-xs">
+                            <span className="text-purple-900 font-bold">ระบุค่าเช่าเดือนสุดท้าย:</span>
+                            <div className="flex items-center gap-1">
+                                <span className="font-bold text-purple-900">฿</span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={customFinalMonthRent || ""}
+                                    onChange={e => setCustomFinalMonthRent(parseFloat(e.target.value) || 0)}
+                                    className="w-28 text-right font-bold text-purple-900 bg-white border border-purple-300 rounded-lg p-1 text-xs focus:outline-none focus:border-purple-500"
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* Pending bills toggle control */}
                 {(data?.pendingBillsTotal ?? 0) > 0 && (
                     <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 space-y-3">
@@ -1030,6 +1112,7 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                         finalElectricCost,
                         totalDamageRepairCost,
                         pendingBillsTotal,
+                        finalMonthRentCost,
                         depositAmount,
                         depositDeductions,
                         depositReturned,
