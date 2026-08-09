@@ -341,6 +341,8 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     // Final month rent option
     const [finalMonthRentType, setFinalMonthRentType] = useState<"none" | "full" | "prorated" | "custom">("none");
     const [customFinalMonthRent, setCustomFinalMonthRent] = useState<number>(0);
+    // Draft restore state
+    const [hasDraftRestored, setHasDraftRestored] = useState(false);
 
     const loadDefaultChecklist = () => {
         const defaults = [
@@ -399,26 +401,61 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                 setDepositAmount(previewData.effectiveDeposit ?? 0);
                 setDepositSource(previewData.depositSource ?? "recorded");
 
-                // Load checklist templates (optional — fallback to default items if empty or table not ready)
-                try {
-                    const clRes = await fetch("/api/checkout/checklist");
-                    const clData = await clRes.json();
-                    const templates = Array.isArray(clData) ? clData : [];
-                    if (templates.length > 0) {
-                        setChecklist(templates.map((t: any) => ({
-                            ...t,
-                            suggestedRepairCost: t.suggestedRepairCost || 0,
-                            status: null,
-                            repairCost: 0,
-                            note: "",
-                            images: [],
-                        })));
-                    } else {
-                        // DB returned empty checklist, use default local list
+                // Try restoring draft from localStorage
+                const draftKey = `checkout_draft_${residentId}`;
+                const savedDraftStr = localStorage.getItem(draftKey);
+                let isRestored = false;
+
+                if (savedDraftStr) {
+                    try {
+                        const draft = JSON.parse(savedDraftStr);
+                        if (draft && typeof draft === "object") {
+                            if (typeof draft.step === "number") setStep(draft.step);
+                            if (draft.checkoutDate) setCheckoutDate(draft.checkoutDate);
+                            if (typeof draft.finalWaterMeter === "number") setFinalWaterMeter(draft.finalWaterMeter);
+                            if (typeof draft.finalElectricMeter === "number") setFinalElectricMeter(draft.finalElectricMeter);
+                            if (typeof draft.prevWaterMeter === "number") setPrevWaterMeter(draft.prevWaterMeter);
+                            if (typeof draft.prevElectricMeter === "number") setPrevElectricMeter(draft.prevElectricMeter);
+                            if (typeof draft.usingPrevBilling === "boolean") setUsingPrevBilling(draft.usingPrevBilling);
+                            if (typeof draft.depositAmount === "number") setDepositAmount(draft.depositAmount);
+                            if (typeof draft.includePendingBills === "boolean") setIncludePendingBills(draft.includePendingBills);
+                            if (draft.customPendingBillsTotal !== undefined) setCustomPendingBillsTotal(draft.customPendingBillsTotal);
+                            if (draft.finalMonthRentType) setFinalMonthRentType(draft.finalMonthRentType);
+                            if (typeof draft.customFinalMonthRent === "number") setCustomFinalMonthRent(draft.customFinalMonthRent);
+                            if (draft.note) setNote(draft.note);
+                            if (Array.isArray(draft.checklist) && draft.checklist.length > 0) {
+                                setChecklist(draft.checklist);
+                                isRestored = true;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse checkout draft:", e);
+                    }
+                }
+
+                if (isRestored) {
+                    setHasDraftRestored(true);
+                } else {
+                    // Load checklist templates (optional — fallback to default items if empty or table not ready)
+                    try {
+                        const clRes = await fetch("/api/checkout/checklist");
+                        const clData = await clRes.json();
+                        const templates = Array.isArray(clData) ? clData : [];
+                        if (templates.length > 0) {
+                            setChecklist(templates.map((t: any) => ({
+                                ...t,
+                                suggestedRepairCost: t.suggestedRepairCost || 0,
+                                status: null,
+                                repairCost: 0,
+                                note: "",
+                                images: [],
+                            })));
+                        } else {
+                            loadDefaultChecklist();
+                        }
+                    } catch {
                         loadDefaultChecklist();
                     }
-                } catch {
-                    loadDefaultChecklist();
                 }
 
                 setLoading(false);
@@ -430,8 +467,54 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         loadData();
     }, [residentId]);
 
+    // ── Auto-save draft on form state changes ─────────────────
+    useEffect(() => {
+        if (loading || !data) return;
+        const draftKey = `checkout_draft_${residentId}`;
+        const draftData = {
+            step,
+            checkoutDate,
+            finalWaterMeter,
+            finalElectricMeter,
+            prevWaterMeter,
+            prevElectricMeter,
+            usingPrevBilling,
+            depositAmount,
+            includePendingBills,
+            customPendingBillsTotal,
+            finalMonthRentType,
+            customFinalMonthRent,
+            note,
+            checklist,
+            savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(draftKey, JSON.stringify(draftData));
+    }, [
+        loading, data, residentId, step, checkoutDate, finalWaterMeter, finalElectricMeter,
+        prevWaterMeter, prevElectricMeter, usingPrevBilling, depositAmount,
+        includePendingBills, customPendingBillsTotal, finalMonthRentType,
+        customFinalMonthRent, note, checklist
+    ]);
 
-    // ── Derived calculations ──────────────────────────────────
+
+    // ── Clear draft helper ────────────────────────────────────
+    const clearDraft = () => {
+        const draftKey = `checkout_draft_${residentId}`;
+        localStorage.removeItem(draftKey);
+        setHasDraftRestored(false);
+        setStep(0);
+        setNote("");
+        setFinalMonthRentType("none");
+        setCustomFinalMonthRent(0);
+        if (data) {
+            setFinalWaterMeter(data.lastWaterMeter ?? 0);
+            setFinalElectricMeter(data.lastElectricMeter ?? 0);
+            setPrevWaterMeter(data.lastWaterMeter ?? 0);
+            setPrevElectricMeter(data.lastElectricMeter ?? 0);
+            setDepositAmount(data.effectiveDeposit ?? 0);
+        }
+        loadDefaultChecklist();
+    };
     const waterUsage = data ? calcMeterUsage(prevWaterMeter, finalWaterMeter, WATER_METER_MAX) : 0;
     const electricUsage = data ? calcMeterUsage(prevElectricMeter, finalElectricMeter, ELECTRIC_METER_MAX) : 0;
     const finalWaterCost = waterUsage * (data?.waterRate ?? 18);
@@ -1155,6 +1238,26 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
 
     return (
         <div className="max-w-lg mx-auto">
+            {/* Draft Restored Banner */}
+            {hasDraftRestored && (
+                <div className="mb-4 bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 flex items-center justify-between shadow-sm animate-fade-in">
+                    <div className="flex items-center gap-2">
+                        <span className="text-lg">💾</span>
+                        <div>
+                            <p className="text-xs font-bold text-amber-900">กู้คืนร่างข้อมูลการย้ายออกที่กรอกไว้ล่าสุด</p>
+                            <p className="text-[11px] text-amber-700">ระบบจำข้อมูลมิเตอร์, ตรวจสภาพห้อง และรูปภาพที่คุณกรอกไว้ก่อนหน้าให้อัตโนมัติ</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={clearDraft}
+                        className="shrink-0 px-2.5 py-1 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 text-xs font-bold rounded-lg transition"
+                    >
+                        🔄 เริ่มกรอกใหม่
+                    </button>
+                </div>
+            )}
+
             {/* Progress Bar */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-2">
