@@ -99,9 +99,10 @@ export async function POST(req: Request) {
             },
         });
 
-        // 8. Update Resident status → CheckedOut
-        await prisma.resident.update({
-            where: { id: residentId },
+        // 8. Update ALL residents in this room status → CheckedOut & detach from room
+        const targetRoomId = resident.roomId!;
+        await prisma.resident.updateMany({
+            where: { roomId: targetRoomId },
             data: {
                 status: "CheckedOut",
                 checkOutDate: checkoutAt,
@@ -109,21 +110,15 @@ export async function POST(req: Request) {
                 depositReturnedDate: checkoutAt,
                 depositReturnedAmount: depositReturned,
                 depositForfeitReason: depositForfeitReason || null,
-                roomId: null, // Detach from room
+                roomId: null, // Detach all residents from room
             },
         });
 
-        // 9. Check if room is now empty → update room status to Vacant
-        const remainingResidents = await prisma.resident.count({
-            where: { roomId: resident.roomId!, status: "Active" },
+        // 9. Update room status to Vacant
+        await prisma.room.update({
+            where: { id: targetRoomId },
+            data: { status: "Vacant" },
         });
-
-        if (remainingResidents === 0) {
-            await prisma.room.update({
-                where: { id: resident.roomId! },
-                data: { status: "Vacant" },
-            });
-        }
 
         // Revalidate rooms page cache
         try {
