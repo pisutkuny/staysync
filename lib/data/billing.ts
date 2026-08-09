@@ -28,5 +28,5 @@ export const getBillingData = unstable_cache(
         return { rooms, bills, config };
     },
     ['billing-data-v2'],
-    { revalidate: 0 }
+    { revalidate: 1 }
 );
