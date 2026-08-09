@@ -264,6 +264,27 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
                 </div>
             </div>
 
+            ${checklist.some(i => i.status === "damaged" && i.images && i.images.length > 0) ? `
+            <div class="section-title">4. ภาพถ่ายหลักฐานความเสียหาย (Damage Photo Evidence)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                ${checklist.filter(i => i.status === "damaged" && i.images && i.images.length > 0).map(item => `
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px;">
+                        <div style="font-weight: 700; font-size: 12px; color: #991b1b; margin-bottom: 6px;">
+                            ❌ ${item.label} (${fmt(item.repairCost)})
+                        </div>
+                        ${item.note ? `<div style="font-size: 11px; color: #7f1d1d; margin-bottom: 6px;">หมายเหตุ: ${item.note}</div>` : ''}
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            ${item.images?.map(imgUrl => `
+                                <div style="width: 100px; height: 100px; border-radius: 6px; overflow: hidden; border: 1px solid #dc2626; background: #fff;">
+                                    <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Damage photo" />
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+            ` : ''}
+
             ${note ? `<div style="margin-top: 15px; background: #fffbebf8; padding: 10px 15px; border-radius: 6px; border: 1px solid #fef3c7;"><strong>📝 หมายเหตุเพิ่มเติม:</strong> ${note}</div>` : ''}
 
             <div class="signatures">
