@@ -11,6 +11,63 @@ import {
     Camera, Image as ImageIcon, X, Plus
 } from "lucide-react";
 
+// Helper: Compress Image in Browser before Upload (Max 1600px, quality 0.8)
+async function compressImage(file: File): Promise<File> {
+    if (!file.type.startsWith("image/")) return file;
+    return new Promise((resolve) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            img.src = e.target?.result as string;
+        };
+
+        img.onload = () => {
+            const MAX_WIDTH = 1600;
+            const MAX_HEIGHT = 1600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width = Math.round((width * MAX_HEIGHT) / height);
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        resolve(file);
+                        return;
+                    }
+                    const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                        type: "image/jpeg",
+                        lastModified: Date.now(),
+                    });
+                    resolve(compressedFile);
+                },
+                "image/jpeg",
+                0.8
+            );
+        };
+
+        img.onerror = () => resolve(file);
+        reader.readAsDataURL(file);
+    });
+}
+
 // ─── Types ────────────────────────────────────────────────────
 interface ChecklistItem {
     id: number;
@@ -367,12 +424,14 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
         setChecklist(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
     };
 
-    const handleUploadImage = async (itemId: number, file: File) => {
-        if (!file) return;
-        setUploadingItemId(itemId);
+    const handleUploadImage = async (itemId: number, file: File): Promise<boolean> => {
+        if (!file) return false;
         try {
+            // Compress Image on Browser Client before Upload
+            const processedFile = await compressImage(file);
+
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", processedFile);
             formData.append("folderType", "checkout-damages");
 
             const res = await fetch("/api/upload", {
@@ -388,13 +447,15 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                     }
                     return item;
                 }));
+                return true;
             } else {
-                showAlert("ข้อผิดพลาด", data.error || "ไม่สามารถอัปโหลดรูปภาพได้", "error");
+                console.error("Upload error:", data.error);
+                return false;
             }
         } catch (err: any) {
-            showAlert("ข้อผิดพลาด", "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ", "error");
+            console.error("Upload exception:", err);
+            return false;
         }
-        setUploadingItemId(null);
     };
 
     const handleRemoveImage = (itemId: number, imgIndex: number) => {
@@ -410,8 +471,23 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
     const handleDropImages = async (itemId: number, files: FileList | File[]) => {
         const fileList = Array.from(files).filter(f => f.type.startsWith("image/"));
         if (fileList.length === 0) return;
+
+        setUploadingItemId(itemId);
+        let successCount = 0;
+        let failCount = 0;
+
         for (const file of fileList) {
-            await handleUploadImage(itemId, file);
+            const ok = await handleUploadImage(itemId, file);
+            if (ok) successCount++;
+            else failCount++;
+        }
+
+        setUploadingItemId(null);
+
+        if (failCount > 0 && successCount === 0) {
+            showAlert("ข้อผิดพลาด", "ไม่สามารถอัปโหลดรูปภาพได้", "error");
+        } else if (failCount > 0) {
+            showAlert("อัปโหลดเสร็จสิ้น", `อัปโหลดสำเร็จ ${successCount} รูป (ไม่สำเร็จ ${failCount} รูป)`, "warning");
         }
     };
 
