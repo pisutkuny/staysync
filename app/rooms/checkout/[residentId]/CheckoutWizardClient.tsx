@@ -267,16 +267,16 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
             ${checklist.some(i => i.status === "damaged" && i.images && i.images.length > 0) ? `
             <div style="page-break-before: always; break-before: page; margin-top: 30px;">
                 <div class="section-title">4. ภาพถ่ายหลักฐานความเสียหาย (Damage Photo Evidence)</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px;">
                     ${checklist.filter(i => i.status === "damaged" && i.images && i.images.length > 0).map(item => `
-                        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px; break-inside: avoid; page-break-inside: avoid;">
-                            <div style="font-weight: 700; font-size: 12px; color: #991b1b; margin-bottom: 6px;">
-                                ❌ ${item.label} (${fmt(item.repairCost)})
+                        <div style="background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 14px; break-inside: avoid; page-break-inside: avoid;">
+                            <div style="font-weight: 700; font-size: 13px; color: #991b1b; margin-bottom: 6px;">
+                                ❌ ${item.label} — <span style="color: #b91c1c;">${fmt(item.repairCost)}</span>
                             </div>
-                            ${item.note ? `<div style="font-size: 11px; color: #7f1d1d; margin-bottom: 6px;">หมายเหตุ: ${item.note}</div>` : ''}
-                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            ${item.note ? `<div style="font-size: 12px; color: #7f1d1d; margin-bottom: 10px; background: #fff; padding: 6px 10px; border-radius: 6px; border: 1px solid #fee2e2;"><strong>หมายเหตุ:</strong> ${item.note}</div>` : ''}
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                                 ${item.images?.map(imgUrl => `
-                                    <div style="width: 100px; height: 100px; border-radius: 6px; overflow: hidden; border: 1px solid #dc2626; background: #fff;">
+                                    <div style="width: 185px; height: 185px; border-radius: 8px; overflow: hidden; border: 2px solid #ef4444; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Damage photo" />
                                     </div>
                                 `).join("")}
