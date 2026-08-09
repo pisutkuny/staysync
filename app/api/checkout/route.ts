@@ -113,7 +113,7 @@ export async function POST(req: Request) {
             },
         });
 
-        // 9. Check if room is now empty → update room status to Available
+        // 9. Check if room is now empty → update room status to Vacant
         const remainingResidents = await prisma.resident.count({
             where: { roomId: resident.roomId!, status: "Active" },
         });
@@ -121,8 +121,17 @@ export async function POST(req: Request) {
         if (remainingResidents === 0) {
             await prisma.room.update({
                 where: { id: resident.roomId! },
-                data: { status: "Available" },
+                data: { status: "Vacant" },
             });
+        }
+
+        // Revalidate rooms page cache
+        try {
+            const { revalidatePath } = await import("next/cache");
+            revalidatePath("/rooms");
+            revalidatePath("/api/checkout");
+        } catch (e) {
+            console.error("Failed to revalidate paths:", e);
         }
 
         // 10. Send LINE notification if requested

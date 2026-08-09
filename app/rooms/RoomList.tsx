@@ -142,7 +142,7 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                     </div>
 
                     <div className="mt-4 pt-4 border-t-2 border-emerald-100 flex gap-2 items-center">
-                        {room.status === "Available" ? (
+                        {(room.status === "Vacant" || room.status === "Available" || !room.residents || room.residents.length === 0) ? (
                             <>
                                 <Link href={`/rooms/checkin/${room.id}`} className="w-full">
                                     <button className="w-full py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-lg hover:from-emerald-600 hover:to-green-600 font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm border-2 border-transparent hover:border-emerald-700">
