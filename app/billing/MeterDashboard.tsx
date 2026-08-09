@@ -271,10 +271,10 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
             // Ensure bills is an array before finding
             const safeBills = Array.isArray(bills) ? bills : [];
             const bill = safeBills.find(b => {
-                // Priority: Use 'month' field if available (correct logic), otherwise fallback to 'createdAt' (legacy)
-                const targetDate = b.month ? b.month : b.createdAt;
-                const billDate = new Date(targetDate);
-                const billMonth = billDate.toISOString().slice(0, 7);
+                const targetDate = b.month ? new Date(b.month) : new Date(b.createdAt);
+                const year = targetDate.getFullYear();
+                const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+                const billMonth = `${year}-${month}`;
                 return b.roomId === room.id && billMonth === selectedMonth;
             });
 

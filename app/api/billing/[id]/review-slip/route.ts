@@ -34,9 +34,16 @@ export async function POST(
             );
         }
 
-        if (bill.paymentStatus !== "Review") {
+        // If already paid and action is approve, return success smoothly
+        if (bill.paymentStatus === "Paid" && action === "approve") {
+            revalidatePath('/billing');
+            revalidatePath('/dashboard');
+            return NextResponse.json({ success: true, bill: bill });
+        }
+
+        if (bill.paymentStatus !== "Review" && bill.paymentStatus !== "PendingVerification" && bill.paymentStatus !== "Pending") {
             return NextResponse.json(
-                { error: "Bill is not in Review status" },
+                { error: "Bill status cannot be updated" },
                 { status: 400 }
             );
         }
