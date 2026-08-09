@@ -80,13 +80,13 @@ export async function POST(req: Request) {
             data: {
                 checkoutDate: checkoutAt,
                 residentId,
+                roomId: resident.roomId!,
+                organizationId: session.organizationId,
                 isEarlyCheckout,
                 daysEarly,
                 finalWaterMeter,
-                finalElectricMeter,
-                finalWaterUsage,
-                finalElectricUsage,
                 finalWaterCost,
+                finalElectricMeter,
                 finalElectricCost,
                 checklistResult: checklistResult || [],
                 totalDamageCost: totalDamageRepairCost,
@@ -96,7 +96,6 @@ export async function POST(req: Request) {
                 depositReturned,
                 depositForfeitReason: depositForfeitReason || null,
                 note: note || null,
-                organizationId: session.organizationId,
             },
         });
 

@@ -41,6 +41,7 @@ model Room {
   residents Resident[]
   billings  Billing[]
   bookings  Booking[] // Relation to Booking
+  checkoutRecords CheckoutRecord[]
 
   // Performance Indexes
   @@index([status])
@@ -125,6 +126,7 @@ model Resident {
   issues       Issue[]
   billings     Billing[]
   documents    Document[]
+  checkoutRecords CheckoutRecord[]
 
   // Performance Indexes
   @@index([depositStatus])
@@ -482,44 +484,38 @@ model CheckoutChecklistTemplate {
 
 model CheckoutRecord {
   id           Int      @id @default(autoincrement())
-  checkoutDate DateTime @default(now())
-
-  // ผู้เช่าที่ย้ายออก
   residentId   Int
+  roomId       Int
+  organizationId Int
+  checkoutDate DateTime
 
-  // ประเภทการย้ายออก
   isEarlyCheckout Boolean @default(false)
   daysEarly       Int     @default(0)
 
-  // มิเตอร์ครั้งสุดท้าย
-  finalWaterMeter    Float @default(0)
-  finalElectricMeter Float @default(0)
-  finalWaterUsage    Float @default(0)
-  finalElectricUsage Float @default(0)
-  finalWaterCost     Float @default(0)
-  finalElectricCost  Float @default(0)
+  finalWaterMeter    Float
+  finalWaterCost     Float
+  finalElectricMeter Float
+  finalElectricCost  Float
 
-  // Checklist ผลการตรวจสภาพห้อง (JSON array)
-  checklistResult Json?
+  checklistResult Json
 
-  // การเงิน
   totalDamageCost      Float   @default(0)
   pendingBillsTotal     Float   @default(0)
   depositAmount         Float   @default(0)
-  depositDeductions     Float   @default(0) // รวมค่าปรับ+ซ่อม
+  depositDeductions     Float   @default(0)
   depositReturned       Float   @default(0)
   depositForfeitReason  String?
 
-  // เอกสาร
   note      String?
   createdAt DateTime @default(now())
 
-  organizationId Int
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  resident     Resident     @relation(fields: [residentId], references: [id])
+  room         Room         @relation(fields: [roomId], references: [id])
 
   @@index([organizationId])
   @@index([residentId])
-  @@index([checkoutDate])
+  @@index([roomId])
 }
 
 model UserSession {
