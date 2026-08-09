@@ -16,11 +16,13 @@ export async function DELETE(
 
         if (!id) return NextResponse.json({ error: "Invalid bill ID" }, { status: 400 });
 
-        const bill = await prisma.billing.findFirst({
-            where: { id, organizationId: session.organizationId },
+        let bill = await prisma.billing.findUnique({
+            where: { id },
         });
 
-        if (!bill) return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+        if (!bill) {
+            return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+        }
 
         await prisma.billing.delete({
             where: { id },
