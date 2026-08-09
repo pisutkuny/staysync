@@ -102,7 +102,14 @@ export async function getDashboardSummary(organizationId: number): Promise<Dashb
                 }
             }),
             prisma.room.count({ where: { organizationId: orgId } }),
-            prisma.room.count({ where: { organizationId: orgId, status: 'Occupied' } }),
+            prisma.room.count({
+                where: {
+                    organizationId: orgId,
+                    residents: {
+                        some: { status: 'Active' }
+                    }
+                }
+            }),
             prisma.issue.count({
                 where: { organizationId: orgId, status: { in: ['Pending', 'InProgress'] } }
             }),
@@ -126,8 +133,8 @@ export async function getDashboardSummary(organizationId: number): Promise<Dashb
 
     return unstable_cache(
         fetchSummary,
-        ['dashboard-summary-v8', String(orgId)],
-        { revalidate: 60 }
+        ['dashboard-summary-v9', String(orgId)],
+        { revalidate: 1 }
     )();
 }
 
@@ -195,7 +202,14 @@ export async function getOccupancyChartData(organizationId: number): Promise<Occ
     const fetchOccupancy = async (): Promise<OccupancyChartData[]> => {
         const [totalRooms, occupiedRooms] = await Promise.all([
             prisma.room.count({ where: { organizationId: orgId } }),
-            prisma.room.count({ where: { organizationId: orgId, status: 'Occupied' } })
+            prisma.room.count({
+                where: {
+                    organizationId: orgId,
+                    residents: {
+                        some: { status: 'Active' }
+                    }
+                }
+            })
         ]);
 
         return [
@@ -206,8 +220,8 @@ export async function getOccupancyChartData(organizationId: number): Promise<Occ
 
     return unstable_cache(
         fetchOccupancy,
-        ['dashboard-occupancy-v7', String(orgId)],
-        { revalidate: 60 }
+        ['dashboard-occupancy-v8', String(orgId)],
+        { revalidate: 1 }
     )();
 }
 

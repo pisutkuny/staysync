@@ -24,5 +24,5 @@ export const getRooms = unstable_cache(
         return rooms;
     },
     ['rooms-data-v1'],
-    { revalidate: 30 }
+    { revalidate: 1 }
 );
