@@ -30,7 +30,23 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
 
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-8">
+            {/* Enhanced Gradient Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-xl">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-lg">🏠 {t.rooms?.allRooms || "ห้องพักทั้งหมด"}</h2>
+                        <p className="text-indigo-100 mt-2 text-sm md:text-base">{t.rooms?.manageRoomsDesc || "จัดการห้องพักและผู้เช่า"}</p>
+                    </div>
+                    <Link href="/rooms/add">
+                        <button className="bg-white text-green-700 px-4 py-2.5 rounded-lg font-bold hover:bg-green-50 transition-all shadow-md hover:shadow-lg flex items-center gap-2 border border-white/30 hover:scale-105 text-sm">
+                            ➕ {t.rooms?.addNewRoom || "เพิ่มห้องพัก"}
+                        </button>
+                    </Link>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room) => (
                 <div key={room.id} className="bg-white p-6 rounded-2xl border-2 border-slate-300 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 flex flex-col justify-between min-h-[14rem]">
                     <div className="flex justify-between items-start">
@@ -166,11 +182,11 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                                     return (
                                         <Link href={`/rooms/checkout/${mainTenant.id}`}>
                                             <button
-                                                title="ย้ายออก (Check Out)"
+                                                title={t.rooms?.checkoutBtn || "ย้ายออก"}
                                                 className="py-2 px-3 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-1.5 text-sm border-2 border-red-200 hover:border-red-700 shadow-sm hover:shadow-md"
                                             >
                                                 <LogOut size={16} />
-                                                <span className="hidden sm:inline">ย้ายออก</span>
+                                                <span className="hidden sm:inline">{t.rooms?.checkoutBtn || "ย้ายออก"}</span>
                                             </button>
                                         </Link>
                                     );
@@ -181,5 +197,6 @@ export default function RoomList({ rooms }: { rooms: any[] }) {
                 </div>
             ))}
         </div>
-    );
+    </div>
+);
 }

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useModal } from "@/app/context/ModalContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function RoomCommonAreaToggle({ roomId, initialValue }: { roomId: number, initialValue: boolean }) {
     const [enabled, setEnabled] = useState(initialValue);
     const [loading, setLoading] = useState(false);
     const { showAlert } = useModal();
+    const { t } = useLanguage();
 
     const handleToggle = async () => {
         setLoading(true);
@@ -36,7 +38,7 @@ export default function RoomCommonAreaToggle({ roomId, initialValue }: { roomId:
                 disabled={loading}
                 className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer disabled:opacity-50"
             />
-            <span className="text-xs font-medium text-gray-700">เก็บค่าส่วนกลาง</span>
+            <span className="text-xs font-medium text-gray-700">{t.rooms?.commonAreaCharge || "เก็บค่าส่วนกลาง"}</span>
         </div>
     );
 }

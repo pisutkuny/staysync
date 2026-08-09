@@ -188,6 +188,7 @@ export const dictionary = {
             checkIn: "เช็คอิน / เข้าพัก",
             addResident: "เพิ่มผู้เช่า",
             createRoomDesc: "สร้างห้องพักใหม่ในหอพัก",
+            checkoutBtn: "ย้ายออก",
         },
         residents: {
             checkInTitle: "เช็คอินผู้เช่า",
@@ -899,7 +900,8 @@ export const dictionary = {
             emptyRoom: "Empty room",
             checkIn: "Check In",
             addResident: "Add Resident",
-            createRoomDesc: "Create a new room in the dormitory.",
+            createRoomDesc: "Create new room in dormitory",
+            checkoutBtn: "Check Out",
         },
         residents: {
             checkInTitle: "Check In Resident",
