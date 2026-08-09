@@ -173,7 +173,17 @@ export function createInvoiceFlexMessage(
                 "layout": "vertical",
                 "spacing": "sm",
                 "contents": [
-                    ...(!isPaid ? [{
+                    isPaid ? {
+                        "type": "button",
+                        "style": "secondary",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "✅ ชำระเงินเรียบร้อยแล้ว",
+                            "uri": payUrl
+                        },
+                        "color": "#e8f5e9"
+                    } as FlexComponent : {
                         "type": "button",
                         "style": "primary",
                         "height": "sm",
@@ -183,7 +193,7 @@ export function createInvoiceFlexMessage(
                             "uri": payUrl
                         },
                         "color": "#06c755"
-                    } as FlexComponent] : []),
+                    } as FlexComponent,
                     {
                         "type": "text",
                         "text": isPaid ? "ขอบพระคุณที่ชำระเงินตรงเวลาครับ 🙏" : "กรุณาชำระภายในวันที่ 5 ของเดือน ขอบพระคุณครับ",

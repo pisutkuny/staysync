@@ -10,7 +10,21 @@ export async function POST(
         const billingId = Number(id);
         const { slipImage } = await request.json();
 
-        // Update Billing Status
+        // Check if bill is already paid
+        const currentBill = await prisma.billing.findUnique({
+            where: { id: billingId },
+        });
+
+        if (!currentBill) {
+            return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+        }
+
+        if (currentBill.paymentStatus === "Paid") {
+            return NextResponse.json(
+                { error: "บิลนี้ได้รับการชำระเงินเรียบร้อยแล้ว ไม่สามารถส่งสลิปซ้ำได้ กรุณาตรวจสอบการ์ดบิลเดือนล่าสุดใน LINE" },
+                { status: 400 }
+            );
+        }
         const billing = await prisma.billing.update({
             where: { id: billingId },
             data: {

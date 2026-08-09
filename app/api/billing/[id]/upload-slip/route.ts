@@ -33,6 +33,14 @@ export async function POST(
             );
         }
 
+        // 🛑 Block uploading slip to an already Paid bill
+        if (bill.paymentStatus === "Paid") {
+            return NextResponse.json(
+                { error: "บิลนี้ได้รับการชำระเงินเรียบร้อยแล้ว ไม่สามารถส่งสลิปซ้ำได้ กรุณาตรวจสอบการ์ดบิลเดือนล่าสุดใน LINE" },
+                { status: 400 }
+            );
+        }
+
         // Format month as YYYY-MM
         const billMonth = new Date(bill.month);
         const monthStr = `${billMonth.getFullYear()}-${String(billMonth.getMonth() + 1).padStart(2, '0')}`;
