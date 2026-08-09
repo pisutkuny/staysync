@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
-const COLORS = ['#4f46e5', '#e5e7eb', '#ef4444']; // Occupied, Available, Maintenance
+const COLORS = ['#4f46e5', '#cbd5e1', '#ef4444']; // Occupied, Available, Maintenance
 
 export default function OccupancyChart({ data }: { data: any[] }) {
     const PATTERNS = ["url(#pattern-lines)", "url(#pattern-dots)", "url(#pattern-cross)", "url(#pattern-diag)"];
@@ -44,7 +44,12 @@ export default function OccupancyChart({ data }: { data: any[] }) {
                         ))}
                     </Pie>
                     <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    <Legend
+                        verticalAlign="bottom"
+                        height={36}
+                        iconType="circle"
+                        formatter={(value) => <span className="text-slate-900 font-bold text-xs sm:text-sm ml-1">{value}</span>}
+                    />
                 </PieChart>
             </ResponsiveContainer>
         </div>
