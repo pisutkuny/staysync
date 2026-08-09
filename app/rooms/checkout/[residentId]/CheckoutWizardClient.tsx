@@ -105,7 +105,7 @@ const STEPS = [
 
 // ─── PDF / Print Document Generator ───────────────────────────
 function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: ChecklistItem[], checkoutDate: string, note?: string) {
-    const fmt = (n: number) => `฿${(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })}`;
+    const fmt = (n: number) => `${(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 })} ฿`;
     const d = data.resident;
     const roomNumber = d.room?.number || "-";
     const formattedCheckoutDate = new Date(checkoutDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
@@ -193,7 +193,7 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
                         <td class="text-right">${(summary.prevWaterMeter ?? 0).toFixed(1)}</td>
                         <td class="text-right">${(summary.finalWaterMeter ?? 0).toFixed(1)}</td>
                         <td class="text-right">${(summary.finalWaterUsage ?? 0).toFixed(1)}</td>
-                        <td class="text-right">฿${data.waterRate}/หน่วย</td>
+                        <td class="text-right">${data.waterRate} ฿/หน่วย</td>
                         <td class="text-right">${fmt(summary.finalWaterCost)}</td>
                     </tr>
                     <tr>
@@ -201,7 +201,7 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
                         <td class="text-right">${(summary.prevElectricMeter ?? 0).toFixed(1)}</td>
                         <td class="text-right">${(summary.finalElectricMeter ?? 0).toFixed(1)}</td>
                         <td class="text-right">${(summary.finalElectricUsage ?? 0).toFixed(1)}</td>
-                        <td class="text-right">฿${data.electricRate}/หน่วย</td>
+                        <td class="text-right">${data.electricRate} ฿/หน่วย</td>
                         <td class="text-right">${fmt(summary.finalElectricCost)}</td>
                     </tr>
                 </tbody>
@@ -222,7 +222,7 @@ function exportCheckoutPDF(data: CheckoutData, summary: any, checklist: Checklis
                         <tr>
                             <td>${item.category} — ${item.label}</td>
                             <td class="text-center">${item.status === "pass" ? '<span class="badge-pass">✅ ผ่าน</span>' : item.status === "damaged" ? '<span class="badge-damaged">❌ ชำรุด</span>' : '<span style="color:#94a3b8;">—</span>'}</td>
-                            <td class="text-right">${item.status === "damaged" ? fmt(item.repairCost) : "฿0.00"}</td>
+                            <td class="text-right">${item.status === "damaged" ? fmt(item.repairCost) : "0.00 ฿"}</td>
                             <td>${item.note || "-"}</td>
                         </tr>
                     `).join("")}
