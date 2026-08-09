@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
         const rooms = await prisma.room.findMany({
             where: {
-                status: "Available"
+                status: { in: ["Available", "Vacant", "vacant", "available"] }
             },
             orderBy: {
                 number: "asc"
