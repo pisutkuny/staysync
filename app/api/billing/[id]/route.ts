@@ -1,41 +1,34 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/auth/session";
 
+// DELETE /api/billing/[id]
 export async function DELETE(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params;
-        const billId = parseInt(id);
+        const session = await getCurrentSession();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        // Fetch bill to ensure it exists
-        const bill = await prisma.billing.findUnique({
-            where: { id: billId }
+        const { id: idStr } = await params;
+        const id = parseInt(idStr || "0");
+
+        if (!id) return NextResponse.json({ error: "Invalid bill ID" }, { status: 400 });
+
+        const bill = await prisma.billing.findFirst({
+            where: { id, organizationId: session.organizationId },
         });
 
-        if (!bill) {
-            return NextResponse.json(
-                { error: "Bill not found" },
-                { status: 404 }
-            );
-        }
+        if (!bill) return NextResponse.json({ error: "Bill not found" }, { status: 404 });
 
-        // Delete the bill
         await prisma.billing.delete({
-            where: { id: billId }
+            where: { id },
         });
 
-        return NextResponse.json({
-            success: true,
-            message: "Bill deleted successfully"
-        });
-
+        return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("Delete bill error:", error);
-        return NextResponse.json(
-            { error: error.message || "Internal server error" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: error?.message || "Failed to delete bill" }, { status: 500 });
     }
 }

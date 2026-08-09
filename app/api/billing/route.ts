@@ -137,3 +137,31 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Failed to create bill" }, { status: 500 });
     }
 }
+
+// DELETE /api/billing?id=X
+export async function DELETE(req: Request) {
+    try {
+        const session = await getCurrentSession();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const { searchParams } = new URL(req.url);
+        const id = parseInt(searchParams.get("id") || "0");
+
+        if (!id) return NextResponse.json({ error: "Invalid bill ID" }, { status: 400 });
+
+        const bill = await prisma.billing.findFirst({
+            where: { id, organizationId: session.organizationId },
+        });
+
+        if (!bill) return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+
+        await prisma.billing.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error("Delete bill error:", error);
+        return NextResponse.json({ error: error?.message || "Failed to delete bill" }, { status: 500 });
+    }
+}
