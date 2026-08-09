@@ -905,25 +905,60 @@ export default function CheckoutWizard({ residentId }: { residentId: number }) {
                                 <span className={`font-bold ${row.color}`}>฿{row.amount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span>
                             </div>
                         ))}
+                        <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
+                            <span className="font-bold text-gray-800 text-sm">🧾 ยอดรวมค่าใช้จ่ายหักทั้งหมด</span>
+                            <span className="font-extrabold text-red-600 text-base">฿{depositDeductions.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span>
+                        </div>
                     </div>
                 </div>
 
                 <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
-                        <p className="font-bold text-gray-700">เงินประกัน</p>
+                        <p className="font-bold text-gray-700">หักลบเงินประกัน</p>
                     </div>
                     <div className="p-4 space-y-3">
-                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💰 เงินประกันทั้งหมด</span><span className="font-bold text-gray-900 text-base">฿{depositAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
-                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💳 หักทั้งหมด</span><span className="font-bold text-red-600 text-base">- ฿{depositDeductions.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💰 เงินประกันมัดจำที่มี</span><span className="font-bold text-gray-900 text-base">฿{depositAmount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-700 text-sm font-medium">💳 หักค่าใช้จ่ายรวม</span><span className="font-bold text-red-600 text-base">- ฿{depositDeductions.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span></div>
                     </div>
-                    <div className={`px-4 py-4 ${depositReturned > 0 ? "bg-emerald-50" : "bg-red-50"}`}>
-                        <div className="flex justify-between items-center">
-                            <span className="font-bold text-gray-800">{depositReturned > 0 ? "✅ เงินคืนให้ผู้เช่า" : "❌ ไม่ได้รับเงินคืน"}</span>
-                            <span className={`text-2xl font-black ${depositReturned > 0 ? "text-emerald-700" : "text-red-700"}`}>
-                                ฿{depositReturned.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                            </span>
+
+                    {/* Net Settlement Status Box */}
+                    {depositAmount > depositDeductions ? (
+                        <div className="px-4 py-4 bg-emerald-50 border-t border-emerald-200">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <span className="font-bold text-emerald-900 block text-sm">✅ เงินคืนให้ผู้เช่า</span>
+                                    <span className="text-xs text-emerald-700">หอพักต้องโอนเงินประกันคืนผู้เช่า</span>
+                                </div>
+                                <span className="text-2xl font-black text-emerald-700">
+                                    ฿{depositReturned.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    ) : depositAmount === depositDeductions ? (
+                        <div className="px-4 py-4 bg-gray-100 border-t border-gray-200">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <span className="font-bold text-gray-800 block text-sm">⚖️ เคลียร์ยอดพอดี</span>
+                                    <span className="text-xs text-gray-500">เงินประกันหักลบค่าใช้จ่ายพอดี</span>
+                                </div>
+                                <span className="text-xl font-bold text-gray-700">฿0.00</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="px-4 py-4 bg-red-50 border-t-2 border-red-300">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <span className="font-bold text-red-900 block text-sm">🔴 ผู้เช่าต้องชำระเงินเพิ่ม</span>
+                                    <span className="text-xs text-red-700 font-medium">ค่าใช้จ่ายเกินเงินประกันมัดจำ</span>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-2xl font-black text-red-700 block">
+                                        ฿{(depositDeductions - depositAmount).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         );
