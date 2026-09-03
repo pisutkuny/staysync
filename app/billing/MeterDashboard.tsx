@@ -416,6 +416,7 @@ export default function MeterDashboard({ rooms, bills }: { rooms: RoomData[], bi
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredRooms.map((room) => {
                         const bill = room.bill;
+                        const status = bill?.paymentStatus || bill?.status || '';
                         const hasActiveResidents = Array.isArray(room.residents) && room.residents.length > 0;
                         const isOccupied = room.status === 'Occupied' && hasActiveResidents;
 
