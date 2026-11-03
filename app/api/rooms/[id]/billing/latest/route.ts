@@ -9,9 +9,35 @@ export async function GET(
     const roomId = parseInt(id);
 
     try {
-        const latestBill = await prisma.billing.findFirst({
-            where: { roomId: roomId },
-            orderBy: { createdAt: 'desc' }
+        const room = await prisma.room.findUnique({
+            where: { id: roomId },
+            include: {
+                residents: {
+                    where: { status: "Active" },
+                    orderBy: { isMainTenant: 'desc' }
+                },
+                billings: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 5
+                }
+            }
+        });
+
+        if (!room) {
+            return NextResponse.json({ error: "Room not found" }, { status: 404 });
+        }
+
+        const activeResidents = room.residents || [];
+        const mainResident = activeResidents[0];
+        const activeResidentIds = activeResidents.map(r => r.id);
+        const residentStartDate = mainResident?.contractStartDate
+            ? new Date(mainResident.contractStartDate)
+            : (mainResident?.checkInDate ? new Date(mainResident.checkInDate) : null);
+
+        const latestBill = room.billings.find(b => {
+            if (b.residentId && activeResidentIds.includes(b.residentId)) return true;
+            if (residentStartDate && new Date(b.createdAt) >= residentStartDate) return true;
+            return false;
         });
 
         if (!latestBill) {

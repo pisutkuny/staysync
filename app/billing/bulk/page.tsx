@@ -13,22 +13,38 @@ export default async function BulkPage() {
                 orderBy: { isMainTenant: 'desc' }
             },
             billings: {
-                take: 1,
+                take: 5,
                 orderBy: { createdAt: 'desc' },
-                select: { waterMeterCurrent: true, electricMeterCurrent: true }
+                select: { id: true, residentId: true, createdAt: true, waterMeterCurrent: true, electricMeterCurrent: true }
             }
         },
         orderBy: { number: "asc" }
     });
 
-    const roomData = rooms.map(room => ({
-        id: room.id,
-        number: room.number,
-        residentName: room.residents[0]?.fullName || "Unknown",
-        roomPrice: room.price,
-        lastWater: room.billings[0]?.waterMeterCurrent ?? room.waterMeterInitial ?? 0,
-        lastElectric: room.billings[0]?.electricMeterCurrent ?? room.electricMeterInitial ?? 0,
-    }));
+    const roomData = rooms.map(room => {
+        const activeResidents = room.residents || [];
+        const mainResident = activeResidents[0];
+        const activeResidentIds = activeResidents.map(r => r.id);
+        const residentStartDate = mainResident?.contractStartDate
+            ? new Date(mainResident.contractStartDate)
+            : (mainResident?.checkInDate ? new Date(mainResident.checkInDate) : null);
+
+        // Find latest bill belonging to current active resident(s), or created after their start date
+        const latestBilling = room.billings.find(b => {
+            if (b.residentId && activeResidentIds.includes(b.residentId)) return true;
+            if (residentStartDate && new Date(b.createdAt) >= residentStartDate) return true;
+            return false;
+        });
+
+        return {
+            id: room.id,
+            number: room.number,
+            residentName: mainResident?.fullName || "Unknown",
+            roomPrice: room.price,
+            lastWater: latestBilling?.waterMeterCurrent ?? room.waterMeterInitial ?? 0,
+            lastElectric: latestBilling?.electricMeterCurrent ?? room.electricMeterInitial ?? 0,
+        };
+    });
 
     const config = await prisma.systemConfig.findFirst();
 

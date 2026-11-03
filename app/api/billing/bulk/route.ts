@@ -46,7 +46,7 @@ export async function POST(req: Request) {
                     include: {
                         billings: {
                             orderBy: { createdAt: "desc" },
-                            take: 1
+                            take: 5
                         },
                         residents: {
                             where: { status: "Active" },
@@ -92,8 +92,19 @@ export async function POST(req: Request) {
                 }
 
                 // Get last meter readings
-                // Priority: 1. Manual Input (from Payload) 2. Last Billing 3. Room Initial
-                const lastBilling = room.billings[0];
+                // Priority: 1. Manual Input (from Payload) 2. Last Billing for current resident 3. Room Initial
+                const activeResidents = room.residents || [];
+                const mainResident = activeResidents[0];
+                const activeResidentIds = activeResidents.map(r => r.id);
+                const residentStartDate = mainResident?.contractStartDate
+                    ? new Date(mainResident.contractStartDate)
+                    : (mainResident?.checkInDate ? new Date(mainResident.checkInDate) : null);
+
+                const lastBilling = room.billings.find(b => {
+                    if (b.residentId && activeResidentIds.includes(b.residentId)) return true;
+                    if (residentStartDate && new Date(b.createdAt) >= residentStartDate) return true;
+                    return false;
+                });
 
                 const waterLast = manualLastWater ?? (lastBilling?.waterMeterCurrent ?? room.waterMeterInitial);
                 const electricLast = manualLastElectric ?? (lastBilling?.electricMeterCurrent ?? room.electricMeterInitial);

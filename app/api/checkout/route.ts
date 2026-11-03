@@ -46,8 +46,18 @@ export async function POST(req: Request) {
             : 0;
 
         // 3. Calculate final meter usage (rollover-safe)
+        const residentStartDate = resident.contractStartDate
+            ? new Date(resident.contractStartDate)
+            : (resident.checkInDate ? new Date(resident.checkInDate) : null);
+
         const lastBilling = await prisma.billing.findFirst({
-            where: { roomId: resident.roomId! },
+            where: {
+                roomId: resident.roomId!,
+                OR: [
+                    { residentId: resident.id },
+                    ...(residentStartDate ? [{ createdAt: { gte: residentStartDate } }] : [])
+                ]
+            },
             orderBy: { createdAt: "desc" },
         });
 
@@ -208,14 +218,26 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Resident not found" }, { status: 404 });
         }
 
+        const residentStartDate = resident.contractStartDate
+            ? new Date(resident.contractStartDate)
+            : (resident.checkInDate ? new Date(resident.checkInDate) : null);
+
+        const residentBillingFilter = {
+            roomId: resident.roomId!,
+            OR: [
+                { residentId: resident.id },
+                ...(residentStartDate ? [{ createdAt: { gte: residentStartDate } }] : [])
+            ]
+        };
+
         const lastBilling = await prisma.billing.findFirst({
-            where: { roomId: resident.roomId! },
+            where: residentBillingFilter,
             orderBy: { createdAt: "desc" },
         });
 
         // Second-to-last billing (for cases where final bill was already issued)
         const prevBilling = await prisma.billing.findFirst({
-            where: { roomId: resident.roomId!, id: { not: lastBilling?.id ?? 0 } },
+            where: { ...residentBillingFilter, id: { not: lastBilling?.id ?? 0 } },
             orderBy: { createdAt: "desc" },
         });
 
