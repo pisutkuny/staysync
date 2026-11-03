@@ -11,7 +11,7 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
     // Calculate total common fees
     const commonFees = (billing.commonWaterFee || 0) + (billing.commonElectricFee || 0) + (billing.commonInternetFee || 0) + (billing.commonTrashFee || 0);
 
-    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + (billing.depositFee || 0) + commonFees);
 
     // Date Formatters
     const billDate = new Date(billing.month || billing.createdAt);
@@ -141,6 +141,13 @@ export default function ReceiptSlip({ billing, resident, config }: { billing: an
                                 <td className="py-1 text-left">อื่นๆ</td>
                                 <td className="py-1 text-center">-</td>
                                 <td className="py-1 font-bold">{billing.otherFees.toLocaleString()}</td>
+                            </tr>
+                        )}
+                        {billing.depositFee > 0 && (
+                            <tr>
+                                <td className="py-1 text-left">เงินมัดจำแรกเข้า</td>
+                                <td className="py-1 text-center">-</td>
+                                <td className="py-1 font-bold">{billing.depositFee.toLocaleString()}</td>
                             </tr>
                         )}
                         {billing.internetFee > 0 && (

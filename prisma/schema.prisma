@@ -166,6 +166,7 @@ model Billing {
   internetFee Float @default(0)
   trashFee    Float @default(0)
   otherFees   Float @default(0)
+  depositFee  Float @default(0) // Security deposit for first month / move-in bill
 
   // Phase 2: Common Area Fees (auto-calculated from CentralMeter)
   commonWaterFee    Float @default(0)

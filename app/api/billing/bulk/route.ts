@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
         // Process each entry
         for (const entry of entries) {
-            const { roomId, wCurr: waterCurrent, eCurr: electricCurrent, wLast: manualLastWater, eLast: manualLastElectric } = entry;
+            const { roomId, wCurr: waterCurrent, eCurr: electricCurrent, wLast: manualLastWater, eLast: manualLastElectric, depositFee } = entry;
 
             // Skip if incomplete
             if (waterCurrent == null || electricCurrent == null) {
@@ -114,9 +114,10 @@ export async function POST(req: Request) {
                 const electricUsage = calcMeterUsage(electricLast, electricCurrent, ELECTRIC_METER_MAX);
 
                 // Calculate costs
+                const entryDeposit = parseFloat(depositFee) || 0;
                 const waterCost = waterUsage * config.waterRate;
                 const electricCost = electricUsage * config.electricRate;
-                const totalAmount = room.price + waterCost + electricCost + config.internetFee + config.trashFee + config.otherFees;
+                const totalAmount = room.price + waterCost + electricCost + config.internetFee + config.trashFee + config.otherFees + entryDeposit;
 
                 // Create billing record
                 const session = await getCurrentSession();
@@ -137,6 +138,7 @@ export async function POST(req: Request) {
                         internetFee: config.internetFee,
                         trashFee: config.trashFee,
                         otherFees: config.otherFees,
+                        depositFee: entryDeposit,
                         totalAmount,
                         month: new Date(month + "-01"),
                         paymentStatus: "Pending",

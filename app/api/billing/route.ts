@@ -37,6 +37,7 @@ export async function POST(req: Request) {
             waterCurrent, waterLast,
             electricCurrent, electricLast,
             trashFee, internetFee, otherFees,
+            depositFee,
             commonFee,
             billDate // Optional: YYYY-MM
         } = body;
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
         const trash = parseFloat(trashFee) || 0;
         const internet = parseFloat(internetFee) || 0;
         const other = parseFloat(otherFees) || 0;
+        const deposit = parseFloat(depositFee) || 0;
         const common = parseFloat(commonFee) || 0;
 
         // Calculate Usage (รองรับ rollover: น้ำ 4 หลัก, ไฟ 5 หลัก)
@@ -77,7 +79,7 @@ export async function POST(req: Request) {
 
         if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
 
-        const totalAmount = room.price + waterCost + electricCost + trash + internet + other + common;
+        const totalAmount = room.price + waterCost + electricCost + trash + internet + other + deposit + common;
 
         // Create Billing Record
         const residentId = room.residents[0]?.id;
@@ -100,6 +102,7 @@ export async function POST(req: Request) {
                 trashFee: trash,
                 internetFee: internet,
                 otherFees: other,
+                depositFee: deposit,
                 commonWaterFee: common, // Storing single common fee here
                 totalAmount,
                 paymentStatus: "Pending",

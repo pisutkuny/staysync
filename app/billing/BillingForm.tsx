@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Send, Save, CreditCard, Receipt, Calendar, Droplets, Zap, Trash2, Wifi, HelpCircle, Users } from "lucide-react";
+import { Loader2, Send, Save, CreditCard, Receipt, Calendar, Droplets, Zap, Trash2, Wifi, HelpCircle, Users, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useModal } from "@/app/context/ModalContext";
+import { calcMeterUsage, WATER_METER_MAX, ELECTRIC_METER_MAX } from "@/lib/utils";
 
 type Room = {
     id: number;
@@ -37,6 +38,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
         trashFee: initialRates.trash.toString(),
         internetFee: initialRates.internet.toString(),
         otherFees: initialRates.other.toString(),
+        depositFee: "0",
         commonFee: initialRates.common?.toString() || "0",
         billDate: new Date().toISOString().slice(0, 7) // Default to YYYY-MM
     });
@@ -57,6 +59,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
 
                 const lastWater = (data.water !== undefined && data.water !== null) ? data.water.toString() : (room.waterMeterInitial?.toString() || "0");
                 const lastElectric = (data.electric !== undefined && data.electric !== null) ? data.electric.toString() : (room.electricMeterInitial?.toString() || "0");
+                const autoDeposit = (data.isFirstBill && data.residentDeposit > 0) ? data.residentDeposit.toString() : "0";
 
                 setFormData(prev => ({
                     ...prev,
@@ -67,6 +70,7 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                     trashFee: initialRates.trash.toString(),
                     internetFee: initialRates.internet.toString(),
                     otherFees: initialRates.other.toString(),
+                    depositFee: autoDeposit,
                     // Check if room has common area fee enabled
                     commonFee: room.chargeCommonArea ? (initialRates.common?.toString() || "0") : "0"
                 }));
@@ -243,6 +247,51 @@ export default function BillingForm({ rooms, initialRates, config, totalRoomCoun
                                         </p>
                                     )}
                                 </div>
+
+                                {/* Security Deposit (for move-in / first bill) */}
+                                <div className="mt-3 bg-amber-50/70 p-3 rounded-xl border border-amber-200">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="text-xs text-amber-900 font-bold flex items-center gap-1">
+                                            <ShieldCheck size={14} className="text-amber-600" /> {t.billing.depositFee || "เงินมัดจำแรกเข้า"}
+                                        </label>
+                                        {Number(formData.depositFee) > 0 && (
+                                            <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+                                                มัดจำแรกเข้า
+                                            </span>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="number"
+                                        className="w-full border-2 border-amber-300 rounded-lg p-2 text-sm bg-white font-mono font-bold text-amber-950 focus:ring-2 focus:ring-amber-200 outline-none"
+                                        value={formData.depositFee}
+                                        onChange={(e) => setFormData({ ...formData, depositFee: e.target.value })}
+                                        placeholder="0"
+                                    />
+                                    <p className="text-[11px] text-amber-700 mt-1">
+                                        สำหรับผู้เช่าใหม่ ยอดมัดจำจะถูกนำไปรวมในบิลแรกเข้าและแสดงในใบเสร็จ
+                                    </p>
+                                </div>
+
+                                {/* Live Total Preview */}
+                                {(() => {
+                                    const wUsage = calcMeterUsage(parseFloat(formData.waterLast) || 0, parseFloat(formData.waterCurrent) || 0, WATER_METER_MAX);
+                                    const eUsage = calcMeterUsage(parseFloat(formData.electricLast) || 0, parseFloat(formData.electricCurrent) || 0, ELECTRIC_METER_MAX);
+                                    const wTotal = wUsage * (config?.waterRate || 18);
+                                    const eTotal = eUsage * (config?.electricRate || 7);
+                                    const calculatedTotal = (room.price || 0) + wTotal + eTotal +
+                                        (parseFloat(formData.trashFee) || 0) +
+                                        (parseFloat(formData.internetFee) || 0) +
+                                        (parseFloat(formData.otherFees) || 0) +
+                                        (parseFloat(formData.depositFee) || 0) +
+                                        (parseFloat(formData.commonFee) || 0);
+
+                                    return (
+                                        <div className="mt-4 p-3 bg-slate-100 rounded-xl border border-slate-300 flex justify-between items-center">
+                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">{t.billing.total}</span>
+                                            <span className="text-xl font-mono font-black text-indigo-700">฿{calculatedTotal.toLocaleString()}</span>
+                                        </div>
+                                    );
+                                })()}
 
                                 <button
                                     type="submit"

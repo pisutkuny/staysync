@@ -11,7 +11,7 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
     // Calculate total common fees
     const commonFees = (billing.commonWaterFee || 0) + (billing.commonElectricFee || 0) + (billing.commonInternetFee || 0) + (billing.commonTrashFee || 0);
 
-    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + (billing.depositFee || 0) + commonFees);
 
     const promptPayPayload = config.promptPayId
         ? generatePayload(config.promptPayId, { amount: billing.totalAmount })
@@ -146,6 +146,17 @@ export default function InvoiceA4({ billing, resident, config, type = 'invoice' 
                                         <td className="py-4 text-right">-</td>
                                         <td className="py-4 text-center">-</td>
                                         <td className="py-4 text-right font-mono font-bold text-black">{billing.otherFees.toLocaleString()}</td>
+                                    </tr>
+                                )}
+                                {billing.depositFee > 0 && (
+                                    <tr>
+                                        <td className="py-4 font-medium text-gray-800">
+                                            เงินประกัน / มัดจำแรกเข้า (Security Deposit)
+                                            <span className="block text-xs text-gray-500 font-normal mt-0.5">เงินประกันความเสียหายตามสัญญาเช่า</span>
+                                        </td>
+                                        <td className="py-4 text-right">{billing.depositFee.toLocaleString()}</td>
+                                        <td className="py-4 text-center">1</td>
+                                        <td className="py-4 text-right font-mono font-bold text-gray-900">{billing.depositFee.toLocaleString()}</td>
                                     </tr>
                                 )}
                                 {/* Phase 2: Common Area Fees */}

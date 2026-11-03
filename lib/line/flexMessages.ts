@@ -53,6 +53,10 @@ export function createInvoiceFlexMessage(
         items.push({ label: "📝 อื่นๆ", value: `${formatMoney(bill.otherFees)} ฿` });
     }
 
+    if (bill.depositFee > 0) {
+        items.push({ label: "💰 เงินมัดจำแรกเข้า", value: `${formatMoney(bill.depositFee)} ฿` });
+    }
+
     // Prepare QR Code URL
     const amountClean = bill.totalAmount.toString();
     const qrImageUrl = (!isPaid && hasPromptPay)

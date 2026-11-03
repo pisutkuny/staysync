@@ -126,6 +126,17 @@ export default function BillDetailsModal({ bill, onClose }: BillDetailsModalProp
                                     <span className="font-mono font-bold text-slate-900">฿{bill.trashFee.toLocaleString()}</span>
                                 </div>
                             )}
+
+                            {/* Security Deposit */}
+                            {(bill.depositFee > 0) && (
+                                <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-amber-50/60 border border-amber-200">
+                                    <span className="flex items-center gap-2 text-amber-900 font-bold">
+                                        <span>💰</span>
+                                        {t.billing.depositFee || "เงินมัดจำแรกเข้า"}
+                                    </span>
+                                    <span className="font-mono font-bold text-amber-900">฿{bill.depositFee.toLocaleString()}</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Divider */}

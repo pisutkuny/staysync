@@ -40,16 +40,11 @@ export async function GET(
             return false;
         });
 
-        if (!latestBill) {
-            return NextResponse.json({
-                water: null,
-                electric: null
-            });
-        }
-
         return NextResponse.json({
-            water: latestBill.waterMeterCurrent,
-            electric: latestBill.electricMeterCurrent
+            water: latestBill ? latestBill.waterMeterCurrent : null,
+            electric: latestBill ? latestBill.electricMeterCurrent : null,
+            isFirstBill: !latestBill,
+            residentDeposit: mainResident?.deposit || 0
         });
 
     } catch (error) {

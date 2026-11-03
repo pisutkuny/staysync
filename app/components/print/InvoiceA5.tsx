@@ -11,7 +11,7 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
     // Calculate total common fees
     const commonFees = (billing.commonWaterFee || 0) + (billing.commonElectricFee || 0) + (billing.commonInternetFee || 0) + (billing.commonTrashFee || 0);
 
-    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + commonFees);
+    const rentAmount = billing.totalAmount - (waterAmount + electricAmount + (billing.trashFee || 0) + (billing.otherFees || 0) + (billing.internetFee || 0) + (billing.depositFee || 0) + commonFees);
 
     // Theme Color
     const themeColor = config.invoiceColor || "#4f46e5";
@@ -176,6 +176,17 @@ export default function InvoiceA5({ billing, resident, config, copyType, type = 
                                     <td className="py-3 text-right">{billing.otherFees.toLocaleString()}</td>
                                     <td className="py-3 text-center">1</td>
                                     <td className="py-3 text-right font-mono text-gray-900">{billing.otherFees.toLocaleString()}</td>
+                                </tr>
+                            )}
+                            {billing.depositFee > 0 && (
+                                <tr>
+                                    <td className="py-3">
+                                        เงินประกัน / มัดจำแรกเข้า
+                                        <span className="block text-[10px] text-gray-500">เงินประกันสัญญาเช่า</span>
+                                    </td>
+                                    <td className="py-3 text-right">{billing.depositFee.toLocaleString()}</td>
+                                    <td className="py-3 text-center">1</td>
+                                    <td className="py-3 text-right font-mono text-gray-900">{billing.depositFee.toLocaleString()}</td>
                                 </tr>
                             )}
                         </tbody>
